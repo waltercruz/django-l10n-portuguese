@@ -1,0 +1,635 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Como utilizar sessões &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Manipulando requisições HTTP" href="index.html" />
+    <link rel="next" title="Trabalhando com formulários" href="../forms/index.html" />
+    <link rel="prev" title="Middleware" href="middleware.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="middleware.html" title="Middleware">previous</a> 
+     |
+    <a href="../index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="../forms/index.html" title="Trabalhando com formulários">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-http-sessions">
+            
+  <div class="section" id="s-module-django.contrib.sessions">
+<span id="s-como-utilizar-sessoes"></span><span id="module-django.contrib.sessions"></span><span id="como-utilizar-sessoes"></span><h1>Como utilizar sessões<a class="headerlink" href="#module-django.contrib.sessions" title="Permalink to this headline">¶</a></h1>
+<p>O Django provê suporte integral para sessões anônimas. O framework de sessão
+deixa você armazenar e recuperar dados arbitrários para cada visitante do site.
+Ele armazena dados no lado do servidor e abstrai o envio e recebimento de
+cookies. Os cookies contêm um ID da sessão &#8211; não os dados em si.</p>
+<div class="section" id="s-habilitando-as-sessoes">
+<span id="habilitando-as-sessoes"></span><h2>Habilitando as sessões<a class="headerlink" href="#habilitando-as-sessoes" title="Permalink to this headline">¶</a></h2>
+<p>As sessões são implementadas por meio de um <a class="reference internal" href="../../ref/middleware.html#ref-middleware"><em>middleware</em></a>.</p>
+<p>Para habilitar a funcionalidade de sessões, faça o seguinte:</p>
+<ul>
+<li><p class="first">Edite o parâmetro de configuração <tt class="docutils literal"><span class="pre">MIDDLEWARE_CLASSES</span></tt> e assegure-se
+de que ele contenha
+<tt class="docutils literal"><span class="pre">'django.contrib.sessions.middleware.SessionMiddleware'</span></tt>.
+O arquivo padrão <tt class="docutils literal"><span class="pre">settings.py</span></tt> criado pelo <tt class="docutils literal"><span class="pre">django-admin.py</span>
+<span class="pre">startproject</span></tt> tem o <tt class="docutils literal"><span class="pre">SessionMiddleware</span></tt> ativado.</p>
+</li>
+<li><p class="first">Adicione <tt class="docutils literal"><span class="pre">'django.contrib.sessions'</span></tt> à sua configuração
+<tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt> e rode <tt class="docutils literal"><span class="pre">manage.py</span> <span class="pre">syncdb</span></tt> para instalar a única
+tabela de banco de dados que armazena os dados de sessão.</p>
+<p><strong>Novo na versão de desenvolvimento do Django</strong>: esse passo é opcional
+se você não estiver usando um backend de sessão de banco de dados; veja
+<a class="reference internal" href="#configurando-o-mecanismo-de-sessao">configurando o mecanismo de sessão</a>.</p>
+</li>
+</ul>
+<div class="versionchanged">
+<span class="title">Changed in Django 1.0:</span> Este passo é opcional se você não está usando o banco de dados sessão
+backend; veja <a class="reference internal" href="#configurando-o-mecanismo-de-sessao">configurando o mecanismo de sessão</a>.</div>
+<p>Se você não deseja utilizar sessões, você pode remover a linha
+<tt class="docutils literal"><span class="pre">SessionMiddleware</span></tt> do <tt class="docutils literal"><span class="pre">MIDDLEWARE_CLASSES</span></tt> e <tt class="docutils literal"><span class="pre">'django.contrib.sessions'</span></tt>
+de seu <tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt>. Isso poupará um pouco o processamento adicional.</p>
+</div>
+<div class="section" id="s-configurando-o-mecanismo-de-sessao">
+<span id="configurando-o-mecanismo-de-sessao"></span><h2>Configurando o mecanismo de sessão<a class="headerlink" href="#configurando-o-mecanismo-de-sessao" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Por padrão, o Django armazena as sessões no seu banco de dados (usando o modelo
+<tt class="docutils literal"><span class="pre">django.contrib.sessions.models.Session</span></tt>). Apesar de ser conveniente, em
+algumas configurações é mais rápido armazenar esses dados em algum outro lugar,
+então o Django pode ser configurado para armazenar dados de sessão no seu
+sistema de arquivos ou no cache.</p>
+<div class="section" id="s-usando-sessoes-baseadas-em-arquivos">
+<span id="usando-sessoes-baseadas-em-arquivos"></span><h3>Usando sessões baseadas em arquivos<a class="headerlink" href="#usando-sessoes-baseadas-em-arquivos" title="Permalink to this headline">¶</a></h3>
+<p>Para usar sessões em arquivos, configure o parâmetro <tt class="docutils literal"><span class="pre">SESSION_ENGINE</span></tt> para
+<tt class="docutils literal"><span class="pre">&quot;django.contrib.sessions.backends.file&quot;</span></tt>.</p>
+<p>Você pode querer configurar o parâmetro <tt class="docutils literal"><span class="pre">SESSION_FILE_PATH</span></tt> (que obtém o
+valor padrão de saída de <tt class="docutils literal"><span class="pre">tempfile.gettempdir()</span></tt>, comumente <tt class="docutils literal"><span class="pre">/tmp</span></tt>) para
+controlar onde o Django deve armazenar os arquivos de sessão. Certifique-se de
+que seu servidor Web tem permissão para ler e escrever neste local.</p>
+</div>
+<div class="section" id="s-usando-sessoes-baseadas-em-cache">
+<span id="usando-sessoes-baseadas-em-cache"></span><h3>Usando sessões baseadas em cache<a class="headerlink" href="#usando-sessoes-baseadas-em-cache" title="Permalink to this headline">¶</a></h3>
+<p>Para armazenar dados de sessão utilizando o sistema de cache do Django,
+configure <tt class="docutils literal"><span class="pre">SESSION_ENGINE</span></tt> para <tt class="docutils literal"><span class="pre">&quot;django.contrib.sessions.backends.cache&quot;</span></tt>.
+É importante confirmar que o seu cache esteja configurado; veja a
+<a class="reference internal" href="../cache.html"><em>documentação de cache</em></a> para mais detalhes.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Você provavelmente só deve utilizar sessões baseadas em cache se estiver
+usando o backend de cache Memcached. O backend de cache de memória local
+não guarda os dados por um período longo o suficiente para ser considerado
+uma boa escolha, e será mais rápido usar sessões de arquivos ou banco de
+dados diretamente em vez de enviar tudo por meio do backend de cache
+baseado em arquivos ou banco de dados.</p>
+</div>
+</div>
+</div>
+<div class="section" id="s-utilizando-sessoes-nas-views">
+<span id="utilizando-sessoes-nas-views"></span><h2>Utilizando sessões nas views<a class="headerlink" href="#utilizando-sessoes-nas-views" title="Permalink to this headline">¶</a></h2>
+<p>Quando <tt class="docutils literal"><span class="pre">SessionMiddleware</span></tt> está ativo, cada objeto <tt class="docutils literal"><span class="pre">HttpRequest</span></tt> &#8211; o
+primeiro argumento para qualquer view em Django &#8211; terá um atributo
+<tt class="docutils literal"><span class="pre">session</span></tt>, que é um objeto que se comporta como dicionário. Você pode ler ou
+escrever nele.</p>
+<p>Ele implementa os seguintes métodos padrões de dicionários:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">__getitem__(key)</span></tt></p>
+<p>Exemplo: <tt class="docutils literal"><span class="pre">fav_color</span> <span class="pre">=</span> <span class="pre">request.session['fav_color']</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">__setitem__(key,</span> <span class="pre">value)</span></tt></p>
+<p>Exemplo: <tt class="docutils literal"><span class="pre">request.session['fav_color']</span> <span class="pre">=</span> <span class="pre">'blue'</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">__delitem__(key)</span></tt></p>
+<p>Exemplo: <tt class="docutils literal"><span class="pre">del</span> <span class="pre">request.session['fav_color']</span></tt>. Se a chave <tt class="docutils literal"><span class="pre">key</span></tt> ainda
+não está na sessão, uma exceção <tt class="docutils literal"><span class="pre">KeyError</span></tt> será lançada.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">__contains__(key)</span></tt></p>
+<p>Exemplo: <tt class="docutils literal"><span class="pre">'fav_color'</span> <span class="pre">in</span> <span class="pre">request.session</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">get(key,</span> <span class="pre">default=None)</span></tt></p>
+<p>Exemplo: <tt class="docutils literal"><span class="pre">fav_color</span> <span class="pre">=</span> <span class="pre">request.session.get('fav_color',</span> <span class="pre">'red')</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">keys()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">items()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">setdefault()</span></tt></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">clear()</span></tt></p>
+</li>
+</ul>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <tt class="docutils literal"><span class="pre">setdefault()</span></tt> and <tt class="docutils literal"><span class="pre">clear()</span></tt> são novos nesta versão.</div>
+<p>Existem também estes métodos:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">flush()</span></tt></p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Deleta os dados da sessão corrente da sessão, e re-gera a chave o
+valor da chave da sessão que é enviado de volta para o cookie do usuário.
+Isto é usado se você quer assegurar que os dados de uma sessão prévia não
+possa ser acessados novamente por usuário do navegador (por exempo, a
+função :func:<tt class="docutils literal"><span class="pre">django.contrib.auth.logout()</span></tt> o chama).</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">set_test_cookie()</span></tt></p>
+<p>Cria um cookie de teste para determinar se o navegador do usuário suporta
+cookies. Devido à maneira como os cookies funcionam, você não é capaz
+de testá-lo até que o usuário requisite a próxima página. Veja
+<a class="reference internal" href="#criando-cookies-de-teste">Criando cookies de teste</a> abaixo para mais informações.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">test_cookie_worked()</span></tt></p>
+<p>Devolve <tt class="xref docutils literal"><span class="pre">True</span></tt> ou <tt class="xref docutils literal"><span class="pre">False</span></tt>, a depender de o navegador do usuário ter
+aceito o cookie de teste ou não. Devido à maneira como os cookies
+funcionam, você deverá chamar <tt class="docutils literal"><span class="pre">set_test_cookie()</span></tt> em uma requisição
+anterior de uma página separada. Veja <a class="reference internal" href="#criando-cookies-de-teste">Criando cookies de teste</a>
+abaixo para mais informações.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">delete_test_cookie()</span></tt></p>
+<p>Apaga o cookie de test. Use isto você mesmo, para limpar tudo.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">set_expiry(value)</span></tt></p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Configura o tempo de expiração para a sessão. Você pode passar vários
+valores diferentes:</p>
+<ul class="simple">
+<li>Se <tt class="docutils literal"><span class="pre">value</span></tt> é um inteiro, a sessão irá expirar depois dessa
+quantidade de segundos de inatividade. Por exemplo, chamar
+<tt class="docutils literal"><span class="pre">request.session.set_expiry(300)</span></tt> fará com que a sessão expire
+em 5 minutos.</li>
+<li>Se <tt class="docutils literal"><span class="pre">value</span></tt> é um objeto <tt class="docutils literal"><span class="pre">datetime</span></tt> ou <tt class="docutils literal"><span class="pre">timedelta</span></tt>, a sessão
+irá expirar nessa data/hora específica.</li>
+<li>Se <tt class="docutils literal"><span class="pre">value</span></tt> é <tt class="docutils literal"><span class="pre">0</span></tt>, o cookie de sessão do usuário expirará
+quando o navegador Web do usuário for fechado.</li>
+<li>Se <tt class="docutils literal"><span class="pre">value</span></tt> é <tt class="xref docutils literal"><span class="pre">None</span></tt>, a sessão volta a utilizar a política
+global de expiração.</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">get_expiry_age()</span></tt></p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Devolve o número de segundos até que a sessão expire. Para sessões sem
+uma expiração customizada (ou aquelas que são configuradas para expirar
+quando o navegador fecha), esse valor será igual a
+<tt class="docutils literal"><span class="pre">settings.SESSION_COOKIE_AGE</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">get_expiry_date()</span></tt></p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Devolve a data em que a sessão expirará. Para sessões sem expiração
+customizada (ou aquelas que são configuradas para expirar quando o
+navegador fechar), esse valor é igual à data
+<tt class="docutils literal"><span class="pre">settings.SESSION_COOKIE_AGE</span></tt> segundos de agora.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">get_expire_at_browser_close()</span></tt></p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Devolve <tt class="xref docutils literal"><span class="pre">True</span></tt> ou <tt class="xref docutils literal"><span class="pre">False</span></tt>, dependendo se o cookie de sessão do
+usuário expirar quando o navegador Web do usuário for fechado.</p>
+</li>
+</ul>
+<p>Você pode editar <tt class="docutils literal"><span class="pre">request.session</span></tt> em qualquer ponto de sua view, podendo
+ser editado múltiplas vezes.</p>
+<div class="section" id="s-guia-de-uso-do-objeto-de-sessao">
+<span id="guia-de-uso-do-objeto-de-sessao"></span><h3>Guia de uso do objeto de sessão<a class="headerlink" href="#guia-de-uso-do-objeto-de-sessao" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Use strings normais Python como chaves de dicionário em
+<tt class="docutils literal"><span class="pre">request.session</span></tt>. Isso é mais uma convenção do que uma regra.</li>
+<li>Chaves de dicionário de sessão que começam com &#8220;underscore&#8221; (&#8220;_&#8221;) são
+reservadas para uso interno do Django.</li>
+<li>Nâo sobrescreva <tt class="docutils literal"><span class="pre">request.session</span></tt> com um novo objeto e não acesse
+ou mude o valor de seus atributos. Use-o como um dicionário Python.</li>
+</ul>
+</div>
+<div class="section" id="s-exemplos">
+<span id="exemplos"></span><h3>Exemplos<a class="headerlink" href="#exemplos" title="Permalink to this headline">¶</a></h3>
+<p>Esta view simplista muda o valor da variável <tt class="docutils literal"><span class="pre">has_commented</span></tt> para <tt class="xref docutils literal"><span class="pre">True</span></tt>
+depois que um usuário posta um comentário. Ela não deixa que um usuário
+poste um comentário mais de uma vez:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">post_comment</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">new_comment</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;has_commented&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">u&quot;Você já comentou.&quot;</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">comments</span><span class="o">.</span><span class="n">Comment</span><span class="p">(</span><span class="n">comment</span><span class="o">=</span><span class="n">new_comment</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;has_commented&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">u&#39;Obrigado pelo seu comentário!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Esta outra view simples autentica um &quot;membro&quot; do site:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">Member</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;password&#39;</span><span class="p">]:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;member_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">u&quot;Você está autenticado.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">u&quot;Seu nome de usuário e senha não conferem.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>...E esta encerra a sessão do membro, de acordo com o <tt class="docutils literal"><span class="pre">login()</span></tt> acima:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">logout</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;member_id&#39;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">u&quot;Você saiu.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A função padrão <tt class="docutils literal"><span class="pre">django.contrib.auth.logout()</span></tt> na verdade faz um pouco mais do
+que isso para evitar fugas de dados inadvertida. Ele chama
+<tt class="docutils literal"><span class="pre">request.session.flush()</span></tt>. Nós estamos usando este exemplo como uma
+demonstração de como trabalhar com objetos de sessão, não uma implementação
+completa de <tt class="docutils literal"><span class="pre">logout()</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="s-criando-cookies-de-teste">
+<span id="criando-cookies-de-teste"></span><h2>Criando cookies de teste<a class="headerlink" href="#criando-cookies-de-teste" title="Permalink to this headline">¶</a></h2>
+<p>Como uma conveniência, o Django provê uma maneira fácil de testar se o navegador
+do usuário aceita cookies. Simplesmente chame
+<tt class="docutils literal"><span class="pre">request.session.set_test_cookie()</span></tt> em uma view e chame
+<tt class="docutils literal"><span class="pre">request.session.test_cookie_worked()</span></tt> em uma view subseqüente -- não na
+mesma chamada de view.</p>
+<p>Essa estranha separação entre <tt class="docutils literal"><span class="pre">set_test_cookie()</span></tt> e <tt class="docutils literal"><span class="pre">test_cookie_worked()</span></tt>
+é necessária devido à maneira como os cookies funcionam. Quando você cria um
+cookie, você não pode dizer se o navegador o aceitou até a próxima requisição do
+navegador.</p>
+<p>É uma boa prática usar <tt class="docutils literal"><span class="pre">delete_test_cookie()</span></tt> para limpar o cookie de teste.
+Faça isso depois que você verificou que o cookie funcionou.</p>
+<p>Aqui vai um exemplo típico de uso:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">test_cookie_worked</span><span class="p">():</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">delete_test_cookie</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">u&quot;Você está autenticado.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">u&quot;Por favor habilite os cookies e tente novamente.&quot;</span><span class="p">)</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">set_test_cookie</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;foo/login_form.html&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-usando-sessoes-fora-das-views">
+<span id="usando-sessoes-fora-das-views"></span><h2>Usando sessões fora das views<a class="headerlink" href="#usando-sessoes-fora-das-views" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Uma API está disponível para manipular os dados da sessão fora de uma view:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.contrib.sessions.backends.db</span> <span class="kn">import</span> <span class="n">SessionStore</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">SessionStore</span><span class="p">(</span><span class="n">session_key</span><span class="o">=</span><span class="s">&#39;2b1189a188b44ad18c35e113ac6ceead&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">[</span><span class="s">&#39;last_login&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">[</span><span class="s">&#39;last_login&#39;</span><span class="p">]</span>
+<span class="go">datetime.datetime(2005, 8, 20, 13, 35, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Se você está usando o backend <tt class="docutils literal"><span class="pre">django.contrib.sessions.backends.db</span></tt>, cada
+sessão é simplesmente um modelo normal do Django. O modelo <tt class="docutils literal"><span class="pre">Session</span></tt> é
+definido em <tt class="docutils literal"><span class="pre">django/contrib/sessions/models.py</span></tt>. Por ser um modelo normal,
+você pode acessar as sessões usando a API normal de banco de dados do Django:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.contrib.sessions.models</span> <span class="kn">import</span> <span class="n">Session</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="s">&#39;2b1189a188b44ad18c35e113ac6ceead&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">expire_date</span>
+<span class="go">datetime.datetime(2005, 8, 20, 13, 35, 12)</span>
+</pre></div>
+</div>
+<p>Note que você precisa chamar <tt class="docutils literal"><span class="pre">get_decoded()</span></tt> para obter o dicionário da
+sessão. Isso é necessário porque o dicionário é armazenado em um formato
+codificado:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">session_data</span>
+<span class="go">&#39;KGRwMQpTJ19hdXRoX3VzZXJfaWQnCnAyCkkxCnMuMTExY2ZjODI2Yj...&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">get_decoded</span><span class="p">()</span>
+<span class="go">{&#39;user_id&#39;: 42}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-quando-as-sessoes-sao-gravadas">
+<span id="quando-as-sessoes-sao-gravadas"></span><h2>Quando as sessões são gravadas<a class="headerlink" href="#quando-as-sessoes-sao-gravadas" title="Permalink to this headline">¶</a></h2>
+<p>Por padrão, o Django somente grava no banco de dados da sessão quando ela foi
+modificada -- ou seja, se algum de seus valores de dicionário foram atribuídos
+ou apagados:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># A sessão é modificada.</span>
+<span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;foo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;bar&#39;</span>
+
+<span class="c"># A sessão é modificada.</span>
+<span class="k">del</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;foo&#39;</span><span class="p">]</span>
+
+<span class="c"># A sessão é modificada.</span>
+<span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;foo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c"># Pegadinha: A sessão NÃO é modificada, porque isso altera</span>
+<span class="c"># request.session[&#39;foo&#39;] em vez de request.session.</span>
+<span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;foo&#39;</span><span class="p">][</span><span class="s">&#39;bar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;baz&#39;</span>
+</pre></div>
+</div>
+<p>No último caso do exemplo acima, podemos dizer explicitamente ao objeto de
+sessão que ele foi modificado por meio do atributo <tt class="docutils literal"><span class="pre">modified</span></tt> do objeto
+de sessão:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">modified</span> <span class="o">=</span> <span class="bp">True</span>
+</pre></div>
+</div>
+<p>Para mudar esse comportamento padrão, coloque o valor de configuração
+<tt class="docutils literal"><span class="pre">SESSION_SAVE_EVERY_REQUEST</span></tt> para <tt class="xref docutils literal"><span class="pre">True</span></tt>. Se <tt class="docutils literal"><span class="pre">SESSION_SAVE_EVERY_REQUEST</span></tt>
+for <tt class="xref docutils literal"><span class="pre">True</span></tt>, o Django gravará a sessão no banco de dados a cada requisição.</p>
+<p>Note que o cookie de sessão somente é enviado quando uma sessão foi criada ou
+modificada. Se <tt class="docutils literal"><span class="pre">SESSION_SAVE_EVERY_REQUEST</span></tt> for <tt class="xref docutils literal"><span class="pre">True</span></tt>, o cookie de sessão
+será enviado em todos os requests.</p>
+<p>Similarmente, a parte de <tt class="docutils literal"><span class="pre">expires</span></tt> de um cookie de sessão é atualizado a cada
+vez que o cookie é enviado.</p>
+</div>
+<div class="section" id="s-sessoes-que-duram-ate-o-navegador-fechar-contra-sessoes-persistentes">
+<span id="sessoes-que-duram-ate-o-navegador-fechar-contra-sessoes-persistentes"></span><h2>Sessões que duram até o navegador fechar contra sessões persistentes<a class="headerlink" href="#sessoes-que-duram-ate-o-navegador-fechar-contra-sessoes-persistentes" title="Permalink to this headline">¶</a></h2>
+<p>Você pode controlar se o framework de sessão usa sessões que duram enquanto o
+navegador está aberto ou sessões persistentes com o parâmetro de configuração
+<tt class="docutils literal"><span class="pre">SESSION_EXPIRE_AT_BROWSER_CLOSE</span></tt>.</p>
+<p>Por padrão, <tt class="docutils literal"><span class="pre">SESSION_EXPIRE_AT_BROWSER_CLOSE</span></tt> é <tt class="xref docutils literal"><span class="pre">False</span></tt>, o que significa que
+os cookies de sessão serão armazenados nos navegadores dos usuários pelo tempo
+determinado no parâmetro <tt class="docutils literal"><span class="pre">SESSION_COOKIE_AGE</span></tt>. Use isso se você não quer que
+as pessoas tenham que se autenticar toda vez que abrem o navegador.</p>
+<p>Se <tt class="docutils literal"><span class="pre">SESSION_EXPIRE_AT_BROWSER_CLOSE</span></tt> for <tt class="xref docutils literal"><span class="pre">True</span></tt>, o Django usará cookies que
+duram enquanto o navegador estiver aberto -- ou seja, eles expirarão assim
+que o usuário fechar o seu navegador. Use isso se você deseja que as pessoas
+tenham de se autenticar toda vez que abrem o seu navegador.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Esse parâmetro é um padrão global que pode ser redefinido para cada sessão
+chamando explicitamente <tt class="docutils literal"><span class="pre">request.session.set_expiry()</span></tt> como descrito acima,
+em <a class="reference internal" href="#utilizando-sessoes-nas-views">utilizando sessões nas views</a>.</p>
+</div>
+<div class="section" id="s-limpando-a-tabela-de-sessao">
+<span id="limpando-a-tabela-de-sessao"></span><h2>Limpando a tabela de sessão<a class="headerlink" href="#limpando-a-tabela-de-sessao" title="Permalink to this headline">¶</a></h2>
+<p>Se você está usando um banco de dados como backend para as sessões, perceba que os dados de sessão podem acumular
+na tabela de banco de dados <tt class="docutils literal"><span class="pre">django_session</span></tt> e o Django <em>não</em> dispõe de uma limpeza automática. Portanto,
+é seu trabalho limpar as sessões expiradas regularmente.</p>
+<p>Para entender esse problema, considere o que acontece quando um usuário usa uma
+sessão. Quando um usuário se autentica, o Django adiciona uma linha na tabela
+<tt class="docutils literal"><span class="pre">django_session</span></tt>. O Django atualiza essa linha cada vez que os dados da
+sessão mudam. Se o usuário encerra sua sessão manualmente (logout), o Django
+apaga essa linha. Mas se o usuário não <em>sai</em> (não dá logout), a linha nunca é
+apagada.</p>
+<p>O Django tem um script de exemplo para limpeza em <tt class="docutils literal"><span class="pre">django-admin.py</span> <span class="pre">cleanup</span></tt>.
+Esse script apaga qualquer sessão na tabela em que <tt class="docutils literal"><span class="pre">expire_date</span></tt> está em
+uma data no passado --, mas sua aplicação pode ter requisitos diferentes.</p>
+</div>
+<div class="section" id="s-configuracoes">
+<span id="configuracoes"></span><h2>Configurações<a class="headerlink" href="#configuracoes" title="Permalink to this headline">¶</a></h2>
+<p>Algumas <a class="reference internal" href="../../ref/settings.html"><em>configurações do Django</em></a> te dão controle sobre o
+comportamento de sessões:</p>
+<div class="section" id="s-session-engine">
+<span id="session-engine"></span><h3>SESSION_ENGINE<a class="headerlink" href="#session-engine" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Padrão: <tt class="docutils literal"><span class="pre">django.contrib.sessions.backends.db</span></tt></p>
+<p>Controla onde o Django armazena os dados de sessão. Os valores válidos são:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">'django.contrib.sessions.backends.db'</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">'django.contrib.sessions.backends.file'</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">'django.contrib.sessions.backends.cache'</span></tt></li>
+</ul>
+<p>Veja <a class="reference internal" href="#configurando-o-mecanismo-de-sessao">configurando o mecanismo de sessão</a> para mais detalhes.</p>
+</div>
+<div class="section" id="s-session-file-path">
+<span id="session-file-path"></span><h3>SESSION_FILE_PATH<a class="headerlink" href="#session-file-path" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Padrão: <tt class="docutils literal"><span class="pre">/tmp/</span></tt></p>
+<p>Se você está usando um armazenamento baseado em arquivos, esse parâmetro
+configura o diretório no qual o Django irá armazenar os dados de sessão.</p>
+</div>
+<div class="section" id="s-session-cookie-age">
+<span id="session-cookie-age"></span><h3>SESSION_COOKIE_AGE<a class="headerlink" href="#session-cookie-age" title="Permalink to this headline">¶</a></h3>
+<p>Padrão: <tt class="docutils literal"><span class="pre">1209600</span></tt> (2 semanas, em segundos)</p>
+<p>O tempo de duração de um cookie de sessão, em segundos.</p>
+</div>
+<div class="section" id="s-session-cookie-domain">
+<span id="session-cookie-domain"></span><h3>SESSION_COOKIE_DOMAIN<a class="headerlink" href="#session-cookie-domain" title="Permalink to this headline">¶</a></h3>
+<p>Padrão: <tt class="xref docutils literal"><span class="pre">None</span></tt></p>
+<p>O domínio para seu usado nos cookies de sessão. Configure-o para uma string
+como <tt class="docutils literal"><span class="pre">&quot;.lawrence.com&quot;</span></tt> (repare no ponto inicial) para cookies entre domínios diferentes (cross-domain
+cookies), ou use <tt class="xref docutils literal"><span class="pre">None</span></tt> para um cookie de domínio padrão.</p>
+</div>
+<div class="section" id="s-session-cookie-name">
+<span id="session-cookie-name"></span><h3>SESSION_COOKIE_NAME<a class="headerlink" href="#session-cookie-name" title="Permalink to this headline">¶</a></h3>
+<p>Padrão: <tt class="docutils literal"><span class="pre">'sessionid'</span></tt></p>
+<p>O nome do cookie a usar para as sessões. Esse valor pode ser o que você quiser.</p>
+</div>
+<div class="section" id="s-session-cookie-secure">
+<span id="session-cookie-secure"></span><h3>SESSION_COOKIE_SECURE<a class="headerlink" href="#session-cookie-secure" title="Permalink to this headline">¶</a></h3>
+<p>Padrão: <tt class="xref docutils literal"><span class="pre">False</span></tt></p>
+<p>Se deseja usar cookie seguro para os cookies de sessão ou não. Se este
+parâmetro for <tt class="xref docutils literal"><span class="pre">True</span></tt>, o cookie será marcado como &quot;seguro&quot;, o que significa
+que os navegadores devem assegurar-se de que o cookie somente será enviado por
+meio de uma conexão HTTPS.</p>
+</div>
+<div class="section" id="s-session-expire-at-browser-close">
+<span id="session-expire-at-browser-close"></span><h3>SESSION_EXPIRE_AT_BROWSER_CLOSE<a class="headerlink" href="#session-expire-at-browser-close" title="Permalink to this headline">¶</a></h3>
+<p>Padrão: <tt class="xref docutils literal"><span class="pre">False</span></tt></p>
+<p>Se a sessão deve expirar quando o usuário fecha seu navegador. Veja
+&quot;Sessões que duram até o navegador fechar contra sessões persistentes&quot; acima.</p>
+</div>
+<div class="section" id="s-session-save-every-request">
+<span id="session-save-every-request"></span><h3>SESSION_SAVE_EVERY_REQUEST<a class="headerlink" href="#session-save-every-request" title="Permalink to this headline">¶</a></h3>
+<p>Padrão: <tt class="xref docutils literal"><span class="pre">False</span></tt></p>
+<p>Se os dados da sessão devem ser gravados a cada request. Se for <tt class="xref docutils literal"><span class="pre">False</span></tt>
+(padrão), então os dados da sessão somente serão gravados quando forem
+modificados -- ou seja, se algum dos valores de seu dicionário forem alterados
+ou excluídos.</p>
+</div>
+</div>
+<div class="section" id="s-detalhes-tecnicos">
+<span id="detalhes-tecnicos"></span><h2>Detalhes técnicos<a class="headerlink" href="#detalhes-tecnicos" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>O dicionário de sessão deve aceitar qualquer objeto Python que possa
+ser serializado com &quot;pickle&quot;. Veja <a class="reference external" href="http://www.python.org/doc/current/lib/module-pickle.html">o módulo pickle</a> para mais
+informações.</li>
+<li>Os dados de sessão são armazenados em uma tabela de banco de dados
+chamada <tt class="docutils literal"><span class="pre">django_session</span></tt>.</li>
+<li>O Django somente envia o cookie se for necessário. Se você não coloca
+nenhum dado na sessão, ele não enviará o cookie de sessão.</li>
+</ul>
+</div>
+<div class="section" id="s-ids-de-sessao-em-urls">
+<span id="ids-de-sessao-em-urls"></span><h2>IDs de sessão em URLs<a class="headerlink" href="#ids-de-sessao-em-urls" title="Permalink to this headline">¶</a></h2>
+<p>O framework de sessão do Django é única e inteiramente baseado em cookies.
+Ele não tenta colocar IDs de sessão em URLs como um último recurso se o
+navegador não aceita cookies, como o PHP faz. Isso é uma decisão de projeto
+intencional. Esse comportamento não só cria URLs horríveis, como deixa seu
+site vulnerável a roubo de ID de sessão por meio do cabeçalho &quot;Referer&quot;.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Como utilizar sessões</a><ul>
+<li><a class="reference internal" href="#habilitando-as-sessoes">Habilitando as sessões</a></li>
+<li><a class="reference internal" href="#configurando-o-mecanismo-de-sessao">Configurando o mecanismo de sessão</a><ul>
+<li><a class="reference internal" href="#usando-sessoes-baseadas-em-arquivos">Usando sessões baseadas em arquivos</a></li>
+<li><a class="reference internal" href="#usando-sessoes-baseadas-em-cache">Usando sessões baseadas em cache</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#utilizando-sessoes-nas-views">Utilizando sessões nas views</a><ul>
+<li><a class="reference internal" href="#guia-de-uso-do-objeto-de-sessao">Guia de uso do objeto de sessão</a></li>
+<li><a class="reference internal" href="#exemplos">Exemplos</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#criando-cookies-de-teste">Criando cookies de teste</a></li>
+<li><a class="reference internal" href="#usando-sessoes-fora-das-views">Usando sessões fora das views</a></li>
+<li><a class="reference internal" href="#quando-as-sessoes-sao-gravadas">Quando as sessões são gravadas</a></li>
+<li><a class="reference internal" href="#sessoes-que-duram-ate-o-navegador-fechar-contra-sessoes-persistentes">Sessões que duram até o navegador fechar contra sessões persistentes</a></li>
+<li><a class="reference internal" href="#limpando-a-tabela-de-sessao">Limpando a tabela de sessão</a></li>
+<li><a class="reference internal" href="#configuracoes">Configurações</a><ul>
+<li><a class="reference internal" href="#session-engine">SESSION_ENGINE</a></li>
+<li><a class="reference internal" href="#session-file-path">SESSION_FILE_PATH</a></li>
+<li><a class="reference internal" href="#session-cookie-age">SESSION_COOKIE_AGE</a></li>
+<li><a class="reference internal" href="#session-cookie-domain">SESSION_COOKIE_DOMAIN</a></li>
+<li><a class="reference internal" href="#session-cookie-name">SESSION_COOKIE_NAME</a></li>
+<li><a class="reference internal" href="#session-cookie-secure">SESSION_COOKIE_SECURE</a></li>
+<li><a class="reference internal" href="#session-expire-at-browser-close">SESSION_EXPIRE_AT_BROWSER_CLOSE</a></li>
+<li><a class="reference internal" href="#session-save-every-request">SESSION_SAVE_EVERY_REQUEST</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#detalhes-tecnicos">Detalhes técnicos</a></li>
+<li><a class="reference internal" href="#ids-de-sessao-em-urls">IDs de sessão em URLs</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="middleware.html">Middleware</a></li>
+    
+    
+      <li>Next: <a href="../forms/index.html">Trabalhando com formulários</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Usando o Django</a>
+        
+          <ul><li><a href="index.html">Manipulando requisições HTTP</a>
+        
+        <ul><li>Como utilizar sessões</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/topics/http/sessions.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="middleware.html" title="Middleware">previous</a> 
+     |
+    <a href="../index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="../forms/index.html" title="Trabalhando com formulários">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

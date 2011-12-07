@@ -1,0 +1,30 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 13609 $
+..   $TranslationAuthors: Robson $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _obsolete-index:
+
+Documentação depreciada/obsoleto
+================================
+
+Estes documentos são sobre funcionalidades que são depreciadas ou que serão
+substituídas nas novas versões do django. Elas são preservadas aqui para quem
+estiver usando versões mais antigas do Django, ou que ainda usa APIs depreciadas. 
+Nenhum código novo baseado nestas APIs deverá ser escrito
+
+.. toctree::
+   :maxdepth: 1
+   
+   admin-css

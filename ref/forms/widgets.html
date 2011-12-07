@@ -1,0 +1,369 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Widgets &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Formulários" href="index.html" />
+    <link rel="next" title="Validação de campos e formulários" href="validation.html" />
+    <link rel="prev" title="Campos de formulário" href="fields.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="fields.html" title="Campos de formulário">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="validation.html" title="Validação de campos e formulários">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-forms-widgets">
+            
+  <div class="section" id="s-module-django.forms.widgets">
+<span id="s-widgets"></span><span id="s-ref-forms-widgets"></span><span id="module-django.forms.widgets"></span><span id="widgets"></span><span id="ref-forms-widgets"></span><h1>Widgets<a class="headerlink" href="#module-django.forms.widgets" title="Permalink to this headline">¶</a></h1>
+<p>Um widget é uma representação do Django de um elemento input do HTML. O widget
+manipula a renderização do HTML, e a extração de dados de um dicionário GET/POST
+que correspondem ao widget.</p>
+<p>O Django fornece uma representação de todos os widget básicos do HTML, mais
+alguns grupos de widgets comumente usados:</p>
+<dl class="class">
+<dt id="django.forms.TextInput">
+<em class="property">class </em><tt class="descname">TextInput</tt><a class="headerlink" href="#django.forms.TextInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Campo de texto: <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type='text'</span> <span class="pre">...&gt;</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.PasswordInput">
+<em class="property">class </em><tt class="descname">PasswordInput</tt><a class="headerlink" href="#django.forms.PasswordInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Campo de senha: <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type='password'</span> <span class="pre">...&gt;</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.HiddenInput">
+<em class="property">class </em><tt class="descname">HiddenInput</tt><a class="headerlink" href="#django.forms.HiddenInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Campo invisível: <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type='hidden'</span> <span class="pre">...&gt;</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.MultipleHiddenInput">
+<em class="property">class </em><tt class="descname">MultipleHiddenInput</tt><a class="headerlink" href="#django.forms.MultipleHiddenInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Múltiplos widgets <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type='hidden'</span> <span class="pre">...&gt;</span></tt>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.FileInput">
+<em class="property">class </em><tt class="descname">FileInput</tt><a class="headerlink" href="#django.forms.FileInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Campo de upload de arquivo: <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type='file'</span> <span class="pre">...&gt;</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.DateTimeInput">
+<em class="property">class </em><tt class="descname">DateTimeInput</tt><a class="headerlink" href="#django.forms.DateTimeInput" title="Permalink to this definition">¶</a></dt>
+<dd><div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Campo de Data/hora como uma caixa de texto: <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type='text'</span> <span class="pre">...&gt;</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.Textarea">
+<em class="property">class </em><tt class="descname">Textarea</tt><a class="headerlink" href="#django.forms.Textarea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Area de texto: <tt class="docutils literal"><span class="pre">&lt;textarea&gt;...&lt;/textarea&gt;</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.CheckboxInput">
+<em class="property">class </em><tt class="descname">CheckboxInput</tt><a class="headerlink" href="#django.forms.CheckboxInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checkbox: <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type='checkbox'</span> <span class="pre">...&gt;</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.Select">
+<em class="property">class </em><tt class="descname">Select</tt><a class="headerlink" href="#django.forms.Select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Campo select: <tt class="docutils literal"><span class="pre">&lt;select&gt;&lt;option</span> <span class="pre">...&gt;...&lt;/select&gt;</span></tt></p>
+<p>Requer que seu campo forneça um <tt class="xref py py-attr docutils literal"><span class="pre">choices</span></tt>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.NullBooleanSelect">
+<em class="property">class </em><tt class="descname">NullBooleanSelect</tt><a class="headerlink" href="#django.forms.NullBooleanSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo select com as opções &#8216;Unknown&#8217;, &#8216;Yes&#8217; e &#8216;No&#8217;</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.SelectMultiple">
+<em class="property">class </em><tt class="descname">SelectMultiple</tt><a class="headerlink" href="#django.forms.SelectMultiple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um select que permite seleção múltipla: <tt class="docutils literal"><span class="pre">&lt;select</span>
+<span class="pre">multiple='multiple'&gt;...&lt;/select&gt;</span></tt></p>
+<p>Requer que seu campo forneça um <tt class="xref py py-attr docutils literal"><span class="pre">choices</span></tt>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.RadioSelect">
+<em class="property">class </em><tt class="descname">RadioSelect</tt><a class="headerlink" href="#django.forms.RadioSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uma lista de botões radio:</p>
+<div class="highlight-html"><pre>&lt;ul&gt;
+  &lt;li&gt;&lt;input type='radio' ...&gt;&lt;/li&gt;
+  ...
+&lt;/ul&gt;</pre>
+</div>
+<p>Requer que seu campo forneça um <tt class="xref py py-attr docutils literal"><span class="pre">choices</span></tt>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.CheckboxSelectMultiple">
+<em class="property">class </em><tt class="descname">CheckboxSelectMultiple</tt><a class="headerlink" href="#django.forms.CheckboxSelectMultiple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uma lista de checkboxes:</p>
+<div class="highlight-html"><pre>&lt;ul&gt;
+  &lt;li&gt;&lt;input type='checkbox' ...&gt;&lt;/li&gt;
+  ...
+&lt;/ul&gt;</pre>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.MultiWidget">
+<em class="property">class </em><tt class="descname">MultiWidget</tt><a class="headerlink" href="#django.forms.MultiWidget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invólucro em torno de vários outros widgets</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.forms.SplitDateTimeWidget">
+<em class="property">class </em><tt class="descname">SplitDateTimeWidget</tt><a class="headerlink" href="#django.forms.SplitDateTimeWidget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invólucro em torno de dois widgets <tt class="docutils literal"><span class="pre">TextInput</span></tt>: um para data, e um para a
+hora.</p>
+</dd></dl>
+
+<div class="section" id="s-especificando-widgets">
+<span id="especificando-widgets"></span><h2>Especificando widgets<a class="headerlink" href="#especificando-widgets" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="django.forms.Form.widget">
+<tt class="descclassname">Form.</tt><tt class="descname">widget</tt><a class="headerlink" href="#django.forms.Form.widget" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Sempre que você especificar um campo em um formulário, o Django irá usar um
+widget padrão que seja apropriado ao tipo de dado que será mostrado. Para
+encontrar que widget é usado em que campo, veja a documentação das classes Field
+embutidas.</p>
+<p>No entanto, se você quiser usar um widget diferente para um campo, você pode -
+simplesmente usar o argumento 'widget' na definição de campo. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+
+<span class="k">class</span> <span class="nc">CommentForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">URLField</span><span class="p">()</span>
+    <span class="n">comment</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">Textarea</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Isso poderia especificar um formulário com um comentário que usa um widget
+Textarea, ao invés do widget padrão TextInput.</p>
+</div>
+<div class="section" id="s-customizando-instancias-de-widget">
+<span id="customizando-instancias-de-widget"></span><h2>Customizando instâncias de widget<a class="headerlink" href="#customizando-instancias-de-widget" title="Permalink to this headline">¶</a></h2>
+<p>Quando o Django renderiza um widget como HTML, ele somente renderiza o HTML
+mínimo - o Django não adicionar uma definição class, ou qualquer outro atributo
+específico de widget. Isto significa que todos os widgets 'TextInput' parecerão
+os mesmos em sua página web.</p>
+<p>If you want to make one widget look different to another, you need to
+specify additional attributes for each widget. When you specify a
+widget, you can provide a list of attributes that will be added to the
+rendered HTML for the widget.</p>
+<p>Se você quiser fazer um widget parecer diferente de outro, você precisa
+especificar atributos adicionais para cada widget. Quando você especificar um
+widget, você pode prover uma lista de atributos que serão adicionados ao HTML
+renderizado do widget.</p>
+<p>Por exemplo, pegue este simples formulário:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">CommentForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">URLField</span><span class="p">()</span>
+    <span class="n">comment</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Este formulário incluirá três widgets TextInput padrão, com renderização
+padrão - sem classe CSS, sem atributos extras. Isto significa que as caixas de
+entrada fornecidas para cada widget serão renderizadas iguais:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">CommentForm</span><span class="p">(</span><span class="n">auto_id</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">as_table</span><span class="p">()</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Name:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Url:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;url&quot;/&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Comment:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;comment&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+</pre></div>
+</div>
+<p>Numa página web real, você provavelmente não vai querer todos os campos iguais.
+Você pode querer um campo maior para o comentário, e você pode querer que o
+widget 'name' tenha alguma classe CSS especial. Para fazer isto, você usa o
+argumento <tt class="docutils literal"><span class="pre">attrs</span></tt> quando estiver criando o widget:</p>
+<dl class="attribute">
+<dt id="django.forms.Widget.attrs">
+<tt class="descclassname">Widget.</tt><tt class="descname">attrs</tt><a class="headerlink" href="#django.forms.Widget.attrs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">CommentForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+                <span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">TextInput</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;class&#39;</span><span class="p">:</span><span class="s">&#39;special&#39;</span><span class="p">}))</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">URLField</span><span class="p">()</span>
+    <span class="n">comment</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+               <span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">TextInput</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;size&#39;</span><span class="p">:</span><span class="s">&#39;40&#39;</span><span class="p">}))</span>
+</pre></div>
+</div>
+<p>O Django irá então incluir os atributos extras na saída renderizada:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">CommentForm</span><span class="p">(</span><span class="n">auto_id</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">as_table</span><span class="p">()</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Name:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;name&quot; class=&quot;special&quot;/&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Url:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;url&quot;/&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Comment:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;comment&quot; size=&quot;40&quot;/&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Widgets</a><ul>
+<li><a class="reference internal" href="#especificando-widgets">Especificando widgets</a></li>
+<li><a class="reference internal" href="#customizando-instancias-de-widget">Customizando instâncias de widget</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="fields.html">Campos de formulário</a></li>
+    
+    
+      <li>Next: <a href="validation.html">Validação de campos e formulários</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Referência da API</a>
+        
+          <ul><li><a href="index.html">Formulários</a>
+        
+        <ul><li>Widgets</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/forms/widgets.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="fields.html" title="Campos de formulário">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="validation.html" title="Validação de campos e formulários">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

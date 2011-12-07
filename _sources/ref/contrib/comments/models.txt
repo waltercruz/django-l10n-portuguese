@@ -1,0 +1,97 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 11298 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+.. _ref-contrib-comments-models:
+
+==============================
+Os models embutidos do Comment
+==============================
+
+.. module:: django.contrib.comments.models
+   :synopsis: Os model embutidos do comment
+
+.. class:: Comment
+
+    O model embutido de comentário do Django. Tem os seguintes campos:
+
+    .. attribute:: content_object
+
+        Um atributo
+        :class:`~django.contrib.contettypes.generic.GenericForeignKey` apontando
+        para o objeto ao qual o comment está atachado. Você pode usar isto para
+        obter o objeto relacionado (i.e. `my_comment.content_object``).
+
+        Uma vez que este campo é um
+        :class:`~django.contrib.contenttypes.generic.GenericForeignKey`, é
+        realmente fácil entender sobre os dois atributos subjacentes, descritos
+        abaixo.
+
+    .. attribute:: content_type
+
+        Uma :class:`~django.db.models.ForeignKey` para
+        :class:`~django.contrib.contettypes.models.ContentType`; este é o tipo
+        de objeto ao qual o coment é atachado.
+
+    .. attribute:: object_pk
+
+        Um :class:`~django.db.models.TExtField` contendo a chave primária do
+        objeto ao qual o comment está atachado.
+
+    .. attribute:: site
+
+        Uma :class:`~django.db.models.ForeignKey` para o
+        :class:`~django.contrib.sites.models.Site` em que o comentário foi
+        postado.
+
+    .. attribute:: user
+
+        Uma :class:`~django.db.models.ForeignKey` para o
+        :class:`~django.contrib.auth.models.User` que postou o comentário.
+        Pode ser branco se o comentário foi postado por um usuário não
+        atenticado.
+
+    .. attribute:: user_name
+
+        O nome do usuário que postou o comentário.
+
+    .. attribute:: user_email
+
+        O email do usuário que postou o comentário.
+
+    .. attribute:: user_url
+
+        A URL entrada pela pessoa que postou o comentário.
+
+    .. attribute:: comment
+
+        O conteúdo atual do comentário em si.
+
+    .. attribute:: submit_date
+
+        A data em que o comentário foi postado.
+
+    .. attribute:: ip_address
+
+        O endereço IP do usuário que postou o comentário.
+
+    .. attribute:: is_public
+
+        ``False`` se o comentário não foi aprovado para exibição.
+
+    .. attribute:: is_removed
+
+        ``True`` se o comentário foi aprovado. Usado para manter o traço de
+        comentários removidos ao invés de somente deletá-los.
+

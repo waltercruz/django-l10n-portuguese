@@ -1,0 +1,918 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11298 $
+..   $TranslationAuthors: Luiz Fernando Barbosa Vital, Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+==============
+URL dispatcher
+==============
+
+.. module:: django.core.urlresolvers
+
+Um esquema de URLs limpo e elegante é um detalhe importante numa aplicação Web
+de qualidade. O Django permite que você defina as URLs da maneira que quiser,
+sem limitações impostas pelo framework.
+
+Não são necessários ``.php``, ``.cgi`` ou outras coisas sem o menor sentido
+como ``0,2097,1-1-1928,00``.
+
+Veja `Cool URIs don't change`_, pelo criador da World Wide Web Tim Berners-Lee,
+para ter excelentes argumentos do porquê as URLs devem ser limpas e facilmente
+utilizáveis.
+
+.. _Cool URIs don't change: http://www.w3.org/Provider/Style/URI
+
+Visão geral
+===========
+
+Para definir URLs para uma aplicação, você cria um módulo Python informalmente
+chamado de **URLconf** (URL configuration). Este módulo é Python puro e é um
+mapeamento simples entre padrões de URL (na forma de expressões regulares
+simples) para funções Python de callback (suas views).
+
+Este mapeamento pode ser tão extenso ou curto quanto necessário. Ele pode
+referenciar outros mapeamentos. E, por ser código Python puro, pode ser
+construído dinamicamente.
+
+.. _how-django-processes-a-request:
+
+Como o Django processa uma requisição
+=====================================
+
+Quando um usuário requisita uma página de nosso site em Django, este é o
+algoritmo que o sistema segue para determinar qual código Python irá executar:
+
+    1. O Django determina o módulo URLconf inicial a ser usado. Normalmente,
+       este é o valor de configuração do ``ROOT_URLCONF`` no
+       arquivo settings, mas se o objeto ``HttpRequest`` de entrada tem um
+       atributo chamado ``urlconf``, esse valor será utilizado no lugar da
+       configuração ``ROOT_URLCONF``.
+
+    2. O Django carrega o módulo Python em questão e procura a variável
+       ``urlpatterns``. Esta deve ser uma lista Python, no formato retornado
+       pela função ``django.conf.urls.defaults.patterns()``.
+
+    3. O Django percorre cada padrão de URL, ordenadamente, e pára no primeiro
+       padrão em que exista uma correspondência com a URL requisitada.
+
+    4. Uma vez que uma das expressões regulares corresponda, o Django importa
+       e chama a view associada, que é uma simples função Python. Um
+       :class:`~django.http.HttpRequest` é sempre passado como primeiro
+       argumento da view e qualquer outro valor capturado pela expressão regular
+       é passado como argumento adicional.
+
+Exemplo
+=======
+
+Aqui está um URLconf de exemplo::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('',
+        (r'^articles/2003/$', 'news.views.special_case_2003'),
+        (r'^articles/(\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
+    )
+
+Notas:
+
+    * ``from django.conf.urls.defaults import *`` disponibiliza a função
+      ``patterns()``.
+
+    * Para capturar um valor da URL, simplesmente coloque parênteses em volta
+      dele.
+
+    * Não é necessário adicionar uma barra no início, porque toda URL tem isso.
+      Por exemplo, o correto é ``^articles``, e não ``^/articles``.
+
+    * O ``'r'`` na frente de cada string de expressão regular é opcional, mas
+      recomendado. Ele diz ao Python que o conteúdo de uma string deve levar
+      em conta caracteres como ``'\'`` literalmente em vez de interpretá-los
+      como um caractere especial. Veja `a explicação do Dive Into Python`_.
+
+Requisições de exemplo:
+
+    * Uma requisição para ``/articles/2005/03/`` corresponde ao terceiro
+      elemento da lista. O Django então chama a função
+      ``news.views.month_archive(request, '2005', '03')``.
+
+    * ``/articles/2005/3/`` não corresponde a nenhum padrão, porque o terceiro
+      elemento da lista requer dois dígitos para o mês.
+
+    * ``/articles/2003/`` corresponde ao primeiro elemento da lista, e não ao
+      segundo, porque os padrões são testados seguindo a ordem da lista,
+      portanto o primeiro elemento é o primeiro a ser testado. Esteja à vontade
+      para explorar a ordem das regras para inserir casos especiais como este.
+
+    * ``/articles/2003`` não corresponde a nenhum destes padrões, pois cada
+      padrão exige que a URL termine com uma barra.
+
+    * ``/articles/2003/03/3/`` corresponde ao último padrão. O Django chama a
+      função ``news.views.article_detail(request, '2003', '03', '3')``.
+
+.. _a explicação do Dive Into Python: http://diveintopython.org/regular_expressions/street_addresses.html#re.matching.2.3
+
+Grupos nomeados
+===============
+
+O exemplo acima usou grupos de expressões regulares simples e *não-nomeados*
+(usando parênteses) para capturar pedaços da URL e passá-los como argumentos
+*posicionais* para a view. Em um uso mais avançado, é possível utilizar grupos
+*nomeados* de expressões regulares para capturar pedaços de URL e passá-los como
+argumentos *nomeados* para a view.
+
+Em expressões regulares Python, a sintaxe para grupos nomeados é
+``(?P<nome>padrão)``, onde ``nome`` é o nome do grupo e ``padrão`` é algum
+padrão a ser correspondido.
+
+Segue o URLconf do exemplo acima, reescrita para utilizar grupos nomeados::
+
+    urlpatterns = patterns('',
+        (r'^articles/2003/$', 'news.views.special_case_2003'),
+        (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
+    )
+
+Este exemplo faz exatamente a mesma coisa que o anterior, com uma pequena
+diferença: Os valores capturados são passados para as funções de view como
+argumentos nomeados em vez de argumentos posicionais. Por exemplo:
+
+    * Uma requisição para ``/articles/2005/03/`` chama a função
+      ``news.views.month_archive(request, year='2005', month='03')``, em vez
+      de ``news.views.month_archive(request, '2005', '03')``.
+
+    * Uma requisição para ``/articles/2003/03/3/`` chama a função
+      ``news.views.article_detail(request, year='2003', month='03', day='3')``.
+
+Na prática, isso significa que seus URLconfs são um pouco mais explícitos e
+menos propensos a bugs de ordem de argumentos -- e você pode reordenar os
+argumentos nas definições de função de view. Obviamente, estes benefícios são
+obtidos ao custo da brevidade; alguns desenvolvedores acham a sintaxe
+de grupos nomeados feia e muito prolixa.
+
+O algoritmo de correspondência/agrupamento
+------------------------------------------
+
+Eis o algoritmo que o parser URLconf segue, no que diz respeito a grupos
+nomeados contra grupos não-nomeados em uma expressão regular:
+
+Se existe algum argumento nomeado, ele será utilizado, ignorando argumentos
+não-nomeados. Caso contrário, ele passará todos os argumentos não-nomeados como
+argumentos posicionais.
+
+Em ambos os casos, serão passados quaisquer argumentos nomeados adicionais como
+argumentos nomeados. Veja "Passando opções adicionais para funções de view"
+abaixo.
+
+Onde o URLconf faz sua busca
+============================
+
+O URLconf faz a busca de correspondência na URL requisitada, como uma string
+Python normal. Isso não inclui parâmetros GET ou POST, ou do nome de domínio.
+
+Por exemplo, numa requisição para ``http://www.example.com/myapp/``, o URLconf
+irá procurar por ``myapp/``.
+
+Em uma requisição para ``http://www.example.com/myapp/?page=3``, o URLconf irá
+procurar por ``myapp/``.
+
+O URLconf não se importa com o método de requisição. Em outras palavras, todos
+os métodos de requisição -- ``POST``, ``GET``, ``HEAD``, etc. -- serão roteados
+para a mesma função da mesma URL.
+
+A sintaxe da varivável urlpatterns
+==================================
+
+``urlpatterns`` deve ser uma lista Python no formato retornado pela função
+``django.conf.urls.defaults.patterns()``. Sempre use ``patterns()`` para criar
+a variável ``urlpatterns``.
+
+A convenção é usar ``from django.conf.urls.defaults import *`` no topo de seu
+URLconf. Isso dá ao módulo acesso a estes objetos:
+
+patterns
+--------
+
+.. function:: patterns(prefix, pattern_description, ...)
+
+Uma função que recebe um prefixo e um número arbitrário de padrões de URL, e
+retorna uma lista de padrões de URL no formato de que o Django precisa.
+
+O primeiro argumento para ``patterns()`` é uma string ``prefix``. Veja
+`O prefixo da view`_ abaixo.
+
+Os argumentos restantes devem ser tuplas neste formato::
+
+    (expressão regular, função de callbak Python, [, dicionário opcional [, nome opcional]])
+
+...onde ``dicionário opcional`` e ``nome opcional`` são opcionais. (Veja
+`Passando opções adicionais para funções de view`_ abaixo.)
+
+.. note::
+    Por `patterns()` ser uma chamada de função, ela aceita um máximo de 255
+    argumentos (padrões de URL, neste caso). Isso é um limite para todas as
+    chamadas de função Python. Isso raramente é um problema na prática, porque
+    você normalmente estrutura seus padrões de URL modularmente usando seções
+    `include()`. Entretanto, se mesmo assim você chegar ao limite de 255
+    argumentos, perceba que `patterns()` retorna uma lista Python, então você
+    pode dividir a construção da lista.
+
+    ::
+
+        urlpatterns = patterns('',
+            ...
+            )
+        urlpatterns += patterns('',
+            ...
+            )
+
+    As listas Python possuem um tamanho ilimitado, então não há um número
+    máximo para quantos padrões de URL você pode construir. O único limite é
+    que você só pode criar 254 de cada vez (o 255o argumento é o prefixo
+    inicial).
+
+url
+---
+
+.. versionadded:: 1.0
+
+.. function:: url(regex, view, kwargs=None, name=None, prefix='')
+
+Você pode utilizar a função ``url()`` no lugar de uma tupla, como um argumento
+para ``patterns()``. Isso é conveniente se você quer especificar um nome sem
+utilizar o dicionário de argumentos opcionais adicionais. Por exemplo::
+
+    urlpatterns = patterns('',
+        url(r'^index/$', index_view, name="main-view"),
+        ...
+    )
+
+Esta função recebe cinco argumentos, onde a maioria é opcional::
+
+    url(regex, view, kwargs=None, name=None, prefix='')
+
+Veja `Nomeando padrões de URL`_ para saber da utilidade do parâmetro ``name``.
+
+O parâmetro ``prefix`` tem o mesmo significado que o primeiro argumento de
+``patterns()`` e somente é relevante quando você está passando uma string como
+um parâmetro para a ``view``.
+
+handler404
+----------
+
+.. data:: handler404
+
+Uma string representando o caminho completo para a importação Python da view
+que deve ser chamada se nenhum dos padrões de URL corresponder.
+
+Por padrão, este valor é ``'django.views.defaults.page_not_found'``, que na
+maioria das vezes deve ser suficiente.
+
+.. versionchanged:: 1.2
+    Previous versions of Django only accepted strings representing import paths.
+
+handler500
+----------
+
+.. data:: handler500
+
+Uma string representando o caminho completo para a importação Python da view que
+deve ser chamada em caso de erros no servidor. Erros no servidor acontecem
+quando você tem erros em tempo de execução no código da sua view.
+
+Por padrão, este valor é ``'django.views.defaults.server_error'``, que na
+maioria das vezes deve ser suficiente.
+
+.. versionchanged:: 1.2
+    Previous versions of Django only accepted strings representing import paths.
+
+include
+-------
+
+.. function:: include(<module or pattern_list>)
+
+Uma função que recebe o caminho completo para a importação Python de outro
+URLconf que deve ser "incluído" neste local. Veja `Incluindo outros URLconfs`_
+abaixo.
+
+.. versionadded:: 1.1
+
+:func:`include` also accepts as an argument an iterable that returns URL
+patterns.
+
+Veja `Incluindo outros URLconfs`_ abaixo.
+
+Notas na captura de texto em URLs
+=================================
+
+Cada argumento capturado é enviado para a view como uma string Python,
+independente do tipo de correspondência feita pela expressão regular. Por
+exemplo, nesta linha do URLconf::
+
+    (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+
+...o argumento ``year`` para ``news.views.year_archive()`` será uma string, não
+um inteiro, embora o ``\d{4}`` só vá corresponder a strings que contenham
+números inteiros.
+
+Um truque conveniente é especificar parâmetros padrão para os argumentos de
+suas views. Aqui vai um exemplo de URLconf e view::
+
+    # URLconf
+    urlpatterns = patterns('',
+        (r'^blog/$', 'blog.views.page'),
+        (r'^blog/page(?P<num>\d+)/$', 'blog.views.page'),
+    )
+
+    # View (em blog/views.py)
+    def page(request, num="1"):
+        # Mostra a página apropriada das postagens de blog, de acordo com num.
+
+No exemplo acima, os dois padrões de URL apontam para a mesma view --
+``blog.views.page`` --, mas o primeiro padrão não captura nada da URL. Se o
+primeiro padrão corresponder, a função ``page()`` usará seu argumento padrão
+para ``num``, ``"1"``. Se o segundo padrão corresponder, ``page()`` usará o
+valor de ``num`` que foi capturado pela expressão regular.
+
+Performance
+===========
+
+Cada expressão regular em um ``urlpatterns`` é compilada na primeira vez em que
+é accessada. Isso torna o sistema extremamente rápido.
+
+O prefixo da view
+=================
+
+Você pode especificar um prefixo comum em sua chamada ``patterns()`` para
+diminuir a duplicação de código.
+
+Segue um exemplo de URLconf da :doc:`Visão geral do Django </intro/overview>`::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('',
+        (r'^articles/(\d{4})/$', 'mysite.news.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'mysite.news.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.news.views.article_detail'),
+    )
+
+Neste exemplo, cada view tem um prefixo comum -- ``'mysite.news.views'``.
+Em vez de digitar isso para cada entrada em ``urlpatterns``, você pode usar
+o primeiro argumento da função ``patterns()`` para especificar o prefixo que se
+aplica a cada função de view.
+
+Com isso em mente, o exemplo acima pode ser reescrito de maneira mais concisa
+assim::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('news.views',
+        (r'^articles/(\d{4})/$', 'year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'article_detail'),
+    )
+
+Note que você não coloca um ponto final (``"."``) no prefixo. O Django coloca
+isso automaticamente.
+
+Múltiplos prefixos de view
+--------------------------
+
+Na prática, você provavelmente acabará misturando views ao ponto em que as views
+em seu ``urlpatterns`` não terão um prefixo comum. Entretanto, você ainda pode
+tirar vantagem do atalho de prefixo da view para remover código duplicado.
+Simplesmente concatene múltiplos objetos ``patterns()``, assim:
+
+Antigo::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('',
+        (r'^$', 'django.views.generic.date_based.archive_index'),
+        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$', 'django.views.generic.date_based.archive_month'),
+        (r'^tag/(?P<tag>\w+)/$', 'weblog.views.tag'),
+    )
+
+Novo::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('django.views.generic.date_based',
+        (r'^$', 'archive_index'),
+        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$','archive_month'),
+    )
+
+    urlpatterns += patterns('weblog.views',
+        (r'^tag/(?P<tag>\w+)/$', 'tag'),
+    )
+
+Incluindo outros URLconfs
+=========================
+
+Em qualquer ponto, seu ``urlpatterns`` pode "incluir" outros módulos URLconf.
+Isso essencialmente "inclui" um conjunto de URLs abaixo de outras.
+
+Por exemplo, eis o URLconf para o próprio `Web site do Django`_. Ele inclui um
+número de outros URLconfs::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('',
+        (r'^weblog/',        include('django_website.apps.blog.urls.blog')),
+        (r'^documentation/', include('django_website.apps.docs.urls.docs')),
+        (r'^comments/',      include('django.contrib.comments.urls.comments')),
+    )
+
+Note que as expressões regulares neste exemplo não possue um ``$`` (caractere
+que corresponde ao final de string), mas incluem a barra final. Sempre que o
+Django encontra ``include()``, ele recorta qualquer parte da URL correspondida
+até aquele ponto e envia a string restante ao URLconf incluído para
+processamento adicional.
+
+.. versionadded:: 1.1
+
+Another possibility is to include additional URL patterns not by specifying the
+URLconf Python module defining them as the `include`_ argument but by using
+directly the pattern list as returned by `patterns`_ instead. For example::
+
+    from django.conf.urls.defaults import *
+
+    extra_patterns = patterns('',
+        url(r'reports/(?P<id>\d+)/$', 'credit.views.report', name='credit-reports'),
+        url(r'charge/$', 'credit.views.charge', name='credit-charge'),
+    )
+
+    urlpatterns = patterns('',
+        url(r'^$',    'apps.main.views.homepage', name='site-homepage'),
+        (r'^help/',   include('apps.help.urls')),
+        (r'^credit/', include(extra_patterns)),
+    )
+
+This approach can be seen in use when you deploy an instance of the Django
+Admin application. The Django Admin is deployed as instances of a
+:class:`~django.contrib.admin.AdminSite`; each
+:class:`~django.contrib.admin.AdminSite` instance has an attribute ``urls``
+that returns the url patterns available to that instance. It is this attribute
+that you ``include()`` into your projects ``urlpatterns`` when you deploy the
+admin instance.
+
+.. _`Web site do Django`: http://www.djangoproject.com/
+
+Parâmetros capturados
+---------------------
+
+Um URLconf incluído recebe quaisquer parâmetros capturados do URLconf pai,
+então o seguinte exemplo é válido::
+
+    # Em settings/urls/main.py
+    urlpatterns = patterns('',
+        (r'^(?P<username>\w+)/blog/', include('foo.urls.blog')),
+    )
+
+    # Em foo/urls/blog.py
+    urlpatterns = patterns('foo.views',
+        (r'^$', 'blog.index'),
+        (r'^archive/$', 'blog.archive'),
+    )
+
+No exemplo acima, a variável ``"username"`` capturada é passada para o URLconf,
+como esperado.
+
+.. _topics-http-defining-url-namespaces:
+
+Defining URL Namespaces
+-----------------------
+
+When you need to deploy multiple instances of a single application, it can be
+helpful to be able to differentiate between instances. This is especially
+important when using :ref:`named URL patterns <naming-url-patterns>`, since
+multiple instances of a single application will share named URLs. Namespaces
+provide a way to tell these named URLs apart.
+
+A URL namespace comes in two parts, both of which are strings:
+
+    * An **application namespace**. This describes the name of the application
+      that is being deployed. Every instance of a single application will have
+      the same application namespace. For example, Django's admin application
+      has the somewhat predictable application namespace of ``admin``.
+
+    * An **instance namespace**. This identifies a specific instance of an
+      application. Instance namespaces should be unique across your entire
+      project. However, an instance namespace can be the same as the
+      application namespace. This is used to specify a default instance of an
+      application. For example, the default Django Admin instance has an
+      instance namespace of ``admin``.
+
+URL Namespaces can be specified in two ways.
+
+Firstly, you can provide the application and instance namespace as arguments
+to ``include()`` when you construct your URL patterns. For example,::
+
+    (r'^help/', include('apps.help.urls', namespace='foo', app_name='bar')),
+
+This will include the URLs defined in ``apps.help.urls`` into the application
+namespace ``bar``, with the instance namespace ``foo``.
+
+Secondly, you can include an object that contains embedded namespace data. If
+you ``include()`` a ``patterns`` object, that object will be added to the
+global namespace. However, you can also ``include()`` an object that contains
+a 3-tuple containing::
+
+    (<patterns object>, <application namespace>, <instance namespace>)
+
+This will include the nominated URL patterns into the given application and
+instance namespace. For example, the ``urls`` attribute of Django's
+:class:`~django.contrib.admin.AdminSite` object returns a 3-tuple that contains
+all the patterns in an admin site, plus the name of the admin instance, and the
+application namespace ``admin``.
+
+Once you have defined namespaced URLs, you can reverse them. For details on
+reversing namespaced urls, see the documentation on :ref:`reversing namespaced
+URLs <topics-http-reversing-url-namespaces>`.
+
+Passando opções adicionais para funções de view
+===============================================
+
+URLconfs possuem um "hook" que permite passar argumentos adicionais para suas
+funções de view como um dicionário Python.
+
+Qualquer tupla URLconf pode ter um terceiro elemento opcional, que deve ser um
+dicionário de argumentos nomeados adicionais a serem passados para a função de
+view.
+
+Por exemplo::
+
+    urlpatterns = patterns('blog.views',
+        (r'^blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
+    )
+
+Neste exemplo, numa requisição para ``/blog/2005/``, o Django chamará a view
+``blog.views.year_archive()``, passando estes argumentos nomeados::
+
+    year='2005', foo='bar'
+
+Essa técnica é utilizada em :doc:`views genéricas </ref/generic-views>` e em
+:doc:`syndication framework </ref/contrib/syndication>` para passar metadados e
+opções para as views.
+
+.. admonition:: Lidando com conflitos
+
+    É possível ter um padrão de URL que captura argumentos nomeados e também
+    passa argumentos com os mesmos nomes no seu dicionário de argumentos
+    adicionais. Quando isso acontece, os argumentos no dicionário serão usados
+    em vez dos argumentos capturados na URL.
+
+Passando opções adicionais para ``include()``
+---------------------------------------------
+
+Do mesmo modo, você pode passar opções adicionais para ``include()``. Quando
+você passa opções adicionais para ``include()``, elas serão passadas para
+*cada* linha no URLconf incluído.
+
+Por exemplo, estes dois conjuntos URLconf são funcionalmente idênticos:
+
+Conjunto 1::
+
+    # main.py
+    urlpatterns = patterns('',
+        (r'^blog/', include('inner'), {'blogid': 3}),
+    )
+
+    # inner.py
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive'),
+        (r'^about/$', 'mysite.views.about'),
+    )
+
+Conjunto 2::
+
+    # main.py
+    urlpatterns = patterns('',
+        (r'^blog/', include('inner')),
+    )
+
+    # inner.py
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive', {'blogid': 3}),
+        (r'^about/$', 'mysite.views.about', {'blogid': 3}),
+    )
+
+Note que as opções adicionais serão *sempre* passadas para *cada* linha no
+URLconf incluído, independentemente se a view da linha aceita as opções como
+válidas. Por este motivo, esta técnica somente é útil se você está seguro de
+que cada view no URLconf incluído aceita as opções adicionais que você está
+passando.
+
+Passando objetos que podem ser chamados (callable objects) em vez de strings
+==============================================================================
+
+Alguns desenvolvedores acham mais natural passar o próprio objeto de função
+Python do que a string contendo o caminho para seu módulo. Esta alternativa é
+suportada -- você pode passar qualquer objeto que pode ser chamado como a view.
+
+Por exemplo, dado este URLconf na notação de "string"::
+
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive'),
+        (r'^about/$', 'mysite.views.about'),
+        (r'^contact/$', 'mysite.views.contact'),
+    )
+
+Você pode obter a mesma coisa passando objetos em vez de strings. Apenas
+assegure-se de importar os objetos::
+
+    from mysite.views import archive, about, contact
+
+    urlpatterns = patterns('',
+        (r'^archive/$', archive),
+        (r'^about/$', about),
+        (r'^contact/$', contact),
+    )
+
+O exemplo seguinte é funcionalmente idêntico. Somente um pouco mais compacto
+porque importa o módulo que contém as views, em vez de importar cada view
+individualmente::
+
+    from mysite import views
+
+    urlpatterns = patterns('',
+        (r'^archive/$', views.archive),
+        (r'^about/$', views.about),
+        (r'^contact/$', views.contact),
+    )
+
+O estilo que você usa fica por sua conta.
+
+Note que se você usa esta técnica -- passando objetos em vez de strings --,
+o prefixo da view (como explicado em "O prefixo da view" acima) não terá efeito.
+
+.. _naming-url-patterns:
+
+Nomeando padrões de URL
+=======================
+
+.. versionadded:: 1.0
+
+É bastante comum usar a mesma função de view em múltiplos padrões de URL em seu
+URLconf. Por exemplo, estes dois padrões de URL apontam para a view
+``archive``::
+
+    urlpatterns = patterns('',
+        (r'^archive/(\d{4})/$', archive),
+        (r'^archive-summary/(\d{4})/$', archive, {'summary': True}),
+    )
+
+Isso é complemente válido, mas ocasiona problemas quando você tenta fazer uma
+correspondência de URL reversa (através do decorator ``permalink()`` ou a tag
+:ttag:`url`). Continuando este exemplo, se você quisesse recuperar a URL para a
+view ``archive``, o mecanismo de correspondência de URL reverso do Django
+ficaria confuso, pois *dois* padrões de URL apontam para esta view.
+
+Para resolver este problema, o Django suporta **padrões de URL nomeados**.
+Ou seja, você pode dar nomes para um padrão de URL afim de distingui-lo de
+outros padrões usando a mesma view e parâmetros. Então, você pode usar este
+nome na correspondência reversa de URL.
+
+Veja o exemplo acima, reescrito para utilizar padrões de URL nomeados::
+
+    urlpatterns = patterns('',
+        url(r'^archive/(\d{4})/$', archive, name="full-archive"),
+        url(r'^archive-summary/(\d{4})/$', archive, {'summary': True}, "arch-summary"),
+    )
+
+Com estes nomes no lugar (``full-archive`` and ``arch-summary``), você pode
+apontar cada padrão individualmente utilizando seu nome::
+
+.. code-block:: html+django
+
+    {% url arch-summary 1945 %}
+    {% url full-archive 2007 %}
+
+Apesar de ambos padrões de URL referirem-se à view ``archive``, ao usar o
+parâmetro ``name`` de ``url()`` é possível distigui-los em templates.
+
+A string usada para o nome da URL pode conter quaisquer caracteres que você
+queira. Você não está restrito a nomes válidos em Python.
+
+.. note::
+
+    Quando você nomear seus padrões de URL, certifique-se de que está utilizando
+    nomes que não têm chances óbvias de colidir com nomes escolhidos em outras
+    aplicações. Se você chama seu padrão de URL ``comment``, e outra aplicação
+    faz a mesma coisa, não há garantias de qual URL será inserida no seu
+    template quando você usa este nome.
+
+    Colocar um prefixo nos nomes de suas URLs, talvez derivado do nome da
+    aplicação, diminuirá as chances de colisão. Recomendamos algo como
+    ``myapp-comment`` em vez de ``comment``.
+
+.. _topics-http-reversing-url-namespaces:
+
+URL namespaces
+--------------
+
+.. versionadded:: 1.1
+
+Namespaced URLs are specified using the ``:`` operator. For example, the main
+index page of the admin application is referenced using ``admin:index``. This
+indicates a namespace of ``admin``, and a named URL of ``index``.
+
+Namespaces can also be nested. The named URL ``foo:bar:whiz`` would look for
+a pattern named ``whiz`` in the namespace ``bar`` that is itself defined within
+the top-level namespace ``foo``.
+
+When given a namespaced URL (e.g. ``myapp:index``) to resolve, Django splits
+the fully qualified name into parts, and then tries the following lookup:
+
+    1. First, Django looks for a matching application namespace (in this
+       example, ``myapp``). This will yield a list of instances of that
+       application.
+
+    2. If there is a *current* application defined, Django finds and returns
+       the URL resolver for that instance. The *current* application can be
+       specified as an attribute on the template context - applications that
+       expect to have multiple deployments should set the ``current_app``
+       attribute on any ``Context`` or ``RequestContext`` that is used to
+       render a template.
+
+       The current application can also be specified manually as an argument
+       to the :func:`reverse()` function.
+
+    3. If there is no current application. Django looks for a default
+       application instance. The default application instance is the instance
+       that has an instance namespace matching the application namespace (in
+       this example, an instance of the ``myapp`` called ``myapp``).
+
+    4. If there is no default application instance, Django will pick the last
+       deployed instance of the application, whatever its instance name may be.
+
+    5. If the provided namespace doesn't match an application namespace in
+       step 1, Django will attempt a direct lookup of the namespace as an
+       instance namespace.
+
+If there are nested namespaces, these steps are repeated for each part of the
+namespace until only the view name is unresolved. The view name will then be
+resolved into a URL in the namespace that has been found.
+
+To show this resolution strategy in action, consider an example of two instances
+of ``myapp``: one called ``foo``, and one called ``bar``. ``myapp`` has a main
+index page with a URL named `index`. Using this setup, the following lookups are
+possible:
+
+    * If one of the instances is current - say, if we were rendering a utility page
+      in the instance ``bar`` - ``myapp:index`` will resolve to the index page of
+      the instance ``bar``.
+
+    * If there is no current instance - say, if we were rendering a page
+      somewhere else on the site - ``myapp:index`` will resolve to the last
+      registered instance of ``myapp``. Since there is no default instance,
+      the last instance of ``myapp`` that is registered will be used. This could
+      be ``foo`` or ``bar``, depending on the order they are introduced into the
+      urlpatterns of the project.
+
+    * ``foo:index`` will always resolve to the index page of the instance ``foo``.
+
+If there was also a default instance - i.e., an instance named `myapp` - the
+following would happen:
+
+    * If one of the instances is current - say, if we were rendering a utility page
+      in the instance ``bar`` - ``myapp:index`` will resolve to the index page of
+      the instance ``bar``.
+
+    * If there is no current instance - say, if we were rendering a page somewhere
+      else on the site - ``myapp:index`` will resolve to the index page of the
+      default instance.
+
+    * ``foo:index`` will again resolve to the index page of the instance ``foo``.
+
+
+
+Métodos utilitários
+===================
+
+reverse()
+---------
+
+Se você precisa usar algo similar a tag de template :ttag:`url` no seu código,
+o Django provê um método (no módulo ``django.core.urlresolvers``):
+
+.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None)
+
+``viewname`` é o nome da função (podendo ser uma referência para a função, ou
+o nome dela como uma string, se foi utilizado desta forma em ``urlpatterns``)
+ou o `Nome do padrão de URL`_. Normalmente, você não precisa se preocupar com o
+parâmetro ``urlconf`` e irá passar somente os argumentos posicionais e nomeados
+para serem usados na correspondência de URL. Por exemplo::
+
+    from django.core.urlresolvers import reverse
+
+    def myview(request):
+        return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
+
+.. _Nome do padrão de URL: `Nomeando padrões de URL`_
+
+A função ``reverse()`` pode reverter uma grande variedade de padrões de
+expressões regulares nas URLs, mas não todas. A principal restrição é quando
+o padrão não contém escolhas alternativas, como quando se usa o caracter barra
+vertical (``"|"``). Você pode utilizar esses padrões tranquilamente para
+corresponderem às requisições recebidas e envia-las para os views, mas você não
+pode reverter tais padrões.
+
+.. versionadded:: 1.1
+
+The ``current_app`` argument allows you to provide a hint to the resolver
+indicating the application to which the currently executing view belongs.
+This ``current_app`` argument is used as a hint to resolve application
+namespaces into URLs on specific application instances, according to the
+:ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`.
+
+.. admonition:: Esteja certo de que suas views estão todas corretas
+
+    Como parte do trabalho no qual os nomes de URL mapeiam os padrões, a função
+    ``reverse()`` tem de importar todos os seus arquivos URLconf e examinar o
+    nome de cada view. Isto envolve importar todos as suas funções view. Se
+    houver *qualquer* erro enquanto importa qualquer uma de suas funções views,
+    irá fazer o ``reverse()`` gerar um erro, mesmo que para tal função não
+    esteja destinado o reverse.
+
+    Esteja certo que qualquer view referenciado nos seus arquivos URLconf
+    existam e que possam ser importados corretamente. Não inclua linhas que
+    apontem para views que você ainda não criou, por que estas views não serão
+    importáveis.
+
+resolve()
+---------
+
+A função :func:`django.core.urlresolvers.resolve` pode ser usada para resolver
+caminhos de URL que correspondem a um funções view. Ela possui a seguinte
+assinatura:
+
+.. function:: resolve(path, urlconf=None)
+
+``path`` é o caminho da URL que você deseja resolver. Como com ``reverse()``
+acima, você não precisa se preocupar com o parâmetro ``urlconf``. A função
+retorna uma tuple tripla (função view, argumentos, argumentos nomeados).
+
+If the URL does not resolve, the function raises an
+:class:`~django.http.Http404` exception.s
+
+Por exemplo, ela pode ser usada para testar se um view geraria um erro
+``Http404`` antes de redirecioná-lo::
+
+    from urlparse import urlparse
+    from django.core.urlresolvers import resolve
+    from django.http import HttpResponseRedirect, Http404
+
+    def myview(request):
+        next = request.META.get('HTTP_REFERER', None) or '/'
+        response = HttpResponseRedirect(next)
+
+        # modifica a requisição e a resposta quando necessário, e.g. mudar
+        # localidade e setar o cookie correspondente a localidade
+
+        view, args, kwargs = resolve(urlparse(next)[2])
+        kwargs['request'] = request
+        try:
+            view(*args, **kwargs)
+        except Http404:
+            return HttpResponseRedirect('/')
+        return response
+
+permalink()
+-----------
+
+O decorator :func:`django.db.models.permalink`` é útil para escrever métodos
+curtos que retornam o caminho inteiro da URL. Por exemplo, o método
+``get_absolute_url()`` do modelo. Consulte :func:`django.db.models.permalink`
+para mais informações.
+
+get_script_prefix() 
+------------------- 
+ 
+.. function:: get_script_prefix() 
+ 
+.. versionadded:: 1.0 
+ 
+Normally, you should always use :func:`~django.core.urlresolvers.reverse` or 
+:func:`~django.db.models.permalink` to define URLs within your application. 
+However, if your application constructs part of the URL hierarchy itself, you 
+may occasionally need to generate URLs. In that case, you need to be able to 
+find the base URL of the Django project within its web server 
+(normally, :func:`~django.core.urlresolvers.reverse` takes care of this for  
+you). In that case, you can call ``get_script_prefix()``, which will return the 
+script prefix portion of the URL for your Django project. If your Django 
+project is at the root of its webserver, this is always ``"/"``, but it can be 
+changed, for instance  by using ``django.root`` (see :doc:`How to use 
+Django with Apache and mod_python </howto/deployment/modpython>`). 

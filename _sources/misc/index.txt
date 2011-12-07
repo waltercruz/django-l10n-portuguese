@@ -1,0 +1,31 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _misc-index:
+
+Meta-documentação e miscelânea
+==============================
+
+Documentação que não podemos encontrar um lugar mais organizado para
+colocá-las.  Como aquela gaveta na sua cozinha com tesoura, baterias, fita
+adesiva, e outras tralhas.
+
+.. toctree::
+   :maxdepth: 2
+   
+   design-philosophies
+   api-stability
+   distributions

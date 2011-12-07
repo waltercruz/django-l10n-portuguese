@@ -1,0 +1,265 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Notas de lançamento do Django 1.0 beta 2 &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Notas de Lançamento" href="index.html" />
+    <link rel="next" title="Django 1.0 beta 1 release notes" href="1.0-beta.html" />
+    <link rel="prev" title="Django 1.1 alpha 1 release notes" href="1.1-alpha-1.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="1.1-alpha-1.html" title="Django 1.1 alpha 1 release notes">previous</a> 
+     |
+    <a href="index.html" title="Notas de Lançamento" accesskey="U">up</a>
+   |
+    <a href="1.0-beta.html" title="Django 1.0 beta 1 release notes">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="releases-1.0-beta-2">
+            
+  <div class="section" id="s-notas-de-lancamento-do-django-1-0-beta-2">
+<span id="s-releases-1-0-beta-2"></span><span id="notas-de-lancamento-do-django-1-0-beta-2"></span><span id="releases-1-0-beta-2"></span><h1>Notas de lançamento do Django 1.0 beta 2<a class="headerlink" href="#notas-de-lancamento-do-django-1-0-beta-2" title="Permalink to this headline">¶</a></h1>
+<p>Bem vindo ao Django 1.0 beta 2!</p>
+<p>Esse é o quarto em uma série de versões de preview/desenvolvimento que
+eventualmente levará ao 1.0, atualmnte agendado para acontecer no
+início de Setembro de 2008. Esse lançamento visa primeiramente
+desenvolvedores que estão interessados em testar a base de código do Django e
+ajudar a identificar e resolver bugs antes da versão 1.0 final.</p>
+<p>Como sempre, essa versão <em>não</em> deve tem a intenção de ser usada em produção, e
+tal uso é desencorajado.</p>
+<div class="section" id="s-o-que-ha-de-novo-no-django-1-0-beta-2">
+<span id="o-que-ha-de-novo-no-django-1-0-beta-2"></span><h2>O que há de novo no Django 1.0 beta 2<a class="headerlink" href="#o-que-ha-de-novo-no-django-1-0-beta-2" title="Permalink to this headline">¶</a></h2>
+<p>O trunk do desenvolvimento do Django tem sido o lugar de desenvolvimento quase
+constante durante o ano passado, com algumas novas funcionalidades desde a versão.
+Para funcionalidades que eram novas no Django 1.0
+alpha 1, veja <a class="reference internal" href="1.0-alpha-1.html"><em>as notas de lançamento do 1.0 alpha 1</em></a>. Para funcionalidades que eram novas no Django 1.0
+alpha 2, veja <a class="reference internal" href="1.0-alpha-2.html"><em>as notas de lançamento do 1.0 alpha 2</em></a>. Para funcionalidades que eram novas no Django 1.0
+beta 1, veja <a class="reference internal" href="1.0-beta.html"><em>as notas de lançamento do 1.0 beta 1</em></a>.</p>
+<p>Essa versão beta inclui duas funcionalidades principais:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">django.contrib.comments</span></tt> refatorado</dt>
+<dd>Como parte de um projeto do Google Summer of Code, Thejaswi Puthraya
+executou uma reescrita e refatoração no sistema de comentários incluído com o
+Django, aumentando grandemente sua flexibilidade e personalização. <a class="reference internal" href="../ref/contrib/comments/index.html"><em>Documentação completa</em></a> está disponível, assim como um <a class="reference internal" href="../ref/contrib/comments/upgrade.html#ref-contrib-comments-upgrade"><em>guia
+de atualização</em></a> se você estiver usando a encarnação
+anterior da aplicação de comentários..</dd>
+<dt>Documentação refatorada</dt>
+<dd>A documentação incluída com o Django é a documentação online foram refatoradas
+significativamente; o novo sistema de documentação usa o
+<a class="reference external" href="http://sphinx.pocoo.org/">Sphinx</a> para construir documentos e lidar com coisas bacanas como índices de
+tópicos, documentação referenciada e inter referenciada dentro
+dos documentos. Você pode ver a nova documentação <a class="reference external" href="http://docs.djangoproject.com/en/dev/">online</a> ou, se você
+tiver o Sphinx instalado, gerar você mesmo o HTML dos arquivos de documentação
+incluídos com o Django.</dd>
+</dl>
+<p>Junto com essas novas funcionalidades, o time do Django tem trabalhado duro
+em esmirilhar a base de código do Django  para a versão 1.0 final; essa versão beta
+contém um número grande de pequenas melhorias e correções de bugs
+a partir da versão anterior, a caminho da versão 1.0.</p>
+<p>Também, como parte do seu processo de obsolescência, o sistema antigo de processamento
+de formulários do Django foi removido; isso significa que <tt class="docutils literal"><span class="pre">django.oldforms</span></tt>
+não existe mais, e seus vários ganchos de API (como manipuladores
+automáticos) não existem mais no Django. Esse sistema foi completamente
+substituído pelo <a class="reference internal" href="../topics/forms/index.html"><em>novo sistema de manipulação de formulários</em></a> em <tt class="docutils literal"><span class="pre">django.forms</span></tt>.</p>
+</div>
+<div class="section" id="s-o-caminho-para-o-django-1-0">
+<span id="o-caminho-para-o-django-1-0"></span><h2>O caminho para o Django 1.0<a class="headerlink" href="#o-caminho-para-o-django-1-0" title="Permalink to this headline">¶</a></h2>
+<p>Um dos alvos principais com essas versão beta é focar a atenção nas
+funcionalidades restantes a serem implementadas no Django 1.0, e nos
+bugs que precisam ser resolvidos antes da versão final. A partir dessa
+versão beta, o Django está em seu &#8220;feature freeze&#8221; final para o 1.0; pedidos
+de funcionalidades novas ficarão para lançamentos posteriores, e o esforço de desenvolvimento
+será todo concentrado em correção de bugs e estabilidade. O Django está
+também em um &#8220;string freeze&#8221;; strings traduzíveis (rótulos, mensagens
+de erro, etc.) na base de código do Django nãp serão mudadas antes do lançamento,
+para que nossos tradutores possam produzir a versão final 1.0 dos arquivos de tradução
+do Django.</p>
+<p>Para esse lançamento, estaremos conduzindo um sprint de desenvolvimento final em
+30 de agosto de 2008, baseado em Londres e coordenado online; o alvo
+desse sprint é corrigir tantos bugs quantos forem possíveis em antecipação ao
+lançamento do 1.0 final, cuja data está agendada para
+<strong>2 de setembro de 2008</strong>. A festa de lançamento oficial do Django 1.0 irá acontecer durante
+a primeira DjangoCon, que acontecerá em Mountain View,
+California, USA, nos dias 6 e 7 de setembro.</p>
+</div>
+<div class="section" id="s-o-que-voce-pode-fazer-para-ajudar">
+<span id="o-que-voce-pode-fazer-para-ajudar"></span><h2>O que você pode fazer para ajudar<a class="headerlink" href="#o-que-voce-pode-fazer-para-ajudar" title="Permalink to this headline">¶</a></h2>
+<p>Para produzir uma versão 1.0 de alta qualidade, precisamos de sua
+ajuda. Mesmo que essa versão beta <em>não</em> deva ser usada em produção,
+você pode ajudar a equipe do Django testando a versão beta em um ambiente
+seguro de testes e informando qualquer bug ou problema que você
+encontrar. O gerenciador de tíquetes do Django é o lugar central para procurar por
+problemas em aberto:</p>
+<blockquote>
+<div><a class="reference external" href="http://code.djangoproject.com/timeline">http://code.djangoproject.com/timeline</a></div></blockquote>
+<p>Por favor, abra novos tíquetes apenas se você não encontrar um tíquete existente
+que corresponda ao problema que você está enfrentando.</p>
+<p>Adicionalmente, discussão sobre o desenvolvimento do Django, incluindo o processo
+até a versão 1.0, acontece diariamente na lista de e-mails
+django-developers:</p>
+<blockquote>
+<div><a class="reference external" href="http://groups.google.com/group/django-developers">http://groups.google.com/group/django-developers</a></div></blockquote>
+<p>...e no canal de IRC <tt class="docutils literal"><span class="pre">#django-dev</span></tt> na <tt class="docutils literal"><span class="pre">irc.freenode.net</span></tt>. Se
+você está interessado em ajudar o desenvolvimento do Django, sinta-se livre
+para entrar nas discussões.</p>
+<p>A documentação online do DJango também inclui instruções de como
+contrbuir com o Django:</p>
+<blockquote>
+<div><a class="reference internal" href="../internals/contributing.html"><em>contribuindo para o Django</em></a></div></blockquote>
+<p>Contribuições de qualquer nível &#8211; desenvolvimento de código, escrita de
+documentação ou simplemente a triagem de tíquetes para ajudar a testar as correções de bugs
+propostas &#8211; são sempre bem vindas e apreciadas.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Notas de lançamento do Django 1.0 beta 2</a><ul>
+<li><a class="reference internal" href="#o-que-ha-de-novo-no-django-1-0-beta-2">O que há de novo no Django 1.0 beta 2</a></li>
+<li><a class="reference internal" href="#o-caminho-para-o-django-1-0">O caminho para o Django 1.0</a></li>
+<li><a class="reference internal" href="#o-que-voce-pode-fazer-para-ajudar">O que você pode fazer para ajudar</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="1.1-alpha-1.html">Django 1.1 alpha 1 release notes</a></li>
+    
+    
+      <li>Next: <a href="1.0-beta.html">Django 1.0 beta 1 release notes</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Notas de Lançamento</a>
+        
+        <ul><li>Notas de lançamento do Django 1.0 beta 2</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/releases/1.0-beta-2.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="1.1-alpha-1.html" title="Django 1.1 alpha 1 release notes">previous</a> 
+     |
+    <a href="index.html" title="Notas de Lançamento" accesskey="U">up</a>
+   |
+    <a href="1.0-beta.html" title="Django 1.0 beta 1 release notes">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

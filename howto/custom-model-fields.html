@@ -1,0 +1,830 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Escrevendo campos de model customizados &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Guias “como fazer”" href="index.html" />
+    <link rel="next" title="Tags e filtros de template personalizados" href="custom-template-tags.html" />
+    <link rel="prev" title="Escrevendo commando customizados para o django-admin" href="custom-management-commands.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="custom-management-commands.html" title="Escrevendo commando customizados para o django-admin">previous</a> 
+     |
+    <a href="index.html" title="Guias &amp;#8220;como fazer&amp;#8221;" accesskey="U">up</a>
+   |
+    <a href="custom-template-tags.html" title="Tags e filtros de template personalizados">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-custom-model-fields">
+            
+  <div class="section" id="s-escrevendo-campos-de-model-customizados">
+<span id="s-howto-custom-model-fields"></span><span id="escrevendo-campos-de-model-customizados"></span><span id="howto-custom-model-fields"></span><h1>Escrevendo campos de model customizados<a class="headerlink" href="#escrevendo-campos-de-model-customizados" title="Permalink to this headline">¶</a></h1>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<div class="section" id="s-introducao">
+<span id="introducao"></span><h2>Introdução<a class="headerlink" href="#introducao" title="Permalink to this headline">¶</a></h2>
+<p>A documentação de <a class="reference internal" href="../topics/db/models.html"><em>referência do model</em></a> explica como
+usar as classes de campos padrão do Django &#8211;
+<a class="reference internal" href="../ref/models/fields.html#django.db.models.CharField" title="django.db.models.CharField"><tt class="xref py py-class docutils literal"><span class="pre">CharField</span></tt></a>, <a class="reference internal" href="../ref/models/fields.html#django.db.models.DateField" title="django.db.models.DateField"><tt class="xref py py-class docutils literal"><span class="pre">DateField</span></tt></a>, etc.
+Para muitos propósitos, estas classes são todas necessárias. Algumas vezes,
+contudo, a versão do Django não atenderá precisamente as suas exigências, ou
+você desejará usar um campo que é completamente diferente daqueles entregues com
+o Django.</p>
+<p>Os tipos de campos nativos do Django não cobrem todas as possibilidades de tipos
+de colunas &#8211; somente os tipos comuns, como <tt class="docutils literal"><span class="pre">VARCHAR</span></tt> e <tt class="docutils literal"><span class="pre">INTEGER</span></tt>. Para os
+tipos de campos mais obscuros, com polígonos geográficos ou mesmo tipos criados
+pelo usuário como <a class="reference external" href="http://www.postgresql.org/docs/8.2/interactive/sql-createtype.html">tipos personalizados do PostgreSQL</a>, você pode definir sua
+própria subclasse <tt class="docutils literal"><span class="pre">Field</span></tt> do Django.</p>
+<p>Alternativamente, você pode ter um objeto do Python complexo que pode de alguma
+forma ser serializado para caber dentro da coluna padrão do bando de dados. Este
+é outro caso onde uma subclasse de <tt class="docutils literal"><span class="pre">Field</span></tt> ajudará você a usar seu objeto com
+seus models.</p>
+<div class="section" id="s-nosso-objeto-exemplo">
+<span id="nosso-objeto-exemplo"></span><h3>Nosso objeto exemplo<a class="headerlink" href="#nosso-objeto-exemplo" title="Permalink to this headline">¶</a></h3>
+<p>Criar campos personalizados requer um pouco de atenção nos detalhes. Para tornar
+as coisas mais fáceis de seguir, nós usaremos um exmplo consistente através
+deste documento: envolvendo um objeto Python representando a oferta de cartas
+numa mão de <a class="reference external" href="http://en.wikipedia.org/wiki/Contract_bridge">Bridge</a>. Não se preocupe, você não precisa saber como jogar Bridge
+para seguir este exemplo. Você somente precisa saber que 52 cartas são
+oferecidas igualmente para 4 jogadores, que são tradicionalmente chamados de
+<em>north</em>, <em>east</em>, <em>south</em> e <em>west</em>. Nossa classe se parece com essa:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Hand</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">north</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">west</span><span class="p">):</span>
+        <span class="c"># Input parameters are lists of cards (&#39;Ah&#39;, &#39;9s&#39;, etc)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">north</span> <span class="o">=</span> <span class="n">north</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">east</span> <span class="o">=</span> <span class="n">east</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">south</span> <span class="o">=</span> <span class="n">south</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">west</span> <span class="o">=</span> <span class="n">west</span>
+
+    <span class="c"># ... (outros métodos possivelmente úteis omitidos) ...</span>
+</pre></div>
+</div>
+<p>Esta é somente uma classe Python, com nada específico do Django nela. Nós
+gostariámos de ter a possibilidade de fazer coisas como essa nos nossos models
+(nós assumimos que o atributo <tt class="docutils literal"><span class="pre">hand</span></tt> no model é uma instância de <tt class="docutils literal"><span class="pre">Hand</span></tt>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">example</span> <span class="o">=</span> <span class="n">MyModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">example</span><span class="o">.</span><span class="n">hand</span><span class="o">.</span><span class="n">north</span>
+
+<span class="n">new_hand</span> <span class="o">=</span> <span class="n">Hand</span><span class="p">(</span><span class="n">north</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">west</span><span class="p">)</span>
+<span class="n">example</span><span class="o">.</span><span class="n">hand</span> <span class="o">=</span> <span class="n">new_hand</span>
+<span class="n">example</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Nós atribuímos e recebemos do atributo <tt class="docutils literal"><span class="pre">hand</span></tt> no nosso model assim como em
+qualquer outra classe Python. O truque é dizer ao Django como guardar e carregar
+um objeto.</p>
+<p>A fim de usar a classe <tt class="docutils literal"><span class="pre">Hand</span></tt> em nossos models, nós <strong>não</strong> temos que mudar
+esta classe em nada. Este é o ideal, pois significa que você pode facilmente
+escrever um suporte de model para classes existentes onde você não pode mudar
+o código fonte.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Você pode estar somente querendo obter vantagem dos tipos de campos
+personalizados de banco de dados e lidar com dados como tipos padrões do
+Python nos seus models; string, ou floats, por exemplo. Este caso é
+semelhante ou nosso exemplo <tt class="docutils literal"><span class="pre">Hand</span></tt> e vamos notar as diferenças a medida
+que avançamos.</p>
+</div>
+</div>
+</div>
+<div class="section" id="s-teoria-de-fundo">
+<span id="teoria-de-fundo"></span><h2>Teoria de fundo<a class="headerlink" href="#teoria-de-fundo" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-armazenamento-de-banco-de-dados">
+<span id="armazenamento-de-banco-de-dados"></span><h3>Armazenamento de banco de dados<a class="headerlink" href="#armazenamento-de-banco-de-dados" title="Permalink to this headline">¶</a></h3>
+<p>A forma mais simples de pensar um campo de model é que ele fornece uma forma de
+obter um objeto Python normal -- string, boolean, <tt class="docutils literal"><span class="pre">datetime</span></tt>, ou algo mais
+complexo como <tt class="docutils literal"><span class="pre">Hand</span></tt> -- e convertê-lo de e para um formato que é útil quando
+se trabalha com o banco de dados (e serialização, mas, como veremos depois, que
+cai quase que naturalmente quando você tem o lado do banco de dados sob controle
+).</p>
+<p>Campos num model de alguma forma devem ser convertidos para caber num tipo de
+coluna de banco de dados existente. Diferentes bancos de dados oferencem
+diferentes conjuntos de tipos de colunas válidas, mas a regra se mantem a mesma:
+esses são somente tipos com os quais você tem que trabalhar. Qualquer coisa que
+você queira armazenar num banco de dados deve combinar com algum desses tipos.</p>
+<p>Normalmente, você quer escrever um campo do Django para um tipo de coluna de
+banco de dados em particular, ou existe uma maneira bastante simples para
+converter seus dados para, digamos, uma string.</p>
+<p>Para o nosso exemplo <tt class="docutils literal"><span class="pre">Hand</span></tt>, nós poderíamos converter os dados das cartas para
+uma string de 104 caracteres concatenando todas as cartas juntas numa ordem
+pre-determinada -- digamos, todas as cartas <em>north</em> primeiro, então as cartas
+<em>east</em>, <em>south</em> e <em>west</em>. Então os objetos <tt class="docutils literal"><span class="pre">Hand</span></tt> podem ser salvos em colunas
+de texto ou caracteres no banco de dados.</p>
+</div>
+<div class="section" id="s-o-que-uma-classee-de-campo-faz">
+<span id="o-que-uma-classee-de-campo-faz"></span><h3>O que uma classee de campo faz?<a class="headerlink" href="#o-que-uma-classee-de-campo-faz" title="Permalink to this headline">¶</a></h3>
+<p>Todos os campos do Django (e quando dizemos <em>campos</em> neste documento, nós sempre
+nos referimos a campos dos models e não <a class="reference internal" href="../ref/forms/fields.html#ref-forms-fields"><em>campos de formulário</em></a>) são subclasses de <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.Field</span></tt>. A maior
+parte das informações que o Django grava sobre um campo é comum a todos os
+campos -- nome, texto de ajuda, unicidade e assim em diante. O armazenamento de
+toda essa informação é feito pelo <tt class="docutils literal"><span class="pre">Field</span></tt>. Nós entraremos nos detalhes
+precisos do que o <tt class="docutils literal"><span class="pre">Field</span></tt> pode fazer depois; por agora, é suficiente dizer que
+tudo descende de <tt class="docutils literal"><span class="pre">Field</span></tt> e então personalizar peças chave do comportamento da
+classe.</p>
+<p>É importante notar que uma classe de campos do Django não é o que é armazenado
+nos atributos do seu model. Os atributos do model contêm objetos Python normais.
+As classes campo que você define num model são na verdade armazenadas na classe
+<tt class="docutils literal"><span class="pre">Meta</span></tt> quando a classe model é criada (os detalhes de como isso é feito não
+são importantes aqui). Isso é porque as classes campo não são necessárias quando
+você estiver criando e modificando atributos. Em vez disso, elas fornecem o
+mecanismo pra conversão entre o valor do atributo e o que é armazenado no banco
+de dados ou enviado para o <a class="reference internal" href="../topics/serialization.html"><em>serializer</em></a>.</p>
+<p>Mantenha isso em mente quando estiver criando seus próprios campos. A subclasse
+<tt class="docutils literal"><span class="pre">Field</span></tt> do Djando que você escrever, fornece mecanismos para conversão entre
+suas instâncias do Python e os valores do banco de dados ou serializer de várias
+formas (há diferenças entre armazenar um valor e usar um valor para pesquisas,
+por exemplo). Se isso soa um pouco complicado, não se preocupe -- ele se tornará
+claro nos exemplos abaixo. Basta lembrar que muitas vezes você vai acabar
+criando duas classes quando você quer um campo personalizado:</p>
+<ul class="simple">
+<li>A primeira classe é o objeto Python que seus usuários irão manipular.
+Eles a atribuirão para o atributo do model, eles irão lê-lo para fins de
+exibição, coisas desse tipo. Esta é a classe <tt class="docutils literal"><span class="pre">Hand</span></tt> no nosso exemplo.</li>
+<li>A segunda classe é a subclasse de <tt class="docutils literal"><span class="pre">Field</span></tt>. Esta é a classe que sabe como
+converter sua primeira classe em ambos sentidos entre sua fora de
+armazenamento permanente e na forma do Python.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="s-escrevendo-uma-subclasse-de-campo">
+<span id="escrevendo-uma-subclasse-de-campo"></span><h2>Escrevendo uma subclasse de campo<a class="headerlink" href="#escrevendo-uma-subclasse-de-campo" title="Permalink to this headline">¶</a></h2>
+<p>Quando estiver brincando com sua subclasse de <tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt>,
+primeiro reflita um pouco sobre a classe <tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt>
+existente, sua nova classe é muito semelhante a ela. Você consegue estender um
+campo existente do Django e poupar um pouco de trabalho? Se não, você deve
+estender a classe :class:<a href="#id1"><span class="problematic" id="id2">`</span></a>~django.db.models.Field`d, a partir da qual todas
+descendem.</p>
+<p>Inicializar o seu novo campo é uma questão de separar os argumentos que são
+específicos para seu caso dos argumentos comuns e passando este último para o
+método <tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt> da classe
+<tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt> (ou sua classe pai).</p>
+<p>No nosso exemplo, nós chamaremos nosso campo de <tt class="docutils literal"><span class="pre">HandField</span></tt>. (É uma boa idéia
+chamar sua subclasse <tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt> de <tt class="docutils literal"><span class="pre">&lt;AlgumaCoisa&gt;Field</span></tt>,
+isso a torna fácil de identificar como uma subclasse de
+<tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt>.) Ele não se comporta como qualquer campo
+existente, sendo assim, nós estenderemos a <tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt>
+diretamente:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">HandField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;max_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">104</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HandField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Nosso <tt class="docutils literal"><span class="pre">HandField</span></tt> aceita a maioria das opções padrão (veja a lista abaixo),
+mas nós asseguramos que ela tenha um comprimento fixo, já que somente precisa
+manter 52 valores de cartas mais seus ternos; 104 caracteres no total.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Muitos campos de models do Django aceitam opções com as quais não fazem
+nada. Por exemplo, você pode passar ambos
+<a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.editable" title="django.db.models.Field.editable"><tt class="xref py py-attr docutils literal"><span class="pre">editable</span></tt></a> e
+<tt class="xref py py-attr docutils literal"><span class="pre">auto_now</span></tt> para um
+<a class="reference internal" href="../ref/models/fields.html#django.db.models.DateField" title="django.db.models.DateField"><tt class="xref py py-class docutils literal"><span class="pre">django.db.models.DateField</span></tt></a> e ele simplesmente irá ignorar o
+parâmetro <a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.editable" title="django.db.models.Field.editable"><tt class="xref py py-attr docutils literal"><span class="pre">editable</span></tt></a>
+(<tt class="xref py py-attr docutils literal"><span class="pre">auto_now</span></tt> sendo definidos implica em
+<tt class="docutils literal"><span class="pre">editable=False</span></tt>). Nenhum erro será mostrado nesse caso.</p>
+<p class="last">Este comportamento simplica as classes de campo, pois elas não precisam
+verificar por opções que não são necessárias. Elas somente passam todas as
+opções para a classe pai e então não as usam depois. Cabe a você decidir
+se você deseja que os campos sejam mais estritos quanto as opções que eles
+podem selecionar, ou usar a forma mais simples, um comportamento mais
+permissivo dos campos atuais.</p>
+</div>
+<p>O método <tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt> recebe os seguintes
+parâmetros:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.verbose_name" title="django.db.models.Field.verbose_name"><tt class="xref py py-attr docutils literal"><span class="pre">verbose_name</span></tt></a></li>
+<li><tt class="xref py py-attr docutils literal"><span class="pre">name</span></tt></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.primary_key" title="django.db.models.Field.primary_key"><tt class="xref py py-attr docutils literal"><span class="pre">primary_key</span></tt></a></li>
+<li><tt class="xref py py-attr docutils literal"><span class="pre">max_length</span></tt></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.unique" title="django.db.models.Field.unique"><tt class="xref py py-attr docutils literal"><span class="pre">unique</span></tt></a></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.blank" title="django.db.models.Field.blank"><tt class="xref py py-attr docutils literal"><span class="pre">blank</span></tt></a></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.null" title="django.db.models.Field.null"><tt class="xref py py-attr docutils literal"><span class="pre">null</span></tt></a></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.db_index" title="django.db.models.Field.db_index"><tt class="xref py py-attr docutils literal"><span class="pre">db_index</span></tt></a></li>
+<li><tt class="xref py py-attr docutils literal"><span class="pre">rel</span></tt>: Usado para relacionar campos (como
+<tt class="xref py py-class docutils literal"><span class="pre">ForeignKey</span></tt>). Para uso avançado somente.</li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.default" title="django.db.models.Field.default"><tt class="xref py py-attr docutils literal"><span class="pre">default</span></tt></a></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.editable" title="django.db.models.Field.editable"><tt class="xref py py-attr docutils literal"><span class="pre">editable</span></tt></a></li>
+<li><tt class="xref py py-attr docutils literal"><span class="pre">serialize</span></tt>: Se <tt class="xref docutils literal"><span class="pre">False</span></tt>, o campo não será
+serializado quando o model é passado para o <a class="reference internal" href="../topics/serialization.html"><em>serializers</em></a> do Django. O padrão é <tt class="xref docutils literal"><span class="pre">True</span></tt>.</li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.unique_for_date" title="django.db.models.Field.unique_for_date"><tt class="xref py py-attr docutils literal"><span class="pre">unique_for_date</span></tt></a></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.unique_for_month" title="django.db.models.Field.unique_for_month"><tt class="xref py py-attr docutils literal"><span class="pre">unique_for_month</span></tt></a></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.unique_for_year" title="django.db.models.Field.unique_for_year"><tt class="xref py py-attr docutils literal"><span class="pre">unique_for_year</span></tt></a></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.choices" title="django.db.models.Field.choices"><tt class="xref py py-attr docutils literal"><span class="pre">choices</span></tt></a></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.help_text" title="django.db.models.Field.help_text"><tt class="xref py py-attr docutils literal"><span class="pre">help_text</span></tt></a></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.db_column" title="django.db.models.Field.db_column"><tt class="xref py py-attr docutils literal"><span class="pre">db_column</span></tt></a></li>
+<li><a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.db_tablespace" title="django.db.models.Field.db_tablespace"><tt class="xref py py-attr docutils literal"><span class="pre">db_tablespace</span></tt></a>: Atualmente somente usado
+com o backend do Oracle e somente para criação de índice. Você normalmente
+pode ignorar esta opção.</li>
+<li><tt class="xref py py-attr docutils literal"><span class="pre">auto_created</span></tt>: True se o campo foi
+automaticamente criado, como o <cite>OneToOneField</cite> usado pela herança de
+model. Somente para uso avançado.</li>
+</ul>
+<p>Todas as opções sem uma exmplicação na lista acima, tem o mesmo significado que
+nos campos normais do Django. Veja a <a class="reference internal" href="../ref/models/fields.html#ref-models-fields"><em>documentação de campos</em></a> para exemplos e detalhes.</p>
+<div class="section" id="s-a-metaclasse-subfieldbase">
+<span id="a-metaclasse-subfieldbase"></span><h3>A metaclasse <tt class="docutils literal"><span class="pre">SubfieldBase</span></tt><a class="headerlink" href="#a-metaclasse-subfieldbase" title="Permalink to this headline">¶</a></h3>
+<p>Como indicammos na <a class="reference internal" href="#introducao">introdução</a>, subclasses de campo são frequentemente
+necessárias por duas razões: tanto para se obter vantagem sobre um tipo de
+coluna de anco de dados personalizada, quanto para manipular tipos complexos do
+Python. Obviamente, uma combinação dos dois também é possível. Se você está
+trabalhando somente com tipos de colunas de banco de dados personalizados e seus
+campos de model aparecem no Python como tipos do Python padrão direto do banco
+de dados, você não precisa se preocupar com essa seção.</p>
+<p>Se você estiver manipulando tipos personalizados do Python, como a nossa classe
+<tt class="docutils literal"><span class="pre">Hand</span></tt>, nós precisamos ter certeza de que quando o Django inicializar uma
+instância de seu model e atributir um valor do banco de dados para nosso
+atributo personalizado, nós converteremos esse valor para dentro do objeto
+Python apropriado. Os detalhes de como isso acontece internamente são um pouco
+complexos, mas o código que você precisa escrever na sua classe <tt class="docutils literal"><span class="pre">Field</span></tt> é
+simples: assegure-se de que sua subclasse use uma metaclasse especial:</p>
+<dl class="class">
+<dt id="django.db.models.SubfieldBase">
+<em class="property">class </em><tt class="descclassname">django.db.models.</tt><tt class="descname">SubfieldBase</tt><a class="headerlink" href="#django.db.models.SubfieldBase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Por exemplo:</p>
+<div class="highlight-python"><pre>class HandField(models.Field):
+    __metaclass__ = models.SubfieldBase
+
+    def __init__(self, *args, **kwargs):
+        # ...</pre>
+</div>
+<p>Isso assegura que o método <a class="reference internal" href="#to_python" title="to_python"><tt class="xref py py-meth docutils literal"><span class="pre">to_python()</span></tt></a>, documentado abaixo, sempre será
+chamado quando o atributo for inicializado.</p>
+</div>
+<div class="section" id="s-metodo-uteis">
+<span id="metodo-uteis"></span><h3>Método úteis<a class="headerlink" href="#metodo-uteis" title="Permalink to this headline">¶</a></h3>
+<p>Uma vez que você tenha criado sua subclasse de <tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt>
+e configurado o <tt class="docutils literal"><span class="pre">__metaclass__</span></tt>, você pode considerar sobrescrever alguns
+métodos padrão, dependendo do comportamento do seu campo. A lista de métodos
+abaixo está numa ordem descrescente aproximada de importância, então comece de
+cima.</p>
+<div class="section" id="s-tipos-de-banco-de-dados-personalizados">
+<span id="tipos-de-banco-de-dados-personalizados"></span><h4>Tipos de banco de dados personalizados<a class="headerlink" href="#tipos-de-banco-de-dados-personalizados" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="db_type">
+<tt class="descname">db_type</tt>(<em>self</em>)<a class="headerlink" href="#db_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Retorna o tipo da coluna do banco de dados para
+<tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt>, tendo em conta a configuração atual
+<a class="reference internal" href="../ref/settings.html#std:setting-DATABASE_ENGINE"><tt class="xref std std-setting docutils literal"><span class="pre">DATABASE_ENGINE</span></tt></a>.</p>
+<p>Digamos que você criou um tipo personalizado do PostgreSQL chamado <tt class="docutils literal"><span class="pre">mytype</span></tt>.
+Você pode usar este campo com o Django através de uma extensão de <tt class="docutils literal"><span class="pre">Field</span></tt> e
+implementando o método <a class="reference internal" href="#db_type" title="db_type"><tt class="xref py py-meth docutils literal"><span class="pre">db_type()</span></tt></a>, tipo assim:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">MytypeField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">db_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;mytype&#39;</span>
+</pre></div>
+</div>
+<p>Uma vez que você tenha <tt class="docutils literal"><span class="pre">MytypeField</span></tt>, você pode usá-lo em qualquer model,
+assim como qualquer outro tipo <tt class="docutils literal"><span class="pre">Field</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Person</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+    <span class="n">gender</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">something_else</span> <span class="o">=</span> <span class="n">MytypeField</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Se você pretende construir uma aplicação agnóstica de banco de dados, você deve
+considerar diferenças nos tipos de campos de banco de dados. Por exemplo, o tipo
+de coluna data/hora no PostgreSQL é chamado <tt class="docutils literal"><span class="pre">timestamp</span></tt>, enquanto que a mesma
+coluna no MySQL é chamado de <tt class="docutils literal"><span class="pre">datetime</span></tt>. A forma mais simples de lidar com
+isso dentro do método <tt class="docutils literal"><span class="pre">db_type()</span></tt> é importando o módulo de configurações do
+Django e verificando o <a class="reference internal" href="../ref/settings.html#std:setting-DATABASE_ENGINE"><tt class="xref std std-setting docutils literal"><span class="pre">DATABASE_ENGINE</span></tt></a>. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyDateField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">db_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">DATABASE_ENGINE</span> <span class="o">==</span> <span class="s">&#39;mysql&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;datetime&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;timestamp&#39;</span>
+</pre></div>
+</div>
+<p>O método <a class="reference internal" href="#db_type" title="db_type"><tt class="xref py py-meth docutils literal"><span class="pre">db_type()</span></tt></a> é somente chamado pelo Django quando o framework
+constrói a cláusula <tt class="docutils literal"><span class="pre">CREATE_TABLE</span></tt> para sua aplicação -- isto é, quando você
+criar suas tabelas. Ele não é chamado em qualquer outro momento, assim ele pode
+executar um código pouco complexo, tal como a verificação do
+<a class="reference internal" href="../ref/settings.html#std:setting-DATABASE_ENGINE"><tt class="xref std std-setting docutils literal"><span class="pre">DATABASE_ENGINE</span></tt></a> do exemplo acima.</p>
+<p>Alguns typos de colunas aceitam parâmetros, como o <tt class="docutils literal"><span class="pre">CHAR(25)</span></tt>, onde o
+parâmetro <tt class="docutils literal"><span class="pre">25</span></tt> representa o comprimento máximo da coluna. Em casos como este,
+é mais flexível se o parâmetro for especificado no model ao invês de ser
+embutido no código do método <tt class="docutils literal"><span class="pre">db_type()</span></tt>. Por exemplo, não faria muito sentido
+ter o <tt class="docutils literal"><span class="pre">CharMaxlength25Field</span></tt>, mostrado aqui:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Este é um exemplo estranho de parâmetros embutidos no código.</span>
+<span class="k">class</span> <span class="nc">CharMaxlength25Field</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">db_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;char(25)&#39;</span>
+
+<span class="c"># No model:</span>
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c"># ...</span>
+    <span class="n">my_field</span> <span class="o">=</span> <span class="n">CharMaxlength25Field</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>A melhor forma de fazer isso, seria fazer o parâmetro especificável em tempo de
+execução -- i.e., quando a classe for instânciada. Para fazer isso, basta
+implementar o <tt class="xref py py-meth docutils literal"><span class="pre">django.db.models.Field.__init__()</span></tt>, tipo assim:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Este é um exemplo muito mais flexível.</span>
+<span class="k">class</span> <span class="nc">BetterCharField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_length</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_length</span> <span class="o">=</span> <span class="n">max_length</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BetterCharField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">db_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;char(</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_length</span>
+
+<span class="c"># No model:</span>
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c"># ...</span>
+    <span class="n">my_field</span> <span class="o">=</span> <span class="n">BetterCharField</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finalmente, se sua coluna requer um SQL de instalação verdadeiramente complexo,
+retorne <tt class="xref docutils literal"><span class="pre">None</span></tt> do método <a class="reference internal" href="#db_type" title="db_type"><tt class="xref py py-meth docutils literal"><span class="pre">db_type()</span></tt></a>. Isso fará o criador de código SQL do
+Django pular este campo. Você será então responsável por criar a coluna na
+tabela certa de alguma outra forma, mas isso lhe dá uma forma de de dizer ao
+Django para sair do caminho.</p>
+</div>
+<div class="section" id="s-convertendo-valores-de-banco-de-dados-para-objetos-do-python">
+<span id="convertendo-valores-de-banco-de-dados-para-objetos-do-python"></span><h4>Convertendo valores de banco de dados para objetos do Python<a class="headerlink" href="#convertendo-valores-de-banco-de-dados-para-objetos-do-python" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="to_python">
+<tt class="descname">to_python</tt>(<em>self</em>, <em>value</em>)<a class="headerlink" href="#to_python" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Converte um valor retornado do seu banco de dados (ou serializer) para um objeto
+Python.</p>
+<p>A implementação padrão simplesmente retorna <tt class="docutils literal"><span class="pre">value</span></tt>, para o caso comum em que
+o backend de banco de dados já retorna o dado no formato correto (como uma
+string Python, por exemplo).</p>
+<p>Se sua classe <tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt> personalizada lida com estrutura
+de dados que snao mais complexas que strings, datas, inteiros ou floats, então
+você precisará sobrescrever esse métod. Como uma regra geral, o método deve
+tomar cuidado com qualquer um dos seguintes argumentos:</p>
+<ul class="simple">
+<li>Uma instância do tipo correto (e.g., <tt class="docutils literal"><span class="pre">Hand</span></tt> no nosso exemplo em
+andamento).</li>
+<li>Uma string (e.g., de um deserializer).</li>
+<li>Qualquer coisa que o banco de dados retorna para o tipo de coluna que você
+está usando.</li>
+</ul>
+<p>Na sua classe <tt class="docutils literal"><span class="pre">HandField</span></tt>, nós armazenamos os dados como um campo VARCHAR no
+banco de dados, então nós precisamos ser capazes de processar strings e
+instâncias de <tt class="docutils literal"><span class="pre">Hand</span></tt> no <a class="reference internal" href="#to_python" title="to_python"><tt class="xref py py-meth docutils literal"><span class="pre">to_python()</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="k">class</span> <span class="nc">HandField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="c"># ...</span>
+
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Hand</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span>
+
+        <span class="c"># O caso de string.</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;.{26}&#39;</span><span class="p">)</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;..&#39;</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">p2</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p1</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">Hand</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Perceba que nós sempre retornams uma instância de <tt class="docutils literal"><span class="pre">Hand</span></tt> deste método. Este é
+o tipo de objeto Python que desejamos armazenar no atributo do model.</p>
+<p><strong>Lembre-se:</strong> Se seu campo personalizado precisa que o método <a class="reference internal" href="#to_python" title="to_python"><tt class="xref py py-meth docutils literal"><span class="pre">to_python()</span></tt></a>
+seja chamado quando ele for criado, você deve estar usando
+<a class="reference internal" href="#a-metaclasse-subfieldbase">A metaclasse SubfieldBase</a> mencionada anteriomente. Caso contrário
+<a class="reference internal" href="#to_python" title="to_python"><tt class="xref py py-meth docutils literal"><span class="pre">to_python()</span></tt></a> não será chamado automaticamente.</p>
+</div>
+<div class="section" id="s-convertendo-objetos-python-para-valores-de-banco-de-dados">
+<span id="convertendo-objetos-python-para-valores-de-banco-de-dados"></span><h4>Convertendo objetos Python para valores de banco de dados<a class="headerlink" href="#convertendo-objetos-python-para-valores-de-banco-de-dados" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="get_db_prep_value">
+<tt class="descname">get_db_prep_value</tt>(<em>self</em>, <em>value</em>)<a class="headerlink" href="#get_db_prep_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Este é o contrário de <a class="reference internal" href="#to_python" title="to_python"><tt class="xref py py-meth docutils literal"><span class="pre">to_python()</span></tt></a> quando trabalha com o backend de banco
+de dados (como o oposto de serialização). O parâmetro <tt class="docutils literal"><span class="pre">value</span></tt> é o valor atual
+do atributo do model (um campo não tem referência para o model que o armazena,
+então ele não pode receber o valor por si só), e o método deve retornar dados no
+formato que possa ser usado como um parâmetro numa consulta ao banco de dados.</p>
+<p>Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">HandField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="c"># ...</span>
+
+    <span class="k">def</span> <span class="nf">get_db_prep_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">north</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">.</span><span class="n">east</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">south</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">west</span><span class="p">)])</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="get_db_prep_save">
+<tt class="descname">get_db_prep_save</tt>(<em>self</em>, <em>value</em>)<a class="headerlink" href="#get_db_prep_save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O mesmo mostrado acima, mas chamado quando o valor do campo deve ser <em>salvo</em>
+no banco de dados. Como a implementação padrão apenas chama
+<tt class="docutils literal"><span class="pre">get_db_prep_value</span></tt>, você não precisa implementar este método a menos que seu
+campo personalizad precise de uma conversão especial ao ser salvo, o que não é o
+mesmo quando a conversão é usada para parâmetros de consultas normais (que é
+implementada por <tt class="docutils literal"><span class="pre">get_db_prep_value</span></tt>).</p>
+</div>
+<div class="section" id="s-processando-valores-antes-de-salvar">
+<span id="processando-valores-antes-de-salvar"></span><h4>Processando valores antes de salvar<a class="headerlink" href="#processando-valores-antes-de-salvar" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="pre_save">
+<tt class="descname">pre_save</tt>(<em>self</em>, <em>model_instance</em>, <em>add</em>)<a class="headerlink" href="#pre_save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Este método é chamado pouco antes do <a class="reference internal" href="#get_db_prep_save" title="get_db_prep_save"><tt class="xref py py-meth docutils literal"><span class="pre">get_db_prep_save()</span></tt></a> e deve retornar o
+valor do atributo apropriado do <tt class="docutils literal"><span class="pre">model_instance</span></tt> para este campo. O nome do
+atributo está no <tt class="docutils literal"><span class="pre">self.attname</span></tt> (ele é configurado pelo
+<tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt>). Se o model estiver sendo salvo no banco de
+dados pela primeira vez, o parâmetro <tt class="docutils literal"><span class="pre">add</span></tt> será <tt class="xref docutils literal"><span class="pre">True</span></tt>, caso contrário, ele
+será <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<p>Você somente precisa sobrescrever este método se desejar processar o valor de
+alguma forma, pouco antes de armazená-lo. Por exemplo, o
+<a class="reference internal" href="../ref/models/fields.html#django.db.models.DateTimeField" title="django.db.models.DateTimeField"><tt class="xref py py-class docutils literal"><span class="pre">DateTimeField</span></tt></a> do Django usa esse método para
+configurar o atributo corretamente no caso do
+<tt class="xref py py-attr docutils literal"><span class="pre">auto_now</span></tt> ou
+<tt class="xref py py-attr docutils literal"><span class="pre">auto_now_add</span></tt>.</p>
+<p>Se você sovrescrever este método, você deve retornar o valor do atributo no
+final. Você deve também atualizar o atributo do model se você fizer qualquer
+alteração no valor, desta forma o código mantem as referências para o model, e
+ele sempre verá o valor correto.</p>
+</div>
+<div class="section" id="s-preparando-valores-para-o-uso-em-pesquisas-no-banco-de-dados">
+<span id="preparando-valores-para-o-uso-em-pesquisas-no-banco-de-dados"></span><h4>Preparando valores para o uso em pesquisas no banco de dados<a class="headerlink" href="#preparando-valores-para-o-uso-em-pesquisas-no-banco-de-dados" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="get_db_prep_lookup">
+<tt class="descname">get_db_prep_lookup</tt>(<em>self</em>, <em>lookup_type</em>, <em>value</em>)<a class="headerlink" href="#get_db_prep_lookup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Prepara o <tt class="docutils literal"><span class="pre">value</span></tt> passando para o banco de dados quando usado numa pesquisa
+(um constraint <tt class="docutils literal"><span class="pre">WHERE</span></tt> no SQL). O <tt class="docutils literal"><span class="pre">lookup_type</span></tt> será um dos filtros válidos
+do Django para pesquisa: <tt class="docutils literal"><span class="pre">exact</span></tt>, <tt class="docutils literal"><span class="pre">iexact</span></tt>, <tt class="docutils literal"><span class="pre">contains</span></tt>, <tt class="docutils literal"><span class="pre">icontains</span></tt>,
+<tt class="docutils literal"><span class="pre">gt</span></tt>, <tt class="docutils literal"><span class="pre">gte</span></tt>, <tt class="docutils literal"><span class="pre">lt</span></tt>, <tt class="docutils literal"><span class="pre">lte</span></tt>, <tt class="docutils literal"><span class="pre">in</span></tt>, <tt class="docutils literal"><span class="pre">startswith</span></tt>, <tt class="docutils literal"><span class="pre">istartswith</span></tt>,
+<tt class="docutils literal"><span class="pre">endswith</span></tt>, <tt class="docutils literal"><span class="pre">iendswith</span></tt>, <tt class="docutils literal"><span class="pre">range</span></tt>, <tt class="docutils literal"><span class="pre">year</span></tt>, <tt class="docutils literal"><span class="pre">month</span></tt>, <tt class="docutils literal"><span class="pre">day</span></tt>,
+<tt class="docutils literal"><span class="pre">isnull</span></tt>, <tt class="docutils literal"><span class="pre">search</span></tt>, <tt class="docutils literal"><span class="pre">regex</span></tt>, e <tt class="docutils literal"><span class="pre">iregex</span></tt>.</p>
+<p>Se método deve estar preparado para lidar com todos estes valores de
+<tt class="docutils literal"><span class="pre">lookup_type</span></tt> e deve lançar tanto um <tt class="docutils literal"><span class="pre">ValueError</span></tt> se o <tt class="docutils literal"><span class="pre">value</span></tt> tiver algum
+tipo de erro (uma lista quando você estava esperando um objeto, por exemplo) ou
+um <tt class="docutils literal"><span class="pre">TypeError</span></tt> se seu campo não suporta tal tipo de pesquisa. Para muitos
+campos, você pode começar manipulando os tipos de pesquisa que precisam de
+tratamento especial para seu campo e passar o resto para o método
+<a class="reference internal" href="#get_db_prep_lookup" title="get_db_prep_lookup"><tt class="xref py py-meth docutils literal"><span class="pre">get_db_prep_lookup()</span></tt></a> da classe pai.</p>
+<p>Se você precisa implementar o <tt class="docutils literal"><span class="pre">get_db_prep_save()</span></tt>, você normalmente precisará
+implementar <tt class="docutils literal"><span class="pre">get_db_prep_lookup()</span></tt>. Se você não o fizer, <tt class="docutils literal"><span class="pre">get_db_prep_value</span></tt>
+será chamado pela implementação padrnao, para gerenciar as pesquisas <tt class="docutils literal"><span class="pre">exact</span></tt>,
+<tt class="docutils literal"><span class="pre">gt</span></tt>, <tt class="docutils literal"><span class="pre">gte</span></tt>, <tt class="docutils literal"><span class="pre">lt</span></tt>, <tt class="docutils literal"><span class="pre">lte</span></tt>, <tt class="docutils literal"><span class="pre">in</span></tt> e <tt class="docutils literal"><span class="pre">range</span></tt>.</p>
+<p>Você pode também querer implementar este método para limitar os tipos de
+pesquisa que podem ser usados com seu tipo de campo.</p>
+<p>Note que, para <tt class="docutils literal"><span class="pre">range</span></tt> e <tt class="docutils literal"><span class="pre">in</span></tt>, <tt class="docutils literal"><span class="pre">get_db_prep_lookup</span></tt> receberá uma lista de
+objetos (presumidamente o tipo certo) e terá de convertê-los em uma lista de
+coisas do tipo certo para passar para o banco de dados. Na maioria das vezes,
+você poderá reusar <tt class="docutils literal"><span class="pre">get_db_prep_value()</span></tt>, ou pelo menos um fator comum a
+algumas partes.</p>
+<p>Por exemplo, o seguinte código implementa <tt class="docutils literal"><span class="pre">get_db_prep_lookup</span></tt> para limitar
+os tipos de pesquisa aceitos para <tt class="docutils literal"><span class="pre">exact</span></tt> e <tt class="docutils literal"><span class="pre">in</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">HandField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="c"># ...</span>
+
+    <span class="k">def</span> <span class="nf">get_db_prep_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lookup_type</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c"># Nós somente manipulamos &#39;exact&#39; e &#39;in&#39;. Todos os outros são erros.</span>
+        <span class="k">if</span> <span class="n">lookup_type</span> <span class="o">==</span> <span class="s">&#39;exact&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_db_prep_value</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="n">lookup_type</span> <span class="o">==</span> <span class="s">&#39;in&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_db_prep_value</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Lookup type </span><span class="si">%r</span><span class="s"> not supported.&#39;</span> <span class="o">%</span> <span class="n">lookup_type</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-especificando-o-campo-de-formulario-para-o-campo-de-model">
+<span id="especificando-o-campo-de-formulario-para-o-campo-de-model"></span><h4>Especificando o campo de formulário para o campo de model<a class="headerlink" href="#especificando-o-campo-de-formulario-para-o-campo-de-model" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="formfield">
+<tt class="descname">formfield</tt>(<em>self</em>, <em>form_class=forms.CharField</em>, <em>**kwargs</em>)<a class="headerlink" href="#formfield" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Retorna o campo de formulário padrão para se usar quando este campo é mostrado
+num model. Este método é chamado pelo helper <tt class="xref py py-class docutils literal"><span class="pre">ModelForm</span></tt>.</p>
+<p>Tudo no dicionário <tt class="docutils literal"><span class="pre">kwargs</span></tt> é passado diretamente para o método
+<tt class="xref py py-meth docutils literal"><span class="pre">Field__init__()</span></tt> do campo. Normalmente, tudo que você precisa
+fazer é configurar um bom padrão para o argumento <tt class="docutils literal"><span class="pre">form_class</span></tt> e então delegar
+mais manipulação para a classe pai. Isso pode exigir que você escreva um campo
+de formulário personalizado (ou mesmo um widget de formulário). Veja a
+<a class="reference internal" href="../topics/forms/index.html"><em>documentação de formulários</em></a> para mais informação
+sobre isso, e dê uma olhada no código <a class="reference internal" href="../ref/contrib/localflavor.html#module-django.contrib.localflavor" title="django.contrib.localflavor: Uma coleção de vários fragmentos que são úteis somente para um país ou cultura em particular."><tt class="xref py py-mod docutils literal"><span class="pre">localflavor</span></tt></a> para
+ter mais exemplos de widgets personalizados.</p>
+<p>Continuand nosso exemplo, nós podemos escrever o método <a class="reference internal" href="#formfield" title="formfield"><tt class="xref py py-meth docutils literal"><span class="pre">formfield()</span></tt></a> como:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">HandField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="c"># ...</span>
+
+    <span class="k">def</span> <span class="nf">formfield</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c"># Esta é uma forma bastante normal para configurar alguns padrões</span>
+        <span class="c"># enquanto deixa o chamador sobrescrever eles.</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;form_class&#39;</span><span class="p">:</span> <span class="n">MyFormField</span><span class="p">}</span>
+        <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">HandField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">formfield</span><span class="p">(</span><span class="o">**</span><span class="n">defaults</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Isso assume que nós imporamos uma classe de campo <tt class="docutils literal"><span class="pre">MyFormField</span></tt> (que tem seu
+próprio widget padrão). Este documento não cobre os detalhes de se escrever
+campos de formulário personalizados.</p>
+</div>
+<div class="section" id="s-emulando-tipos-de-campos-nativo">
+<span id="emulando-tipos-de-campos-nativo"></span><h4>Emulando tipos de campos nativo<a class="headerlink" href="#emulando-tipos-de-campos-nativo" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="get_internal_type">
+<tt class="descname">get_internal_type</tt>(<em>self</em>)<a class="headerlink" href="#get_internal_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Retorna uma string dando o nome da subclasse de <tt class="xref py py-class docutils literal"><span class="pre">Field</span></tt>
+que nós estamos emulando a nível de banco de dados. Isso é utilizado para
+determinar o tipo de coluna de banco de dados para casos simples.</p>
+<p>Se você criou um método <a class="reference internal" href="#db_type" title="db_type"><tt class="xref py py-meth docutils literal"><span class="pre">db_type()</span></tt></a>, você não precisa se preocupar com o
+<a class="reference internal" href="#get_internal_type" title="get_internal_type"><tt class="xref py py-meth docutils literal"><span class="pre">get_internal_type()</span></tt></a> -- não será muito usado. Algumas vezes, embora, o
+armazenamento de banco de dados é de um tipo semelhante a algum outro campo,
+assim você pode usar a lógica de outro campo para criar a coluna certa.</p>
+<p>Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">HandField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="c"># ...</span>
+
+    <span class="k">def</span> <span class="nf">get_internal_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;CharField&#39;</span>
+</pre></div>
+</div>
+<p>Não importa que backend de banco de dados nós usemos, isso significará que o
+<tt class="docutils literal"><span class="pre">syncdb</span></tt> e outros comandos SQL criam o tipo certo de coluna para armazenar
+uma string.</p>
+<p>Se <a class="reference internal" href="#get_internal_type" title="get_internal_type"><tt class="xref py py-meth docutils literal"><span class="pre">get_internal_type()</span></tt></a> retorna uma string que não é conhecida pelo Django
+para backend do banco de dados que você está usando -- isto é, ele não aparece
+em <tt class="docutils literal"><span class="pre">django.db.backends.&lt;db_name&gt;.creation.DATA_TYPES</span></tt> -- a string continuará
+sendo usada pelo serializer, mas o método padrão <a class="reference internal" href="#db_type" title="db_type"><tt class="xref py py-meth docutils literal"><span class="pre">db_type()</span></tt></a> retornará
+<tt class="xref docutils literal"><span class="pre">None</span></tt>. Veja a documentação de <a class="reference internal" href="#db_type" title="db_type"><tt class="xref py py-meth docutils literal"><span class="pre">db_type()</span></tt></a> por razões do porquê isso pode
+ser útil. Colocando uma string descritiva como o tipo de campo para o serializer
+é uma boa idéia se você estiver sempre usando a saída do serializer em algum
+outro lugar, fora do Django.</p>
+</div>
+<div class="section" id="s-convertendo-dados-do-campo-por-serializacao">
+<span id="convertendo-dados-do-campo-por-serializacao"></span><h4>Convertendo dados do campo por serialização<a class="headerlink" href="#convertendo-dados-do-campo-por-serializacao" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="value_to_string">
+<tt class="descname">value_to_string</tt>(<em>self</em>, <em>obj</em>)<a class="headerlink" href="#value_to_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Este método é usado pelo serializer para converter o campo numa string de saída.
+Chamando <tt class="xref py py-meth docutils literal"><span class="pre">Field._get_val_from_obj(obj)()</span></tt> é a melhor forma de obter o valor
+para serializar. Por exemplo, desde que nosso <tt class="docutils literal"><span class="pre">HandField</span></tt> use strings para seu
+armazenamento de dados de qualquer forma, nós podemos reusar algumas conversões
+de código existente:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">HandField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="c"># ...</span>
+
+    <span class="k">def</span> <span class="nf">value_to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_val_from_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_db_prep_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="s-alguns-conselhos-gerais">
+<span id="alguns-conselhos-gerais"></span><h3>Alguns conselhos gerais<a class="headerlink" href="#alguns-conselhos-gerais" title="Permalink to this headline">¶</a></h3>
+<p>Escrevendo um campo personalizado pode ser um processo complicado,
+particularmente se você estiver fazendo uma conversões complexas entre seus
+tipos Python e seu banco de dados e formatos serializados. Há algumas dicas para
+tornar as coisas mais suaves:</p>
+<ol class="arabic simple">
+<li>Procure por campos existentes do Django (no
+<tt class="file docutils literal"><span class="pre">django/db/models/fields/__init__.py</span></tt>) para inspiração. Tente
+encontrar um campo que seja similar ao que você deseja fazer e estenda-a
+um pouco, ao invês de criar uma totalmente do zero.</li>
+<li>Coloque um método <tt class="xref py py-meth docutils literal"><span class="pre">__str__()</span></tt> ou <tt class="xref py py-meth docutils literal"><span class="pre">__unicode__()</span></tt> na classe que
+está envolvendo como um campo. Há um monte de lugares onde  comportamento
+padrão do código do campo é chamar
+<a class="reference internal" href="../ref/utils.html#django.utils.encoding.force_unicode" title="django.utils.encoding.force_unicode"><tt class="xref py py-func docutils literal"><span class="pre">force_unicode()</span></tt></a> sobre o valor. (Nos nossos
+exemplos neste documento, <tt class="docutils literal"><span class="pre">value</span></tt> poderia ser uma intância de <tt class="docutils literal"><span class="pre">Hand</span></tt>,
+não um <tt class="docutils literal"><span class="pre">HandField</span></tt>). Portanto se seu método <tt class="xref py py-meth docutils literal"><span class="pre">__unicode__()</span></tt>
+converte automaticamente para uma string a partir de seu objeto Python,
+você pode poupar a si mesmo um monte de trabalho.</li>
+</ol>
+</div>
+</div>
+<div class="section" id="s-escrevendo-uma-extensao-de-filefield">
+<span id="escrevendo-uma-extensao-de-filefield"></span><h2>Escrevendo uma extensão de <tt class="docutils literal"><span class="pre">FileField</span></tt><a class="headerlink" href="#escrevendo-uma-extensao-de-filefield" title="Permalink to this headline">¶</a></h2>
+<p>Além dos métodos acima, campos que lidam com arquivos possuem alguns poucos
+requesitos especiais que deve ser tomado nota. A maioria dos mecanismos
+fornecidos pelo <tt class="docutils literal"><span class="pre">FileField</span></tt>, como controlador de armazenamento de banco de
+dados e recebimento, podem permenacer imutáveis, deixando a subclasse para lidar
+com o desafio de suportar um tipo particular de arquivo.</p>
+<p>O Django fornece uma classe <tt class="docutils literal"><span class="pre">File</span></tt>, que é usada como um proxy entre o conteúdo
+do arquivo e as operações. Este pode ser estendido para customizar como o
+arquivo é acessado, e quais métodos são disponíveis. Ele fica em
+<tt class="docutils literal"><span class="pre">django.db.models.fields.files</span></tt>, e seu comportamento padrão é explicado na
+<a class="reference internal" href="../ref/files/file.html#ref-files-file"><em>documentação de arquivo</em></a>.</p>
+<p>Uma vez que uma subclasse de <tt class="docutils literal"><span class="pre">File</span></tt> é criada, a nova subclasse de
+<tt class="docutils literal"><span class="pre">FileField</span></tt> deve ser instruída a usá-la. Para fazer isso, simplesmente atribua
+a nova subclasse <tt class="docutils literal"><span class="pre">File</span></tt> para o atributo especial <tt class="docutils literal"><span class="pre">attr_class</span></tt> da subclasse
+<tt class="docutils literal"><span class="pre">FileField</span></tt>.</p>
+<div class="section" id="s-umas-poucas-sugestoes">
+<span id="umas-poucas-sugestoes"></span><h3>Umas poucas sugestões<a class="headerlink" href="#umas-poucas-sugestoes" title="Permalink to this headline">¶</a></h3>
+<p>Além dos detalhes acima, há umas poucas linhas guias que podem melhorar muito a
+eficiência e legibilidade do código dos campos.</p>
+<ol class="arabic simple">
+<li>O fonte dos próprios campos do Django <tt class="docutils literal"><span class="pre">ImageField</span></tt> (em
+<tt class="docutils literal"><span class="pre">django/db/models/fields/files.py</span></tt>) é um grande exemplo de como a
+subclasse <tt class="docutils literal"><span class="pre">FileField</span></tt> pode suportar um tipo de arquivo em particular,
+e como incorpora todas as técnicas descritas acima.</li>
+<li>Cacheie os atributos dos arquivos sempre que possível. Uma vez que
+arquivos podem ser guardados em sistemas de armazenamento remotos,
+recebê-los pode custar um tempo extra, ou mesmo dinheiro, o que nem
+sempre é necessário. Uma vez que o arquivo é recebido para obter algum
+dado sobre seus conteúdos, cacheie o máximo de dados que for possível
+para reduzir o número de vezes que o arquivo deve ser recebido em
+chamadas subsequentes para esta informação.</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Escrevendo campos de model customizados</a><ul>
+<li><a class="reference internal" href="#introducao">Introdução</a><ul>
+<li><a class="reference internal" href="#nosso-objeto-exemplo">Nosso objeto exemplo</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#teoria-de-fundo">Teoria de fundo</a><ul>
+<li><a class="reference internal" href="#armazenamento-de-banco-de-dados">Armazenamento de banco de dados</a></li>
+<li><a class="reference internal" href="#o-que-uma-classee-de-campo-faz">O que uma classee de campo faz?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#escrevendo-uma-subclasse-de-campo">Escrevendo uma subclasse de campo</a><ul>
+<li><a class="reference internal" href="#a-metaclasse-subfieldbase">A metaclasse <tt class="docutils literal"><span class="pre">SubfieldBase</span></tt></a></li>
+<li><a class="reference internal" href="#metodo-uteis">Método úteis</a><ul>
+<li><a class="reference internal" href="#tipos-de-banco-de-dados-personalizados">Tipos de banco de dados personalizados</a></li>
+<li><a class="reference internal" href="#convertendo-valores-de-banco-de-dados-para-objetos-do-python">Convertendo valores de banco de dados para objetos do Python</a></li>
+<li><a class="reference internal" href="#convertendo-objetos-python-para-valores-de-banco-de-dados">Convertendo objetos Python para valores de banco de dados</a></li>
+<li><a class="reference internal" href="#processando-valores-antes-de-salvar">Processando valores antes de salvar</a></li>
+<li><a class="reference internal" href="#preparando-valores-para-o-uso-em-pesquisas-no-banco-de-dados">Preparando valores para o uso em pesquisas no banco de dados</a></li>
+<li><a class="reference internal" href="#especificando-o-campo-de-formulario-para-o-campo-de-model">Especificando o campo de formulário para o campo de model</a></li>
+<li><a class="reference internal" href="#emulando-tipos-de-campos-nativo">Emulando tipos de campos nativo</a></li>
+<li><a class="reference internal" href="#convertendo-dados-do-campo-por-serializacao">Convertendo dados do campo por serialização</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#alguns-conselhos-gerais">Alguns conselhos gerais</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#escrevendo-uma-extensao-de-filefield">Escrevendo uma extensão de <tt class="docutils literal"><span class="pre">FileField</span></tt></a><ul>
+<li><a class="reference internal" href="#umas-poucas-sugestoes">Umas poucas sugestões</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="custom-management-commands.html">Escrevendo commando customizados para o django-admin</a></li>
+    
+    
+      <li>Next: <a href="custom-template-tags.html">Tags e filtros de template personalizados</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Guias &#8220;como fazer&#8221;</a>
+        
+        <ul><li>Escrevendo campos de model customizados</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/howto/custom-model-fields.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="custom-management-commands.html" title="Escrevendo commando customizados para o django-admin">previous</a> 
+     |
+    <a href="index.html" title="Guias &amp;#8220;como fazer&amp;#8221;" accesskey="U">up</a>
+   |
+    <a href="custom-template-tags.html" title="Tags e filtros de template personalizados">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

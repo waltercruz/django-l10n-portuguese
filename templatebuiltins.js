@@ -1,0 +1,1 @@
+var django_template_builtins = {"ttags": ["ifequal", "ifchanged", "cycle", "csrf_token", "load", "regroup", "templatetag", "extends", "ifnotequal", "comment", "autoescape", "now", "filter", "if", "spaceless", "ssi", "for", "block", "include", "with", "url", "firstof", "debug", "widthratio"], "tfilters": []};

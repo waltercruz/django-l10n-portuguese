@@ -1,0 +1,130 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done $
+..   $OriginalRevision: 13609 $
+..   $TranslationAuthors: Italo Maia, Walter Cruz $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _faq-install:
+
+FAQ: Instalação
+=================
+
+Como eu começo?
+---------------
+
+    #. `Baixe o código`_.
+    #. Instale o Django (leia o :ref:`guia de instalação <intro-install>`).
+    #. Execute o :doc:`tutorial </intro/tutorial01>`.
+    #. Verifique o resto da :doc:`documentação </index>`, e `pergunte`_ se você
+       estiver com problemas.
+
+.. _`Baixe o código`: http://www.djangobrasil.org/download/
+.. _pergunte: http://www.djangobrasil.org/comunidade/
+
+Quais são os pré requisitos para executar o Django?
+---------------------------------------------------
+
+O Django requer o Python_ 2.3, especificamente qualquer versão do Python da 2.3
+até a 2.7. Nenhuma outra biblioteca Python é requerida para o uso básico do
+Django.
+
+Para um ambiente de desenvolvimento -- se você apenas quer experimentar o
+Django -- você não precisa ter um servidor web separado; o Django vem com o seu
+próprio servidor leve de desenvolvimento. Para um ambiente de produção, o
+Django segue a especificação WSGI_, o que significa que ele pode rodar sobre
+uma ampla variedade de plataformas de servidores. Veja :doc:`Implantando o
+Django </howto/deployment/index>` para algumas anternativas populares. Além
+disso, a `página wiki de opções de configuração do servidor`_ contém detalhes para
+algumas estratégias de implantação.
+
+Se você quer usar o Django com um banco de dados, que é o caso provável, você
+irá também precisar de um servidor de banco de dados. O PostgreSQL_ é
+recomendado, porque somos fãs do PostgreSQL, e o MySQL_, `SQLite 3`_, e Oracle_
+são suportados também.
+
+.. _Python: http://www.python.org/
+.. _Apache 2: http://httpd.apache.org/
+.. _mod_python: http://www.modpython.org/
+.. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _página wiki de opções de configuração do servidor: http://code.djangoproject.com/wiki/ServerArrangements
+.. _PostgreSQL: http://www.postgresql.org/
+.. _MySQL: http://www.mysql.com/
+.. _`SQLite 3`: http://www.sqlite.org/
+.. _Oracle: http://www.oracle.com/
+
+Eu perco algo se eu rodar o Django com uma a versão 2.4 do Python em vez de usar versẽs mais novas do Python como a 2.5 ou 2.6? 2.5?
+------------------------------------------------------------------------------------------------------------------------------------
+
+Não no framework. Atualmente, o Django suporta oficialmente quaisquer versões
+do Python da 2.4 até a 2.7, inclusive. Porém, novas versões do Python sã
+frequentemente mais rápidas, tem mais features e são 
+melhor suportadas. Aplicações de terceiros para uso com o Django são, é claro, livres para
+escolher seus próprios requerimentos de versão.
+
+Note porém que no próximo ano e talvez no outro o Django irá começar a remover
+suporte para versões antigas do Python como parte da migração que culminará com
+o Django rodando no Python 3.(veja abaixo para mais detalhes)
+
+Assim, se você está começando com o Python, é recomendado que você use a última versão
+da série 2.x (atualmente, o Python 2.7). Isso irá permitir que você tome
+proveito de numerosas melhorias e otimizações na linguagem Python desde a
+versão 2.4, e irá ajudar a facilitar o processo de remoção do suporte para
+versões antigas do Python no caminho para o Python 3.
+
+Can I use Django with Python 2.3?
+---------------------------------
+
+Django 1.1 (and earlier) supported Python 2.3. Django 1.2 and newer does not.
+We highly recommend you upgrade Python if at all possible, but Django 1.1 will
+continue to work on Python 2.3.
+
+Posso usar o Django com o Python 3?
+-----------------------------------
+
+Não agora. O Python 3.0 introduziu um número de mudanças não retro compatíveis
+na linguagem Python, e apesar dessas mudanças serem algo bom para o futuro do
+Python, irá demorar um pouco até que a maioria dos softwares Python atualizem e
+sejam capazes de rodar no Python 3.0. Para bases grandes de código Python, como
+é o caso do Django, a expectativa é que a transição leve pelo menos um ano ou
+dois (já que envolve a remoção de suporte para versões mais antigas do Python e
+por isso deve ser feita gradualmente).
+
+Enquanto isso, versões da série 2.x do Python serão suportadas e receberão
+correções de bug e atualizações de segurança da equipe de desenvolvimento do
+Python, assim, continuar a usar a série 2.x do Python durante o período de
+transição não deve representar risco algum.
+
+O Django executará em hosts compartilhados (como TextDrive ou o Dreamhost)?
+---------------------------------------------------------------------------
+
+Veja nossa página de `hosts amigáveis ao Django`_ .
+
+.. _`hosts amigáveis ao Django`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
+
+Eu devo usar a versão oficial ou a versão de desenvolvimento?
+-------------------------------------------------------------
+
+Os desenvolvedores do Django melhoram o framework todos os dias e são muito
+bons em não enviar código quebrado ao repositório. Nós usamos o código do
+desenvolvimento (do repositório Subversion) diretamente em nossos servidores,
+então nós o consideramos estável. Com isso em mente, recomentadmos que você use
+a última versão do código em desenvolvimento, porque ele geralmente tem mais
+funcionalidades e menos bugs que as versões "oficiais".
+
+Generally, if you're using code in production, you should be using a
+stable release. The Django project publishes a full stable release
+every nine months or so, with bugfix updates in between. These stable
+releases contain the API that is covered by our backwards
+compatibility guarantees; if you write code against stable releases,
+you shouldn't have any problems upgrading when the next official
+version is released.

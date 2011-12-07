@@ -1,0 +1,294 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 13609 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+==========
+Paginação
+==========
+
+.. module:: django.core.paginator
+   :synopsis: Classes para ajudá-lo a gerenciar dados pagináveis.
+
+.. versionchanged:: 1.0
+   As fundações da paginação foram reformuladas, quase que por completo.
+
+O Django fornece algumas classes que ajudam a lidar com paginação de dados --
+isto é, dados que são divididos entre várias páginas, com links "Previous/Next".
+Essas classes estão contidas no módulo :file:`django/core/paginator.py`.
+
+
+Exemplo
+=======
+
+Dada a um :class:`Paginator` uma lista de objetos, mais um número de itens que você
+gostaria que aparececem em cada página, ele fornecerá os métodos necessários
+para acessar os itens de cada página::
+
+    >>> from django.core.paginator import Paginator
+    >>> objects = ['john', 'paul', 'george', 'ringo']
+    >>> p = Paginator(objects, 2)
+
+    >>> p.count
+    4
+    >>> p.num_pages
+    2
+    >>> p.page_range
+    [1, 2]
+
+    >>> page1 = p.page(1)
+    >>> page1
+    <Page 1 of 2>
+    >>> page1.object_list
+    ['john', 'paul']
+
+    >>> page2 = p.page(2)
+    >>> page2.object_list
+    ['george', 'ringo']
+    >>> page2.has_next()
+    False
+    >>> page2.has_previous()
+    True
+    >>> page2.has_other_pages()
+    True
+    >>> page2.next_page_number()
+    3
+    >>> page2.previous_page_number()
+    1
+    >>> page2.start_index() # O índice iniciado em 1 do primeiro item nesta página
+    3
+    >>> page2.end_index() # O índice iniciado em 1 do último item nesta página
+    4
+
+    >>> p.page(0)
+    Traceback (most recent call last):
+    ...
+    EmptyPage: That page number is less than 1
+    >>> p.page(3)
+    Traceback (most recent call last):
+    ...
+    EmptyPage: That page contains no results
+
+.. note::
+
+    Note que você pode dar a um paginador uma lista ou tupla ``Paginator``, uma
+    ``QuerySet`` do Django, ou qualquer objeto com um método ``count()`` ou
+    ``__len__()``. Ao determinar o número de objetos contidos no objeto passado,
+    o ``Paginator`` vai primeiro tentar chamar ``count()``, depois irá tentar
+    chamar ``len()`` se o objeto não tiver um método ``count()``. Isso permite a
+    objetos como o ``QuerySet`` do Django usarem um ``count()`` mais eficiente,
+    quando disponível.
+
+Usando ``Paginator`` em uma view
+================================
+
+Aqui há um exemplo ligeiramente mais complexo do uso do :class:`Paginator` em
+um view para paginar um queryset. Nós dizemos a ambos, view e o template que o
+acompanha, como você pode exibir resultados. Este exemplo assume que você tem um
+model ``Contacts`` que já foi importado.
+
+A função view parece com isso::
+
+    from django.core.paginator import Paginator, InvalidPage, EmptyPage
+
+    def listing(request):
+        contact_list = Contacts.objects.all()
+        paginator = Paginator(contact_list, 25) # Mostra 25 contatos por página
+
+        # Make sure page request is an int. If not, deliver first page.
+        # Esteja certo de que o `page request` é um inteiro. Se não, mostre a primeira página.
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+
+        # Se o page request (9999) está fora da lista, mostre a última página.
+        try:
+            contacts = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            contacts = paginator.page(paginator.num_pages)
+
+        return render_to_response('list.html', {"contacts": contacts})
+
+No template :file:`list.html`, você poderá incluir a navegação entre as páginas,
+juntamente com qualquer informação interessante a partir dos próprios objetos::
+
+    {% for contact in contacts.object_list %}
+        {# Cada "contato" é um objeto do model Contact. #}
+        {{ contact.full_name|upper }}<br />
+        ...
+    {% endfor %}
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if contacts.has_previous %}
+                <a href="?page={{ contacts.previous_page_number }}">anterior</a>
+            {% endif %}
+
+            <span class="current">
+                Página {{ contacts.number }} of {{ contacts.paginator.num_pages }}.
+            </span>
+
+            {% if contacts.has_next %}
+                <a href="?page={{ contacts.next_page_number }}">próxima</a>
+            {% endif %}
+        </span>
+    </div>
+
+
+Objetos ``Paginator``
+=====================
+
+A classe :class:`Paginator` tem este construtor:
+
+.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True)
+
+Argumentos obrigatórios
+-----------------------
+
+``object_list``
+    Uma lista, tupla, ``QuerySet`` do Django, ou outro objeto contável por um
+    método ``count()`` ou ``__len__()``.
+
+``per_page``
+    O número máximo de ítens que serão incluídos na página, não incluíndo
+    orfãos (veja o argumento opcional ``orphans`` abaixo).
+
+Argumentos opcionais
+--------------------
+
+``orphans``
+    O número mínimo de ítens permitidos em uma última página, o padrão é zero.
+    Use isto quando você não quiser ter uma última página com pouquíssimos
+    ítens. Se a última página poderá ter um número de ítens menor que ou igual
+    ao ``orphans``, então estes ítens serão adicionados na página anterior (que
+    se torna a última página) ao invés de deixados em uma página só para eles.
+    Por exemplo, com 23 ítens, ``per_pager=10``, e ``orphans=3``, haverá duas
+    páginas; a primeira com 10 ítens e a segunda (e última) com 13 ítems.
+
+``allow_empty_first_page``
+    Permite ou não a primeira página ser vazia. Se for ``False`` e
+    ``object_list`` estiver vazio, então um erro ``EmtpyPage`` será levantado.
+
+Métodos
+-------
+
+.. method:: Paginator.page(number)
+
+    Retorna um objeto :class:`Page` com um determinado índice. Se a determinada
+    página não existe, é lançado uma exceção :exc:`InvalidPage`.
+
+Atributos
+---------
+
+.. attribute:: Paginator.count
+
+    O número total de objetos, através de todas as páginas.
+
+    .. note::
+
+        Quando se determina o número de objetos contidos no ``object_list``,
+        o ``Paginator`` irá primeiro tentar chamar ``object_list.count()``. Se
+        ``object_list`` não tem o método ``count()``, então o ``Paginator``
+        tentará usar o ``object_list.__len__()``. Isto permite objetos, como um
+        ``QuerySet`` do Django, usar um método de ``count()`` mais eficiente
+        quando disponível.
+
+.. attribute:: Paginator.num_pages
+
+    O número total de páginas.
+
+.. attribute:: Paginator.page_range
+
+    Um número começando com 1 de páginas, por exemplo, ``[1, 2, 3, 4]``.
+
+Exceções ``InvalidPage``
+========================
+
+O método ``page()`` lança a exceção ``InvalidPage`` se a página requisitada for
+inválida (ex., não for um inteiro) ou não conter objetos. Geralmente,
+isto é suficiente para se ter uma exceção ``InvalidPage``, mas se você quizer
+mais granularidade, você pode utilizar qualquer uma dessas exceções:
+
+``PageNotAnInteger``
+    Lançada quando à ``page()`` é dado um valor que não é um inteiro.
+``EmptyPage``
+    Lançada quando à ``page()`` é dado um valor válido, mas não á objetos
+    existentes naquela página.
+
+Ambas as exceções são subclasses de ``InvalidPage``, então você poder
+manipulá-las com um simples ``except InvalidPage``.
+
+Objetos ``Page``
+================
+
+.. class:: Page(object_list, number, paginator):
+
+Você normalmente não iŕa construir :class:`Pages <Page>` na mão -- você vai
+obtê-los usando :meth:`Paginator.page`.
+
+Métodos
+-------
+
+.. method:: Page.has_next()
+
+    Retorna ``True`` se existe uma página subseqüente.
+
+.. method:: Page.has_previous()
+
+    Retorna ``True`` se existe uma página anterior.
+
+.. method:: Page.has_other_pages()
+
+    Retorna ``True`` se existe uma página subsequente ou anterior.
+
+.. method:: Page.next_page_number()
+
+    Retorna o número da página subseqüente. Note que este é um método "burro" e
+    vai apenas retornar o número da página subseqüente, a página existindo ou
+    não.
+
+.. method:: Page.previous_page_number()
+
+    Retorna o número da página anterior. Note que este é um método "burro" e vai
+    apenas retornar o número da página anterior, a página existindo ou não.
+
+.. method:: Page.start_index()
+
+    Retorna o índice iniciado em 1 do primeiro objeto na página, relativo a
+    todos os objetos na lista do paginador. Por exemplo, quando se pagina uma
+    lista com 5 objetos a 2 objetos por página, o :meth:`~Page.start_index` da
+    segunda página devolveria ``3``.
+
+.. method:: Page.end_index()
+
+    Retorna o índice iniciado em 1 do último objeto na página, relativo a todos
+    os objetos na lista do paginador. Por exemplo, quando se pagina uma lista
+    com 5 objetos a 2 objetos por página, o :meth:`~Page.end_index` da segunda
+    página devolveria ``4``.
+
+Atributos
+---------
+
+.. attribute:: Page.object_list
+
+    A lista de objetos nesta página.
+
+.. attribute:: Page.number
+
+    O número da página com índice começando em 1.
+
+.. attribute:: Page.paginator
+
+    O :class:`Paginator` associado ao objeto.
+

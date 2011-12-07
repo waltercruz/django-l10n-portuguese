@@ -1,0 +1,547 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Como usar o Django com FastCGI, SCGI ou AJP &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Implantando o Django" href="index.html" />
+    <link rel="next" title="Como usar o Django com o Apache e mod_python" href="modpython.html" />
+    <link rel="prev" title="Como usar o Django com o Apache e mod_wsgi" href="modwsgi.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="modwsgi.html" title="Como usar o Django com o Apache e mod_wsgi">previous</a> 
+     |
+    <a href="../index.html" title="Guias &amp;#8220;como fazer&amp;#8221;" accesskey="U">up</a>
+   |
+    <a href="modpython.html" title="Como usar o Django com o Apache e mod_python">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-deployment-fastcgi">
+            
+  <div class="section" id="s-como-usar-o-django-com-fastcgi-scgi-ou-ajp">
+<span id="s-howto-deployment-fastcgi"></span><span id="como-usar-o-django-com-fastcgi-scgi-ou-ajp"></span><span id="howto-deployment-fastcgi"></span><h1>Como usar o Django com FastCGI, SCGI ou AJP<a class="headerlink" href="#como-usar-o-django-com-fastcgi-scgi-ou-ajp" title="Permalink to this headline">¶</a></h1>
+<p>Apesar da instalação atualmente preferida para rodar o Django ser <a class="reference internal" href="modwsgi.html"><em>Apache
+com mod_wsgi</em></a>, muitas pessoas usam hospedagem
+compartilhada, onde protocolos como FastCGI, SCGI ou AJP são a única opção
+viável. Em algumas instalações, estes protocolos pode fornecer uma performance
+melhor que o <a class="reference external" href="http://code.google.com/p/modwsgi/">mod_wsgi</a>.</p>
+<div class="admonition-note admonition ">
+<p class="first admonition-title">Note</p>
+<p class="last">Este documento foca primariamente no FastCGI. Outros protocolos, como SCGI
+e AJP, são também suportados, através do pacote do Python <tt class="docutils literal"><span class="pre">flup</span></tt>. Veja a
+seção <a class="reference internal" href="#protocolos">Protocolos</a> abaixo para detalhes sobre SCGI e AJP.</p>
+</div>
+<p>Essencialmente, o FastCGI é uma forma eficiente de deixar uma aplicação externa
+servir páginas para um servidor Web. O servidor Web deleta as requisições Web
+vindas (via socket) para o FastCGI, que executa o código passando a resposta de
+volta ao servidor Web, que, por sua vez, passa-o de volta ao navegador do
+cliente.</p>
+<p>Como mod_python, o FastCGI permite que o código fique na memória, permitindo
+requisições serem servidas sem tempo de inicialização. Diferentemente do
+<a class="reference external" href="http://www.modpython.org/">mod_python</a> (ou <a class="reference external" href="http://perl.apache.org/">mod_perl</a>), um processo FastCGI não roda dentro do processo do
+servidor Web, mas em um processo persistente separado.</p>
+<div class="admonition-porque-rodar-codigo-em-um-processo-separado admonition ">
+<p class="first admonition-title">Porque rodar código em um processo separado?</p>
+<p>A modalidade tradicional <tt class="docutils literal"><span class="pre">mod_*</span></tt> no Apache embute várias linguagens de
+script (mais notavelmente PHP, Python e Perl) dentro do espaço do processo
+de seu servidor Web. Embora isto diminua o tempo de inicialização &#8211; porque
+o código não tem que ser lido em disco para cada requisição &#8211; ele vem com
+custo de uso de memória. Para mod_python, por exemplo, todo processo Apache
+carrega seu próprio interpretador Python, que consome um montante
+considerável de RAM.</p>
+<p class="last">Devido a natureza do FastCGI, ainda é possível ter processos que rodem sob
+uma conta de usuário diferente do processo do servidor Apache. O que é um
+grande benefício para segurança em sistemas compartilhados, por que
+significa que você pode assegurar o seu código de outros usuários.</p>
+</div>
+<div class="section" id="s-pre-requisito-flup">
+<span id="pre-requisito-flup"></span><h2>Pré-requisito: flup<a class="headerlink" href="#pre-requisito-flup" title="Permalink to this headline">¶</a></h2>
+<p>Antes que você possa começar a usar o FastCGI com o Django, você precisará
+instalar o <a class="reference external" href="http://www.saddi.com/software/flup/">flup</a>, uma biblioteca Python para lidar com FastCGI. A versão 0.5 ou
+as mais recentes devem funcionar muito bem.</p>
+</div>
+<div class="section" id="s-iniciando-seu-servidor-fastcgi">
+<span id="iniciando-seu-servidor-fastcgi"></span><h2>Iniciando seu servidor FastCGI<a class="headerlink" href="#iniciando-seu-servidor-fastcgi" title="Permalink to this headline">¶</a></h2>
+<p>O FastCGI opera sobre um modelo cliente-servidor, e na maioria dos casos você
+estará iniciando o processo FastCGI em seu próprio. Seu servidor Web (seja o
+Apache, lighttpd, ou qualquer outro) somente contata seu processo Django-FastCGI
+quando o servidor precisa que uma página dinâmica seja carregada. Porque o
+daemon já está rodando com o código em memoria, ele está pronto para servir uma
+resposta rapidamente.</p>
+<div class="admonition-note admonition ">
+<p class="first admonition-title">Note</p>
+<p class="last">Se você está em sistema de hospedagem compartilhada, você provavelmente será
+forçado a usar o processo FastCGI gerenciado pelo servidor Web. Veja a seção
+abaixo, rodando o Django em processos gerenciados pelo servidor Web para
+mais informações.</p>
+</div>
+<p>Um servidor Web pode se conectar com um servidor FastCGI de uma das duas
+maneiras disponíveis: Ele pode usar cada um dos sockets de domínios Unix (um
+&#8220;pipe nomeado&#8221; em sistemas Win32), ou ele pode usar um socket TCP. O que você
+escolher é de sua preferência; um socket TCP é normalmente mais fácil devido aos
+problemas de permissões.</p>
+<p>Para iniciar seu servidor, primeiro mude dentro do diretório de seu projeto
+(aonde quer que seu <a class="reference internal" href="../../ref/django-admin.html"><em>manage.py</em></a> esteja), e então rode o
+comando <a class="reference internal" href="../../ref/django-admin.html#django-admin-runfcgi"><tt class="xref std std-djadmin docutils literal"><span class="pre">runfcgi</span></tt></a>:</p>
+<div class="highlight-bash"><div class="highlight"><pre>./manage.py runfcgi <span class="o">[</span>options<span class="o">]</span>
+</pre></div>
+</div>
+<p>Se vocÊ especificar <tt class="docutils literal"><span class="pre">help</span></tt> como a única opção depois de <a class="reference internal" href="../../ref/django-admin.html#django-admin-runfcgi"><tt class="xref std std-djadmin docutils literal"><span class="pre">runfcgi</span></tt></a>,
+ele irá mostrar uma lista de todas as opções disponíveis.</p>
+<p>Você precisará especificar ainda um <tt class="docutils literal"><span class="pre">socket</span></tt>, um <tt class="docutils literal"><span class="pre">protocolo</span></tt> ou ambos
+<tt class="docutils literal"><span class="pre">host</span></tt> e <tt class="docutils literal"><span class="pre">porta</span></tt>. Então, quando você configurar seu servidor Web, você
+somente precisará apontá-lo para o host/port ou socket que você especificou
+quando iniciou o servidor FastCGI. Veja os <a class="reference internal" href="#exemplos">Exemplos</a>, abaixo.</p>
+<div class="section" id="s-protocolos">
+<span id="protocolos"></span><h3>Protocolos<a class="headerlink" href="#protocolos" title="Permalink to this headline">¶</a></h3>
+<p>O Django suporta todos os protocolos que o <a class="reference external" href="http://www.saddi.com/software/flup/">flup</a> suporta, <a class="reference external" href="http://www.fastcgi.com/">fastcgi</a>, <a class="reference external" href="http://python.ca/scgi/protocol.txt">SCGI</a> e
+<a class="reference external" href="http://tomcat.apache.org/connectors-doc/ajp/ajpv13a.html">AJP1.3</a> (o Apache JServ Protocol, versão 1.3). Selecione seu protocolo
+preferido usando a opção <a class="reference internal" href="../../ref/django-admin.html#django-admin-option-protocol"><tt class="xref std std-djadminopt docutils literal"><span class="pre">protocol=&lt;protocol_name&gt;</span></tt></a>
+com <tt class="docutils literal"><span class="pre">./manage.py</span> <span class="pre">runfcgi</span></tt> -- onde <tt class="docutils literal"><span class="pre">&lt;protocol_name&gt;</span></tt> pode ser um dos: <tt class="docutils literal"><span class="pre">fcgi</span></tt> (o padrão),
+<tt class="docutils literal"><span class="pre">scgi</span></tt> ou <tt class="docutils literal"><span class="pre">ajp</span></tt>. Por exemplo:</p>
+<div class="highlight-bash"><div class="highlight"><pre>./manage.py runfcgi <span class="nv">protocol</span><span class="o">=</span>scgi
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-exemplos">
+<span id="exemplos"></span><h3>Exemplos<a class="headerlink" href="#exemplos" title="Permalink to this headline">¶</a></h3>
+<p>Rodando um servidor em threads em uma porta TCP:</p>
+<div class="highlight-bash"><div class="highlight"><pre>./manage.py runfcgi <span class="nv">method</span><span class="o">=</span>threaded <span class="nv">host</span><span class="o">=</span>127.0.0.1 <span class="nv">port</span><span class="o">=</span>3033
+</pre></div>
+</div>
+<p>Rodando um servidor preforked em um socket de domínio Unix:</p>
+<div class="highlight-bash"><div class="highlight"><pre>./manage.py runfcgi <span class="nv">method</span><span class="o">=</span>prefork <span class="nv">socket</span><span class="o">=</span>/home/user/mysite.sock <span class="nv">pidfile</span><span class="o">=</span>django.pid
+</pre></div>
+</div>
+<div class="admonition-socket-security admonition ">
+<p class="first admonition-title">Socket security</p>
+<p class="last">Django's default umask requires that the webserver and the Django fastcgi
+process be run with the same group <strong>and</strong> user. For increased security,
+you can run them under the same group but as different users. If you do
+this, you will need to set the umask to 0002 using the <tt class="docutils literal"><span class="pre">umask</span></tt> argument
+to <tt class="docutils literal"><span class="pre">runfcgi</span></tt>.</p>
+</div>
+<p>Executando sem o deamonizing (rodar em background) o processo (bom para
+debugging):</p>
+<div class="highlight-bash"><div class="highlight"><pre>./manage.py runfcgi <span class="nv">daemonize</span><span class="o">=</span><span class="nb">false </span><span class="nv">socket</span><span class="o">=</span>/tmp/mysite.sock <span class="nv">maxrequests</span><span class="o">=</span>1
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-parando-o-daemon-fastcgi">
+<span id="parando-o-daemon-fastcgi"></span><h3>Parando o daemon FastCGI<a class="headerlink" href="#parando-o-daemon-fastcgi" title="Permalink to this headline">¶</a></h3>
+<p>Se você tem o processo rodando em foreground, é bem fácil de pará-lo:
+Simplesmente pressionando <tt class="docutils literal"><span class="pre">Ctrl-C</span></tt> você parará e fechará o servidor FastCGI.
+Entretanto, quando você está com processos em background, você precisará
+recorrer ao comando <tt class="docutils literal"><span class="pre">kill</span></tt> do Unix.</p>
+<p>Se você especificr a opção <tt class="docutils literal"><span class="pre">pidfile</span></tt> para o <a class="reference internal" href="../../ref/django-admin.html#django-admin-runfcgi"><tt class="xref std std-djadmin docutils literal"><span class="pre">runfcgi</span></tt></a>, você poderá
+matar o daemon do  processo FastCGI desta forma:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nb">kill</span> <span class="sb">`</span>cat <span class="nv">$PIDFILE</span><span class="sb">`</span>
+</pre></div>
+</div>
+<p>...onde <tt class="docutils literal"><span class="pre">$PIDFILE</span></tt> é o <tt class="docutils literal"><span class="pre">pidfile</span></tt> que você especificou.</p>
+<p>Para facilitar o reinício do seu daemon FastCGI no Unix, tente este pequeno
+script shell:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c">#!/bin/bash</span>
+
+<span class="c"># Replace these three settings.</span>
+<span class="nv">PROJDIR</span><span class="o">=</span><span class="s2">&quot;/home/user/myproject&quot;</span>
+<span class="nv">PIDFILE</span><span class="o">=</span><span class="s2">&quot;$PROJDIR/mysite.pid&quot;</span>
+<span class="nv">SOCKET</span><span class="o">=</span><span class="s2">&quot;$PROJDIR/mysite.sock&quot;</span>
+
+<span class="nb">cd</span> <span class="nv">$PROJDIR</span>
+<span class="k">if</span> <span class="o">[</span> -f <span class="nv">$PIDFILE</span> <span class="o">]</span>; <span class="k">then</span>
+<span class="k">    </span><span class="nb">kill</span> <span class="sb">`</span>cat -- <span class="nv">$PIDFILE</span><span class="sb">`</span>
+    rm -f -- <span class="nv">$PIDFILE</span>
+<span class="k">fi</span>
+
+<span class="nb">exec</span> /usr/bin/env - <span class="se">\</span>
+  <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;../python:..&quot;</span> <span class="se">\</span>
+  ./manage.py runfcgi <span class="nv">socket</span><span class="o">=</span><span class="nv">$SOCKET</span> <span class="nv">pidfile</span><span class="o">=</span><span class="nv">$PIDFILE</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="s-configuracao-do-apache">
+<span id="configuracao-do-apache"></span><h2>Configuração do Apache<a class="headerlink" href="#configuracao-do-apache" title="Permalink to this headline">¶</a></h2>
+<p>Para usar o Django com o Apache e FastCGI, você precisará ter o Apache instalado
+e configurado, com <a class="reference external" href="http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html">mod_fastcgi</a> instalado e habilitado. Consulte a
+documentação do Apache para instruções.</p>
+<p>Uma vez que você tenha realizado a instalação, aponte o Apache para sua
+instância do Django FastCGI editando o arquivo <tt class="docutils literal"><span class="pre">httpd.conf</span></tt> (configuração do
+Apache). Você precisará fazer duas coisas:</p>
+<ul class="simple">
+<li>Usar a diretiva <tt class="docutils literal"><span class="pre">FastCGIExternalServer</span></tt> para especificar a localização
+do seu servidor FastCGI.</li>
+<li>Usar <tt class="docutils literal"><span class="pre">mode_rewrite</span></tt> para apontar as URLs para o FastCGI como se deve.</li>
+</ul>
+<div class="section" id="s-especificando-a-localizacao-do-servidor-fastcgi">
+<span id="especificando-a-localizacao-do-servidor-fastcgi"></span><h3>Especificando a localização do servidor FastCGI<a class="headerlink" href="#especificando-a-localizacao-do-servidor-fastcgi" title="Permalink to this headline">¶</a></h3>
+<p>A diretiva <tt class="docutils literal"><span class="pre">FastCGIExternalServer</span></tt> diz ao Apache como encontrar seu servidor
+FastCGI. Como a <a class="reference external" href="http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html#FastCgiExternalServer">documentação do FastCGIExternalServer</a> explica, você pode
+especificar ambos <tt class="docutils literal"><span class="pre">socket</span></tt> ou um <tt class="docutils literal"><span class="pre">host</span></tt>. Aqui há alguns exemplos de ambos:</p>
+<div class="highlight-apache"><div class="highlight"><pre><span class="c"># Conecta o FastCGI via socket / pipe nomeado.</span>
+<span class="nb">FastCGIExternalServer</span> <span class="sx">/home/user/public_html/mysite.fcgi</span> -socket <span class="sx">/home/user/mysite.sock</span>
+
+<span class="c"># Conecta o FastCGI via um host/port TCP.</span>
+<span class="nb">FastCGIExternalServer</span> <span class="sx">/home/user/public_html/mysite.fcgi</span> -host <span class="m">127.0.0.1</span>:3033
+</pre></div>
+</div>
+<p>Em ambos os casos, o arquivo <tt class="docutils literal"><span class="pre">/home/user/public_html/mysite.fcgi</span></tt> na verdade
+não tem de existir. Ele é somente uma URL usada pelo servidor Web internamente --
+um hook para significando que as requisições para uma URL devem ser manipuladas
+pelo FastCGI. (Mais sobre isto na próxima seção.)</p>
+</div>
+<div class="section" id="s-usando-o-mod-rewrite-para-apontar-urls-no-fastcgi">
+<span id="usando-o-mod-rewrite-para-apontar-urls-no-fastcgi"></span><h3>Usando o mod_rewrite para apontar URLs no FastCGI<a class="headerlink" href="#usando-o-mod-rewrite-para-apontar-urls-no-fastcgi" title="Permalink to this headline">¶</a></h3>
+<p>O segundo passo é dizer ao Apache para usar o FastCGI para URLs que combinam com
+certos padrões. Para fazer isto, use o módulo <a class="reference external" href="http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html">mod_rewrite</a> e redirecione as
+URLs para <tt class="docutils literal"><span class="pre">mysite.fcgi</span></tt> (ou o que você tenha especificado na diretiva
+<tt class="docutils literal"><span class="pre">FastCGIExternalServer</span></tt>, como explicado na seção anterior).</p>
+<p>Neste exemplo, nós dizemos ao Apache para usar o FastCGI como manipulador de
+qualquer requisição que não represente um arquivo do sistema de arquivos e não
+com <tt class="docutils literal"><span class="pre">/media/</span></tt>. Este é provavelmente caso mais comum, se você estiver usando o
+admin do Django:</p>
+<div class="highlight-apache"><div class="highlight"><pre><span class="nt">&lt;VirtualHost</span> <span class="s">12.34.56.78</span><span class="nt">&gt;</span>
+  <span class="nb">ServerName</span> example.com
+  <span class="nb">DocumentRoot</span> <span class="sx">/home/user/public_html</span>
+  <span class="nb">Alias</span> <span class="sx">/media</span> <span class="sx">/home/user/python/django/contrib/admin/media</span>
+  <span class="nb">RewriteEngine</span> <span class="k">On</span>
+  <span class="nb">RewriteRule</span> ^/(media.*)$ /$1 [QSA,L,PT]
+  <span class="nb">RewriteCond</span> %{REQUEST_FILENAME} !-f
+  <span class="nb">RewriteRule</span> ^/(.*)$ <span class="sx">/mysite.fcgi/</span>$1 [QSA,L]
+<span class="nt">&lt;/VirtualHost&gt;</span>
+</pre></div>
+</div>
+<p>O Django automaticamente usará a versão pre-rewrite da URL quando estiver
+construindo URLs com a tag de template <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">url</span> <span class="pre">%}</span></tt> (e métodos similares).</p>
+</div>
+</div>
+<div class="section" id="s-configuracao-do-lighttpd">
+<span id="configuracao-do-lighttpd"></span><h2>Configuração do lighttpd<a class="headerlink" href="#configuracao-do-lighttpd" title="Permalink to this headline">¶</a></h2>
+<p>O <a class="reference external" href="http://www.lighttpd.net/">lighttpd</a> é um servidor Web bem leve, comumente usado para servir arquivos
+estáticos. Ele suporta FastCGI nativamente e, esta, é uma boa escolha para
+servir ambas páginas estáticas e dinâmicas, se seu site não tem qualquer
+necessidade especifica relacionada ao Apache.</p>
+<p>Esteja certo que <tt class="docutils literal"><span class="pre">mod_fastcgi</span></tt> está na sua lista de módulos, em algum lugar
+depois de <tt class="docutils literal"><span class="pre">mod_rewrite</span></tt> e <tt class="docutils literal"><span class="pre">mod_access</span></tt>, mas não depois do <tt class="docutils literal"><span class="pre">mod_accesslog</span></tt>.
+Você provavelmente precisará do <tt class="docutils literal"><span class="pre">mod_alias</span></tt>, para servir as medias do admin.
+Add the following to your lighttpd config file:</p>
+<div class="highlight-lua"><div class="highlight"><pre><span class="n">server</span><span class="p">.</span><span class="n">document</span><span class="o">-</span><span class="n">root</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="s">/home/user/public_html&quot;</span>
+<span class="n">fastcgi</span><span class="p">.</span><span class="n">server</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;</span><span class="s">/mysite.fcgi&quot;</span> <span class="o">=&gt;</span> <span class="p">(</span>
+        <span class="s2">&quot;</span><span class="s">main&quot;</span> <span class="o">=&gt;</span> <span class="p">(</span>
+            <span class="o">#</span> <span class="n">Use</span> <span class="n">host</span> <span class="o">/</span> <span class="n">port</span> <span class="n">instead</span> <span class="n">of</span> <span class="n">socket</span> <span class="k">for</span> <span class="n">TCP</span> <span class="n">fastcgi</span>
+            <span class="o">#</span> <span class="s2">&quot;</span><span class="s">host&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;</span><span class="s">127.0.0.1&quot;</span><span class="p">,</span>
+            <span class="o">#</span> <span class="s2">&quot;</span><span class="s">port&quot;</span> <span class="o">=&gt;</span> <span class="mi">3033</span><span class="p">,</span>
+            <span class="s2">&quot;</span><span class="s">socket&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;</span><span class="s">/home/user/mysite.sock&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;</span><span class="s">check-local&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;</span><span class="s">disable&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="n">alias</span><span class="p">.</span><span class="n">url</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;</span><span class="s">/media&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;</span><span class="s">/home/user/django/contrib/admin/media/&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">url</span><span class="p">.</span><span class="n">rewrite</span><span class="o">-</span><span class="n">once</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;</span><span class="s">^(/media.*)$&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;</span><span class="s">$1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;</span><span class="s">^/favicon\.ico$&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;</span><span class="s">/media/favicon.ico&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;</span><span class="s">^(/.*)$&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;</span><span class="s">/mysite.fcgi$1&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="s-executando-multiplos-sites-django-em-um-lighttpd">
+<span id="executando-multiplos-sites-django-em-um-lighttpd"></span><h3>Executando múltiplos sites Django em um lighttpd<a class="headerlink" href="#executando-multiplos-sites-django-em-um-lighttpd" title="Permalink to this headline">¶</a></h3>
+<p>O lighttpd deixa você usar &quot;configuração condicional&quot; para permitir que a
+configuração seja customizada por host. Para especificar múltiplos sites
+FastCGI, é só adicionar um bloco condicional na sua configuração do FastCGI para
+cada site:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># Se o hostname for &#39;www.example1.com&#39;...</span>
+<span class="nv">$HTTP</span><span class="o">[</span><span class="s2">&quot;host&quot;</span><span class="o">]</span> <span class="o">==</span> <span class="s2">&quot;www.example1.com&quot;</span> <span class="o">{</span>
+    server.document-root <span class="o">=</span> <span class="s2">&quot;/foo/site1&quot;</span>
+    fastcgi.server <span class="o">=</span> <span class="o">(</span>
+       ...
+    <span class="o">)</span>
+    ...
+<span class="o">}</span>
+
+<span class="c"># Se o hostname for &#39;www.example2.com&#39;...</span>
+<span class="nv">$HTTP</span><span class="o">[</span><span class="s2">&quot;host&quot;</span><span class="o">]</span> <span class="o">==</span> <span class="s2">&quot;www.example2.com&quot;</span> <span class="o">{</span>
+    server.document-root <span class="o">=</span> <span class="s2">&quot;/foo/site2&quot;</span>
+    fastcgi.server <span class="o">=</span> <span class="o">(</span>
+       ...
+    <span class="o">)</span>
+    ...
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Você pode também rodar múltiplas instalações do Django no mesmo site,
+simplesmente especificando múltiplas entradas na diretiva <tt class="docutils literal"><span class="pre">fastcgi.server</span></tt>.
+Adicione um FastCGI host para cada um.</p>
+</div>
+</div>
+<div class="section" id="s-configuracao-do-cherokee">
+<span id="configuracao-do-cherokee"></span><h2>Configuração do Cherokee<a class="headerlink" href="#configuracao-do-cherokee" title="Permalink to this headline">¶</a></h2>
+<p>O Cherokee é um servidor Web muito rápido, flexível e fácil de configurar. Ele
+suporta tecnologias muito difundidas hoje: FastCGI, SCGI, PHP, CGI, SSI, TLS e
+conexões criptografadas por SSL, Vitual hosts, Authentication, encoding em tempo
+de execução, Load Balancing, compatível com arquivos de log do Apache, Data Base
+Balancer, Reverse HTTP Proxy e muito mais.</p>
+<p>O projeto Cherokee provê uma documentação para <a class="reference external" href="http://www.cherokee-project.com/doc/cookbook_django.html">configurar o Django</a> com o
+Cherokee.</p>
+</div>
+<div class="section" id="s-rodando-o-django-em-ambiente-compartilhado-com-apache">
+<span id="rodando-o-django-em-ambiente-compartilhado-com-apache"></span><h2>Rodando o Django em ambiente compartilhado com Apache<a class="headerlink" href="#rodando-o-django-em-ambiente-compartilhado-com-apache" title="Permalink to this headline">¶</a></h2>
+<p>Muitos hospedeiros não permitem que você rode seus próprios daemons de servidor
+ou editar o arquivo <tt class="docutils literal"><span class="pre">httpd.conf</span></tt>. Nestes casos, ainda é possível rodar o
+Django usando processos gerados pelo servidor Web.</p>
+<div class="admonition-note admonition ">
+<p class="first admonition-title">Note</p>
+<p class="last">Se você está usando processos gerados pelo servidor Web, como explicado
+nesta seção não há necessidade de você iniciar o servidor FastCGI você
+mesmo. O Apache gerará um número de processos, escalando como ele precisar.</p>
+</div>
+<p>No seu diretório Web raiz, adicione isto ao arquivo chamado <tt class="docutils literal"><span class="pre">.htaccess</span></tt>:</p>
+<div class="highlight-apache"><div class="highlight"><pre><span class="nb">AddHandler</span> fastcgi-script .fcgi
+<span class="nb">RewriteEngine</span> <span class="k">On</span>
+<span class="nb">RewriteCond</span> %{REQUEST_FILENAME} !-f
+<span class="nb">RewriteRule</span> ^(.*)$ mysite.fcgi/$1 [QSA,L]
+</pre></div>
+</div>
+<p>Então, crie um pequeno script para dizer ao Apache como gerar seu programa
+FastCGI. Crie um arquivo <tt class="docutils literal"><span class="pre">mysite.fcgi</span></tt> e coloque-o no seu diretório Web, e
+assegure-se de torná-lo executável:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+
+<span class="c"># Adicione um caminho customizado do Python.</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;/home/user/python&quot;</span><span class="p">)</span>
+
+<span class="c"># Mudando para o diretório do seu projeto. (Opcional.)</span>
+<span class="c"># os.chdir(&quot;/home/user/myproject&quot;)</span>
+
+<span class="c"># Setar a variável de ambiente DJANGO_SETTINGS_MODULE.</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;DJANGO_SETTINGS_MODULE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;myproject.settings&quot;</span>
+
+<span class="kn">from</span> <span class="nn">django.core.servers.fastcgi</span> <span class="kn">import</span> <span class="n">runfastcgi</span>
+<span class="n">runfastcgi</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s">&quot;threaded&quot;</span><span class="p">,</span> <span class="n">daemonize</span><span class="o">=</span><span class="s">&quot;false&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="s-restartando-o-servidor-gerado">
+<span id="restartando-o-servidor-gerado"></span><h3>Restartando o servidor gerado<a class="headerlink" href="#restartando-o-servidor-gerado" title="Permalink to this headline">¶</a></h3>
+<p>Se você mudou qualquer código Python do seu site, você precisará dizer ao
+FastCGI que o código mudou. Mas não há necessidade de reiniciar o Apache neste
+caso. Ao invés, somente re-envie o <tt class="docutils literal"><span class="pre">mysite.fcgi</span></tt>, ou edite o arquivo, desta
+forma o timestamp do arquivo mudará. Quando o Apache ver que o arquivos foi
+atualizado, ele irá reiniciar sua aplicação Django para você.</p>
+<p>Se você tem acesso ao terminal em um sistema Unix, você pode realizar isto
+facilmente usando o comando <tt class="docutils literal"><span class="pre">touch</span></tt>:</p>
+<div class="highlight-bash"><div class="highlight"><pre>touch mysite.fcgi
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="s-servindo-arquivos-de-midia-da-administracao">
+<span id="servindo-arquivos-de-midia-da-administracao"></span><h2>Servindo arquivos de mídia da administração<a class="headerlink" href="#servindo-arquivos-de-midia-da-administracao" title="Permalink to this headline">¶</a></h2>
+<p>Regardless of the server and configuration you eventually decide to use, you
+will also need to give some thought to how to serve the admin media files. The
+advice given in the <a class="reference internal" href="modwsgi.html#serving-the-admin-files"><em>modpython</em></a> documentation
+is also applicable in the setups detailed above.</p>
+</div>
+<div class="section" id="s-forcando-o-prefixo-de-url-para-um-valor-em-particular">
+<span id="forcando-o-prefixo-de-url-para-um-valor-em-particular"></span><h2>Forçando o prefixo de URL para um valor em particular<a class="headerlink" href="#forcando-o-prefixo-de-url-para-um-valor-em-particular" title="Permalink to this headline">¶</a></h2>
+<p>Como muitas destas soluções baseadas no FastCGI requerem re-escrita de URL em
+algum ponto dentro do servidor Web, a informação de caminho que o Django vê pode
+não ser a mesma da URL original que foi passada. Isto é um problema se a
+aplicação Django é servida sob um prefixo particular e você deseja que as URLs
+geradas com a tag <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">url</span> <span class="pre">%}</span></tt> apareçam com o prefixo, ao invés da versão
+re-escrita, que pode conter por exemplo, <tt class="docutils literal"><span class="pre">mysite.fcgi</span></tt>.</p>
+<p>O Django faz uma boa tentativa pra descobrir qual o verdadeiro nome de prefixo
+do script que deve ser. Em particular, se o servidor Web seta o <tt class="docutils literal"><span class="pre">SCRIPT_URL</span></tt>
+(específica para o mod_rewrite do Apache), ou <tt class="docutils literal"><span class="pre">REDIRECT_URL</span></tt> (setada por
+alguns servidores, incluindo Apache + mod_rewrite em algumas situações), o
+Django encontrará o prefixo original automaticamente.</p>
+<p>Nos casos onde o Django não encontra o prefixo corretamente e onde você quer que
+o valor original seja usado nas URLs, você pode setar a configuração
+<tt class="docutils literal"><span class="pre">FORCE_SCRIPT_NAME</span></tt> no arquivo <tt class="docutils literal"><span class="pre">settings</span></tt> principal. Isto seta o nome do
+script uniformemente para toda URL servida via este arquivo settings. Assim,
+você precisará usar arquivos de configurações diferentes, se você quiser
+diferentes conjuntos de URLs para ter nomes de scripts diferentes neste caso,
+mas está é uma situação rara.</p>
+<p>Como um exemplo de como usá-lo, se sua configuração do Django está servindo
+todas as URLs em <tt class="docutils literal"><span class="pre">'/'</span></tt> e você esperava usar esta configuração, você poderia
+setar <tt class="docutils literal"><span class="pre">FORCE_SCRIPT_NAME</span> <span class="pre">=</span> <span class="pre">''</span></tt> no seu arquivo settings.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Como usar o Django com FastCGI, SCGI ou AJP</a><ul>
+<li><a class="reference internal" href="#pre-requisito-flup">Pré-requisito: flup</a></li>
+<li><a class="reference internal" href="#iniciando-seu-servidor-fastcgi">Iniciando seu servidor FastCGI</a><ul>
+<li><a class="reference internal" href="#protocolos">Protocolos</a></li>
+<li><a class="reference internal" href="#exemplos">Exemplos</a></li>
+<li><a class="reference internal" href="#parando-o-daemon-fastcgi">Parando o daemon FastCGI</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuracao-do-apache">Configuração do Apache</a><ul>
+<li><a class="reference internal" href="#especificando-a-localizacao-do-servidor-fastcgi">Especificando a localização do servidor FastCGI</a></li>
+<li><a class="reference internal" href="#usando-o-mod-rewrite-para-apontar-urls-no-fastcgi">Usando o mod_rewrite para apontar URLs no FastCGI</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuracao-do-lighttpd">Configuração do lighttpd</a><ul>
+<li><a class="reference internal" href="#executando-multiplos-sites-django-em-um-lighttpd">Executando múltiplos sites Django em um lighttpd</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuracao-do-cherokee">Configuração do Cherokee</a></li>
+<li><a class="reference internal" href="#rodando-o-django-em-ambiente-compartilhado-com-apache">Rodando o Django em ambiente compartilhado com Apache</a><ul>
+<li><a class="reference internal" href="#restartando-o-servidor-gerado">Restartando o servidor gerado</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#servindo-arquivos-de-midia-da-administracao">Servindo arquivos de mídia da administração</a></li>
+<li><a class="reference internal" href="#forcando-o-prefixo-de-url-para-um-valor-em-particular">Forçando o prefixo de URL para um valor em particular</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="modwsgi.html">Como usar o Django com o Apache e mod_wsgi</a></li>
+    
+    
+      <li>Next: <a href="modpython.html">Como usar o Django com o Apache e mod_python</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Guias &#8220;como fazer&#8221;</a>
+        
+          <ul><li><a href="index.html">Implantando o Django</a>
+        
+        <ul><li>Como usar o Django com FastCGI, SCGI ou AJP</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/howto/deployment/fastcgi.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="modwsgi.html" title="Como usar o Django com o Apache e mod_wsgi">previous</a> 
+     |
+    <a href="../index.html" title="Guias &amp;#8220;como fazer&amp;#8221;" accesskey="U">up</a>
+   |
+    <a href="modpython.html" title="Como usar o Django com o Apache e mod_python">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

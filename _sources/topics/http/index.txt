@@ -1,0 +1,34 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _topics-http-index:
+
+Manipulando requisições HTTP
+============================
+
+Informações sobre manipulação de requisições HTTP no Django:
+
+.. toctree::
+   :maxdepth: 1
+   
+   urls
+   views
+   decorators
+   file-uploads
+   shortcuts
+   generic-views
+   middleware
+   sessions

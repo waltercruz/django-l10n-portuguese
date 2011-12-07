@@ -1,0 +1,239 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 15030 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _internals-documentation:
+
+Como a documentação do Django funciona
+======================================
+
+\... e como contribuir.
+
+A documentação do Django usa o sistema de documentação Sphinx__, que por sua vez
+é baseado no docutils__. A idéia básica é ter uma documentação leve em formato
+de texto-plano, que seja transformada em HTML, PDF, ou qualquer outro formato.
+
+__ http://sphinx.pocoo.org/
+__ http://docutils.sourceforge.net/
+
+Na verdade para compilar a documentação localmente, você precisará instalar o
+Sphinx -- ``easy_install Sphinx`` deve fazer a mágica.
+
+Somente então, transforme tudo em html, para isso é só executar ``make html``
+dentro do diretório ``docs``.
+
+Para começar a contribuir, você precisará ler a `ReStructuredText Primer`__.
+Depois disso, você poderá ler sobre o `Sphinx-specific markup`__ que é
+utilizado para manipular os metadados, indexação, e cruzamento de referências.
+
+__ http://sphinx.pocoo.org/rest.html
+__ http://sphinx.pocoo.org/markup/
+
+A principal coisa que você deve manter em mente quando escrever ou editar a
+documentação é, quanto mais semântica você puder colocar, melhor. Então::
+
+    Adicione ``django.conrib.auth`` no seu ``INSTALLED_APPS``...
+
+Não é tão útil quanto::
+
+    Adicione :mod:`django.contrib.auth` no seu :setting:`INSTALLED_APPS`...
+
+Isto porque o Sphinx irá gerar links durante a compilação, que ajudarão muito
+os leitores. Basicamente não há limites para a quantidade de markup que você
+pode adicionar.
+
+Markup específico do Django
+---------------------------
+
+Além das `markups built-in do Sphinx`__, a documentação do Django define algumas
+unidades de descrição extras:
+
+__ http://sphinx.pocoo.org/markup/desc.html
+
+    * Settings::
+
+            .. setting:: INSTALLED_APPS
+
+      Para linkar o setting, use ``:setting:`INSTALLED_APPS```.
+
+    * Tags de template::
+
+            .. templatetag:: regroup
+
+      Para linkar, use ``:ttag:`regroup```.
+
+    * Filtros de template::
+
+            .. templatefilter:: linebreaksbr
+
+      Para linkar, use ``:tfilter:`linebreaksbr```.
+
+    * Lookups de campos (i.e. ``Foo.objects.filter(bar__exact=qualquercoisa)``)::
+
+            .. fieldlookup:: exact
+
+      Para linkar, use ``:lookup:`exact```.
+
+    * Comandos do ``django-admin``::
+
+            .. django-admin:: syncdb
+
+      Para linkar, use ``:djadmin:`syncdb```.
+
+    * Opções de linha de comando do ``django-admin``::
+
+            .. django-admin-option:: --traceback
+
+      Para linkar, use ``:djadminopt:`--traceback```.
+
+Um Exemplo
+----------
+
+Para um exemplo rápido de como tudo se agrupa, dá uma olhada nisso:
+
+    * Primeiro, o documento ``ref/settings.txt`` começa, dessa forma::
+
+        .. _ref-settings:
+
+        Configurações disponíveis
+        =========================
+
+        ...
+
+    * Em seguida se olharmos para o documento ``topics/settings, você pode ver
+      como um link para ``ref/settings`` funciona::
+
+        .. _available-settings:
+
+        Available settings
+        ==================
+
+        ...
+
+        .. _deprecated-settings:
+
+        Deprecated settings
+        ===================
+
+        ...
+
+    * Next, the ``topics/settings.txt`` document could contain something like
+      this:
+
+      .. code-block:: rst
+
+        You can access a :ref:`listing of all available settings
+        <available-settings>`. For a list of deprecated settings see
+        :ref:`deprecated-settings`.
+
+        You can find both in the :doc:`settings reference document </ref/settings>`.
+
+      We use the Sphinx doc_ cross reference element when we want to link to
+      another document as a whole and the ref_ element when we want to link to
+      an arbitrary location in a document.
+
+.. _doc: http://sphinx.pocoo.org/markup/inline.html#role-doc
+.. _ref: http://sphinx.pocoo.org/markup/inline.html#role-ref
+
+    * Next, notice how the settings are annotated:
+
+      .. code-block:: rst
+
+        .. setting:: ADMIN_FOR
+
+        ADMIN_FOR
+        ---------
+
+        Padrão: ``()`` (Tupla vazia)
+
+        Usado para definir módulos do site de administraçaõ. este deve ser uma
+        tupla de configurações de módulos (no formato ``'foo.bar.baz'``) para
+        que este site tenha uma amdinistração.
+
+        O site de administração usa isto em sua instrospecção automática da
+        documentação de models, views e tags de template.
+
+      Isto marca o seguinte cabeçalho como um alvo "canonico" para a
+      configuração ``ADMIN_FOR``. Isto significa que toda vez que você fores
+      mencionar ``ADMIN_FOR``, podes referenciá-lo utilizando
+      ``:setting:`ADMIN_FOR```.
+
+Basicamente, é desta forma que tudo se encaixa.
+
+TODO
+----
+
+O trabalho está na maioria feito, mas aqui tem o que falta, em ordem de
+prioridade.
+
+    * A maior parte dos documentos ``index.txt`` têm textos de introdução
+      *muito* curtos, ou quase inexistem. Cada um destes documentos precisar de
+      de um bom conteúdo de introdução.
+
+    * O glossário é muito superficial. Ele precisa ser preenchido.
+
+    * E mais alvos de metadados: há vários lugares que se parecem com isso::
+
+            ``File.close()``
+            ~~~~~~~~~~~~~~~~
+
+      \... e deveria ser::
+
+            .. method:: File.close()
+
+      Que é, usar os metadados no lugar de títulos.
+
+    * Adicionar mais links -- quase tudo o que um código inline literal,
+      provavelmente pode ser transformado em um xref.
+
+      Veja o arquivo ``literals_to_xrefs.py`` no ``_ext`` -- este é um script
+      shell para ajudar no trabalho.
+
+      Este será, ou provavelmente continuará sendo, um projeto sem fim.
+
+    * Adicionar `listas de informações de campos`__ onde for apropriado.
+
+      __ http://sphinx.pocoo.org/markup/desc.html#info-field-lists
+
+    * Adicionar ``.. code-block:: <lang>`` para blocos literais para que eles
+      sejam destacados.
+
+Dicas
+-----
+
+Algumas dicas para fazer as coisas parecerem melhor:
+
+    * Sempre que possível, use links. Então, use ``:setting:`ADMIN_FOR``` ao
+      invés de ````ADMIN_FOR````.
+
+    * Algumas diretivas (``.. setting::``, por exemplo) são diretivas de estilo
+      prefixado; elas vão *antes* da unidade que estão descrevendo. Estas são
+      conhecidas como diretivas "crossref". Já outras (``.. class::``, ex.)
+      geram suas próprias marcações; elas devem ir dentro da seção que estão
+      descrevendo. São chamadas "unidades de descrição".
+
+      Você pode dizer quem é quem olhando no :file:`_ext/djangodocs.py`; que
+      registra as regras tanto para uma quanto para outra.
+
+    * Quando estiver referindo-se a classes/funções/módulos, etc., você terá que
+      usar um nome completo para o alvo
+      (``:class:`django.contrib.contenttypes.models.ContentType```).
+
+      Uma vez que isto não pareça ser uma saída incrível -- ela mostra o caminho
+      completo para o objeto -- você pode prefixar o alto com um ``~`` para usar
+      somente o final do caminho. Então
+      ``:class:`~django.contrib.contenttypes.models.ContentType``` mostrará
+      somente um link com o título "ContentType".
+

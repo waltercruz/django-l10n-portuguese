@@ -1,0 +1,227 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-middleware:
+
+====================================
+Referência dos middlewares embutidos
+====================================
+
+.. module:: django.middleware
+   :synopsis: Classes embutidas de middleware do Django.
+
+Este documento detalha todos os componentes middleware que acompanham o Django.
+Para informações de como usá-los e de como escrever o seu próprio middleware,
+veja o :doc:`guia de uso de middleware </topics/http/middleware>`.
+
+Middlewares disponíveis
+=======================
+
+Middleware de cache
+-------------------
+
+.. module:: django.middleware.cache
+   :synopsis: Middleware para fazer cache do site todo.
+
+.. class:: django.middleware.cache.UpdateCacheMiddleware
+
+.. class:: django.middleware.cache.FetchFromCacheMiddleware
+
+Habilita o cache em todo o site. Se este estiver habilitado, cada página
+construída pelo Django será cacheada durante o tempo definido em
+:setting:`CACHE_MIDDLEWARE_SECONDS`. Veja a :doc:`documentação do cache
+</topics/cache>`.
+
+Middleware "Common"
+-------------------
+
+.. module:: django.middleware.common
+   :synopsis: Middleware que adiciona conveniências "comuns" para perfeccionistas.
+
+.. class:: django.middleware.common.CommonMiddleware
+
+Adiciona algumas conveniências para perfeccionistas:
+
+    * Proíbe o acesso de "user agents" especificados em
+      :setting:`DISALLOWED_USER_AGENTS`, o qual deve ser uma lista de strings.
+
+    * Executa uma reescrita de URL baseada nas configurações
+      :setting:`APPEND_SLASH` e :setting:`PREPEND_WWW`.
+
+      Se o :setting:`APPEND_SLASH` for ``True`` e a URL inicial não terminar
+      com uma barra, e ela não for encontrada no URLconf, então uma nova URL é
+      formada, adicionando uma barra no final. Se esta nova URL é encontrada no
+      URLconf, o Django redireciona a requisição para esta nova URL. Por outro
+      lado, a URL inicial é processada habitualmente.
+
+      Por exemplo, ``foo.com/bar`` será redirecionado para ``foo.com/bar/`` se
+      você não tiver um padrão de URL válido para ``foo.com/bar`` mas *tem* um
+      padrão válido para ``foo.com/bar/``.
+
+      .. versionchanged:: 1.0
+         O comportamento do :setting:`APPEND_SLASH` mudou ligeiramente nesta
+         versão. Ele não é utilizado para verificar se o padrão confere na
+         URLconf.
+
+      Se o :setting:`PREPEND_WWW` é ``True``, as URLs que faltam um "www." na
+      frente serão redirecionadas para a mesma URL com o "www." na frente.
+
+      Estes dois tipos de opções são destinadas a normalizar URLs. A filosofia
+      é que cada URL deve existir em um, e somente um, lugar. Tecnicamente uma
+      URL ``foo.com/bar`` é diferente de ``foo.com/bar/`` -- um indexador de
+      motor de busca tratará elas como URLs separadas -- então esta é a melhor
+      prática para normalizar URLs.
+
+    * Manipula ETags baseado na configuração :setting:`USE_ETAGS`. Se o
+      :setting:`USE_ETAGS` é definido como ``True``, o Django calculará um ETag
+      para cada requisição usando um hash MD5 do conteúdo da página, e irá se
+      responsabilizar por enviar repostas ``Not Modified`` (não modificado), se
+      apropriado.
+
+Middleware view metadata
+------------------------
+
+.. module:: django.middleware.doc
+   :synopsis: Middleware para ajudar sua aplicação se auto documentar.
+
+.. class:: django.middleware.doc.XViewMiddleware
+
+Envia cabeçalhos HTTP ``X-View`` personalizados para requisições HEAD oriundas
+de endereços IP definidos na configuração :setting:`INTERNAL_IPS`. Isso é
+utilizado pelo sistema de documentação automática do Django.
+
+Middleware GZIP
+---------------
+
+.. module:: django.middleware.gzip
+   :synopsis: Middleware para servir conteúdos gzipado para melhor desempenho.
+
+.. class:: django.middleware.gzip.GZipMiddleware
+
+Comprime conteúdos para navegadores que entendem compressão gzip (todos os
+navegadores modernos).
+
+É sugerido colocá-lo em primeiro na lista de middlewares, desta forma a
+compressão do conteúdo de resposta será a última coisa a ser feita. Não serão
+comprimidos conteúdos menores que 200 bytes, quando o código de resposta for
+diferente de 200, quando arquivos JavaScript (para compatibilidade com IE), ou
+quando as respostas possuem o cabeçalho ``Content-Encoding`` já especificado.
+
+Middleware GET condicional
+--------------------------
+
+.. module:: django.middleware.http
+   :synopsis: Middleware para manipulação de funcionalidades avançadas do HTTP.
+
+.. class:: django.middleware.http.ConditionalGetMiddleware
+
+Manipula operações condicionais do GET. Se a resposta tem um cabeçalho ``ETag``
+ou ``Last-Modified``, e a requisição possui ``If-None-Match`` ou
+``If-Modified-Since``, a resposta é substituída por um
+:class:`~django.http.HttpNotModified``.
+
+Também define os cabeçalhos de resposta ``Date`` e ``Content-Length``.
+
+Middleware para proxy reverso
+-----------------------------
+
+.. class:: django.middleware.http.SetRemoteAddrFromForwardedFor
+
+Define o ``request.META['REMOTE_ADDR']`` baseado no
+``request.META['HTTP_X_FORWARDED_FOR']``, se o último estiver definido. Isso é
+útil se você estiver por trás de um proxy reverso que faz com que cada
+``REMOTE_ADDR`` seja definido como ``127.0.0.1``.
+
+**Nota importante:** Isso NÃO valida o ``HTTP_X_FORWARDED_FOR``. Se você não
+está atrás de um proxy reverso que define o ``HTTP_X_FORWARDED_FOR``
+automaticamente, não utilize este middleware. Ninguém pode burlar o valor do
+``HTTP_X_FORWARDED_FOR``, e por causa disso defina ``REMOTE_ADDR`` baseado no
+``HTTP_X_FORWARDED_FOR``, o que significa que ninguém pode "falsificar" seus
+endereços de IP. Somente use isto quando você confia absolutamente no valor do
+``HTTP_X_FORWARDED_FOR``.
+
+Middleware Locale
+-----------------
+
+.. module:: django.middleware.locale
+   :synopsis: Middleware para habilitar a seleção de idioma baseado na requisição.
+
+.. class:: django.middleware.locale.LocaleMiddleware
+
+Habilita a seleção de idioma baseado em dados vindos da requisição. Ele
+personaliza o conteúdo para cada usuário. Veja a :doc:`documentação de
+internacionalização </topics/i18n/index>`.
+
+Middleware Session
+------------------
+
+.. module:: django.contrib.sessions.middleware
+   :synopsis: Middleware de sessão.
+
+.. class:: django.contrib.sessions.middleware.SessionMiddleware
+
+Habilita o suporte a sessões. Veja a :doc:`documentação de sessões
+</topics/http/sessions>`.
+
+Middleware Authentication
+-------------------------
+
+.. module:: django.contrib.auth.middleware
+  :synopsis: Middleware de autenticação.
+
+.. class:: django.contrib.auth.middleware.AuthenticationMiddleware
+
+Adiciona o atributo ``user``, representando o usuário atualmente logado, para
+todo objeto ``HttpRequest`` que chega. Veja :doc:`Autenticação em requisições
+Web </topics/auth>`.
+
+Middleware de proteção CSRF
+---------------------------
+
+.. module:: django.contrib.csrf.middleware
+   :synopsis: Middleware que adiciona proteção contra Cross Site Request
+              Forgeries.
+
+.. class:: django.contrib.csrf.middleware.CsrfMiddleware
+
+.. versionadded:: 1.0
+
+Adiciona proteção contra Cross Site Request Forgeries adicionando campos
+invisíveis de formulários aos formulários POST e checando suas requisições
+pelos valores corretos. Veja a :doc:`documentação da proteção de Cross Site
+Request Forgeries </ref/contrib/csrf>`.
+
+Middleware Transaction
+----------------------
+
+.. module:: django.middleware.transaction
+   :synopsis: Middleware que vincula uma transação de banco de dados a cada
+              requisição Web.
+
+.. class:: django.middleware.transaction.TransactionMiddleware
+
+Vincula commit e rollback às fases request/response. Se uma função view é
+executada com sucesso, um commit é feito. Se ela falhar com uma exceção, um
+rollback é realizado.
+
+A ordem deste middleware na pilha é importante: módulos middleware rodando fora
+dele rodam com commit-on-save - o comportamento padrão do Django. Módulos
+middleware rodando dentro dele (vêm depois na pilha) estarão abaixo do mesmo
+controle de transações como nas funções view.
+
+Veja a :doc:`documentação de gerenciamento de transações
+</topics/db/transactions>`.
+

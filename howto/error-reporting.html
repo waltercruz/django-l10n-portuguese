@@ -1,0 +1,231 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Reporte de erros via e-mail &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Guias “como fazer”" href="index.html" />
+    <link rel="next" title="Provendo dados inicias para models" href="initial-data.html" />
+    <link rel="prev" title="Como usar o Django com o Apache e mod_python" href="deployment/modpython.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="deployment/modpython.html" title="Como usar o Django com o Apache e mod_python">previous</a> 
+     |
+    <a href="index.html" title="Guias &amp;#8220;como fazer&amp;#8221;" accesskey="U">up</a>
+   |
+    <a href="initial-data.html" title="Provendo dados inicias para models">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-error-reporting">
+            
+  <div class="section" id="s-reporte-de-erros-via-e-mail">
+<span id="s-howto-error-reporting"></span><span id="reporte-de-erros-via-e-mail"></span><span id="howto-error-reporting"></span><h1>Reporte de erros via e-mail<a class="headerlink" href="#reporte-de-erros-via-e-mail" title="Permalink to this headline">¶</a></h1>
+<p>Quando você está rodando um site público deve sempre desligar a configuração
+<a class="reference internal" href="../ref/settings.html#std:setting-DEBUG"><tt class="xref std std-setting docutils literal"><span class="pre">DEBUG</span></tt></a>. Isso irá fazer seu servidor operar muito mais rápido, e também
+evitará que usuários maliciosos vejam detalhes de sua aplicação que não devem
+ser revelados pelas páginas de erro.</p>
+<p>Entretanto, rodar com o <a class="reference internal" href="../ref/settings.html#std:setting-DEBUG"><tt class="xref std std-setting docutils literal"><span class="pre">DEBUG</span></tt></a> como <tt class="xref docutils literal"><span class="pre">False</span></tt> significa que você nunca
+verá os erros gerados pelo seu site &#8211; todo mundo sempre verá somente a sua
+página de erros pública.</p>
+<div class="section" id="s-erros-de-servidor">
+<span id="erros-de-servidor"></span><h2>Erros de servidor<a class="headerlink" href="#erros-de-servidor" title="Permalink to this headline">¶</a></h2>
+<p>Quando <a class="reference internal" href="../ref/settings.html#std:setting-DEBUG"><tt class="xref std std-setting docutils literal"><span class="pre">DEBUG</span></tt></a> é <tt class="xref docutils literal"><span class="pre">False</span></tt>, o Django irá enviar um email para os
+usuários listados em <tt class="xref std std-setting docutils literal"><span class="pre">ADMIN</span></tt> sempre que seu código lançar uma exceção
+não tratada e que resulta num &#8220;internal server error&#8221; (código de status HTTP
+500). Isto dá aos administradores a notificação imediata de quaisquer erros. O
+<a class="reference internal" href="../ref/settings.html#std:setting-ADMINS"><tt class="xref std std-setting docutils literal"><span class="pre">ADMINS</span></tt></a> irá pegar uma descrição do erro, um traceback completo do
+Python, e detalhes sobre a requisição HTTP que causou o erro.</p>
+<p>Por padrão, o Django irá mandar e-mails de <a class="reference external" href="mailto:root&#37;&#52;&#48;localhost">root<span>&#64;</span>localhost</a>. Porém, alguns provedores
+de e-mail rejeitam todos os e-mails desse endereço. Para usar um endereço de remetente
+diferente, modifique a configuração <a class="reference internal" href="../ref/settings.html#std:setting-SERVER_EMAIL"><tt class="xref std std-setting docutils literal"><span class="pre">SERVER_EMAIL</span></tt></a>.</p>
+<p>Para desabilitar este comportamento, basta remover todas as entradas da
+configuração <a class="reference internal" href="../ref/settings.html#std:setting-ADMINS"><tt class="xref std std-setting docutils literal"><span class="pre">ADMINS</span></tt></a>.</p>
+</div>
+<div class="section" id="s-erros-404">
+<span id="erros-404"></span><h2>Erros 404<a class="headerlink" href="#erros-404" title="Permalink to this headline">¶</a></h2>
+<p>O Django também pode ser configurado para enviar e-mail com erros de links
+quebrados (erros 404 &#8220;page not found&#8221;). O Django envia um email sobre os erros
+quando:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../ref/settings.html#std:setting-DEBUG"><tt class="xref std std-setting docutils literal"><span class="pre">DEBUG</span></tt></a> é <tt class="xref docutils literal"><span class="pre">False</span></tt></li>
+<li><a class="reference internal" href="../ref/settings.html#std:setting-SEND_BROKEN_LINK_EMAILS"><tt class="xref std std-setting docutils literal"><span class="pre">SEND_BROKEN_LINK_EMAILS</span></tt></a> é <tt class="xref docutils literal"><span class="pre">True</span></tt></li>
+<li>Seu <a class="reference internal" href="../ref/settings.html#std:setting-MIDDLEWARE_CLASSES"><tt class="xref std std-setting docutils literal"><span class="pre">MIDDLEWARE_CLASSES</span></tt></a> incluí <tt class="docutils literal"><span class="pre">CommonMiddleware</span></tt>
+(o que é feito por padrão).</li>
+</ul>
+<p>Se essas condições forem satisfeitas, o Django irá enviar um e-email para os
+usuários listados em <a class="reference internal" href="../ref/settings.html#std:setting-MANAGERS"><tt class="xref std std-setting docutils literal"><span class="pre">MANAGERS</span></tt></a> toda vez que seu código gerar um erro
+404 e a requisição tiver um referente. (Ela não se preocupa em enviar e-mail de
+erros 404 que não têm um referente &#8211; normalmente esses são tentativas dos
+usuários de escrever URLs ou algum bot web quebrado).</p>
+<p>Você pode dizer ao Django parar de reportar alguns erros 404 específicos
+apromirando as configurações <a class="reference internal" href="../ref/settings.html#std:setting-IGNORABLE_404_ENDS"><tt class="xref std std-setting docutils literal"><span class="pre">IGNORABLE_404_ENDS</span></tt></a> e
+<a class="reference internal" href="../ref/settings.html#std:setting-IGNORABLE_404_STARTS"><tt class="xref std std-setting docutils literal"><span class="pre">IGNORABLE_404_STARTS</span></tt></a>. Ambos devem ser uma tupla de strings. Por
+exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">IGNORABLE_404_ENDS</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;.php&#39;</span><span class="p">,</span> <span class="s">&#39;.cgi&#39;</span><span class="p">)</span>
+<span class="n">IGNORABLE_404_STARTS</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;/phpmyadmin/&#39;</span><span class="p">,)</span>
+</pre></div>
+</div>
+<p>Neste exemplo, um error 404 para qualquer final de URL com <tt class="docutils literal"><span class="pre">.php</span></tt> ou <tt class="docutils literal"><span class="pre">.cgi</span></tt>
+não será reportado. Nem mesmo qualquer URL que comece com <tt class="docutils literal"><span class="pre">/phpmyadmin/</span></tt>.</p>
+<p>O melhor caminho para desabilitar este comportamento é setar o
+<a class="reference internal" href="../ref/settings.html#std:setting-SEND_BROKEN_LINK_EMAILS"><tt class="xref std std-setting docutils literal"><span class="pre">SEND_BROKEN_LINK_EMAILS</span></tt></a> para <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">Você pode também configurar um reporte de erro customizado, personalizando
+uma parte do <a class="reference internal" href="../topics/http/middleware.html#exception-middleware"><em>exception middleware</em></a>. Se
+você escrever um manipulador de erro personalizado, será uma boa idéia
+emular o manipulador de erros nativo do Django e somente reportar/logar
+erros se o <a class="reference internal" href="../ref/settings.html#std:setting-DEBUG"><tt class="xref std std-setting docutils literal"><span class="pre">DEBUG</span></tt></a> for <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Reporte de erros via e-mail</a><ul>
+<li><a class="reference internal" href="#erros-de-servidor">Erros de servidor</a></li>
+<li><a class="reference internal" href="#erros-404">Erros 404</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="deployment/modpython.html">Como usar o Django com o Apache e mod_python</a></li>
+    
+    
+      <li>Next: <a href="initial-data.html">Provendo dados inicias para models</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Guias &#8220;como fazer&#8221;</a>
+        
+        <ul><li>Reporte de erros via e-mail</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/howto/error-reporting.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="deployment/modpython.html" title="Como usar o Django com o Apache e mod_python">previous</a> 
+     |
+    <a href="index.html" title="Guias &amp;#8220;como fazer&amp;#8221;" accesskey="U">up</a>
+   |
+    <a href="initial-data.html" title="Provendo dados inicias para models">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

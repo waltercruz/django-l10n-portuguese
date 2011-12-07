@@ -1,0 +1,711 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-contrib-localflavor:
+
+=========================
+Os add-ons "local flavor"
+=========================
+
+.. module:: django.contrib.localflavor
+    :synopsis: Uma coleção de vários fragmentos que são úteis somente para um
+               país ou cultura em particular.
+
+Seguindo sua filosofia de "beterias inclusas", o Django vem acompanhado de peças
+sortidas de código que são úteis para paises e culturas particulares. Estes são
+chamados de "local flavor" (sabores locais) e ficam no pacote
+:mod:`django.contrib.localflavor`.
+
+Dentro desse pacote, ó código de um país ou uma cultura específica fica dentro
+de sub-pacotes, chamados usando `códigos de país ISO 3166`_.
+
+A maioria dos add-ons ``localflavor`` estão localizados na forma de componentes
+derivando do framework :doc:`forms </topics/forms/index>` -- por exemplo, um
+:class:`~django.contrib.localflavor.us.forms.USStateField` que sabe como validar
+abreviações de estados do E.U.A., e um 
+:class:`~django.contrib.localflavor.fi.forms.FISocialSecurityNumber` que sabe
+como validar os números do seguro social Finlandês.
+
+Para usar um desses componentes localizados, basta importar o sub-pacote 
+relevante. Por exemplo, aqui tem como você consegue criar um formulário com um
+campo representando um número de telefone Francês::
+
+    from django import forms
+    from django.contrib.localflavor.fr.forms import FRPhoneNumberField
+
+    class MyForm(forms.Form):
+        my_french_phone_no = FRPhoneNumberField()
+
+Paises suportados
+=================
+
+Os paises atualmente suportados pelo :mod:`~django.contrib.localflavor` são
+
+    * Argentina_
+    * Australia_
+    * Austria_
+    * Brazil_
+    * Canada_
+    * Chile_
+    * Finland_
+    * France_
+    * Germany_
+    * Iceland_
+    * India_
+    * Italy_
+    * Japan_
+    * Mexico_
+    * `The Netherlands`_
+    * Norway_
+    * Peru_
+    * Poland_
+    * Romania_
+    * Slovakia_
+    * `South Africa`_
+    * Spain_
+    * Switzerland_
+    * `United Kingdom`_
+    * `United States of America`_
+
+O pacote ``django.contrib.localflavor`` também inclui um sub-pacote genérico,
+contendo código útil que não são específicos para um único país ou cultura.
+Atualmente, é definido campos de entrada date e datetime baseados naqueles 
+vindos de :doc:`forms </topics/forms/index>`, mas com formatos que não seguem o
+padrão dos E.U.A. Aqui temos um exemplo de como usá-los::
+
+    from django import forms
+    from django.contrib.localflavor import generic
+
+    class MyForm(forms.Form):
+        my_date_field = generic.forms.DateField()
+
+.. _códigos de país ISO 3166: http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm
+.. _Argentina: `Argentina (ar)`_
+.. _Australia: `Australia (au)`_
+.. _Austria: `Austria (at)`_
+.. _Brazil: `Brazil (br)`_
+.. _Canada: `Canada (ca)`_
+.. _Chile: `Chile (cl)`_
+.. _Finland: `Finland (fi)`_
+.. _France: `France (fr)`_
+.. _Germany: `Germany (de)`_
+.. _The Netherlands: `The Netherlands (nl)`_
+.. _Iceland: `Iceland (is\_)`_
+.. _India: `India (in\_)`_
+.. _Italy: `Italy (it)`_
+.. _Japan: `Japan (jp)`_
+.. _Mexico: `Mexico (mx)`_
+.. _Norway: `Norway (no)`_
+.. _Peru: `Peru (pe)`_
+.. _Poland: `Poland (pl)`_
+.. _Romania: `Romania (ro)`_
+.. _Slovakia: `Slovakia (sk)`_
+.. _South Africa: `South Africa (za)`_
+.. _Spain: `Spain (es)`_
+.. _Switzerland: `Switzerland (ch)`_
+.. _United Kingdom: `United Kingdom (uk)`_
+.. _United States of America: `United States of America (us)`_
+
+Adicionando sabores
+===================
+
+Nós adoraríamos adicionar mais deles no Django, então por favor 
+`crie um ticket`_ com qualquer código que você gostaria de contribuir. Uma coisa
+que nós pedimos é que você, por favor, use objetos Unicode (``u'mystring'``) 
+para strings, ao invês de configurar a codificação no arquivo. Veja qualquer um
+dos flavors como exemplos.
+
+.. _crie um ticket: http://code.djangoproject.com/simpleticket
+
+Argentina (``ar``)
+=============================================
+
+.. class:: ar.forms.ARPostalCodeField
+
+    Um campo de formulário que valida a entrada como um número clássico de 
+    quatro dígitos do código postal ou um CPA_.
+
+.. _CPA: http://www.correoargentino.com.ar/consulta_cpa/home.php
+
+.. class:: ar.forms.ARDNIField
+
+    Um campo de formulário que valida a entrada como um número de  Documento 
+    Nacional de Identidade (DNI).
+
+.. class:: ar.forms.ARCUITField
+
+    Um campo de formulário que valida a entrada como um número de Código Único
+    de Identificação Tributária (CUIT).
+
+.. class:: ar.forms.ARProvinceSelect
+
+    Um widget ``Select`` que usa uma lista de províncias argentinas e cidades
+    autônomas como suas opções.
+
+Australia (``au``)
+=============================================
+
+.. class:: au.forms.AUPostCodeField
+
+    Um campo de formulário que valida a entrada como um código postal 
+    austráliano.
+
+.. class:: au.forms.AUPhoneNumberField
+
+    Um campo de formulário que valida a entrada como um número de telefone
+    australiano. Números válidos possuem dez dígitos.
+
+.. class:: au.forms.AUStateSelect
+
+    Um widget ``Select`` que usa uma lista de estados/territórios australianos
+    como suas opções.
+
+Austria (``at``)
+================
+
+.. class:: at.forms.ATZipCodeField
+
+    Um campo de formulário que valida sua entrada como um código zip austríaco.
+
+.. class:: at.forms.ATStateSelect
+
+    Um widget ``Select`` que usa uma lista de estados austríacos como suas 
+    opções.
+
+.. class:: at.forms.ATSocialSecurityNumberField
+
+    Um campo de formulário que valida sua entrada como um número de seguro 
+    social austríaco.
+
+Brazil (``br``)
+===============
+
+.. class:: br.forms.BRPhoneNumberField
+
+    Um campo de formulário que valida a entrada como um número de telefone
+    brasileiro, com o formato XX-XXXX-XXXX.
+
+.. class:: br.forms.BRZipCodeField
+
+    Um campo de formulário que valida a entrada como um C.E.P. brasileiro, com o
+    formato XXXXX-XXX.
+
+.. class:: br.forms.BRStateSelect
+
+    Um widget ``Select`` que usa uma lista de estados/territórios brasileiros
+    como suas opções.
+
+Canada (``ca``)
+===============
+
+.. class:: ca.forms.CAPhoneNumberField
+
+    Um campo de formulário que valida a entrada como um número de telefone 
+    canadence, como o formato XXX-XXX-XXXX.
+
+.. class:: ca.forms.CAPostalCodeField
+
+    Um campo de formulário que valida a entrada como um código postal canadence,
+    com o formato XXX XXX
+
+.. class:: ca.forms.CAProvinceField
+
+    Um campo de formulário que valida a entrada como um nome ou abreviação de 
+    província canadense.
+
+.. class:: ca.forms.CASocialInsuranceNumberField
+
+    Um campo de formulário que valida a entrada como um Número de Seguro Social
+    Canadense (SIN). Um número válido deve ter o formato XXX-XXX-XXX e passar um
+    `Luhn mod-10 checksum`_.
+
+.. _Luhn mod-10 checksum: http://en.wikipedia.org/wiki/Luhn_algorithm
+
+.. class:: ca.forms.CAProvinceSelect
+
+    Um widget ``Select`` que usa uma lista de províncias e territórios 
+    canadenses como suas opções.
+
+Chile (``cl``)
+==============
+
+.. class:: cl.forms.CLRutField
+
+    Um campo de formulário que valida a entrada como um número de identificação 
+    nacional chilena ('Rol Unico Tributario' or RUT). O formato válido é
+    XX.XXX.XXX-X.
+
+.. class:: cl.forms.CLRegionSelect
+
+    Um widget ``Select`` que usa uma lista de regiões chilenas (Regiões) como
+    suas opções.
+
+Finland (``fi``)
+================
+
+.. class:: fi.forms.FISocialSecurityNumber
+
+    Um campo de formulário que valida a entrada como um número de seguro social
+    finlandês.
+
+.. class:: fi.forms.FIZipCodeField
+
+    Um campo de formulário que valida a entrada como de um código zip finlandês.
+    Códigos válidos consistem em cinco dígitos.
+
+.. class:: fi.forms.FIMunicipalitySelect
+
+    Um widget ``Select`` que usa uma lista de municípios finlandeses como suas
+    opções.
+
+France (``fr``)
+===============
+
+.. class:: fr.forms.FRPhoneNumberField
+
+    Um campo de formulário que valida a entrada como um número local francês. O
+    formato correto é 0X XX XX XX XX. 0X.XX.XX.XX.XX e 0XXXXXXXXX validam mas
+    são corrigidos para 0X XX XX XX XX.
+
+.. class:: fr.forms.FRZipCodeField
+
+    Um campo de formulário que valida a entrada como um código zip fancês. 
+    Códigos válidos consistem em cinco dígitos.
+
+.. class:: fr.forms.FRDepartmentSelect
+
+    Um widget ``Select`` que usa uma lista de departamentos franceses como suas
+    opções.
+
+Germany (``de``)
+================
+
+.. class:: de.forms.DEIdentityCardNumberField
+
+    Um campo de formulário que valida a entrada como um número de carteira de
+    identidade alemã (Personalausweis_). Números válidos têm o formato
+    XXXXXXXXXXX-XXXXXXX-XXXXXXX-X, com nenhum grupo com somente zeros.
+
+.. _Personalausweis: http://de.wikipedia.org/wiki/Personalausweis
+
+.. class:: de.forms.DEZipCodeField
+
+    Um campo de formulário que valida a entrada como um código zip alemão. 
+    Códigos válidos consistem em cinco dígitos.
+
+.. class:: de.forms.DEStateSelect
+
+    Um widget ``Select`` que usa uma lista de estados alemãos como suas opções.
+
+The Netherlands (``nl``)
+========================
+
+.. class:: nl.forms.NLPhoneNumberField
+
+    Um campo de formulário que valida a entrada como um número de telefone 
+    holandês.
+
+.. class:: nl.forms.NLSofiNumberField
+
+    Um campo de formulário que valida a entrada como um número de seguro social
+    holandês (SoFI/BSN).
+
+.. class:: nl.forms.NLZipCodeField
+
+    Um campo de formulário que valida a entrada como um código zip holandês.
+
+.. class:: nl.forms.NLProvinceSelect
+
+    Um widget ``Select`` que usa uma lista de províncias holandesas como uma 
+    lista de opções..
+
+Iceland (``is_``)
+=================
+
+.. class:: is_.forms.ISIdNumberField
+
+    Um campo de formulário que valida a entrada como um número de identificação
+    islandês (kennitala). O formato é XXXXXX-XXXX.
+
+.. class:: is_.forms.ISPhoneNumberField
+
+    Um campo de formulário que valida a entrada como um número de telefone da
+    Islândia (sete dígitos com um hífen opcional depois dos primeiros três 
+    dígitos).
+
+.. class:: is_.forms.ISPostalCodeSelect
+
+    Um widget ``Select`` que usa uma lista de códigos postais da Islândia como 
+    suas opções.
+
+India (``in_``)
+===============
+
+.. class:: in.forms.INStateField
+
+    Um campo de formulário que valida a entrada como o nome ou abreviação de um
+    estado/território indiano. A entrada é normalizada para o padrão de duas 
+    letras do veículo de registro de abreviação para o dado estado ou 
+    território.
+
+.. class:: in.forms.INZipCodeField
+
+    Um campo de formulário que valida a entrada como um código zip indiano, com
+    o formato XXXXXXX.
+
+.. class:: in.forms.INStateSelect
+
+    Um widget ``Select`` que usa uma lista de estados/territórios indianos como 
+    suas opções.
+
+Italy (``it``)
+==============
+
+.. class:: it.forms.ITSocialSecurityNumberField
+
+    Um campo de formulário que valida a entrada como um número de seguro social
+    italiano (`condição fiscal`_).
+
+.. _condição fiscal: http://www.agenziaentrate.it/ilwwcm/connect/Nsi/Servizi/Codice+fiscale+-+tessera+sanitaria/NSI+Informazioni+sulla+codificazione+delle+persone+fisiche
+
+.. class:: it.forms.ITVatNumberField
+
+    Um campo de formulário que valida números italianos VAT (partida IVA).
+
+.. class:: it.forms.ITZipCodeField
+
+    Um campo de formulário que valida a entrada como um código zip italiano.
+    Códigos válidos devem conter cinco dígitos.
+
+.. class:: it.forms.ITProvinceSelect
+
+    Um widget ``Select`` que usa uma lista de províncias italianas como suas
+    opções.
+
+.. class:: it.forms.ITRegionSelect
+
+    Um widget ``Select`` que usa uma lista de regiões italianas como suas 
+    opções.
+
+Japan (``jp``)
+==============
+
+.. class:: jp.forms.JPPostalCodeField
+
+    Um campo de formulário que valida a entrada como um código postal japonês. 
+    Ele aceita sete dígitos, com ou sem hífen.
+
+.. class:: jp.forms.JPPrefectureSelect
+
+    Um widget ``Select`` que usa uma lista de prefeituras japonesas como suas 
+    opções.
+
+Mexico (``mx``)
+===============
+
+.. class:: mx.forms.MXStateSelect
+
+    Um widget ``Select`` que usa uma lista de estados mexicanos como suas 
+    opções.
+
+Norway (``no``)
+===============
+
+.. class:: no.forms.NOSocialSecurityNumber
+
+    Um campo de formulário que valida a entrada como um número de seguro social
+    norueguesa (personnummer_).
+
+.. _personnummer: http://no.wikipedia.org/wiki/Personnummer
+
+.. class:: no.forms.NOZipCodeField
+
+    Um campo de formulário que valida a entrada como um código zip norueguês. 
+    Códigos válidos possuem quatro dígitos.
+
+.. class:: no.forms.NOMunicipalitySelect
+
+    Um widget ``Select`` que usa uma lista de minicípios noruegueses (fylker)
+    como suas opções.
+
+Peru (``pe``)
+=============
+
+.. class:: pt.forms.PEDNIField
+
+    Um campo de formulário que valida a entrada como uma DNI (Identidade 
+    nacional peruana).
+
+.. class:: pt.forms.PERUCField
+
+    Um campo de formulário que valida a entrada como um número RUC (Registro 
+    Unico de Contribuintes). Números RUC válidos possuem 11 dígitos.
+
+.. class:: pt.forms.PEDepartmentSelect
+
+    Um widget ``Select`` que usa uma lista de Departamentos Peruanos como suas
+    opções.
+
+Poland (``pl``)
+===============
+
+.. class:: pl.forms.PLNationalIdentificationNumberField
+
+    Um campo de formulário que valida a entrada como um número de identificação
+    polonês (PESEL_).
+
+.. _PESEL: http://en.wikipedia.org/wiki/PESEL
+
+.. class:: pl.forms.PLNationalBusinessRegisterField
+
+    Um campo de formulário que valida a entrada como um Número de Registro 
+    Nacional Oficial Polonês (REGON_), tendo tanto sete quando nove dígitos. O
+    algorítmo checksum é usado para REGONs está documentado em
+    http://wipos.p.lodz.pl/zylla/ut/nip-rego.html.
+
+.. _REGON: http://www.stat.gov.pl/bip/regon_ENG_HTML.htm
+
+.. class:: pl.forms.PLPostalCodeField
+
+    Um campo de formulário que valida a entrada como um código postal polonês. 
+    O formato válido é XX-XXX, onde X é um dígito.
+
+.. class:: pl.forms.PLTaxNumberField
+
+    Um campo de formulário que valida a entrada como a Número de Taxa Polonês 
+    (NIP). Formatos válidos são XXX-XXX-XX-XX ou XX-XX-XXX-XXX. O algorítmo
+    checksum usado para NIPs está documentado em
+    http://wipos.p.lodz.pl/zylla/ut/nip-rego.html.
+
+.. class:: pl.forms.PLAdministrativeUnitSelect
+
+    Um widget ``Select`` que usa uma lista de unidades administrativas polonesas
+    como suas opções.
+
+.. class:: pl.forms.PLVoivodeshipSelect
+
+    Um widget ``Select`` que usa uma lista de voivodeships polonesas (províncias
+    administrativas) como suas opções.
+
+Romania (``ro``)
+================
+
+.. class:: ro.forms.ROCIFField
+
+    Um campo de formulário que valida códigos de identificação fiscal (CIF). O
+    valor retornado mostra o RO na frente, se fornecido.
+
+.. class:: ro.forms.ROCNPField
+
+    Um campo de formulário que valida códigos numéricos pessoais (CNP).
+
+.. class:: ro.forms.ROCountyField
+
+    Um campo de formulário que valida sua entrada como um um nome ou abreviação
+    de uma comarca (judete) romena. Ele normaliza a entrada como uma abreviatura
+    padrão de registro de veículo para a comarca informada. Este campo só aceita
+    nomes escritos com sinais diacríticos; considere usar ROCountySelect como 
+    uma alternativa.
+    
+
+.. class:: ro.forms.ROCountySelect
+
+    Um widget ``Select`` que usa uma lista de países romenos (judete) como suas
+    opções.
+
+.. class:: ro.forms.ROIBANField
+
+    Um campo de formulário que valida sua entrada como um Número de Conta de 
+    Banco Internacional Romeno (IBAN). O formato válido é 
+    ROXX-XXXX-XXXX-XXXX-XXXX-XXXX, com ou sem hífens.
+
+.. class:: ro.forms.ROPhoneNumberField
+
+    Um campo de formulário que valida como números de telefone romenos, números
+    curtos especiais excluídos.
+
+.. class:: ro.forms.ROPostalCodeField
+
+    Um campo de formulário que valida como um código postal romeno.
+    
+
+Slovakia (``sk``)
+=================
+
+.. class:: sk.forms.SKPostalCodeField
+
+    Um campo de formulário que valida a entrada como um código postal eslovaco. 
+    Formatos válidos são XXXXX ou XXX XX, onde X é um dígito.
+
+.. class:: sk.forms.SKDistrictSelect
+
+    Um widget ``Select`` que usa uma lista de distritos eslovacos como suas 
+    opções.
+
+.. class:: sk.forms.SKRegionSelect
+
+    Um widget ``Select`` que usa uma lista de regiões eslovacas como suas 
+    opções.
+
+South Africa (``za``)
+=====================
+
+.. class:: za.forms.ZAIDField
+
+    Um campo de formulário que valida a entrada como um número ID sulafricano. 
+    A validação usa o Luhn checksum e um verificador simplista (i.e., não é
+    totalmente exato) para a data do nascimento.
+
+.. class:: za.forms.ZAPostCodeField
+
+    Um campo de formulário que valida a entrada como um código postal da Africa
+    do Sul. Códigos postais válidos devem ter quatro dígitos.
+
+Spain (``es``)
+==============
+
+.. class:: es.forms.ESIdentityCardNumberField
+
+    Um campo de formulário que valida a entrada como um código NIF/NIE/CIF 
+    espanhol (Número de identificação Fiscal).
+
+.. class:: es.forms.ESCCCField
+
+    Um campo de formulário que valida a entrada como um número de conta de banco
+    espanhol (Código Conta Cliente ou CCC). Um número CCC válido tem o formato
+    EEEE-OOOO-CC-AAAAAAAAAA, onde os dígitos E, O, C e A denotam a entidade, 
+    office (escritório), checksum e account (conta), repectivamente. O primeiro
+    dígito checksum valida a entidade e o escritório. O segundo dígito checksum
+    valida a conta. Ele também é valido usar um espaço como um delimitador, ou
+    não usar delimitadores.
+
+.. class:: es.forms.ESPhoneNumberField
+
+    Um campo de formulário que valida a entrada como um número de telefone 
+    espanhol. Números válidos possuem nove dígitos, o primeiro dos quais é 6, 8
+    ou 9.
+
+.. class:: es.forms.ESPostalCodeField
+
+    Um campo de formulário que valida a entrada como um código postal espanhol. 
+    Códigos válidos possuem cinco dígitos, os dois primeiros estando entre 01 e
+    52, representando a província.
+
+.. class:: es.forms.ESProvinceSelect
+
+    Um widget ``Select`` que usa uma lista de províncias espanholas como suas 
+    opções.
+
+.. class:: es.forms.ESRegionSelect
+
+    Um widget ``Select`` que usa uma lista de regiões espanholas como suas 
+    opções.
+
+Switzerland (``ch``)
+====================
+
+.. class:: ch.forms.CHIdentityCardNumberField
+
+    Um campo de formulário que valida a entrada como um número de cartão de
+    identidade suíça. Um número válido deve estar no formato X1234567<0 ou 
+    1234567890 e ter os checksums corretos -- veja 
+    http://adi.kousz.ch/artikel/IDCHE.htm.
+
+.. class:: ch.forms.CHPhoneNumberField
+
+    Um campo de formulário que valida a entrada como um número de telefone 
+    suíço. O formato correto é 0XX XXX XX XX. 0XX.XXX.XX.XX e 0XXXXXXXXX validam
+    mas são convertidos para 0XX XXX XX XX.
+
+.. class:: ch.forms.CHZipCodeField
+
+    Um campo de formulário que valida a entrada como um código zip suíço. 
+    Códigos válidos consitem em quatro dígitos.
+
+.. class:: ch.forms.CHStateSelect
+
+    Um widget ``Select`` que usa uma lista de estados suíços como suas opções.
+
+United Kingdom (``uk``)
+=======================
+
+.. class:: uk.forms.UKPostcodeField
+
+    Um campo de formulário que valida a entrada como um código postal do Reino
+    Unido. A expressão regular usada é proveniente do esquema para os tipos de
+    endereço no padrão britânico (British Standard) BS7666 em
+    http://www.govtalk.gov.uk/gdsc/schemas/bs7666-v2-0.xsd.
+
+.. class:: uk.forms.UKCountySelect
+
+    Um widget ``Select`` que usa uma lista de paises/regiões do Reino Unido como
+    suas opções.
+
+.. class:: uk.forms.UKNationSelect
+
+    Um widget ``Select`` que usa uma lista de nações do Reino Unido como suas
+    opções.
+
+United States of America (``us``)
+=================================
+
+.. class:: us.forms.USPhoneNumberField
+
+    Um campo de formulário que valida a entrada como um número de telefone dos
+    E.U.A.
+
+.. class:: us.forms.USSocialSecurityNumberField
+
+    Um campo de formulário que valida a entrada como um Número de Seguro Social
+    dos E.U.A. (SSN).
+
+    Um SSN válido deve obedecer as seguintes regras:
+
+        * Formato de XXX-XX-XXXX
+        * Nenhum grupo de dígitos pode consistir inteiramente de zeros
+        * O início de um grupo de dígitos não pode ser 666
+        * Os números não podem estar em blocos promocionais 987-65-4320 até
+          987-65-4329
+        * Um número não conhecido pode ser inválido devido o uso ou distribuição
+          de promoção generalizada (e.g., o número do Woolworth ou o número
+          promocional 1962)
+
+.. class:: us.forms.USStateField
+
+    Um campo de formulário que valida a entrada como um nome ou abreviação de
+    um estado dos E.U.A. A entrada é normalizada para o padrão de duas letras
+    da abreviação do serviço postal para o estado informado.
+
+.. class:: us.forms.USZipCodeField
+
+    Um campo de formulário que valida a entrada como um código ZIP dos E.U.A.
+    Os formatos válidos são XXXXX ou XXXXX-XXXX.
+
+.. class:: us.forms.USStateSelect
+
+    Um widget ``Select`` que usa uma lista de estados/territórios dos E.U.A.
+    como suas opções.
+
+.. class:: us.models.PhoneNumberField
+
+    Um :class:`CharField` que verifica se o valor é um número de telefone válido
+    dos E.U.A. (no formato ``XXX-XXX-XXXX``).
+
+.. class:: us.models.USStateField
+
+    Um campo de model que o formulário representa como um campo
+    ``forms.USStateField`` e armazena a abreviação de duas letras dos E.U.A. no
+    banco de dados.

@@ -1,0 +1,1106 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Campos de formulário &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Formulários" href="index.html" />
+    <link rel="next" title="Widgets" href="widgets.html" />
+    <link rel="prev" title="A API de formulários" href="api.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="api.html" title="A API de formulários">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="widgets.html" title="Widgets">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-forms-fields">
+            
+  <div class="section" id="s-module-django.forms.fields">
+<span id="s-campos-de-formulario"></span><span id="s-ref-forms-fields"></span><span id="module-django.forms.fields"></span><span id="campos-de-formulario"></span><span id="ref-forms-fields"></span><h1>Campos de formulário<a class="headerlink" href="#module-django.forms.fields" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="django.forms.Field">
+<em class="property">class </em><tt class="descname">Field</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.Field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Quando você cria uma class <tt class="docutils literal"><span class="pre">Form</span></tt>, a parte mais importante é definir os campos
+do formulário. Cada campo tem uma lógica de validação personalizada, juntamente
+com alguns outros hooks.</p>
+<dl class="method">
+<dt id="django.forms.Field.clean">
+<tt class="descclassname">Field.</tt><tt class="descname">clean</tt>(<em>value</em>)<a class="headerlink" href="#django.forms.Field.clean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Embora a principal maneira de você usar as classes <tt class="docutils literal"><span class="pre">Field</span></tt> seja dentro de
+classes <tt class="docutils literal"><span class="pre">Form</span></tt>, você pode também instanciá-las e usá-las para obter uma idéia
+melhor de como elas funcionam. Cada instância de <tt class="docutils literal"><span class="pre">Fiel</span></tt> tem um método
+<tt class="docutils literal"><span class="pre">clean()</span></tt>, que recebe um único argumento e ambos lançam uma excessão
+<tt class="docutils literal"><span class="pre">django.forms.ValidationError</span></tt> ou retorna o valor limpo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="s">&#39;foo@example.com&#39;</span><span class="p">)</span>
+<span class="go">u&#39;foo@example.com&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="s">u&#39;foo@example.com&#39;</span><span class="p">)</span>
+<span class="go">u&#39;foo@example.com&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="s">&#39;invalid e-mail address&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValidationError</span>: <span class="n">[u&#39;Enter a valid e-mail address.&#39;]</span>
+</pre></div>
+</div>
+<div class="section" id="s-argumentos-de-campo-do-core">
+<span id="argumentos-de-campo-do-core"></span><h2>Argumentos de campo do core<a class="headerlink" href="#argumentos-de-campo-do-core" title="Permalink to this headline">¶</a></h2>
+<p>Cada construtor de classe <tt class="docutils literal"><span class="pre">Field</span></tt> recebe pelo menos estes argumentos. Algumas
+classes <tt class="docutils literal"><span class="pre">Field</span></tt> recebem argumentos adicionais, específicos do campo, mas os
+seguintes devem <em>sempre</em> ser aceitos:</p>
+<div class="section" id="s-required">
+<span id="required"></span><h3><tt class="docutils literal"><span class="pre">required</span></tt><a class="headerlink" href="#required" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.forms.Field.required">
+<tt class="descclassname">Field.</tt><tt class="descname">required</tt><a class="headerlink" href="#django.forms.Field.required" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Por padrão cada classe <tt class="docutils literal"><span class="pre">Field</span></tt> assume que o valor é obrigatório, então se você
+passar um valor vazio -- tanto <tt class="xref docutils literal"><span class="pre">None</span></tt> quando uma string vazia (<tt class="docutils literal"><span class="pre">&quot;&quot;</span></tt>) --
+então <tt class="docutils literal"><span class="pre">clean()</span></tt> lançará uma exeção <tt class="docutils literal"><span class="pre">ValidationError</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="s">&#39;foo&#39;</span><span class="p">)</span>
+<span class="go">u&#39;foo&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValidationError</span>: <span class="n">[u&#39;This field is required.&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValidationError</span>: <span class="n">[u&#39;This field is required.&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+<span class="go">u&#39; &#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">u&#39;0&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">u&#39;True&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+<span class="go">u&#39;False&#39;</span>
+</pre></div>
+</div>
+<p>Para especificar que o campo <em>não</em> é obrigatório, passe <tt class="docutils literal"><span class="pre">required=False</span></tt> para
+o contrutor de <tt class="docutils literal"><span class="pre">Field</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="s">&#39;foo&#39;</span><span class="p">)</span>
+<span class="go">u&#39;foo&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+<span class="go">u&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="go">u&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">u&#39;0&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">u&#39;True&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+<span class="go">u&#39;False&#39;</span>
+</pre></div>
+</div>
+<p>Se um <tt class="docutils literal"><span class="pre">Field</span></tt> tem <tt class="docutils literal"><span class="pre">required=False</span></tt> e você passar ao <tt class="docutils literal"><span class="pre">clean()</span></tt> um valor
+vazio, então <tt class="docutils literal"><span class="pre">clean()</span></tt> retornará um valor <em>normalizado</em> vazio ao invés de
+lançar uma exceção <tt class="docutils literal"><span class="pre">ValidationError</span></tt>. Para <tt class="docutils literal"><span class="pre">CharField</span></tt>, este será uma string
+Unicode vazia. Para as outras classes <tt class="docutils literal"><span class="pre">Field</span></tt>, poderá ser <tt class="xref docutils literal"><span class="pre">None</span></tt>. (Isso
+varia de campo para campo.)</p>
+</div>
+<div class="section" id="s-label">
+<span id="label"></span><h3><tt class="docutils literal"><span class="pre">label</span></tt><a class="headerlink" href="#label" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.forms.Field.label">
+<tt class="descclassname">Field.</tt><tt class="descname">label</tt><a class="headerlink" href="#django.forms.Field.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O argumento <tt class="docutils literal"><span class="pre">label</span></tt> permite você especificar o &quot;nome amigável&quot; para este
+campo. Isso é usado quando o <tt class="docutils literal"><span class="pre">Field</span></tt> é mostrado num <tt class="docutils literal"><span class="pre">Form</span></tt>.</p>
+<p>Como foi explicado no &quot;Mostrando formulário como HTML&quot; acima, a legenda padrão
+para um <tt class="docutils literal"><span class="pre">Field</span></tt> é gerada a partir do nome do campo, convertendo todos os
+sublinhados para espaços e pondo em maiúscula a primeira letra. Especifique
+o <tt class="docutils literal"><span class="pre">label</span></tt> se o resultado padrão não for adquado.</p>
+<p>Aqui temos um exemplo de <tt class="docutils literal"><span class="pre">Form</span></tt> completo que implementa <tt class="docutils literal"><span class="pre">label</span></tt> para dois
+de seus campo. Nós especificamos <tt class="docutils literal"><span class="pre">auto_id=False</span></tt> para simplificar a saída:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">CommentForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;Your name&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">URLField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;Your Web site&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">comment</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">CommentForm</span><span class="p">(</span><span class="n">auto_id</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Your name:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Your Web site:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;url&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Comment:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;comment&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-initial">
+<span id="initial"></span><h3><tt class="docutils literal"><span class="pre">initial</span></tt><a class="headerlink" href="#initial" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.forms.Field.initial">
+<tt class="descclassname">Field.</tt><tt class="descname">initial</tt><a class="headerlink" href="#django.forms.Field.initial" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O argumento <tt class="docutils literal"><span class="pre">initial</span></tt> permite você especificar um valor inicial a ser usado
+ao renderizar este <tt class="docutils literal"><span class="pre">Field</span></tt> num <tt class="docutils literal"><span class="pre">Form</span></tt> desacoplado.</p>
+<p>Para especificar dados iniciais dinâmicos, veja o parámetro
+<a class="reference internal" href="api.html#django.forms.Form.initial" title="django.forms.Form.initial"><tt class="xref py py-attr docutils literal"><span class="pre">Form.initial</span></tt></a>.</p>
+<p>O caso de uso para isso é quando você quer mostrar um formulário &quot;vazio&quot; em que
+um campo é inicializado com um valor em particular. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">CommentForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;Your name&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">URLField</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;http://&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">comment</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">CommentForm</span><span class="p">(</span><span class="n">auto_id</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Name:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;name&quot; value=&quot;Your name&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Url:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;url&quot; value=&quot;http://&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Comment:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;comment&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+</pre></div>
+</div>
+<p>Você pode estar pensando, por quê não passo um dicionário com os valores
+iniciais quando estiver mostrando o formulário? Bem, se você fizer isso, você
+irá disparar a validação, e a saída HTML incluirá qualquer erro de validação:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">CommentForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">URLField</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">comment</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">default_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Your name&#39;</span><span class="p">,</span> <span class="s">&#39;url&#39;</span><span class="p">:</span> <span class="s">&#39;http://&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">CommentForm</span><span class="p">(</span><span class="n">default_data</span><span class="p">,</span> <span class="n">auto_id</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Name:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;name&quot; value=&quot;Your name&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Url:&lt;/th&gt;&lt;td&gt;&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;Enter a valid URL.&lt;/li&gt;&lt;/ul&gt;&lt;input type=&quot;text&quot; name=&quot;url&quot; value=&quot;http://&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Comment:&lt;/th&gt;&lt;td&gt;&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;&lt;input type=&quot;text&quot; name=&quot;comment&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+</pre></div>
+</div>
+<p>É por isso que valores <tt class="docutils literal"><span class="pre">iniciais</span></tt> são somente mostrados por formulários
+unbound. Para formulário bound.</p>
+<p>Tamém note que valores <tt class="docutils literal"><span class="pre">inciais</span></tt> <em>não</em> são usados como dados &quot;reserva&quot; numa
+validação se um valor de um campo em particular não for fornecido. Valores
+<tt class="docutils literal"><span class="pre">iniciais</span></tt> destinam-se <em>somente</em> para mostrar dados iniciais no formulário:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">CommentForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;Your name&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">URLField</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;http://&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">comment</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;url&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;comment&#39;</span><span class="p">:</span> <span class="s">&#39;Foo&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">CommentForm</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="go"># The form does *not* fall back to using the initial values.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">errors</span>
+<span class="go">{&#39;url&#39;: [u&#39;This field is required.&#39;], &#39;name&#39;: [u&#39;This field is required.&#39;]}</span>
+</pre></div>
+</div>
+<p>Ao invés de uma constante, você também pode passar qualquer função chamável:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">DateForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">day</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">DateForm</span><span class="p">()</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Day:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;day&quot; value=&quot;12/23/2008&quot; /&gt;&lt;td&gt;&lt;/tr&gt;</span>
+</pre></div>
+</div>
+<p>A função chamável será avaliada somente quando o formulário unbound é exibido,
+não quando é definido.</p>
+</div>
+<div class="section" id="s-widget">
+<span id="widget"></span><h3><tt class="docutils literal"><span class="pre">widget</span></tt><a class="headerlink" href="#widget" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.forms.Field.widget">
+<tt class="descclassname">Field.</tt><tt class="descname">widget</tt><a class="headerlink" href="#django.forms.Field.widget" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O argumento <tt class="docutils literal"><span class="pre">widget</span></tt> permite você especificar uma classe <tt class="docutils literal"><span class="pre">Widget</span></tt> para usar
+quando for renderizar este <tt class="docutils literal"><span class="pre">Field</span></tt>. Veja <a class="reference internal" href="widgets.html#ref-forms-widgets"><em>Widgets</em></a> para mais
+informações.</p>
+</div>
+<div class="section" id="s-help-text">
+<span id="help-text"></span><h3><tt class="docutils literal"><span class="pre">help_text</span></tt><a class="headerlink" href="#help-text" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.forms.Field.help_text">
+<tt class="descclassname">Field.</tt><tt class="descname">help_text</tt><a class="headerlink" href="#django.forms.Field.help_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O argumento <tt class="docutils literal"><span class="pre">help_text</span></tt> permite você especificar um texto descritivo para este
+<tt class="docutils literal"><span class="pre">Field</span></tt>. Se você fornece o <tt class="docutils literal"><span class="pre">help_text</span></tt>, ele será mostrado próximo do
+<tt class="docutils literal"><span class="pre">Field</span></tt> quando o ele for renderizado por um dos métodos do <tt class="docutils literal"><span class="pre">Form</span></tt>
+convenientes (e.g., <tt class="docutils literal"><span class="pre">as_ul()</span></tt>).</p>
+<p>Aqui tem um exemplo de <tt class="docutils literal"><span class="pre">Form</span></tt> completo que implementa <tt class="docutils literal"><span class="pre">help_text</span></tt> para dois
+de seus campos. Nós especificams <tt class="docutils literal"><span class="pre">auto_id=False</span></tt> para simplificar a saída:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">HelpTextContactForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">subject</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;100 characters max.&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">message</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">sender</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span><span class="n">help_text</span><span class="o">=</span><span class="s">&#39;A valid e-mail address, please.&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">cc_myself</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">HelpTextContactForm</span><span class="p">(</span><span class="n">auto_id</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f</span><span class="o">.</span><span class="n">as_table</span><span class="p">()</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Subject:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;subject&quot; maxlength=&quot;100&quot; /&gt;&lt;br /&gt;100 characters max.&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Message:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;message&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Sender:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;text&quot; name=&quot;sender&quot; /&gt;&lt;br /&gt;A valid e-mail address, please.&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="go">&lt;tr&gt;&lt;th&gt;Cc myself:&lt;/th&gt;&lt;td&gt;&lt;input type=&quot;checkbox&quot; name=&quot;cc_myself&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f</span><span class="o">.</span><span class="n">as_ul</span><span class="p">()</span>
+<span class="go">&lt;li&gt;Subject: &lt;input type=&quot;text&quot; name=&quot;subject&quot; maxlength=&quot;100&quot; /&gt; 100 characters max.&lt;/li&gt;</span>
+<span class="go">&lt;li&gt;Message: &lt;input type=&quot;text&quot; name=&quot;message&quot; /&gt;&lt;/li&gt;</span>
+<span class="go">&lt;li&gt;Sender: &lt;input type=&quot;text&quot; name=&quot;sender&quot; /&gt; A valid e-mail address, please.&lt;/li&gt;</span>
+<span class="go">&lt;li&gt;Cc myself: &lt;input type=&quot;checkbox&quot; name=&quot;cc_myself&quot; /&gt;&lt;/li&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f</span><span class="o">.</span><span class="n">as_p</span><span class="p">()</span>
+<span class="go">&lt;p&gt;Subject: &lt;input type=&quot;text&quot; name=&quot;subject&quot; maxlength=&quot;100&quot; /&gt; 100 characters max.&lt;/p&gt;</span>
+<span class="go">&lt;p&gt;Message: &lt;input type=&quot;text&quot; name=&quot;message&quot; /&gt;&lt;/p&gt;</span>
+<span class="go">&lt;p&gt;Sender: &lt;input type=&quot;text&quot; name=&quot;sender&quot; /&gt; A valid e-mail address, please.&lt;/p&gt;</span>
+<span class="go">&lt;p&gt;Cc myself: &lt;input type=&quot;checkbox&quot; name=&quot;cc_myself&quot; /&gt;&lt;/p&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-error-messages">
+<span id="error-messages"></span><h3><tt class="docutils literal"><span class="pre">error_messages</span></tt><a class="headerlink" href="#error-messages" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<dl class="attribute">
+<dt id="django.forms.Field.error_messages">
+<tt class="descclassname">Field.</tt><tt class="descname">error_messages</tt><a class="headerlink" href="#django.forms.Field.error_messages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O argumento <tt class="docutils literal"><span class="pre">error_messages</span></tt> permite você sobrescrever a mensagem padrão que
+o campo mostrará. Passe um dicionário com chaves combinando com as mensagens de
+erro que você deseja sobrescrever. Por exemplo, aqui temos a mensagem de erro
+padrão:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">generic</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">generic</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">ValidationError</span>: <span class="n">[u&#39;This field is required.&#39;]</span>
+</pre></div>
+</div>
+<p>E aqui temos uma mensagem de erro personalizada:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">error_messages</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;required&#39;</span><span class="p">:</span> <span class="s">&#39;Please enter your name&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">ValidationError</span>: <span class="n">[u&#39;Please enter your name&#39;]</span>
+</pre></div>
+</div>
+<p>Na seção <a class="reference internal" href="#classes-field-nativas">classes Field nativas</a> abaixo, cada <tt class="docutils literal"><span class="pre">Field</span></tt> define as chaves de
+mensagens de error que usa.</p>
+</div>
+</div>
+<div class="section" id="s-classes-field-nativas">
+<span id="classes-field-nativas"></span><h2>Classes <tt class="docutils literal"><span class="pre">Field</span></tt> nativas<a class="headerlink" href="#classes-field-nativas" title="Permalink to this headline">¶</a></h2>
+<p>Naturalmente, a biblioteca <tt class="docutils literal"><span class="pre">forms</span></tt> vem com um conjunto de classes <tt class="docutils literal"><span class="pre">Field</span></tt>
+que representam as necessidades de validação comuns. Esta seçnao documenta cada
+campo nativo.</p>
+<p>Para cada campo, nós descrevemos o widget padrão usado se você não especificar
+um <tt class="docutils literal"><span class="pre">widget</span></tt>. Nós também especificamos o valor retornado quando você fornece
+um valor vazio (veja a seção <tt class="docutils literal"><span class="pre">required</span></tt> acima para entender o que significa).</p>
+<div class="section" id="s-booleanfield">
+<span id="booleanfield"></span><h3><tt class="docutils literal"><span class="pre">BooleanField</span></tt><a class="headerlink" href="#booleanfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.BooleanField">
+<em class="property">class </em><tt class="descname">BooleanField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.BooleanField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">CheckboxInput</span></tt></li>
+<li>Valor vazio: <tt class="xref docutils literal"><span class="pre">False</span></tt></li>
+<li>Normalizar para: Um valor Python <tt class="xref docutils literal"><span class="pre">True</span></tt> ou <tt class="xref docutils literal"><span class="pre">False</span></tt>.</li>
+<li>Valida se o valor é <tt class="xref docutils literal"><span class="pre">True</span></tt> (e.g. a check box está selecionada) se o
+campo tiver <tt class="docutils literal"><span class="pre">required=True</span></tt>.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt></li>
+</ul>
+</dd></dl>
+
+<div class="versionchanged">
+<span class="title">Changed in Django 1.0:</span> O valor vazio para um <tt class="docutils literal"><span class="pre">CheckboxInput</span></tt> (e portanto o padrão
+<tt class="docutils literal"><span class="pre">BooleanField</span></tt>) mudou para retornar <tt class="xref docutils literal"><span class="pre">False</span></tt> ao invés de <tt class="xref docutils literal"><span class="pre">None</span></tt> no
+Django 1.0.</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Desde que todas as subclasses de <tt class="docutils literal"><span class="pre">Field</span></tt> possui <tt class="docutils literal"><span class="pre">required=True</span></tt> por
+padrão, a condição de validação aqui é importante. Se você quiser incluir um
+boleano no seu formulário que pode ser tanto <tt class="xref docutils literal"><span class="pre">True</span></tt> ou <tt class="xref docutils literal"><span class="pre">False</span></tt> (e.g.
+uma checkbox marcada ou não), você deve lembrar de passar um
+<tt class="docutils literal"><span class="pre">required=False</span></tt> quando criar o <tt class="docutils literal"><span class="pre">BooleanField</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="s-charfield">
+<span id="charfield"></span><h3><tt class="docutils literal"><span class="pre">CharField</span></tt><a class="headerlink" href="#charfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.CharField">
+<em class="property">class </em><tt class="descname">CharField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.CharField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">TextInput</span></tt></li>
+<li>Valor vazio: <tt class="docutils literal"><span class="pre">''</span></tt> (uma string vazia)</li>
+<li>Normalizar para: Um objeto Unicode.</li>
+<li>Validates <tt class="docutils literal"><span class="pre">max_length</span></tt> or <tt class="docutils literal"><span class="pre">min_length</span></tt>, if they are provided.
+Otherwise, all inputs are valid.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">max_length</span></tt>, <tt class="docutils literal"><span class="pre">min_length</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Possui dois argumentos opcionais para validação:</p>
+<dl class="attribute">
+<dt id="django.forms.CharField.max_length">
+<tt class="descclassname">CharField.</tt><tt class="descname">max_length</tt><a class="headerlink" href="#django.forms.CharField.max_length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="django.forms.CharField.min_length">
+<tt class="descclassname">CharField.</tt><tt class="descname">min_length</tt><a class="headerlink" href="#django.forms.CharField.min_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Se fornecido, estes argumentos asseguram que a string é no máximo ou no
+mínimo do tamanho informado.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-choicefield">
+<span id="choicefield"></span><h3><tt class="docutils literal"><span class="pre">ChoiceField</span></tt><a class="headerlink" href="#choicefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.ChoiceField">
+<em class="property">class </em><tt class="descname">ChoiceField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.ChoiceField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">Select</span></tt></li>
+<li>Valor vazio: <tt class="docutils literal"><span class="pre">''</span></tt> (uma string vazia)</li>
+<li>Normalizar para: Um objeto Unicode.</li>
+<li>Valida se o valor fornecido está numa lista de escolhas.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid_choice</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Recebe um argumento obrigatório extra:</p>
+<dl class="attribute">
+<dt id="django.forms.ChoiceField.choices">
+<tt class="descclassname">ChoiceField.</tt><tt class="descname">choices</tt><a class="headerlink" href="#django.forms.ChoiceField.choices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um iterável (e.g., uma lista ou tupla) de tuplas duplas para usar como
+opções para este campo.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-typedchoicefield">
+<span id="typedchoicefield"></span><h3><tt class="docutils literal"><span class="pre">TypedChoiceField</span></tt><a class="headerlink" href="#typedchoicefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.TypedChoiceField">
+<em class="property">class </em><tt class="descname">TypedChoiceField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.TypedChoiceField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Assim como um <a class="reference internal" href="#django.forms.ChoiceField" title="django.forms.ChoiceField"><tt class="xref py py-class docutils literal"><span class="pre">ChoiceField</span></tt></a>, exceto o <a class="reference internal" href="#django.forms.TypedChoiceField" title="django.forms.TypedChoiceField"><tt class="xref py py-class docutils literal"><span class="pre">TypedChoiceField</span></tt></a> recebe um
+argumento extra <tt class="docutils literal"><span class="pre">coerce</span></tt>.</p>
+<ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">Select</span></tt></li>
+<li>Valor vazio: Qualquer coisa que você fornecer como um <tt class="docutils literal"><span class="pre">empty_value</span></tt></li>
+<li>Normalizar para: o valor retornado pelo argumento <tt class="docutils literal"><span class="pre">coerce</span></tt>.</li>
+<li>Valida se o valor fornecido está numa lista de escolhas.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid_choice</span></tt></li>
+</ul>
+<p>Recebe argumentos extra:</p>
+<dl class="attribute">
+<dt id="django.forms.TypedChoiceField.coerce">
+<tt class="descclassname">TypedChoiceField.</tt><tt class="descname">coerce</tt><a class="headerlink" href="#django.forms.TypedChoiceField.coerce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uma função que recebe um argumento e retorna um valor forçado. Os exemplos
+incluem os tipos nativos <tt class="docutils literal"><span class="pre">int</span></tt>, <tt class="docutils literal"><span class="pre">float</span></tt>, <tt class="docutils literal"><span class="pre">bool</span></tt> e outros. Padrões para
+uma função identificadora.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.forms.TypedChoiceField.empty_value">
+<tt class="descclassname">TypedChoiceField.</tt><tt class="descname">empty_value</tt><a class="headerlink" href="#django.forms.TypedChoiceField.empty_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>O valor que representa &quot;vazio.&quot; Padrão para a string vazia;
+<tt class="xref docutils literal"><span class="pre">None</span></tt> é outra escolha comum aqui.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-datefield">
+<span id="datefield"></span><h3><tt class="docutils literal"><span class="pre">DateField</span></tt><a class="headerlink" href="#datefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.DateField">
+<em class="property">class </em><tt class="descname">DateField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.DateField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">TextInput</span></tt></li>
+<li>Valor vazio: <tt class="xref docutils literal"><span class="pre">None</span></tt></li>
+<li>Normalizar para: A Python <tt class="docutils literal"><span class="pre">datetime.date</span></tt> object.</li>
+<li>Valida se o valor passado é um <tt class="docutils literal"><span class="pre">datetime.date</span></tt>, <tt class="docutils literal"><span class="pre">datetime.datetime</span></tt>
+ou uma string no formato particular de data.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Recebe um argumento opcional:</p>
+<dl class="attribute">
+<dt id="django.forms.DateField.input_formats">
+<tt class="descclassname">DateField.</tt><tt class="descname">input_formats</tt><a class="headerlink" href="#django.forms.DateField.input_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uma lista de formatos usada para tentar converter uma string para um objeto
+<tt class="docutils literal"><span class="pre">datetime.date</span></tt> valido.</p>
+</dd></dl>
+
+<p>Se nenhum argumento <tt class="docutils literal"><span class="pre">input_formats</span></tt> for passado, os valores de entrada padrão
+são:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%Y&#39;</span><span class="p">,</span> <span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%y&#39;</span><span class="p">,</span> <span class="c"># &#39;2006-10-25&#39;, &#39;10/25/2006&#39;, &#39;10/25/06&#39;</span>
+<span class="s">&#39;%b </span><span class="si">%d</span><span class="s"> %Y&#39;</span><span class="p">,</span> <span class="s">&#39;%b </span><span class="si">%d</span><span class="s">, %Y&#39;</span><span class="p">,</span>            <span class="c"># &#39;Oct 25 2006&#39;, &#39;Oct 25, 2006&#39;</span>
+<span class="s">&#39;</span><span class="si">%d</span><span class="s"> %b %Y&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s"> %b, %Y&#39;</span><span class="p">,</span>            <span class="c"># &#39;25 Oct 2006&#39;, &#39;25 Oct, 2006&#39;</span>
+<span class="s">&#39;%B </span><span class="si">%d</span><span class="s"> %Y&#39;</span><span class="p">,</span> <span class="s">&#39;%B </span><span class="si">%d</span><span class="s">, %Y&#39;</span><span class="p">,</span>            <span class="c"># &#39;October 25 2006&#39;, &#39;October 25, 2006&#39;</span>
+<span class="s">&#39;</span><span class="si">%d</span><span class="s"> %B %Y&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s"> %B, %Y&#39;</span><span class="p">,</span>            <span class="c"># &#39;25 October 2006&#39;, &#39;25 October, 2006&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-datetimefield">
+<span id="datetimefield"></span><h3><tt class="docutils literal"><span class="pre">DateTimeField</span></tt><a class="headerlink" href="#datetimefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.DateTimeField">
+<em class="property">class </em><tt class="descname">DateTimeField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.DateTimeField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">DateTimeInput</span></tt></li>
+<li>Valor vazio: <tt class="xref docutils literal"><span class="pre">None</span></tt></li>
+<li>Normalizar para: Um objeto Python <tt class="docutils literal"><span class="pre">datetime.datetime</span></tt>.</li>
+<li>Valida se o valor passado é tanto um <tt class="docutils literal"><span class="pre">datetime.datetime</span></tt>,
+<tt class="docutils literal"><span class="pre">datetime.date</span></tt> ou uma string num formato de data.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Recebe um argumento opcional:</p>
+<dl class="attribute">
+<dt id="django.forms.DateTimeField.input_formats">
+<tt class="descclassname">DateTimeField.</tt><tt class="descname">input_formats</tt><a class="headerlink" href="#django.forms.DateTimeField.input_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uma lista de formatos usado para tentar converter uma string para o objeto
+<tt class="docutils literal"><span class="pre">datetime.datetime</span></tt>.</p>
+</dd></dl>
+
+<p>Se nenhum argumento <tt class="docutils literal"><span class="pre">input_formats</span></tt> for passado, os valores de entrada padrão
+são:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s"> %H:%M:%S&#39;</span><span class="p">,</span>     <span class="c"># &#39;2006-10-25 14:30:59&#39;</span>
+<span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s"> %H:%M&#39;</span><span class="p">,</span>        <span class="c"># &#39;2006-10-25 14:30&#39;</span>
+<span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s">&#39;</span><span class="p">,</span>              <span class="c"># &#39;2006-10-25&#39;</span>
+<span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%Y %H:%M:%S&#39;</span><span class="p">,</span>     <span class="c"># &#39;10/25/2006 14:30:59&#39;</span>
+<span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%Y %H:%M&#39;</span><span class="p">,</span>        <span class="c"># &#39;10/25/2006 14:30&#39;</span>
+<span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%Y&#39;</span><span class="p">,</span>              <span class="c"># &#39;10/25/2006&#39;</span>
+<span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%y %H:%M:%S&#39;</span><span class="p">,</span>     <span class="c"># &#39;10/25/06 14:30:59&#39;</span>
+<span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%y %H:%M&#39;</span><span class="p">,</span>        <span class="c"># &#39;10/25/06 14:30&#39;</span>
+<span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%y&#39;</span><span class="p">,</span>              <span class="c"># &#39;10/25/06&#39;</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<span class="title">Changed in Django 1.0:</span> O <tt class="docutils literal"><span class="pre">DateTimeField</span></tt> usado para um widget <tt class="docutils literal"><span class="pre">TextInput</span></tt> por padrão. Isso
+mudou.</div>
+</div>
+<div class="section" id="s-decimalfield">
+<span id="decimalfield"></span><h3><tt class="docutils literal"><span class="pre">DecimalField</span></tt><a class="headerlink" href="#decimalfield" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<dl class="class">
+<dt id="django.forms.DecimalField">
+<em class="property">class </em><tt class="descname">DecimalField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.DecimalField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">TextInput</span></tt></li>
+<li>Valor vazio: <tt class="xref docutils literal"><span class="pre">None</span></tt></li>
+<li>Normalizar para: A Python <tt class="docutils literal"><span class="pre">decimal</span></tt>.</li>
+<li>Validates that the given value is a decimal. Leading and trailing
+whitespace is ignored.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt>, <tt class="docutils literal"><span class="pre">max_value</span></tt>,
+<tt class="docutils literal"><span class="pre">min_value</span></tt>, <tt class="docutils literal"><span class="pre">max_digits</span></tt>, <tt class="docutils literal"><span class="pre">max_decimal_places</span></tt>,
+<tt class="docutils literal"><span class="pre">max_whole_digits</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Recebe quatro argumentos opcionais:</p>
+<dl class="attribute">
+<dt id="django.forms.DecimalField.max_value">
+<tt class="descclassname">DecimalField.</tt><tt class="descname">max_value</tt><a class="headerlink" href="#django.forms.DecimalField.max_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="django.forms.DecimalField.min_value">
+<tt class="descclassname">DecimalField.</tt><tt class="descname">min_value</tt><a class="headerlink" href="#django.forms.DecimalField.min_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estes atributos definem os limites para os valores do campo.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.forms.DecimalField.max_digits">
+<tt class="descclassname">DecimalField.</tt><tt class="descname">max_digits</tt><a class="headerlink" href="#django.forms.DecimalField.max_digits" title="Permalink to this definition">¶</a></dt>
+<dd><p>o número máximo de dígitos (aqueles antes do ponto decimal mais os que estão
+depois do ponto decimal, com zeros na frente) permitidos no valor.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.forms.DecimalField.decimal_places">
+<tt class="descclassname">DecimalField.</tt><tt class="descname">decimal_places</tt><a class="headerlink" href="#django.forms.DecimalField.decimal_places" title="Permalink to this definition">¶</a></dt>
+<dd><p>O número máximo de casas decimais permitidas.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-emailfield">
+<span id="emailfield"></span><h3><tt class="docutils literal"><span class="pre">EmailField</span></tt><a class="headerlink" href="#emailfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.EmailField">
+<em class="property">class </em><tt class="descname">EmailField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.EmailField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">TextInput</span></tt></li>
+<li>Valor vazio: <tt class="docutils literal"><span class="pre">''</span></tt> (uma string vazia)</li>
+<li>Normalizar para: Um objeto Unicode.</li>
+<li>Valida se o valor passado é um endereço de e-mail, usando uma expressão
+regular moderadamente complexa.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Há dois argumentos opcionais para validação, <tt class="docutils literal"><span class="pre">max_length</span></tt> e <tt class="docutils literal"><span class="pre">min_length</span></tt>.
+Se fornecidos, estes argumentos asseguram que a string é no máximo e no mínimo
+do comprimento fonecido.</p>
+</div>
+<div class="section" id="s-filefield">
+<span id="filefield"></span><h3><tt class="docutils literal"><span class="pre">FileField</span></tt><a class="headerlink" href="#filefield" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<dl class="class">
+<dt id="django.forms.FileField">
+<em class="property">class </em><tt class="descname">FileField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.FileField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">FileInput</span></tt></li>
+<li>Valor vazio: <tt class="xref docutils literal"><span class="pre">None</span></tt></li>
+<li>Normalizar para: Um objeto <tt class="docutils literal"><span class="pre">UploadedFile</span></tt> que envolve o contúdo do
+arquivo e nome do arquivo dentro de um único objeto.</li>
+<li>Valida se os dados do arquivo não vazio foi delimitado para o formulário.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt>, <tt class="docutils literal"><span class="pre">missing</span></tt>,
+<tt class="docutils literal"><span class="pre">empty</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Para aprender mais sobre o objeto <tt class="docutils literal"><span class="pre">UploadFile</span></tt>, veja a <a class="reference internal" href="../../topics/http/file-uploads.html#topics-file-uploads"><em>documentação
+de upload de arquivos</em></a>.</p>
+<p>Quando vcê usa um <tt class="docutils literal"><span class="pre">FileField</span></tt> num formulário, você deve também lembrar de
+<a class="reference internal" href="api.html#binding-uploaded-files"><em>vincular os arquivos de dados ao formulário</em></a>.</p>
+</div>
+<div class="section" id="s-filepathfield">
+<span id="filepathfield"></span><h3><tt class="docutils literal"><span class="pre">FilePathField</span></tt><a class="headerlink" href="#filepathfield" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<dl class="class">
+<dt id="django.forms.FilePathField">
+<em class="property">class </em><tt class="descname">FilePathField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.FilePathField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">Select</span></tt></li>
+<li>Valor vazio: <tt class="xref docutils literal"><span class="pre">None</span></tt></li>
+<li>Normalizar para: Um objeto unicode</li>
+<li>Valida se as escolhas selecionadas existem na lista de ecolhas.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid_choice</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>O campo permite escolher arquivos dentro de um certo diretório. Ele recebe três
+argumentos extras; somente <tt class="docutils literal"><span class="pre">path</span></tt> é obrigatório:</p>
+<dl class="attribute">
+<dt id="django.forms.FilePathField.path">
+<tt class="descclassname">FilePathField.</tt><tt class="descname">path</tt><a class="headerlink" href="#django.forms.FilePathField.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>O caminho absoluto para o diretório cujo conteúdo você deseja lista. Este
+diretório deve existir.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.forms.FilePathField.recursive">
+<tt class="descclassname">FilePathField.</tt><tt class="descname">recursive</tt><a class="headerlink" href="#django.forms.FilePathField.recursive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Se <tt class="xref docutils literal"><span class="pre">False</span></tt> (o padrão) somente os contúdos diretos do <tt class="docutils literal"><span class="pre">path</span></tt> serão
+oferecidos como escolhas. Se <tt class="xref docutils literal"><span class="pre">True</span></tt>, o diretório será apresentado
+recursivamente e todos os descendentes serão listados como opções.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.forms.FilePathField.match">
+<tt class="descclassname">FilePathField.</tt><tt class="descname">match</tt><a class="headerlink" href="#django.forms.FilePathField.match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um padrão de expressão regular; somente arquivos com nomes combinando com
+a expressão estarão nas escolhas.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-floatfield">
+<span id="floatfield"></span><h3><tt class="docutils literal"><span class="pre">FloatField</span></tt><a class="headerlink" href="#floatfield" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">TextInput</span></tt></li>
+<li>Valor vazio: <tt class="xref docutils literal"><span class="pre">None</span></tt></li>
+<li>Normalizar para: A Python float.</li>
+<li>Valida se o valor passado é um float. É permitido espaços vazios na frente
+e no fim, como numa função <tt class="docutils literal"><span class="pre">float()</span></tt> do Python.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt>, <tt class="docutils literal"><span class="pre">max_value</span></tt>,
+<tt class="docutils literal"><span class="pre">min_value</span></tt></li>
+</ul>
+<p>Recebe dois argumentos opcionais para validação, <tt class="docutils literal"><span class="pre">max_value</span></tt> e <tt class="docutils literal"><span class="pre">min_value</span></tt>.
+Este controle de intervalo de valores é permitido no campo.</p>
+</div>
+<div class="section" id="s-imagefield">
+<span id="imagefield"></span><h3><tt class="docutils literal"><span class="pre">ImageField</span></tt><a class="headerlink" href="#imagefield" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<dl class="class">
+<dt id="django.forms.ImageField">
+<em class="property">class </em><tt class="descname">ImageField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.ImageField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">FileInput</span></tt></li>
+<li>Valor vazio: <tt class="xref docutils literal"><span class="pre">None</span></tt></li>
+<li>Normalizar para: Um objeto <tt class="docutils literal"><span class="pre">UploadedFile</span></tt> que envolve o conteúdo do
+arquivo e nome do arquivo entro de um único objeto.</li>
+<li>Valida se os dados do arquivo foram capiturados pelo formulário, e que o
+arquivo é um formato de imagem inteligível pelo PIL.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt>, <tt class="docutils literal"><span class="pre">missing</span></tt>, <tt class="docutils literal"><span class="pre">empty</span></tt>,
+<tt class="docutils literal"><span class="pre">invalid_image</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Usar um ImageField requer que a <a class="reference external" href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> esteja instalada.</p>
+<p>Quando você usa um <tt class="docutils literal"><span class="pre">ImageField</span></tt> num formulário, você deve também lembrar de
+<a class="reference internal" href="api.html#binding-uploaded-files"><em>vincular os arquivos de dados ao formulario</em></a>.</p>
+</div>
+<div class="section" id="s-integerfield">
+<span id="integerfield"></span><h3><tt class="docutils literal"><span class="pre">IntegerField</span></tt><a class="headerlink" href="#integerfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.IntegerField">
+<em class="property">class </em><tt class="descname">IntegerField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.IntegerField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">TextInput</span></tt></li>
+<li>Valor vazio: <tt class="xref docutils literal"><span class="pre">None</span></tt></li>
+<li>Normalizar para: Um inteiro ou inteiro longo do Python.</li>
+<li>Valida se o valor passado é um inteiro. É permitido usar espaços vazios
+na frente e no final, como na função <tt class="docutils literal"><span class="pre">int()</span></tt> do Python.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt>, <tt class="docutils literal"><span class="pre">max_value</span></tt>,
+<tt class="docutils literal"><span class="pre">min_value</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Recebe dois argumentos opcionais:</p>
+<dl class="attribute">
+<dt id="django.forms.IntegerField.max_value">
+<tt class="descclassname">IntegerField.</tt><tt class="descname">max_value</tt><a class="headerlink" href="#django.forms.IntegerField.max_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="django.forms.IntegerField.min_value">
+<tt class="descclassname">IntegerField.</tt><tt class="descname">min_value</tt><a class="headerlink" href="#django.forms.IntegerField.min_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Isso controla o intervalo de valores permitidos no campo.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-ipaddressfield">
+<span id="ipaddressfield"></span><h3><tt class="docutils literal"><span class="pre">IPAddressField</span></tt><a class="headerlink" href="#ipaddressfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.IPAddressField">
+<em class="property">class </em><tt class="descname">IPAddressField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.IPAddressField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">TextInput</span></tt></li>
+<li>Valor vazio: <tt class="docutils literal"><span class="pre">''</span></tt> (uma string vazia)</li>
+<li>Normalizar para: Um objeto Unicode.</li>
+<li>Valida se o valor passado é um endereço IPv4 válido, usando uma expressão
+regular.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt></li>
+</ul>
+</dd></dl>
+
+</div>
+<div class="section" id="s-multiplechoicefield">
+<span id="multiplechoicefield"></span><h3><tt class="docutils literal"><span class="pre">MultipleChoiceField</span></tt><a class="headerlink" href="#multiplechoicefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.MultipleChoiceField">
+<em class="property">class </em><tt class="descname">MultipleChoiceField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.MultipleChoiceField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">SelectMultiple</span></tt></li>
+<li>Valor vazio: <tt class="docutils literal"><span class="pre">[]</span></tt> (uma lista vazia)</li>
+<li>Normalizar para: Uma lista de objetos Unicode.</li>
+<li>valida se todo valor passado na lista de valores existe na lista de
+escolhas.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid_choice</span></tt>,
+<tt class="docutils literal"><span class="pre">invalid_list</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Recebe um argumento extra, <tt class="docutils literal"><span class="pre">choices</span></tt>, como para <tt class="docutils literal"><span class="pre">ChoiceField</span></tt>.</p>
+</div>
+<div class="section" id="s-nullbooleanfield">
+<span id="nullbooleanfield"></span><h3><tt class="docutils literal"><span class="pre">NullBooleanField</span></tt><a class="headerlink" href="#nullbooleanfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.NullBooleanField">
+<em class="property">class </em><tt class="descname">NullBooleanField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.NullBooleanField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">NullBooleanSelect</span></tt></li>
+<li>Valor vazio: <tt class="xref docutils literal"><span class="pre">None</span></tt></li>
+<li>Normalizar para: Um valor Python <tt class="xref docutils literal"><span class="pre">True</span></tt>, <tt class="xref docutils literal"><span class="pre">False</span></tt> ou <tt class="xref docutils literal"><span class="pre">None</span></tt>.</li>
+<li>Não valida nada (i.e., ele nunca lança um <tt class="docutils literal"><span class="pre">ValidationError</span></tt>).</li>
+</ul>
+</dd></dl>
+
+</div>
+<div class="section" id="s-regexfield">
+<span id="regexfield"></span><h3><tt class="docutils literal"><span class="pre">RegexField</span></tt><a class="headerlink" href="#regexfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.RegexField">
+<em class="property">class </em><tt class="descname">RegexField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.RegexField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">TextInput</span></tt></li>
+<li>Valor vazio: <tt class="docutils literal"><span class="pre">''</span></tt> (uma string vazia)</li>
+<li>Normalizar para: Um objeto Unicode.</li>
+<li>Valida se o valor passado combina com uma certa expressão regular.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Recebe um argumentos obrigatório:</p>
+<dl class="attribute">
+<dt id="django.forms.RegexField.regex">
+<tt class="descclassname">RegexField.</tt><tt class="descname">regex</tt><a class="headerlink" href="#django.forms.RegexField.regex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uma expressão regular especificada como um string ou como um objeto de
+expressão regular compliado.</p>
+</dd></dl>
+
+<p>Também recebe <tt class="docutils literal"><span class="pre">max_length</span></tt> e <tt class="docutils literal"><span class="pre">min_length</span></tt>, que funcionam da mesma forma como
+no <tt class="docutils literal"><span class="pre">CharField</span></tt>.</p>
+<p>O argumento opcional <tt class="docutils literal"><span class="pre">error_message</span></tt> é também aceito por
+retro-compatibilidade. A forma recomendada para fornecer uma mensagem de erro é
+usar o argumento <tt class="docutils literal"><span class="pre">error_message</span></tt>, passando um dicionário com <tt class="docutils literal"><span class="pre">'invalid'</span></tt>
+como uma chave a mensagem de erro como valor.</p>
+</div>
+<div class="section" id="s-timefield">
+<span id="timefield"></span><h3><tt class="docutils literal"><span class="pre">TimeField</span></tt><a class="headerlink" href="#timefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.TimeField">
+<em class="property">class </em><tt class="descname">TimeField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.TimeField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">TextInput</span></tt></li>
+<li>Valor vazio: <tt class="xref docutils literal"><span class="pre">None</span></tt></li>
+<li>Normalizar para: Um objeto Python <tt class="docutils literal"><span class="pre">datetime.time</span></tt>.</li>
+<li>Valida se o valor passado é um <tt class="docutils literal"><span class="pre">datetime.time</span></tt> ou uma string num formato
+de hora em particular.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Recebe um argumento opicional:</p>
+<dl class="attribute">
+<dt id="django.forms.TimeField.input_formats">
+<tt class="descclassname">TimeField.</tt><tt class="descname">input_formats</tt><a class="headerlink" href="#django.forms.TimeField.input_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uma lista de formatos usado para tentar converter uma string para um objeto
+<tt class="docutils literal"><span class="pre">datetime.time</span></tt> válido.</p>
+</dd></dl>
+
+<p>Se nenhum argumento <tt class="docutils literal"><span class="pre">input_formats</span></tt> for fornecido, os formatos da entrada
+padrão são:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;%H:%M:%S&#39;</span><span class="p">,</span>     <span class="c"># &#39;14:30:59&#39;</span>
+<span class="s">&#39;%H:%M&#39;</span><span class="p">,</span>        <span class="c"># &#39;14:30&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-urlfield">
+<span id="urlfield"></span><h3><tt class="docutils literal"><span class="pre">URLField</span></tt><a class="headerlink" href="#urlfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.forms.URLField">
+<em class="property">class </em><tt class="descname">URLField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.URLField" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>Widget padrão: <tt class="docutils literal"><span class="pre">TextInput</span></tt></li>
+<li>Valor vazio: <tt class="docutils literal"><span class="pre">''</span></tt> (uma string vazia)</li>
+<li>Normalizar para: Um objeto Unicode.</li>
+<li>Valida se o dado valor é uma URL válida.</li>
+<li>Chaves de mensagem de erro: <tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">invalid</span></tt>, <tt class="docutils literal"><span class="pre">invalid_link</span></tt></li>
+</ul>
+</dd></dl>
+
+<p>Recebe os seguintes argumentos opcionais:</p>
+<dl class="attribute">
+<dt id="django.forms.URLField.max_length">
+<tt class="descclassname">URLField.</tt><tt class="descname">max_length</tt><a class="headerlink" href="#django.forms.URLField.max_length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="django.forms.URLField.min_length">
+<tt class="descclassname">URLField.</tt><tt class="descname">min_length</tt><a class="headerlink" href="#django.forms.URLField.min_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>O mesmo como no <tt class="docutils literal"><span class="pre">CharField.max_length</span></tt> e <tt class="docutils literal"><span class="pre">CharField.min_length</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.forms.URLField.verify_exists">
+<tt class="descclassname">URLField.</tt><tt class="descname">verify_exists</tt><a class="headerlink" href="#django.forms.URLField.verify_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Se <tt class="xref docutils literal"><span class="pre">True</span></tt>, o validador tentará carregar a URL passada, lançando um
+<tt class="docutils literal"><span class="pre">ValidationError</span></tt> se a página retornar um 404. O padrão é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.forms.URLField.validator_user_agent">
+<tt class="descclassname">URLField.</tt><tt class="descname">validator_user_agent</tt><a class="headerlink" href="#django.forms.URLField.validator_user_agent" title="Permalink to this definition">¶</a></dt>
+<dd><p>String usada como o user-agent ao checar pela existência da URL.
+O padrão é o valor da configuração <tt class="docutils literal"><span class="pre">URL_VALIDATOR_USER_AGENT</span></tt>.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="s-classes-field-nativas-ligeiramente-complexas">
+<span id="classes-field-nativas-ligeiramente-complexas"></span><h2>Classes <tt class="docutils literal"><span class="pre">Field</span></tt> nativas ligeiramente complexas<a class="headerlink" href="#classes-field-nativas-ligeiramente-complexas" title="Permalink to this headline">¶</a></h2>
+<p>O seguinte ainda não foi documentado.</p>
+<dl class="class">
+<dt id="django.forms.ComboField">
+<em class="property">class </em><tt class="descname">ComboField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.ComboField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="django.forms.MultiValueField">
+<em class="property">class </em><tt class="descname">MultiValueField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.MultiValueField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="django.forms.SplitDateTimeField">
+<em class="property">class </em><tt class="descname">SplitDateTimeField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.SplitDateTimeField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="s-campos-que-manipulam-relacionamentos">
+<span id="campos-que-manipulam-relacionamentos"></span><h2>Campos que manipulam relacionamentos<a class="headerlink" href="#campos-que-manipulam-relacionamentos" title="Permalink to this headline">¶</a></h2>
+<p>Para representar o relacionamento entre dois models, dois campos são fornecidos
+que podem derivar suas escolhas a partir de um <tt class="docutils literal"><span class="pre">QuerySet</span></tt>:</p>
+<dl class="class">
+<dt id="django.forms.ModelChoiceField">
+<em class="property">class </em><tt class="descname">ModelChoiceField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.ModelChoiceField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="django.forms.ModelMultipleChoiceField">
+<em class="property">class </em><tt class="descname">ModelMultipleChoiceField</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.forms.ModelMultipleChoiceField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Este campos agregam um ou mais campos de objetos model dentro do dicionário
+<tt class="docutils literal"><span class="pre">cleaned_data</span></tt> dos formulários em que eles são usados. Ambos os campos possuem
+um argumento adicional obrigatório:</p>
+<dl class="attribute">
+<dt id="django.forms.ModelChoiceField.queryset">
+<tt class="descclassname">ModelChoiceField.</tt><tt class="descname">queryset</tt><a class="headerlink" href="#django.forms.ModelChoiceField.queryset" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <tt class="docutils literal"><span class="pre">QuerySet</span></tt> of model objects from which the choices for the
+field will be derived, and which will be used to validate the
+user's selection.</p>
+</dd></dl>
+
+<div class="section" id="s-modelchoicefield">
+<span id="modelchoicefield"></span><h3><tt class="docutils literal"><span class="pre">ModelChoiceField</span></tt><a class="headerlink" href="#modelchoicefield" title="Permalink to this headline">¶</a></h3>
+<p>Permite a seleçnao de um único objeto de model, apropriado para representar uma
+chave estrangeira.</p>
+<p>O método <tt class="docutils literal"><span class="pre">__unicode__</span></tt> de um model será chamado para gerar a representação em
+string dos objetos ao usá-los no campo de escolhas; para fornecer representações
+personalizadas, extenda o <tt class="docutils literal"><span class="pre">ModelChoiceField</span></tt> e sobrescreva o
+<tt class="docutils literal"><span class="pre">label_form_instance</span></tt>. Este método receberá um objeto de model, e deverá
+retornar uma string adequada para representá-lo. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyModelChoiceField</span><span class="p">(</span><span class="n">ModelChoiceField</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">label_from_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;My Object #</span><span class="si">%i</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">obj</span><span class="o">.</span><span class="n">id</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="django.forms.ModelChoiceField.empty_label">
+<tt class="descclassname">ModelChoiceField.</tt><tt class="descname">empty_label</tt><a class="headerlink" href="#django.forms.ModelChoiceField.empty_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Por padrão o widget <tt class="docutils literal"><span class="pre">&lt;select&gt;</span></tt> usado pelo <tt class="docutils literal"><span class="pre">ModelChoiceField</span></tt> terá uma
+opção vazia no topo da lista. Você poe mudar o texto desta opção (que é
+<tt class="docutils literal"><span class="pre">&quot;---------&quot;</span></tt> por padrão) com o atributo <tt class="docutils literal"><span class="pre">empty_label</span></tt>, ou você pode
+desabilitar a opção vazia inteiramente configurando <tt class="docutils literal"><span class="pre">empty_label</span></tt> para
+<tt class="xref docutils literal"><span class="pre">None</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Uma legenda personalizada</span>
+<span class="n">field1</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ModelChoiceField</span><span class="p">(</span><span class="n">queryset</span><span class="o">=...</span><span class="p">,</span> <span class="n">empty_label</span><span class="o">=</span><span class="s">&quot;(Nothing)&quot;</span><span class="p">)</span>
+
+<span class="c"># Sem legenda</span>
+<span class="n">field2</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ModelChoiceField</span><span class="p">(</span><span class="n">queryset</span><span class="o">=...</span><span class="p">,</span> <span class="n">empty_label</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Se um <tt class="docutils literal"><span class="pre">ModelChoiceField</span></tt> é obrigatório e tem um valor inicial, nenhuma
+opção vazia é criada (independentemente do valor de <tt class="docutils literal"><span class="pre">empty_label</span></tt>).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-modelmultiplechoicefield">
+<span id="modelmultiplechoicefield"></span><h3><tt class="docutils literal"><span class="pre">ModelMultipleChoiceField</span></tt><a class="headerlink" href="#modelmultiplechoicefield" title="Permalink to this headline">¶</a></h3>
+<p>Permite a seleção de um ou mais objetos de model, adequado para representar
+relaçõe muito-para-muitos. Como com <tt class="docutils literal"><span class="pre">ModelChoiceField</span></tt>, você pode usar
+<tt class="docutils literal"><span class="pre">label_from_instance</span></tt> para personalizar a representação do objeto.</p>
+</div>
+</div>
+<div class="section" id="s-criando-campos-personalizados">
+<span id="criando-campos-personalizados"></span><h2>Criando campos personalizados<a class="headerlink" href="#criando-campos-personalizados" title="Permalink to this headline">¶</a></h2>
+<p>Se a classe nativa <tt class="docutils literal"><span class="pre">Field</span></tt> não supre suas necessidades, você pode facilmente
+criar uma classe <tt class="docutils literal"><span class="pre">Field</span></tt> personalizada. Para fazer isso, somente crie uma
+subclasse de <tt class="docutils literal"><span class="pre">django.forms.Field</span></tt>. Suas únicas exigências são a de implementar
+o método <tt class="docutils literal"><span class="pre">clean()</span></tt> e que seu método <tt class="docutils literal"><span class="pre">__init__()</span></tt> aceite os argumentos
+do core mencionados acima (<tt class="docutils literal"><span class="pre">required</span></tt>, <tt class="docutils literal"><span class="pre">label</span></tt>, <tt class="docutils literal"><span class="pre">initial</span></tt>, <tt class="docutils literal"><span class="pre">widget</span></tt>,
+<tt class="docutils literal"><span class="pre">help_text</span></tt>).</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Campos de formulário</a><ul>
+<li><a class="reference internal" href="#argumentos-de-campo-do-core">Argumentos de campo do core</a><ul>
+<li><a class="reference internal" href="#required"><tt class="docutils literal"><span class="pre">required</span></tt></a></li>
+<li><a class="reference internal" href="#label"><tt class="docutils literal"><span class="pre">label</span></tt></a></li>
+<li><a class="reference internal" href="#initial"><tt class="docutils literal"><span class="pre">initial</span></tt></a></li>
+<li><a class="reference internal" href="#widget"><tt class="docutils literal"><span class="pre">widget</span></tt></a></li>
+<li><a class="reference internal" href="#help-text"><tt class="docutils literal"><span class="pre">help_text</span></tt></a></li>
+<li><a class="reference internal" href="#error-messages"><tt class="docutils literal"><span class="pre">error_messages</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#classes-field-nativas">Classes <tt class="docutils literal"><span class="pre">Field</span></tt> nativas</a><ul>
+<li><a class="reference internal" href="#booleanfield"><tt class="docutils literal"><span class="pre">BooleanField</span></tt></a></li>
+<li><a class="reference internal" href="#charfield"><tt class="docutils literal"><span class="pre">CharField</span></tt></a></li>
+<li><a class="reference internal" href="#choicefield"><tt class="docutils literal"><span class="pre">ChoiceField</span></tt></a></li>
+<li><a class="reference internal" href="#typedchoicefield"><tt class="docutils literal"><span class="pre">TypedChoiceField</span></tt></a></li>
+<li><a class="reference internal" href="#datefield"><tt class="docutils literal"><span class="pre">DateField</span></tt></a></li>
+<li><a class="reference internal" href="#datetimefield"><tt class="docutils literal"><span class="pre">DateTimeField</span></tt></a></li>
+<li><a class="reference internal" href="#decimalfield"><tt class="docutils literal"><span class="pre">DecimalField</span></tt></a></li>
+<li><a class="reference internal" href="#emailfield"><tt class="docutils literal"><span class="pre">EmailField</span></tt></a></li>
+<li><a class="reference internal" href="#filefield"><tt class="docutils literal"><span class="pre">FileField</span></tt></a></li>
+<li><a class="reference internal" href="#filepathfield"><tt class="docutils literal"><span class="pre">FilePathField</span></tt></a></li>
+<li><a class="reference internal" href="#floatfield"><tt class="docutils literal"><span class="pre">FloatField</span></tt></a></li>
+<li><a class="reference internal" href="#imagefield"><tt class="docutils literal"><span class="pre">ImageField</span></tt></a></li>
+<li><a class="reference internal" href="#integerfield"><tt class="docutils literal"><span class="pre">IntegerField</span></tt></a></li>
+<li><a class="reference internal" href="#ipaddressfield"><tt class="docutils literal"><span class="pre">IPAddressField</span></tt></a></li>
+<li><a class="reference internal" href="#multiplechoicefield"><tt class="docutils literal"><span class="pre">MultipleChoiceField</span></tt></a></li>
+<li><a class="reference internal" href="#nullbooleanfield"><tt class="docutils literal"><span class="pre">NullBooleanField</span></tt></a></li>
+<li><a class="reference internal" href="#regexfield"><tt class="docutils literal"><span class="pre">RegexField</span></tt></a></li>
+<li><a class="reference internal" href="#timefield"><tt class="docutils literal"><span class="pre">TimeField</span></tt></a></li>
+<li><a class="reference internal" href="#urlfield"><tt class="docutils literal"><span class="pre">URLField</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#classes-field-nativas-ligeiramente-complexas">Classes <tt class="docutils literal"><span class="pre">Field</span></tt> nativas ligeiramente complexas</a></li>
+<li><a class="reference internal" href="#campos-que-manipulam-relacionamentos">Campos que manipulam relacionamentos</a><ul>
+<li><a class="reference internal" href="#modelchoicefield"><tt class="docutils literal"><span class="pre">ModelChoiceField</span></tt></a></li>
+<li><a class="reference internal" href="#modelmultiplechoicefield"><tt class="docutils literal"><span class="pre">ModelMultipleChoiceField</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#criando-campos-personalizados">Criando campos personalizados</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="api.html">A API de formulários</a></li>
+    
+    
+      <li>Next: <a href="widgets.html">Widgets</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Referência da API</a>
+        
+          <ul><li><a href="index.html">Formulários</a>
+        
+        <ul><li>Campos de formulário</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/forms/fields.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="api.html" title="A API de formulários">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="widgets.html" title="Widgets">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

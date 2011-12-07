@@ -1,0 +1,335 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-signals:
+
+==============================
+Referência de sinais embutidos
+==============================
+
+Uma lista de todos os sinais que o Django envia.
+
+.. seealso::
+
+    O :doc:`framework de comentários </ref/contrib/comments/index>` envia um
+    :doc:`conjuntos de sinais relacionados a
+    ele </ref/contrib/comments/signals>`.
+
+Sinais de model
+===============
+
+.. module:: django.db.models.signals
+   :synopsis: Sinais enviados pelo sistema de models.
+
+O módulo :mod:`django.db.models.signals` define um conjunto de sinais enviados
+pelo sistema de módels.
+
+.. warning::
+
+    Muitos destes sinais são enviado por vário métodos de model como
+    :meth:`~django.db.models.Model.__init__` ou
+    :meth:`~django.db.models.Model.save` que você pode sobrescrever no seu
+    próprio código.
+
+    Se você sobrescreve estes métodos no seu próprio model, você deve chamar os
+    método da classe pai para que este sinal seja enviado.
+
+	Note também que o Django armazena manipuladores de sinais como referências
+	fracas por padrão, então se seu manipulador for uma função local, ela
+	poderia ser "garbage collected". Para previnir isso, passe ``weak=False``
+	quando você chamar o método :meth:`~django.dispatch.Signal.connect`.
+
+pre_init
+--------
+
+.. attribute:: django.db.models.signals.pre_init
+   :module:
+
+.. ^^^^^^^ this :module: hack keeps Sphinx from prepending the module.
+
+Sempre que você instanciar um model do Django, este sinal é enviado no início
+do método :meth:`~django.db.models.Model.__init__` do model.
+
+Argumentos enviados com este sinal:
+
+    ``sender``
+        A classe de model que acabou de ter uma instância criada.
+
+    ``args``
+        Uma lista de argumentos posicionais passados para
+        :meth:`~django.db.models.Model.__init__`:
+
+    ``kwargs``
+        Um dicionário de argumentos nomeados passados para
+        :meth:`~django.db.models.Model.__init__`:.
+
+Por exemplo, o :ref:`tutorial <intro-tutorial01>` tem esta linha:
+
+.. code-block:: python
+
+    p = Poll(question="What's up?", pub_date=datetime.now())
+
+Os argumentos enviados para um manipulador :data:`pre_init` seriam:
+
+    ==========  ===============================================================
+    Argumento   Valor
+    ==========  ===============================================================
+    ``sender``  ``Poll`` (a classe em si)
+
+    ``args``    ``[]`` (uma lista vazia, porque não houve argumentos
+                posicionais passados para ``__init__``.)
+
+    ``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
+    ==========  ===============================================================
+
+post_init
+---------
+
+.. data:: django.db.models.signals.post_init
+   :module:
+
+Como o pre_init, mas este é enviado quando o método
+:meth:`~django.db.models.Model.__init__`: finaliza.
+
+Argumentos enviados com este sinal:
+
+    ``sender``
+        Como acima: a classe que acabou de ter uma instância criada.
+
+    ``instance``
+        A instância atual do model que acabou de ser criado.
+
+pre_save
+--------
+
+.. data:: django.db.models.signals.pre_save
+   :module:
+
+Este é enviado no início do método :meth:`~django.db.models.Model.save`.
+
+Argumentos enviardos com este sinal:
+
+    ``sender``
+        A classe model.
+
+    ``instance``
+        A instância atual sendo salva.
+
+post_save
+---------
+
+.. data:: django.db.models.signals.post_save
+   :module:
+
+Como :data:`pre_save`, mas enviado ao final do método
+:meth:`~django.db.models.Model.save`.
+
+Argumentos enviados com este sinal:
+
+    ``sender``
+        A classe model.
+
+    ``instance``
+        A instância atual sendo salva.
+
+    ``created``
+        Um booleano; ``True`` se o novo dado foi criado.
+
+pre_delete
+----------
+
+.. data:: django.db.models.signals.pre_delete
+   :module:
+
+Enviado no início do método de model :meth:`~django.db.models.Model.delete`.
+Argumentos enviados com este sinal:
+
+    ``sender``
+        A classe model.
+
+    ``instance``
+        A instância atual sendo criada.
+
+post_delete
+-----------
+
+.. data:: django.db.models.signals.post_delete
+   :module:
+
+Como :data:`pre_delete`, mas enviado ao final do método
+:meth:`~django.db.models.Model.delete`.
+
+Argumentos enviados com este sinal:
+
+    ``sender``
+        A classe model.
+
+    ``instance``
+        A instância atual sendo criada.
+
+        Note que o objeto não estará mais no banco de dados, portanto seja muito
+        cuidadoso com o que faz com esta instância.
+
+class_prepared
+--------------
+
+.. data:: django.db.models.signals.class_prepared
+   :module:
+
+Enviado sempre que uma classe de model estiver sendo "preparada" -- isto é, uma
+vez que o model tenha sido definido e registrado no sistema de model do Django.
+O Django usa este sinal internamente; ele geralmente não é usado em
+aplicações de terceiros.
+
+Argumentos que são enviados com este sinal:
+
+``sender``
+    A classe model que acabou de ser preparada.
+
+Gerenciamento de sinais
+=======================
+
+Sinais enviados pelo :doc:`django-admin </ref/django-admin>`.
+
+post_syncdb
+-----------
+
+.. data:: django.db.models.signals.post_syncdb
+   :module:
+
+Enviado pelo :djadmin:`syncdb` depois de instalar uma aplicação.
+
+Qualquer manipulador que ouve este sinal, precisa ser escrito num lugar
+específico: num módulo ``management`` numa de suas :setting:`INSTALLED_APPS`. Se
+o manipulador estiver registrado em algum outro lugar eles podem não ser
+carregados pelo :djadmin:`syncdb`.
+
+Argumentos enviados com este sinal:
+
+    ``sender``
+        O módulo ``models`` que acabou de ser instalado. Isto é, se o
+        :djadmin:`syncdb` acabou de instalar uma aplicação chamada
+        ``"foo.bar.myapp"``, o ``sender`` será o módulo
+        ``foo.bar.myapp.models``.
+
+    ``app``
+        O mesmo que o ``sender``.
+
+    ``created_models``
+        Uma lista de classes model de qualquer applicação que o
+        :djadmin:`syncdb` tenha criado até agora.
+
+    ``verbosity``
+        Indica a quantidade de informações que o manage.py imprime na tela.
+        Veja o flag :djadminopt:`--verbosity`` para detalhes.
+
+        Funções que ouvem o :data:`post_syncdb` deve ser ajustar o que vão
+        mostrar na tela baseado no valor deste argumento.
+
+    ``interactive``
+        Se ``interactive`` for ``True``, ele assegura-se de abrir um prompt para
+        usuário digitar coisas na linha de comando. Se o ``interactive`` for
+        ``False``, as funções que ouvem este sinal não devem tentar abrir um
+        prompt para nada.
+
+        Por exemplo, a aplicação :mod:`django.contrib.auth` somente abre um
+        prompt para criar um superusuário quando o ``interactive`` é ``True``.
+
+Sinais Request/response
+=======================
+
+.. module:: django.core.signals
+   :synopsis: Sinais do core enviados para o sistema de request/response.
+
+Sinais enviados pelo core do framework quando processa uma requisição.
+
+request_started
+---------------
+
+.. data:: django.core.signals.request_started
+   :module:
+
+Enviado quando o Django começar a processar uma requisição HTTP.
+
+Argumentos enviados com este sinal:
+
+    ``sender``
+        A classe manipuladora -- i.e.
+        :class:`django.core.handlers.modpython.ModPythonHandler` ou
+        :class:`django.core.handlers.wsgi.WsgiHandler` -- que manipula a
+        requisição.
+
+
+request_finished
+----------------
+
+.. data:: django.core.signals.request_finished
+   :module:
+
+Enviado quando o Django finaliza o processamento da requisição HTTP.
+
+Argumentos enviados com este sinal:
+
+    ``sender``
+        A classe manipuladora, como acima.
+
+got_request_exception
+---------------------
+
+.. data:: django.core.signals.got_request_exception
+   :module:
+
+Este sinal é enviado sempre que o Django encontra uma exceção enquanto processa
+uma chegada de requisição HTTP.
+
+Argumentos enviados com este sinal:
+
+    ``sender``
+        A classe manipuladora, como acima.
+
+    ``request``
+        O objeto :class:`~django.http.HttpRequest`.
+
+Sinais de Test
+==============
+
+.. module:: django.test.signals
+   :synopsis: Sinais enviados durante testes.
+
+Sinais que somente são enviados quando estão :doc:`rodando
+testes </topics/testing>`.
+
+template_rendered
+-----------------
+
+.. data:: django.test.signals.template_rendered
+   :module:
+
+Enviados quando o sistema de teste renderiza um template. Este sinal não é
+emitido durante uma operação normal do servidor do Django -- ele somente está
+disponível durante o teste.
+
+Argumentos enviados com este sinal:
+
+    sender
+        O objeto :class:`~django.template.Template` que foi renderizado.
+
+    template
+        O mesmo que o sender
+
+    context
+        O :class:`~django.template.Context` com que o template foi renderizado.
+

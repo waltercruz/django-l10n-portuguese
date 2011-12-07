@@ -1,0 +1,234 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>FAQ do Django &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="next" title="FAQ: Geral" href="general.html" />
+    <link rel="prev" title="Managing static files" href="../howto/static-files.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="../howto/static-files.html" title="Managing static files">previous</a> 
+     |
+    <a title="Django v1.3.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="general.html" title="FAQ: Geral">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="faq-index">
+            
+  <div class="section" id="s-faq-do-django">
+<span id="s-faq-index"></span><span id="faq-do-django"></span><span id="faq-index"></span><h1>FAQ do Django<a class="headerlink" href="#faq-do-django" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="general.html">FAQ: Geral</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="general.html#por-que-este-projeto-existe">Por que este projeto existe?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#o-que-significa-django-e-como-se-pronucia">O que significa &#8220;Django&#8221;? E como se pronucia?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#o-django-e-estavel">O Django é estável?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#django-e-escalavel">Django é escalável?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#quem-esta-por-tras-do-django">Quem está por trás do Django?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#que-sites-utilizam-o-django">Que sites utilizam o Django?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#o-django-parece-ser-um-framework-mvc-mas-voces-chama-o-controller-de-view-e-a-view-de-template-por-que-voces-nao-utilizam-a-nomenclatura-padrao">O Django parece ser um framework MVC, mas vocês chama o &#8220;controller&#8221; de &#8220;view&#8221; e a View de &#8220;template&#8221;. Por que vocês não utilizam a nomenclatura padrão?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#o-framework-x-faz-funcionalidade-y-por-que-django-nao-faz-tambem">O &lt;Framework X&gt; faz &lt;funcionalidade Y&gt; &#8211; Por que Django não faz também?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#porque-voces-escreveram-o-django-do-zero-ao-inves-de-usar-outras-bibliotecas-python">Porque vocês escreveram o Django do zero, ao invés de usar outras bibliotecas Python?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#o-django-e-um-sistema-de-gerenciamento-de-conteudo-cms">O Django é um sistema de gerenciamento de conteúdo (CMS)?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#como-posso-baixar-a-documentacao-para-le-la-offline">Como posso baixar a documentação para lê-la offline?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#onde-eu-posso-encontrar-desenvolvedores-django-para-contratar">Onde eu posso encontrar desenvolvedores Django para contratar?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">FAQ: Instalação</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#como-eu-comeco">Como eu começo?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#quais-sao-os-pre-requisitos-para-executar-o-django">Quais são os pré requisitos para executar o Django?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#eu-perco-algo-se-eu-rodar-o-django-com-uma-a-versao-2-4-do-python-em-vez-de-usar-verses-mais-novas-do-python-como-a-2-5-ou-2-6-2-5">Eu perco algo se eu rodar o Django com uma a versão 2.4 do Python em vez de usar versẽs mais novas do Python como a 2.5 ou 2.6? 2.5?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#can-i-use-django-with-python-2-3">Can I use Django with Python 2.3?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#posso-usar-o-django-com-o-python-3">Posso usar o Django com o Python 3?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#o-django-executara-em-hosts-compartilhados-como-textdrive-ou-o-dreamhost">O Django executará em hosts compartilhados (como TextDrive ou o Dreamhost)?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#eu-devo-usar-a-versao-oficial-ou-a-versao-de-desenvolvimento">Eu devo usar a versão oficial ou a versão de desenvolvimento?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">FAQ: Usando o Django</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#por-que-acontece-um-erro-ao-importar-o-django-settings-module">Por que acontece um erro ao importar o DJANGO_SETTINGS_MODULE?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#eu-nao-gosto-da-sua-linguagem-de-template-eu-tenho-de-usa-la">Eu não gosto da sua linguagem de template. Eu tenho de usá-la?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#eu-tenho-de-usar-sua-camada-de-modelo-banco-de-dados">Eu tenho de usar sua camada de modelo/banco de dados?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#como-eu-uso-os-campos-de-imagem-e-arquivos">Como eu uso os campos de imagem e arquivos?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#como-eu-torno-uma-variavel-disponivel-em-todos-os-meus-templates">Como eu torno uma variável disponível em todos os meus templates?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="help.html">FAQ: Obtendo ajuda</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="help.html#como-eu-faco-x-por-que-y-nao-funciona-onde-eu-posso-obter-ajuda">Como eu faço X? Por que Y não funciona? Onde eu posso obter ajuda?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help.html#por-que-a-minha-mensagem-nao-apareceu-na-django-users-ou-na-django-brasil">Por que a minha mensagem não apareceu na django-users ou na django-brasil?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help.html#ninguem-na-django-users-ou-django-brasil-respondeu-minha-questao-o-que-eu-faco">Ninguém na django-users ou django-brasil respondeu minha questão! O que eu faço?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help.html#acho-que-eu-encontrei-um-bug-o-que-eu-faco">Acho que eu encontrei um bug! O que eu faço?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help.html#acho-que-encontrei-um-problema-de-seguranca-o-que-eu-faco">Acho que encontrei um problema de segurança. O que eu faço?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">FAQ: Bancos de dados e modelos</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="models.html#como-eu-posso-ver-as-consultas-sql-que-o-django-esta-executando">Como eu posso ver as consultas SQL que o Django está executando?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#eu-posso-usar-o-django-com-um-banco-de-dados-pre-existente">Eu posso usar o Django com um banco de dados pré-existente?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#se-eu-faco-mudancas-no-model-como-eu-atualizo-o-banco-de-dados">Se eu faço mudanças no model, como eu atualizo o banco de dados?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#os-modelos-do-django-suportam-chaves-primarias-compostas">Os modelos do Django suportam chaves primárias compostas?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#como-eu-adiciono-opcoes-especificas-de-banco-de-dados-as-minhas-declaracoes-create-table-como-especificar-a-tabela-como-tipo-myisam">Como eu adiciono opções específicas de banco de dados às minhas declarações CREATE TABLE, como especificar a tabela como tipo MyISAM?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#por-que-o-django-esta-vazando-memoria">Por que o Django está vazando memória?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="admin.html">FAQ: A administração</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#nao-consigo-logar-quando-eu-insiro-um-usuario-e-senha-validos-ele-apenas-tras-a-pagina-de-login-de-novo-sem-mensagens-de-erro">Não consigo logar. Quando eu insiro um usuário e senha válidos, ele apenas trás a página de login de novo, sem mensagens de erro.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#nao-consigo-logar-quando-eu-insiro-um-usuario-e-senha-validos-ele-apenas-tras-a-pagina-de-login-de-novo-com-um-erro-por-favor-informe-um-usuario-e-senha-corretos">Não consigo logar. Quando eu insiro um usuário e senha válidos, ele apenas trás a página de login de novo, com um erro &#8220;Por favor, informe um usuário e senha corretos&#8221;.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#como-eu-previno-o-middleware-de-cache-de-fazer-cache-do-site-administrativo">Como eu previno o middleware de cache de fazer cache do site administrativo?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#como-eu-defino-automaticamente-o-valor-de-um-campo-para-o-usuario-que-editou-o-objeto-por-ultimo-na-administracao">Como eu defino automaticamente o valor de um campo para o usuário que editou o objeto por último na administração?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#como-eu-restrinjo-a-edicao-de-objetos-na-administracao-a-apenas-os-usuarios-que-os-criaram">Como eu restrinjo a edição de objetos na administração a apenas os usuários que os criaram?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#minhas-imagens-e-css-do-site-administrativo-funcionam-no-servidor-de-desenvolvimento-mas-nao-aparecem-ao-executar-no-mod-python">Minhas imagens e CSS do site administrativo funcionam no servidor de desenvolvimento, mas não aparecem ao executar no mod_python.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#meu-list-filter-contem-um-manytomanyfield-mas-o-filtro-nao-e-exibido">Meu &#8220;list_filter&#8221; contém um ManyToManyField, mas o filtro não é exibido.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#como-eu-posso-personalizar-a-funcionalidade-da-interface-administrativa">Como eu posso personalizar a funcionalidade da interface administrativa?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#o-site-administrativo-gerado-automaticamente-e-horrivel-como-eu-posso-muda-lo">O site administrativo gerado automaticamente é horrível! Como eu posso mudá-lo?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">FAQ: Contribuindo com código</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#como-eu-posso-comecar-a-contribuir-com-o-codigo-do-django">Como eu posso começar a contribuir com o código do Django?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#eu-enviei-uma-correcao-de-bug-no-sistema-de-tickets-semanas-atras-por-que-voces-estao-ignorando-meu-patch">Eu enviei uma correção de bug no sistema de tickets semanas atrás. Por que vocês estão ignorando meu patch?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#quando-e-como-eu-posso-relembrar-o-core-team-de-um-patch-com-qual-me-importo">Quando e como eu posso relembrar o core team de um patch com qual me importo?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#mas-eu-tenho-lembrado-voces-varias-vezes-e-voces-continuam-ignorando-meu-patch">Mas eu tenho lembrado vocês várias vezes e vocês continuam ignorando meu patch!</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../howto/static-files.html">Managing static files</a></li>
+    
+    
+      <li>Next: <a href="general.html">FAQ: Geral</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+        <ul><li>FAQ do Django</li></ul>
+        
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/faq/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../howto/static-files.html" title="Managing static files">previous</a> 
+     |
+    <a title="Django v1.3.1 documentation" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="general.html" title="FAQ: Geral">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

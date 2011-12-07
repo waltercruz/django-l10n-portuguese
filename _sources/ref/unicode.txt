@@ -1,0 +1,391 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+=======================
+Dados Unicode no Django
+=======================
+
+.. versionadded:: 1.0
+
+O Django nativamente suporta dados Unicode por toda parte. Proporcionando ao seu
+banco de dados uma forma de armazenar os dados, e dando-lhe a segurança de
+passar strings Unicode aos templates, models e pro banco de dados.
+
+Este documento lhe conta o que você precisa saber se você estiver escrevendo
+aplicações que usam dados ou templates que estão codificados em algum outro
+formato ASCII.
+
+Criando o banco de dados
+========================
+
+Esteja certo que seu banco de dados está configurado para armazenar strings
+arbitrárias. Normalmente, isto significa tê-las numa codificação UTF-8 ou
+UTF-16. Se você usa mais de uma codificação restritiva -- por exemplo, latin1
+(iso8859-1) -- você não poderá armazenar certos caracteres no banco de dados,
+e informações serão perdidas.
+
+ * Usuários do MySQL, consultem o `manual do MySQL`_ (seção 10.3.2 para MySQL
+   5.1) para detalhes sobre como setar ou alterar a codificação do banco de
+   dados.
+ * Usuários de PostgreSQL, consultem o `manual do PostgreSQL`_ (seção 21.2.2 no
+   PostgresSQL 8) para detalhes sobre criar bancos de dados com a codificação
+   correta.
+ * Usuários de SQLite, não há nada que você precise fazer. O SQLite sepre usa o
+   UTF-8 para codificação interna.
+
+.. _manual do MySQL: http://www.mysql.org/doc/refman/5.1/en/charset-database.html
+.. _manual do PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html#AEN24104
+
+Todos os backends de banco de dados do Django automaticamente covertem strings
+Unicode para o formato apropriado do banco de dados. Eles também convertem
+automaticamente strings recebidas de bancos de dados em strings Unicode do
+Python. Você não precisa dizer ao Django qual codificação seu banco de dados
+usa: isso é manipulado transparentemente.
+
+Par mais, veja a seção "API de banco de dados" abaixo.
+
+Manipulação genérica de string
+==============================
+
+Sempre que você usa strings com o Django -- e.g., no banco de dados,
+renderização de templates ou algo mais -- você tem duas escolhas de codificação
+de strings. Você pode usar strings Unicode, ou vocÊ pode usar strings normais (
+algumas chamadas "bytestrings") que são codificadas usando UTF-8.
+
+.. admonition:: Warning
+
+    Uma bytestring não carrega qualquer informação com ela sobre sua
+    codificação. Por esta razão, nós temos que fazer uma suposição, e o Django
+    assume que toda bytestring é UTF-8.
+
+    Se você passar uma string para o Django que já foi codificada em algum outro
+    formato, as coisas podem ir por um caminho errado e de formas interessantes.
+    Normalmente, o Django lançará um erro ``UnicodeDecodeError`` neste ponto.
+
+Se seu código somente usa dados ASCII, ele é seguro para usar strings normais,
+passando-as a vontade, porque o ASCII é sub-conjunto do UTF-8.
+
+Não se engane em pensar que se sua configuração :setting:`DEFAULT_CHARSET` é
+qualquer coisa diferente de ``'utf-8'`` que você pode usar nas suas bytestrings!
+:setting:`DEFAULT_CHARSET` somente se aplica a strings geradas como resultado de
+renderização de templates (e e-mail). O Django sempre assumirá a codificação
+UTF-8 para bytestrings internas. A razão disso é que na verdade a configuração
+:setting:`DEFAULT_CHARSET` não está sob seu controle (se você é um desenvolvedor
+de aplicações). Está sob controle da pessoa que instala e usa sua aplicação --
+e se essa pessoa escolher uma configuração diferente, seu código pode ainda
+continuar funcionando. Portanto, ela não pode contar com essa configuração.
+
+Na maioria dos casos quando o Django está lidando com strings, ele as converterá
+para Unicode antes de fazer algo mais. Então, como uma regra geral, se você
+passa uma bytestring, esteja preparado para receber uma string Unicode de volta
+no resultado.
+
+Strings traduzidas
+------------------
+
+Além das string Unicode e bytestrings, há um terceiro tipo de objeto do tipo
+string que você pode encontrar enquanto usa o Django. As funcionalidades do
+framework de internacionalização introduzem o conceito de uma "tradução
+lazy" -- uma string que foi marcada como traduzida mas cujo resultado atual da
+tradução não é determinado até que o objeto seja utilizado numa string. Esta
+funcionalidade é útil em casos onde a localização da tradução é desconhecida até
+que a string seja usada, mesmo pensando que a string possa ter sigo
+originalmente criada quando o código foi importado pela primeira vez.
+
+Normalmente, você não terá de se preocupar com traduções lazy. Somente esteja
+alerta que se você examinar um objeto e ele afirma ser um objeto
+``django.utils.functional.__proxy__``, ele é uma tradução lazy. Chamando
+``unicode()`` com a tradução lazy como argumento gerará uma string Unicode na
+localização atual.
+
+Para mais detalhes sobre traduções tardias de objetos, leia a documentação de
+:doc:`internacionalização </topics/i18n/index>`.
+
+Utilitário de funções úteis
+---------------------------
+
+Por algumas operações de string serem muito repetitivas, o Django vem
+acompanhado de funções úteis que devem fazer o trabalho com objetos Unicode e
+bytestring ficar um pouco mais fácil.
+
+Fuções de conversão
+~~~~~~~~~~~~~~~~~~~
+
+O módulo ``django.utils.encoding`` contém algumas funções que são capazes de
+realizar conversões entre strings Unicode e bytestrings.
+
+    * ``smart_unicode(s, encoding='utf-8', strings_only=False, errors='strict')``
+      converte sua entrada para uma string Unicode. O parametro ``encoding``
+      especifica a codificação da entrada. (Por exemplo, o Django usa isso
+      internamente quando processa dados de formulários, que podem não ter
+      codificação UTF-8.) O parametro ``strings_only ``, se setado como True,
+      resultará em números Python, booleanos e ``None`` sem conversão para uma
+      string (eles mantêm seus tipos originais). O parametro ``errors`` recebe
+      qualquer um dos valores que são aceitos pela função ``unicode()`` do
+      Python para sua manipulação de erros.
+
+      Se você passar ao ``smart_unicode()`` um objeto que tem um método
+      ``__unicode__``, ele usará este método para fazer a conversão.
+
+    * ``force_unicode(s, encoding='utf-8', strings_only=False,
+      errors='strict')`` é identico ao ``smart_unicode()`` em quase todos os
+      casos. A diferença é quando o primeiro argumento é uma instância de
+      :ref:`tradução lazy <lazy-translations>`. Enquanto ``smart_unicode()``
+      preserva a tradução tardia, ``force_unicode()`` força estes objetos a
+      serem strings Unicode (causando a ocorrência da tradução). Normalmente,
+      você desejará usar ``smart_unicode()``. Entretanto, ``force_unicode()`` é
+      útil em template tags e filtros que *devem* ter absolutamente uma string
+      para trabalhar com, não algo que pode ser convertido numa string.
+
+    * ``smart_str(s, encoding='utf-8', strings_only=False, errors='strict')``
+      é essencialmente o oposto de ``smart_unicode()``. Ele força o primeiro
+      argumento a ser uma bytestring. O parametro ``strings_only`` tem o mesmo
+      comportamento que do ``smart_unicode()`` e ``force_unicode()``. Essa é uma
+      semântica ligeiramente diferente da função nativa do Python ``str()``,
+      mas a diferença é necessária em alguns poucos lugares internos do Django.
+
+
+Normalmente, você somente precisará usar ``smart_unicode()``. Chamando-o tão
+cedo quanto possível sobre qualquer entrada de dados que podem ser Unicode ou
+bytestring, e a partir de então, você pode tratar os resultados como sempre faz
+com Unicode.
+
+Manipulação de URI e IRI
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Os frameworks Web tem de lidar com URLs (que são um tipo de IRI_). Um dos
+requerimentos das URLs é que elas são codificadas usando somente caracteres
+ASCII. Entretanto, num ambiente internacional, você pode precisar construir uma
+URL a partir de uma IRI_ -- falando muito vagamente, um URI que pode conter
+caracteres Unicode. Colocando entre aspas e convertendo uma IRI para URI pode
+ser um pouco complicado, então o Django fornece alguma assistência.
+
+    * A função ``django.utils.encoding.iri_to_uri()`` implementa a conversão
+      de uma IRI para URI como é pedido na especificação (`RFC 3987`_).
+
+    * As funções ``django.utils.http.urlquote()`` e
+      ``django.utils.http.urlquote_plus()`` são versões ao padrão Python
+      ``utllib.quote()`` e ``urllib.quote_plus()`` que trabalham com caracteres
+      não-ASCII. (O dado é convertido para UTF-8 antes da codificação.)
+
+Estes dois grupos de funções têm efeitos ligeiramente diferentes, e é importante
+mante-los distintos. Normalmente, você usaria ``urlquote()`` nas porções
+individuais de caminhos IRI ou URI de modo que quaisquer caracteres reservados
+como '&' ou '%' sejam corretamente codificados. Depois, você aplica
+``iri_to_uri()`` para o IRI completo e ele converte quaisquer caracteres
+não-ASCII para os valores codificados corretos.
+
+.. note::
+    Tecnicamente, não é correto dizer que ``iri_to_uri()`` implementa o
+    algoritmo completo da especificação IRI. Ele (ainda) não faz a codificação
+    de nomes de domnínios internacinais, que é uma porção do algoritmo.
+
+A função ``iri_to_uri()`` não mudará caracteres ASCII que são de outra forma
+permitidos em uma URL. Então, por exemplo, o caractere '%' não é mais codificado
+quando passado para ``iri_to_uri()``. Isso significa que você pode passar uma
+URL completa para essa função e ela não bagunçará a query string ou qualquer
+coisa do tipo.
+
+Um exemplo pode clarear as coisas aqui::
+
+    >>> urlquote(u'Paris & Orléans')
+    u'Paris%20%26%20Orl%C3%A9ans'
+    >>> iri_to_uri(u'/favorites/François/%s' % urlquote(u'Paris & Orléans'))
+    '/favorites/Fran%C3%A7ois/Paris%20%26%20Orl%C3%A9ans'
+
+Se você olhar cuidadosamente, você poderá ver que a porção que foi gerada pelo
+``urlquote()`` no segundo exemplo, não foi duplamente cotada quando passou pelo
+``iri_to_uri()``. Essa é uma funcionalidade muito importante e útil. Ela
+significa que você pode construir suas IRI sem se preocupar se ela contém
+caracteres não-ASCII e então, bem no final, chame ``iri_to_uri()`` sobre o
+resultado.
+
+A função ``iri_to_uri()`` é também imutável, o que significa que o seguinte é
+sempre verdadeiro::
+
+    iri_to_uri(iri_to_uri(some_string)) = iri_to_uri(some_string)
+
+Então você pode seguramente chamá-lo várias vezes sobre a mesma IRI sem o risco
+de ploblemas com dupla-cotação.
+
+.. _URI: http://www.ietf.org/rfc/rfc2396.txt
+.. _IRI: http://www.ietf.org/rfc/rfc3987.txt
+.. _RFC 3987: IRI_
+
+Models
+======
+
+Como todas as strings são retornadas de um banco de dados como strings Unicode,
+os campos de model que são baseados em caracteres (CharField, TextField,
+URLField, etc) conterão valores Unicode quando o Django recebe dados de um banco
+de dados. O caso é *sempre* esse, mesmo que os dados pudessem caber numa
+bytestring ASCII.
+
+Você pode passar dados em bytestrings quando estiver criando um model ou
+populando um campo, mas o Django o converterá para Unicode quando ele precisar.
+
+Escolhendo entre ``__str__()`` e ``__unicode__()``
+--------------------------------------------------
+
+Uma das consequências de se usar o Unicode por padrão é que você tem de tomar
+cuidado quando for imprimir dados de um model.
+
+Em particular, ao invés de dar ao seu model um método ``__str__()``, nós
+recomendamos você implementar um método ``__unicode__()``. No método
+``__unicode__()``, você pode seguramente retornar valores de todos os campos sem
+ter de se preocupar se eles irão caber dentro de uma bytestring ou não. (A forma
+como o Python trabalha, o resultado de ``__str__()`` é *sempre* uma bytestring,
+mesmo se você acidentalmente tentar retornar um objeto Unicode).
+
+Você pode ainda criar um método ``__str__()`` nos seus models se você quiser,
+é claro, mas você não precisa fazer isso a menos que tenha uma boa razão.
+O classe base ``Model`` do Django fornece automaticamente uma implementação do
+método ``__str__()`` que chama ``__unicode__()`` e codifica o resultado para
+UTF-8. Isso significa que você normalmente precisará somente implentar um método
+``__unicode__()`` e deixar o Django manipular a coerção para uma bytestring
+quando for requerido.
+
+Tome cuidado no ``get_absolute_url()``
+--------------------------------------
+
+URLs podem somente conter caracteres ASCII. Se você estiver construíndo uma URL
+a partir de dados que podem ser não-ASCII, tenha cuidado para codificar os
+resultados de uma forma que seja adequada para uma URL. O decorador
+``django.db.models.permalink()`` automaticamente manipula isso automaticamente
+por você.
+
+Se você estiver construíndo uma URL manualmente (i.e., *sem* usar o decorador
+``permalink()``), você precisará se preocupar em codificar você mesmo. Neste
+caso use, use as funções ``iri_to_uri()`` e ``urlquote()`` que foram
+documentadas acima_. Por exemplo::
+
+    from django.utils.encoding import iri_to_uri
+    from django.utils.http import urlquote
+
+    def get_absolute_url(self):
+        url = u'/person/%s/?x=0&y=0' % urlquote(self.location)
+        return iri_to_uri(url)
+
+Essa função retorna um URL corretamente codificada mesmo se ``self.location``
+seja algo tipo "Jack visited Paris & Orléans". (De fato, a chamada
+``iri_to_uri()`` não é estritamente necessária no exemplo acima, pois todos os
+caracteres não-ASCII já foram removidos durante o ``urlquote()`` na primeira
+linha.)
+
+.. _acima: `Manipulação de URI e IRI`_
+
+A API de banco de dados
+=======================
+
+Você pode passar tanto strings Unicode ou bytestrings UTF-8 como argumentos para
+os métodos ``filter()`` e seus semelhantes da API de banco de dados. Os dois
+querysets a seguir são identicos::
+
+    qs = People.objects.filter(name__contains=u'Å')
+    qs = People.objects.filter(name__contains='\xc3\x85') # Codificação UTF-8 de Å
+
+Templates
+=========
+
+Você pode usar tanto Unicode quanto bytestrings quando criar templates
+manualmente::
+
+	from django.template import Template
+	t1 = Template('This is a bytestring template.')
+	t2 = Template(u'This is a Unicode template.')
+
+Porém o caso mais comum é ler os templates do sistema de arquivos, e isso gera
+uma ligeira complicação: nem todos os sistemas de arquivos armazenam seus dados
+codificados em UTF-8. Se seus arquivos de template não são armazenados com
+codificação UTF-8, configure o :setting:`FILE_CHARSET` para codificar os
+arquivos no disco. Quando o Django lê um arquivo de template, ele converterá
+os dados dele para Unicode. (:setting:`FILE_CHARSET` é configurado como
+``'utf-8'`` por padrão.)
+
+A configuração :setting:`DEFAULT_CHARSET` controla a codificação de templates
+renderizados. Isto é configurado como UTF-8 por padrão.
+
+Template tags e filtros
+-----------------------
+
+Algumas dicas para se lembrar quando escrever suas próprias template tags e
+filtros:
+
+    * Sempre retorne strings Unicode de um método render de uma template tag e
+      de um filtro.
+
+    * Use ``force_unicode()`` de preferência, ao invés de ``smart_unicode()``
+      nestes lugares. As chamadas de renderização de tags e filtros ocorrem
+      quando o template estiver em renderização, assim não há vantagem em adiar
+      a conversão de objetos de traduções lazy. É mais fácil trabalhar
+      unicamente com strings Unicode neste ponto.
+
+E-mail
+======
+
+O framework de email do Django (em ``django.core.mail``) suporta Unicode
+transparentemente. Você pode usar dados Unicode no corpo das mensagens e
+qualquer cabeçalho. Entretanto, você ainda será obrigado a respeitar os
+requerimentos das especificações do e-mail, desta forma, por exemplo, endereços
+de e-mail devem usar somente caracteres ASCII.
+
+O seguinte código de exemplo demonstra que tudo, exceto endereços de e-mail,
+podem ser não ASCII::
+
+    from django.core.mail import EmailMessage
+
+    subject = u'My visit to Sør-Trøndelag'
+    sender = u'Arnbjörg Ráðormsdóttir <arnbjorg@example.com>'
+    recipients = ['Fred <fred@example.com']
+    body = u'...'
+    EmailMessage(subject, body, sender, recipients).send()
+
+Submissão de formulários
+========================
+
+Submissão de formulários HTML é uma área complicada. Não há garantias de que a
+submissão incluirá informações de codificação, o que significa que o framework
+pode ter de advinhar a codificação dos dados submetidos.
+
+O Django adota uma abordagem "lazy" para decodificar dados de formulário. Os
+dados num objeto ``HttpRequest`` é somente decodificado quando você o acessa. De
+fato, a maior parte dos dados não é decodificada. Somente as estruturas de dados
+``HttpRequest.GET`` e ``HttpRequest.POST`` tem qualquer decodificação aplicada
+nelas. Estes dois campos retornar]ao seus membros como dados Unicode. Todos os
+outros atributos e método do ``HttpRequest`` retornam exatamente o dado como
+foi submetido pelo cliente.
+
+Por padrão, a configuração :setting:`DEFAULT_CHARSET` é usada como a codificação
+assumida pelos dados do formulário. Se você precisa mudar isso para um
+formulário particular, você pode configurar o atributo ``encoding`` de uma
+instância ``HttpRequest``. Por exemplo::
+
+    def some_view(request):
+        # Nós sabemos que os dados devem ser codificados como KOI8-R
+        # (por alguma razão).
+        request.encoding = 'koi8-r'
+        ...
+
+Você ainda pode mudar a codificação depois de accessado o ``request.GET`` ou
+``request.POST``, e todos os acessos subsequentes usarão a nova codificação.
+
+A maioria dos desenvolvedores não precisam se preocupar em mudar a codificação
+de um formulário, mas essa é uma funcionalidade útil quando falamos de sistemas
+legadas cuja codificação você não pode controlar.
+
+O django não codifica dados de arquivos de upload, pois esses dados são
+normalmente tratados como coleções de bytes, ao invés de strings. Qualquer
+decodificação automática não alteraria o sentido do fluxo de bytes.
+

@@ -1,0 +1,457 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Validação de campos e formulários &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Formulários" href="index.html" />
+    <link rel="next" title="Class-based generic views" href="../class-based-views.html" />
+    <link rel="prev" title="Widgets" href="widgets.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="widgets.html" title="Widgets">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="../class-based-views.html" title="Class-based generic views">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-forms-validation">
+            
+  <div class="section" id="s-validacao-de-campos-e-formularios">
+<span id="s-ref-forms-validation"></span><span id="validacao-de-campos-e-formularios"></span><span id="ref-forms-validation"></span><h1>Validação de campos e formulários<a class="headerlink" href="#validacao-de-campos-e-formularios" title="Permalink to this headline">¶</a></h1>
+<p>A validação de formulários acontece quando os dados são limpos. Se você quer
+customizar este processo, há vários lugares que você pode mudar, cada um
+serve para um diferente propósito. Três tipos de métodos de limpeza são
+executados durante o processamento do formulário. Estes são normalmente
+executados quando você chama o método <tt class="docutils literal"><span class="pre">is_valid()</span></tt> do formulário. Há outras
+coisas que conseguem disparar a limpeza e validação (acessando os atributos
+<tt class="docutils literal"><span class="pre">errors</span></tt> ou chamando <tt class="docutils literal"><span class="pre">full_clean()</span></tt> diretamente), mas normalmente eles não
+são necessários.</p>
+<p>Geralmente, qualquer método de limpeza pode lançar <tt class="docutils literal"><span class="pre">ValidationError</span></tt> se houver
+um problema com os dados processados, passando a mensagem de erro relevante para
+o construtor <tt class="docutils literal"><span class="pre">ValidationError</span></tt>. Se nenhum <tt class="docutils literal"><span class="pre">ValidationError</span></tt> é lançado, o
+método deve retornar os dados limpos (normalizados) como um objeto Python.</p>
+<p>Se você detectar vários erros durante o método de limpeza e deseja sinalizar
+todos eles para o submissor do formulário, é possível passar uma lista dos erros
+para o construtor do <tt class="docutils literal"><span class="pre">ValidationError</span></tt>.</p>
+<p>Os três tipos de métodos de limpeza são:</p>
+<ul>
+<li><p class="first">O método <tt class="docutils literal"><span class="pre">clean()</span></tt> em uma subclasse Field. Este é responsável por limpar
+os dados de uma forma genérica para esse tipo de campo. Por exemplo, um
+FloatField será transformado em um dado Python do tipo <tt class="docutils literal"><span class="pre">float</span></tt> ou
+lançará o <tt class="docutils literal"><span class="pre">ValidationError</span></tt>. Este método retorna o dado limpo, que é
+então inserido dentro do dicionário <tt class="docutils literal"><span class="pre">cleaned_data</span></tt> do formulário.</p>
+</li>
+<li><p class="first">O método <tt class="docutils literal"><span class="pre">clean_&lt;fieldname&gt;()</span></tt> em uma subclasse de formulário &#8211; onde
+<tt class="docutils literal"><span class="pre">&lt;fieldname&gt;</span></tt> é substituído com o nome do atributo campo do forumulário.</p>
+</li>
+<li><p class="first">O método <tt class="docutils literal"><span class="pre">clean_&lt;fieldname&gt;()</span></tt> em uma subclasse de formulário &#8211; onde o
+<tt class="docutils literal"><span class="pre">&lt;fieldname&gt;</span></tt> é substituído com o nome do atributo do campo do
+formulário. Este método faz qualquer limpeza que seja específica para um
+atributo, independente do tipo de campo que ele for. A este método não é
+passado parâmetros. Você precisará olhar o valor do campo em
+<tt class="docutils literal"><span class="pre">self.cleaned_data</span></tt> e lembrar que ele será um objeto Python neste ponto,
+não a string original enviada pelo formulário (ele estará no
+<tt class="docutils literal"><span class="pre">cleaned_data</span></tt> porquê o método <tt class="docutils literal"><span class="pre">clean()</span></tt> dos campos em geral, acima,
+já validaram os dados uma vez).</p>
+<p>Por exemplo, se você procura validar o conteúdo de um <tt class="docutils literal"><span class="pre">CharField</span></tt>
+chamado <tt class="docutils literal"><span class="pre">serialnumber</span></tt> como único, <tt class="docutils literal"><span class="pre">clean_serialnumber()</span></tt> seria o
+lugar certo para fazer isto. Você não precisa de um campo específico (ele
+é só um <tt class="docutils literal"><span class="pre">CharField</span></tt>), mas você deseja a validação de um campo de
+formulário específico e, possivelmente, limpeza/normalização dos dados.</p>
+<p>Assim como o método <tt class="docutils literal"><span class="pre">clean()</span></tt> de campo geral, acima, este método deveria
+retornar o dado normalizado, independentemente do fato de ter mudado
+alguma coisa ou não.</p>
+</li>
+<li><p class="first">O método <tt class="docutils literal"><span class="pre">clean()</span></tt> de subclasse do Form. Este método pode executar
+qualquer validação que requer acesso a múltiplos camops de um formulário
+de uma vez. Aqui é onde você pode colocar coisas para checar se um campo
+<tt class="docutils literal"><span class="pre">A</span></tt> é fornecido, campo <tt class="docutils literal"><span class="pre">B</span></tt> deve conter um endreço de e-mail válido e,
+algo mais. O dado que este método retorna é o atributo final
+<tt class="docutils literal"><span class="pre">cleaned_data</span></tt> para o formulário, então não esqueça de retornar uma
+lista completa com os dados validados se você sobrescrever este método
+(por padrão, <tt class="docutils literal"><span class="pre">Form.clean()</span></tt> retorna somente <tt class="docutils literal"><span class="pre">self.cleaned_data</span></tt>).</p>
+<p>Note que quaisquer erros lançados por sua sobrescrita <tt class="docutils literal"><span class="pre">Form.clean()</span></tt> não
+será associado como qualquer campo em particular. Eles irão dentro de um
+&#8220;campo&#8221; especial (chamado, <tt class="docutils literal"><span class="pre">__all__</span></tt>), que você pode acessar via o
+método <tt class="docutils literal"><span class="pre">non_field_errors()</span></tt> se você precisar. Se vocÊ quer atachar os
+erros a um campo específico do formulário, você precisará acessar o
+atributo <tt class="docutils literal"><span class="pre">_errors</span></tt> do formulário, que é <a class="reference internal" href="#descrito-mais-tarde">descrito mais tarde</a>.</p>
+</li>
+</ul>
+<p>Estes métodos são executados na ordem mostrada acima, um campos por vez. Isto é,
+para campo no formulário (na ordem em que foram declarados, na definição do
+formulário), o método <tt class="docutils literal"><span class="pre">Field.clean()</span></tt> (ou sua sobrescrita) é executado, e
+então <tt class="docutils literal"><span class="pre">clean_&lt;fieldname&gt;()</span></tt>. Finalmente, um dos dois método são executados
+para cada ampo, o método <tt class="docutils literal"><span class="pre">Form.clean()</span></tt>, ou sua sobrescrita, é executado.</p>
+<p>Exemplo de cada um destes métodos são mostrados abaixo.</p>
+<p>Como mensionado, qualquer um desses métodos podem lançar um <tt class="docutils literal"><span class="pre">ValidationError</span></tt>.
+Para qualquer campo, se o método <tt class="docutils literal"><span class="pre">Field.clean()</span></tt> lançar um
+<tt class="docutils literal"><span class="pre">ValidationError</span></tt>, qualquer método de limpeza de campo específico não é
+chamado. Entretanto, os métodos de limpeza para todos os campos remanescentes
+ainda serão executados.</p>
+<p>O método <tt class="docutils literal"><span class="pre">clean()</span></tt> para a classe ou subclasse <tt class="docutils literal"><span class="pre">Form</span></tt> é sempre executado. Se
+este método lançar um <tt class="docutils literal"><span class="pre">ValidationError</span></tt>, o <tt class="docutils literal"><span class="pre">cleaned_data</span></tt> será um dicionário
+vazio.</p>
+<p>O parágrafo anterior significa que se você estiver sobrescrevendo
+<tt class="docutils literal"><span class="pre">Form.clean()</span></tt>, você deve iterar sobre <tt class="docutils literal"><span class="pre">self.cleaned_data.items()</span></tt>,
+possivelmente considerando o atributo dicionário <tt class="docutils literal"><span class="pre">_errors</span></tt> sobre o formulário.
+Desta forma, você já saberá quais campos passaram na validação individual.</p>
+<div class="section" id="s-sublasses-de-form-e-modificando-erros-de-campos">
+<span id="s-descrito-mais-tarde"></span><span id="sublasses-de-form-e-modificando-erros-de-campos"></span><span id="descrito-mais-tarde"></span><h2>Sublasses de Form e modificando erros de campos<a class="headerlink" href="#sublasses-de-form-e-modificando-erros-de-campos" title="Permalink to this headline">¶</a></h2>
+<p>As vezes, num método <tt class="docutils literal"><span class="pre">clean()</span></tt> de um formulário, você pode querer adicionar
+uma mensagem de erro para um campo em particular. Isso nem sempre é apropriado e
+a situação mais comum é lançar um <tt class="docutils literal"><span class="pre">ValidationError</span></tt> num <tt class="docutils literal"><span class="pre">Form.clean()</span></tt>, que
+é ativado em um erro ao longo do formulário e disponibilizado através do método
+<tt class="docutils literal"><span class="pre">Form.non_field_errors()</span></tt>.</p>
+<p>Quando você realmente precisa atachar um erro para um campo em particular, você
+deve armazenar (ou alterar) uma chave no atributo <tt class="docutils literal"><span class="pre">Form._errors</span></tt>. Este
+atributo é uma instância da classe <tt class="docutils literal"><span class="pre">django.forms.util.ErrorDict</span></tt>.
+Essencialmente, porém, é só um dicinário. Cada valor no dicionário é uma
+instância <tt class="docutils literal"><span class="pre">django.forms.util.ErrorList</span></tt>, que é uma lista que sabe como se
+mostrar de diferentes formas. então você pode tratar <tt class="docutils literal"><span class="pre">_erros</span></tt> como um
+dicionário, mapeado com os nomes dos campos.</p>
+<p>Se você quiser adicionar um novo erro a campo em particular, você deve checar se
+a chave já existe em <tt class="docutils literal"><span class="pre">self._errors</span></tt> ou não. Se não, crie um nova entrada para
+a dada chave, mantendo um instância vazia do <tt class="docutils literal"><span class="pre">ErrorList</span></tt>. Em ambos os casos,
+você pode então atachar sua mensagem de erro a lista para o nome do campo em
+questão e ela será exibida quando o formulário for mostrado.</p>
+<p>Há um exemplo de como modificar o <tt class="docutils literal"><span class="pre">self._errors</span></tt> na próxima seção.</p>
+<div class="admonition-o-que-esta-no-nome admonition ">
+<p class="first admonition-title">O que está no nome?</p>
+<p>Você pode estar pensando por que este atributo é chamado <tt class="docutils literal"><span class="pre">_erros</span></tt> e não
+<tt class="docutils literal"><span class="pre">errors</span></tt>. Na prática normal do Python é para prefixar um nome com um
+underscore quando este não for de uso externo. Neste caso, você está
+extendendo a classe <tt class="docutils literal"><span class="pre">Form</span></tt>, então você está essencialmente escrevendo um
+novo núcleo. Na verdade, é dado a permissão a você para acessar alguns
+atributos internos do <tt class="docutils literal"><span class="pre">Form</span></tt>.</p>
+<p>É claro, que qualquer código fora de seu formulário nunca deve acessar o
+<tt class="docutils literal"><span class="pre">_erros</span></tt> diretamente. Os dados estão disponíveis para código externo
+através da propriedade <tt class="docutils literal"><span class="pre">errors</span></tt>, que popula <tt class="docutils literal"><span class="pre">_errors</span></tt> antes de
+retorná-lo).</p>
+<p class="last">Outra razão é puramente histórica: o atributo tem sido chamado <tt class="docutils literal"><span class="pre">_errors</span></tt>
+desde os primeiros dias do módulo forms e mudá-lo agora (particularmente
+desde que <tt class="docutils literal"><span class="pre">errors</span></tt> fora usado como o nome da propriedade somente leitura)
+seria inconveniente por inúmeras razões. Você pode usar a explicação que lhe
+for mais confortável. O resultado é o mesmo.</p>
+</div>
+</div>
+<div class="section" id="s-usando-validacao-na-pratica">
+<span id="usando-validacao-na-pratica"></span><h2>Usando validação na prática<a class="headerlink" href="#usando-validacao-na-pratica" title="Permalink to this headline">¶</a></h2>
+<p>A seção anterior explicou como a validação nos formulários geralmente funciona.
+Uma vez que pode ser mais fácil de por as coisas no lugar ao ver cada
+característica em uso, aqui está uma série de pequenos exemplos que usam
+cada uma das funcionalidades anteriomente citadas.</p>
+<div class="section" id="s-limpeza-padrao-de-campos-do-form">
+<span id="limpeza-padrao-de-campos-do-form"></span><h3>Limpeza padrão de campos do Form<a class="headerlink" href="#limpeza-padrao-de-campos-do-form" title="Permalink to this headline">¶</a></h3>
+<p>Vamos em primeiro lugar criar um campo de formulário customizado que valida sua
+entrada como uma estring contendo endereços de e-mail separados por virgula, com
+pelo menos um endereço. Nós manteremos ele simples e assumimos que a validação
+de e-mail está contida na função chamada <tt class="docutils literal"><span class="pre">is_valid_email()</span></tt>. A classe completa
+parece com esta:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+
+<span class="k">class</span> <span class="nc">MultiEmailField</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Field</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checa que o campo contém um ou mais email separados por vírgula</span>
+<span class="sd">        e normaliza os dados para uma lista de strings de email.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s">&#39;Enter at least one e-mail address.&#39;</span><span class="p">)</span>
+        <span class="n">emails</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">email</span> <span class="ow">in</span> <span class="n">emails</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_valid_email</span><span class="p">(</span><span class="n">email</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> is not a valid e-mail address.&#39;</span> <span class="o">%</span> <span class="n">email</span><span class="p">)</span>
+
+        <span class="c"># Sempre retorna o dado limpo.</span>
+        <span class="k">return</span> <span class="n">emails</span>
+</pre></div>
+</div>
+<p>Todo formulário que usar este campo terpa este método <tt class="docutils literal"><span class="pre">clean()</span></tt> executado
+antes que algo mais seja feito com o os dados do campo. Esta é a validação que é
+específica para este tipo de campo, independentemente da forma como é
+subsequentemente usado.</p>
+<p>Vamos criar um simples <tt class="docutils literal"><span class="pre">ContactForm</span></tt> para demostrar como este campo poderia
+ser utilizado:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ContactForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">sender</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
+    <span class="n">recipients</span> <span class="o">=</span> <span class="n">MultiEmailField</span><span class="p">()</span>
+    <span class="n">cc_myself</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Simplesmente use o <tt class="docutils literal"><span class="pre">MultiEmailField</span></tt> como qualquer outro campo. Quando o
+método <tt class="docutils literal"><span class="pre">is_valid()</span></tt> é chamado no formulário, o método <tt class="docutils literal"><span class="pre">MultiEmailField</span></tt> será
+executado como parte do processo de validação.</p>
+</div>
+<div class="section" id="s-validando-um-atributo-campo-especifico">
+<span id="validando-um-atributo-campo-especifico"></span><h3>Validando um atributo campo específico<a class="headerlink" href="#validando-um-atributo-campo-especifico" title="Permalink to this headline">¶</a></h3>
+<p>Continuando sobre o exemplo anterior, supomos que em seu <tt class="docutils literal"><span class="pre">ContactForm</span></tt>, nós
+queremos estar certos de que o campo <tt class="docutils literal"><span class="pre">recipients</span></tt> sempre conterá o endereço
+<tt class="docutils literal"><span class="pre">&quot;fred&#64;example.com&quot;</span></tt>. Este é uma validação que é expecífica para o nosso
+formulário, então nós não queremos colocá-la dentro da classe geral
+<tt class="docutils literal"><span class="pre">MultiEmailField</span></tt>. Ao invés, nós escreveremos um método que opera sobre o
+campo <tt class="docutils literal"><span class="pre">recipients</span></tt>, desta forma:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ContactForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="c"># Tudo como antes.</span>
+    <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">clean_recipients</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;recipients&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s">&quot;fred@example.com&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s">&quot;You have forgotten about Fred!&quot;</span><span class="p">)</span>
+
+        <span class="c"># Sempre retorna o dado validado, você tendo mudado ele ou não.</span>
+        <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-limpando-e-validando-campos-que-dependem-uns-dos-outros">
+<span id="limpando-e-validando-campos-que-dependem-uns-dos-outros"></span><h3>Limpando e validando campos que dependem uns dos outros<a class="headerlink" href="#limpando-e-validando-campos-que-dependem-uns-dos-outros" title="Permalink to this headline">¶</a></h3>
+<p>Suponhamos adicionar outra exigência ao nosso formulário de contato: se o campo
+<tt class="docutils literal"><span class="pre">cc_myself</span></tt> é <tt class="xref docutils literal"><span class="pre">True</span></tt>, o <tt class="docutils literal"><span class="pre">subject</span></tt> deve conter a palavra <tt class="docutils literal"><span class="pre">&quot;help&quot;</span></tt>. Nós
+estamos executando a validação em mais de um campo ao mesmo tempo, então o
+método <tt class="docutils literal"><span class="pre">clean()</span></tt> do formulário é um bom lugar para se fazer isto. Observe que
+nós estamos falando sobre o método <tt class="docutils literal"><span class="pre">clean()</span></tt> de um formulário, considerando
+que antes nós estavámos escrevendo um método <tt class="docutils literal"><span class="pre">clean()</span></tt> de um campo. É
+importante manter o domínio de forma clara quando estamos trabalhando com
+validações. Campos são um ponto único de dados, formulários são uma coleção de
+campos.</p>
+<p>Agora, o método <tt class="docutils literal"><span class="pre">clean()</span></tt> do formulário é chamado, todos os métodos clean
+individuais dos campos serão executados (as duas seções anteriores), então o
+<tt class="docutils literal"><span class="pre">self.cleaned_data</span></tt> será populado com qualquer dado que tenha sobrevivido até
+então. Você também precisa lembrar de permitir o fato de que os campos que você
+está esperando validar podem não ter sobrevivido a checagem inicial dos campos.</p>
+<p>Há duas formas de reportar quaisquer erros de um passo. Provavelmente o método
+mais comum é mostrar o erro no topo do forumulário. Para criar esse erro, você
+pode lançar um <tt class="docutils literal"><span class="pre">ValidationError</span></tt> no método <tt class="docutils literal"><span class="pre">clean()</span></tt>. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ContactForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="c"># Tudo como antes.</span>
+    <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cleaned_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span>
+        <span class="n">cc_myself</span> <span class="o">=</span> <span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;cc_myself&quot;</span><span class="p">)</span>
+        <span class="n">subject</span> <span class="o">=</span> <span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;subject&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">cc_myself</span> <span class="ow">and</span> <span class="n">subject</span><span class="p">:</span>
+            <span class="c"># Somente faça algo se amgos os campos forem válidos.</span>
+            <span class="k">if</span> <span class="s">&quot;help&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">subject</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s">&quot;Did not send for &#39;help&#39; in &quot;</span>
+                        <span class="s">&quot;the subject despite CC&#39;ing yourself.&quot;</span><span class="p">)</span>
+
+        <span class="c"># Sempre retorne a coleção completa de dados válidos.</span>
+        <span class="k">return</span> <span class="n">cleaned_data</span>
+</pre></div>
+</div>
+<p>Neste código, se o erro de validação é lançado, o formulário mostrará uma
+mensagem de erro no seu topo (normalmente) descrevendo o problema.</p>
+<p>A segunda abordagem pode envolver atribuição de uma mensagem de erro para um ou
+mais campos. Neste caso, vamos atribuir uma mensagem de erro para ambas linhas
+&quot;subject&quot; e &quot;cc_myself&quot; na exibição do formulário. Seja cuidadoso quando
+utilizar esta prática, pois pode conduzir a uma saída confusa de formulário. Nós
+estamos mostrando o que é possível aqui, e deixando você e seus designers
+trabalharem no que efetivamente é a sua situação em particular. Nosso novo
+código (substituindo o exemplo anterior) é este:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.forms.util</span> <span class="kn">import</span> <span class="n">ErrorList</span>
+
+<span class="k">class</span> <span class="nc">ContactForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="c"># Tudo como antes.</span>
+    <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cleaned_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span>
+        <span class="n">cc_myself</span> <span class="o">=</span> <span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;cc_myself&quot;</span><span class="p">)</span>
+        <span class="n">subject</span> <span class="o">=</span> <span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;subject&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">cc_myself</span> <span class="ow">and</span> <span class="n">subject</span> <span class="ow">and</span> <span class="s">&quot;help&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">subject</span><span class="p">:</span>
+            <span class="c"># Nós sabemos estes não estão em self._errors agora (veja a</span>
+            <span class="c"># discussão abaixo).</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">u&quot;Must put &#39;help&#39; in subject when cc&#39;ing yourself.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s">&quot;cc_myself&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ErrorList</span><span class="p">([</span><span class="n">msg</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s">&quot;subject&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ErrorList</span><span class="p">([</span><span class="n">msg</span><span class="p">])</span>
+
+            <span class="c"># Estes campos não são válidos. Remova-os dos dados válidos.</span>
+            <span class="k">del</span> <span class="n">cleaned_data</span><span class="p">[</span><span class="s">&quot;cc_myself&quot;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">cleaned_data</span><span class="p">[</span><span class="s">&quot;subject&quot;</span><span class="p">]</span>
+
+        <span class="c"># Sempre retorne a coleção completa de dados válidos.</span>
+        <span class="k">return</span> <span class="n">cleaned_data</span>
+</pre></div>
+</div>
+<p>Como voê pode ver, esta abordagem requer um pouco mais de esforço, não
+suportando um esforço extra de design para criar uma visualização sensata do
+formulário. Os detalhes são dignos de nota, no entanto. Primeiramente, como
+mensionamos que você pode precisar checar se o nome do campo já existe no
+dicionário <tt class="docutils literal"><span class="pre">_errors</span></tt>. Neste caso, desde que sabemos que os campos existem no
+<tt class="docutils literal"><span class="pre">self.cleaned_data</span></tt>, eles devem ser válidos quando validados individualmente,
+então haverá chaves não correspondentes em <tt class="docutils literal"><span class="pre">_errors</span></tt>.</p>
+<p>Depois, uma vez que nós tenhamos decidido que os dados combinados dos dois campos
+não são válidos, nós devemos lembrar de removê-los do <tt class="docutils literal"><span class="pre">cleaned_data</span></tt>.</p>
+<p>De fato, o Django irá, no momento, limpar completamente o dicionário
+<tt class="docutils literal"><span class="pre">cleaned_data</span></tt> se houver qualquer erro no formulário. No entanto, este
+comportamento pode ser mudado no futuro, então não é uma má ideia, depois você
+mesmo limpá-lo, em primeiro lugar.</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Validação de campos e formulários</a><ul>
+<li><a class="reference internal" href="#sublasses-de-form-e-modificando-erros-de-campos">Sublasses de Form e modificando erros de campos</a></li>
+<li><a class="reference internal" href="#usando-validacao-na-pratica">Usando validação na prática</a><ul>
+<li><a class="reference internal" href="#limpeza-padrao-de-campos-do-form">Limpeza padrão de campos do Form</a></li>
+<li><a class="reference internal" href="#validando-um-atributo-campo-especifico">Validando um atributo campo específico</a></li>
+<li><a class="reference internal" href="#limpando-e-validando-campos-que-dependem-uns-dos-outros">Limpando e validando campos que dependem uns dos outros</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="widgets.html">Widgets</a></li>
+    
+    
+      <li>Next: <a href="../class-based-views.html">Class-based generic views</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Referência da API</a>
+        
+          <ul><li><a href="index.html">Formulários</a>
+        
+        <ul><li>Validação de campos e formulários</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/forms/validation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="widgets.html" title="Widgets">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="../class-based-views.html" title="Class-based generic views">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

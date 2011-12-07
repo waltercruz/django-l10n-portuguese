@@ -1,0 +1,306 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Django 1.0 alpha notas de lançamento &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Notas de Lançamento" href="index.html" />
+    <link rel="next" title="Django internamente" href="../internals/index.html" />
+    <link rel="prev" title="Django 1.0 alpha 2 release notes" href="1.0-alpha-2.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="1.0-alpha-2.html" title="Django 1.0 alpha 2 release notes">previous</a> 
+     |
+    <a href="index.html" title="Notas de Lançamento" accesskey="U">up</a>
+   |
+    <a href="../internals/index.html" title="Django internamente">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="releases-1.0-alpha-1">
+            
+  <div class="section" id="s-django-1-0-alpha-notas-de-lancamento">
+<span id="s-releases-1-0-alpha-1"></span><span id="django-1-0-alpha-notas-de-lancamento"></span><span id="releases-1-0-alpha-1"></span><h1>Django 1.0 alpha notas de lançamento<a class="headerlink" href="#django-1-0-alpha-notas-de-lancamento" title="Permalink to this headline">¶</a></h1>
+<p>Bem-vindo ao Django 1.0 alpha!</p>
+<p>Este é o primeiro de uma série de releases de previsão/desenvolvimento
+conducentes à eventual liberação do Django 1.0, atualmente agendado para o
+início de setembro de 2008. Este release a princípio atinge desenvolvedores que
+estão estão interessados no código do Django e a ajudar a identificar e
+resolver bugs prioritários para o release 1.0 final.</p>
+<p>Dessa forma, este release <em>não</em> é destinado para uso em produção, e qualquer
+uso neste sentido é desencorajado.</p>
+<div class="section" id="s-o-que-ha-de-novo-no-django-1-0-alpha">
+<span id="o-que-ha-de-novo-no-django-1-0-alpha"></span><h2>O que há de novo no Django 1.0 alpha<a class="headerlink" href="#o-que-ha-de-novo-no-django-1-0-alpha" title="Permalink to this headline">¶</a></h2>
+<p>O trunk do desenvolvimento do Django tem sido local de atividade quase
+constante durante o último ano, com a criação de várias novas funcionalidades
+desde o release 0.96. Alguns dos destaques incluem:</p>
+<dl class="docutils">
+<dt>Aplicação admin refatorada (newforms-admin)</dt>
+<dd><p class="first">A interface administrativa do Django (<tt class="docutils literal"><span class="pre">django.contrib.admin</span></tt>) foi
+completamente refatorada; definições do admin agora são completamente
+dissociadas das definições dos modelos (nada de declaração <tt class="docutils literal"><span class="pre">class</span> <span class="pre">Admin</span></tt>
+nos seus modelos!), reescrito para usar a nova biblioteca form-handling do
+Django (introduzido no release 0.96 como <tt class="docutils literal"><span class="pre">django.newforms</span></tt>, e agora
+disponível simplesmente como <tt class="docutils literal"><span class="pre">django.forms</span></tt>) e replanejado tendo em mente
+extensibilidade e customização. A documentação completa para a aplicação
+admin está disponível online na documentação oficial do Django:</p>
+<blockquote class="last">
+<div><a class="reference internal" href="../ref/contrib/admin/index.html"><em>referência da administração</em></a></div></blockquote>
+</dd>
+<dt>Manipulação de Unicode melhorada</dt>
+<dd><p class="first">Internamente o Django foi completamente refatorado para usar Unicode; isso
+simplifica drasticamente a tarefa de lidar com conteúdos e dados não-
+Western-European no Django. Adicionalmente, funções utilitárias foram
+providas para facilitar interoperabilidade de bibliotecas e sistemas de
+terceiros que podem ou não manipular Unicode graciosamente. Detalhes estão
+disponíveis na documentação Manipulando Unicode:</p>
+<blockquote class="last">
+<div><a class="reference internal" href="../ref/unicode.html"><em>unicode reference</em></a></div></blockquote>
+</dd>
+<dt>Uma melhoria no ORM do Django</dt>
+<dd><p class="first">O mapeador objeto-relacional do Django &#8211; o componente que provê o
+mapeamento entre as classes de modelo do Django e seu banco de dados, e que
+faz a mediação de suas consultas de banco de dados &#8211; tem sido
+dramaticamente melhorado por meio de uma massiva refatoração. Para a
+maioria dos usuários do Django isso é compatível com versões anteriores; a
+parte pública da API para consultas do banco de dados sofreu mudanças
+menores, e a maior parte das atualizações foi feita nas partes internas do
+ORM. Um guia das mudanças, incluindo as modificações incompatíveis com
+versões anteriores e as menções às novas funcionalidades introduzidas por
+tal refatoramento, está disponível no wiki do Django:</p>
+<blockquote class="last">
+<div><a class="reference external" href="http://code.djangoproject.com/wiki/QuerysetRefactorBranch">http://code.djangoproject.com/wiki/QuerysetRefactorBranch</a></div></blockquote>
+</dd>
+<dt>Escape automático de variáveis de template</dt>
+<dd>Para prover melhorias de segurança contra vulnerabilidades de cross-site
+scripting (XSS), o sistema de templates do Django agora escapa a saída de
+variáveis automaticamente. Esse comportamento é configurável, e permite
+ambos, variáveis e grandes construções de templates serem marcados como
+seguros (não necessitando de escape) ou não-seguro (necessitando de
+escape). Um guia completo para essa funcionalidade está na documentação do
+sistema da tag <a class="reference internal" href="../ref/templates/builtins.html#std:templatetag-autoescape"><tt class="xref std std-ttag docutils literal"><span class="pre">autoescape</span></tt></a>.</dd>
+</dl>
+<p>Há muitas outras funcionalidades, muitas correções de bugs e muitos
+aprimoramentos para funcionalidades existentes em releases anteriores. A
+biblioteca <tt class="docutils literal"><span class="pre">newforms</span></tt>, por exemplo, tem sofrido massivas melhorias incluíndo
+vários add-ons usuais no <tt class="docutils literal"><span class="pre">django.contrib</span></tt> que complementam e constróem novas
+capacidades de manipulação de formulários no Django, e os manipuladores de
+upload de arquivos do Django têm sido refatorados para permitir um controle
+refinado sobre o processo de transferência, bem como upload stream de arquivos
+grandes.</p>
+<p>Junto com essas melhorias e acréscimos, nós fizemos um número de mudanças
+incompatíveis com versões anteriores do framework, à medida que novas
+funcionalidades tomaram forma e APIs foram finalizadas para o release 1.0. Um
+guia completo para essas mudanças estará disponível como parte do release final
+Django 1.0, e uma lista completa das mudanças que trouxeram incompatibilidades
+com versões anteriores também está disponível no wiki do Django para aqueles
+que desejam começar a desenvolver e testar seu processo de atualização:</p>
+<blockquote>
+<div><a class="reference external" href="http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges">http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges</a></div></blockquote>
+</div>
+<div class="section" id="s-roadmap-do-django-1-0">
+<span id="roadmap-do-django-1-0"></span><h2>Roadmap do Django 1.0<a class="headerlink" href="#roadmap-do-django-1-0" title="Permalink to this headline">¶</a></h2>
+<p>Um dos primeiros objetivos desta versão alpha é focar a atenção nos elementos
+a serem implementados para o Django 1.0, e sobre bugs que precisam ser
+resolvidos antes da versão final. Acompanhando esta versão, nós realizaremos
+uma série de sprints para concretizar uma série de versões beta e atingir um
+estágio release-candidate, logo em seguida virá o Django 1.0. A linha do tempo
+é projetada para ser:</p>
+<ul class="simple">
+<li>1 de agosto de 2008: Sprint (localizado em Washington, DC, e online).</li>
+<li>5 de agosto de 2008: Versão beta do Django 1.0. É quando acontecerá o
+congelamento de novidades para o 1.0. Qualquer funcionalidade que almeje ser
+incluída no 1.0 deve ser completada no trunk neste prazo.</li>
+<li>8 de agosto de 2008: Sprint (localizado em Lawrence, KS, e online).</li>
+<li>12 de agosto de 2008: Versão beta 2 do Django 1.0.</li>
+<li>15 de agosto de 2008: Sprint (localizado em Austin, TX, e online).</li>
+<li>19 de agosto de 2008: Release-candidate 1 do Django 1.0.</li>
+<li>22 de agosto de 2008: Sprint (localizado em Portland, OR e online).</li>
+<li>26 de agosto de 2008: Release-candidate 2 do Django 1.0</li>
+<li>2 de setembro de 2008: Versão final do Django 1.0. A festa da versão oficial
+do Django 1.0 será durante a primeira DjangoCon, a ser realizada em Mountain
+View, CA, nos dias 6 e 7 Setembro.</li>
+</ul>
+<p>É claro, como qualquer linha de tempo estimada, ela está sujeita a mudanças.
+A última informação sempre será disponibilizada no wiki do projeto Django:</p>
+<blockquote>
+<div><a class="reference external" href="http://code.djangoproject.com/wiki/VersionOneRoadmap">http://code.djangoproject.com/wiki/VersionOneRoadmap</a></div></blockquote>
+</div>
+<div class="section" id="s-o-que-voce-pode-fazer-para-ajudar">
+<span id="o-que-voce-pode-fazer-para-ajudar"></span><h2>O que você pode fazer para ajudar<a class="headerlink" href="#o-que-voce-pode-fazer-para-ajudar" title="Permalink to this headline">¶</a></h2>
+<p>A fim de proporcionar uma versão 1.0 de alta qualidade, nós precisamos de
+ajuda. Embora esta versão alpha seja, novamente, <em>não</em>-recomendada para uso em
+produção, você pode ajudar o time do Django testando o código alpha em um
+ambiente seguro de testes e reportando qualquer bug ou problema que encontrar.
+O ticket tracker do Django é o lugar central para procurar por problemas não
+resolvidos:</p>
+<blockquote>
+<div><a class="reference external" href="http://code.djangoproject.com/timeline">http://code.djangoproject.com/timeline</a></div></blockquote>
+<p>Por favor, crie novos tickets se não existir um ticket correspondente ao seu
+problema.</p>
+<p>Adicionalmente, discussões do desenvolvimento do Django, incluindo progressos
+rumo à versão 1.0, ocorrem diariamente na lista de desenvolvedores:</p>
+<div class="highlight-python"><pre>http://groups.google.com/group/django-developers</pre>
+</div>
+<p>...e no canal do IRC <tt class="docutils literal"><span class="pre">#django-dev</span></tt> na rede <tt class="docutils literal"><span class="pre">irc.freenode.net</span></tt>. Se você está
+interessado em ajudar com o desenvolvimento do Django, sinta-se livre para se
+juntar às discussões.</p>
+<p>A documentação online do Django também inclui pontos sobre como contribuir para
+o Django:</p>
+<blockquote>
+<div><a class="reference internal" href="../internals/contributing.html"><em>contribuíndo para o Django</em></a></div></blockquote>
+<p>Contribuições de qualquer nível -- desenvolvendo código, escrevendo
+documentação ou simplesmente criando tickets e ajudando a testar corresções de
+bugs propostos -- são sempre bem-vindas e apreciadas.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Django 1.0 alpha notas de lançamento</a><ul>
+<li><a class="reference internal" href="#o-que-ha-de-novo-no-django-1-0-alpha">O que há de novo no Django 1.0 alpha</a></li>
+<li><a class="reference internal" href="#roadmap-do-django-1-0">Roadmap do Django 1.0</a></li>
+<li><a class="reference internal" href="#o-que-voce-pode-fazer-para-ajudar">O que você pode fazer para ajudar</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="1.0-alpha-2.html">Django 1.0 alpha 2 release notes</a></li>
+    
+    
+      <li>Next: <a href="../internals/index.html">Django internamente</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Notas de Lançamento</a>
+        
+        <ul><li>Django 1.0 alpha notas de lançamento</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/releases/1.0-alpha-1.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="1.0-alpha-2.html" title="Django 1.0 alpha 2 release notes">previous</a> 
+     |
+    <a href="index.html" title="Notas de Lançamento" accesskey="U">up</a>
+   |
+    <a href="../internals/index.html" title="Django internamente">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

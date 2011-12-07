@@ -1,0 +1,262 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>FAQ: Instalação &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="FAQ do Django" href="index.html" />
+    <link rel="next" title="FAQ: Usando o Django" href="usage.html" />
+    <link rel="prev" title="FAQ: Geral" href="general.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="general.html" title="FAQ: Geral">previous</a> 
+     |
+    <a href="index.html" title="FAQ do Django" accesskey="U">up</a>
+   |
+    <a href="usage.html" title="FAQ: Usando o Django">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="faq-install">
+            
+  <div class="section" id="s-faq-instalacao">
+<span id="s-faq-install"></span><span id="faq-instalacao"></span><span id="faq-install"></span><h1>FAQ: Instalação<a class="headerlink" href="#faq-instalacao" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="s-como-eu-comeco">
+<span id="como-eu-comeco"></span><h2>Como eu começo?<a class="headerlink" href="#como-eu-comeco" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><a class="reference external" href="http://www.djangobrasil.org/download/">Baixe o código</a>.</li>
+<li>Instale o Django (leia o <a class="reference internal" href="../intro/install.html#intro-install"><em>guia de instalação</em></a>).</li>
+<li>Execute o <a class="reference internal" href="../intro/tutorial01.html"><em>tutorial</em></a>.</li>
+<li>Verifique o resto da <a class="reference internal" href="../index.html"><em>documentação</em></a>, e <a class="reference external" href="http://www.djangobrasil.org/comunidade/">pergunte</a> se você
+estiver com problemas.</li>
+</ol>
+</div>
+<div class="section" id="s-quais-sao-os-pre-requisitos-para-executar-o-django">
+<span id="quais-sao-os-pre-requisitos-para-executar-o-django"></span><h2>Quais são os pré requisitos para executar o Django?<a class="headerlink" href="#quais-sao-os-pre-requisitos-para-executar-o-django" title="Permalink to this headline">¶</a></h2>
+<p>O Django requer o <a class="reference external" href="http://www.python.org/">Python</a> 2.3, especificamente qualquer versão do Python da 2.3
+até a 2.7. Nenhuma outra biblioteca Python é requerida para o uso básico do
+Django.</p>
+<p>Para um ambiente de desenvolvimento &#8211; se você apenas quer experimentar o
+Django &#8211; você não precisa ter um servidor web separado; o Django vem com o seu
+próprio servidor leve de desenvolvimento. Para um ambiente de produção, o
+Django segue a especificação <a class="reference external" href="http://www.python.org/peps/pep-0333.html">WSGI</a>, o que significa que ele pode rodar sobre
+uma ampla variedade de plataformas de servidores. Veja <a class="reference internal" href="../howto/deployment/index.html"><em>Implantando o
+Django</em></a> para algumas anternativas populares. Além
+disso, a <a class="reference external" href="http://code.djangoproject.com/wiki/ServerArrangements">página wiki de opções de configuração do servidor</a> contém detalhes para
+algumas estratégias de implantação.</p>
+<p>Se você quer usar o Django com um banco de dados, que é o caso provável, você
+irá também precisar de um servidor de banco de dados. O <a class="reference external" href="http://www.postgresql.org/">PostgreSQL</a> é
+recomendado, porque somos fãs do PostgreSQL, e o <a class="reference external" href="http://www.mysql.com/">MySQL</a>, <a class="reference external" href="http://www.sqlite.org/">SQLite 3</a>, e <a class="reference external" href="http://www.oracle.com/">Oracle</a>
+são suportados também.</p>
+</div>
+<div class="section" id="s-eu-perco-algo-se-eu-rodar-o-django-com-uma-a-versao-2-4-do-python-em-vez-de-usar-verses-mais-novas-do-python-como-a-2-5-ou-2-6-2-5">
+<span id="eu-perco-algo-se-eu-rodar-o-django-com-uma-a-versao-2-4-do-python-em-vez-de-usar-verses-mais-novas-do-python-como-a-2-5-ou-2-6-2-5"></span><h2>Eu perco algo se eu rodar o Django com uma a versão 2.4 do Python em vez de usar versẽs mais novas do Python como a 2.5 ou 2.6? 2.5?<a class="headerlink" href="#eu-perco-algo-se-eu-rodar-o-django-com-uma-a-versao-2-4-do-python-em-vez-de-usar-verses-mais-novas-do-python-como-a-2-5-ou-2-6-2-5" title="Permalink to this headline">¶</a></h2>
+<p>Não no framework. Atualmente, o Django suporta oficialmente quaisquer versões
+do Python da 2.4 até a 2.7, inclusive. Porém, novas versões do Python sã
+frequentemente mais rápidas, tem mais features e são
+melhor suportadas. Aplicações de terceiros para uso com o Django são, é claro, livres para
+escolher seus próprios requerimentos de versão.</p>
+<p>Note porém que no próximo ano e talvez no outro o Django irá começar a remover
+suporte para versões antigas do Python como parte da migração que culminará com
+o Django rodando no Python 3.(veja abaixo para mais detalhes)</p>
+<p>Assim, se você está começando com o Python, é recomendado que você use a última versão
+da série 2.x (atualmente, o Python 2.7). Isso irá permitir que você tome
+proveito de numerosas melhorias e otimizações na linguagem Python desde a
+versão 2.4, e irá ajudar a facilitar o processo de remoção do suporte para
+versões antigas do Python no caminho para o Python 3.</p>
+</div>
+<div class="section" id="s-can-i-use-django-with-python-2-3">
+<span id="can-i-use-django-with-python-2-3"></span><h2>Can I use Django with Python 2.3?<a class="headerlink" href="#can-i-use-django-with-python-2-3" title="Permalink to this headline">¶</a></h2>
+<p>Django 1.1 (and earlier) supported Python 2.3. Django 1.2 and newer does not.
+We highly recommend you upgrade Python if at all possible, but Django 1.1 will
+continue to work on Python 2.3.</p>
+</div>
+<div class="section" id="s-posso-usar-o-django-com-o-python-3">
+<span id="posso-usar-o-django-com-o-python-3"></span><h2>Posso usar o Django com o Python 3?<a class="headerlink" href="#posso-usar-o-django-com-o-python-3" title="Permalink to this headline">¶</a></h2>
+<p>Não agora. O Python 3.0 introduziu um número de mudanças não retro compatíveis
+na linguagem Python, e apesar dessas mudanças serem algo bom para o futuro do
+Python, irá demorar um pouco até que a maioria dos softwares Python atualizem e
+sejam capazes de rodar no Python 3.0. Para bases grandes de código Python, como
+é o caso do Django, a expectativa é que a transição leve pelo menos um ano ou
+dois (já que envolve a remoção de suporte para versões mais antigas do Python e
+por isso deve ser feita gradualmente).</p>
+<p>Enquanto isso, versões da série 2.x do Python serão suportadas e receberão
+correções de bug e atualizações de segurança da equipe de desenvolvimento do
+Python, assim, continuar a usar a série 2.x do Python durante o período de
+transição não deve representar risco algum.</p>
+</div>
+<div class="section" id="s-o-django-executara-em-hosts-compartilhados-como-textdrive-ou-o-dreamhost">
+<span id="o-django-executara-em-hosts-compartilhados-como-textdrive-ou-o-dreamhost"></span><h2>O Django executará em hosts compartilhados (como TextDrive ou o Dreamhost)?<a class="headerlink" href="#o-django-executara-em-hosts-compartilhados-como-textdrive-ou-o-dreamhost" title="Permalink to this headline">¶</a></h2>
+<p>Veja nossa página de <a class="reference external" href="http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts">hosts amigáveis ao Django</a> .</p>
+</div>
+<div class="section" id="s-eu-devo-usar-a-versao-oficial-ou-a-versao-de-desenvolvimento">
+<span id="eu-devo-usar-a-versao-oficial-ou-a-versao-de-desenvolvimento"></span><h2>Eu devo usar a versão oficial ou a versão de desenvolvimento?<a class="headerlink" href="#eu-devo-usar-a-versao-oficial-ou-a-versao-de-desenvolvimento" title="Permalink to this headline">¶</a></h2>
+<p>Os desenvolvedores do Django melhoram o framework todos os dias e são muito
+bons em não enviar código quebrado ao repositório. Nós usamos o código do
+desenvolvimento (do repositório Subversion) diretamente em nossos servidores,
+então nós o consideramos estável. Com isso em mente, recomentadmos que você use
+a última versão do código em desenvolvimento, porque ele geralmente tem mais
+funcionalidades e menos bugs que as versões &#8220;oficiais&#8221;.</p>
+<p>Generally, if you&#8217;re using code in production, you should be using a
+stable release. The Django project publishes a full stable release
+every nine months or so, with bugfix updates in between. These stable
+releases contain the API that is covered by our backwards
+compatibility guarantees; if you write code against stable releases,
+you shouldn&#8217;t have any problems upgrading when the next official
+version is released.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">FAQ: Instalação</a><ul>
+<li><a class="reference internal" href="#como-eu-comeco">Como eu começo?</a></li>
+<li><a class="reference internal" href="#quais-sao-os-pre-requisitos-para-executar-o-django">Quais são os pré requisitos para executar o Django?</a></li>
+<li><a class="reference internal" href="#eu-perco-algo-se-eu-rodar-o-django-com-uma-a-versao-2-4-do-python-em-vez-de-usar-verses-mais-novas-do-python-como-a-2-5-ou-2-6-2-5">Eu perco algo se eu rodar o Django com uma a versão 2.4 do Python em vez de usar versẽs mais novas do Python como a 2.5 ou 2.6? 2.5?</a></li>
+<li><a class="reference internal" href="#can-i-use-django-with-python-2-3">Can I use Django with Python 2.3?</a></li>
+<li><a class="reference internal" href="#posso-usar-o-django-com-o-python-3">Posso usar o Django com o Python 3?</a></li>
+<li><a class="reference internal" href="#o-django-executara-em-hosts-compartilhados-como-textdrive-ou-o-dreamhost">O Django executará em hosts compartilhados (como TextDrive ou o Dreamhost)?</a></li>
+<li><a class="reference internal" href="#eu-devo-usar-a-versao-oficial-ou-a-versao-de-desenvolvimento">Eu devo usar a versão oficial ou a versão de desenvolvimento?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="general.html">FAQ: Geral</a></li>
+    
+    
+      <li>Next: <a href="usage.html">FAQ: Usando o Django</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">FAQ do Django</a>
+        
+        <ul><li>FAQ: Instalação</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/faq/install.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="general.html" title="FAQ: Geral">previous</a> 
+     |
+    <a href="index.html" title="FAQ do Django" accesskey="U">up</a>
+   |
+    <a href="usage.html" title="FAQ: Usando o Django">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

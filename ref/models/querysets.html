@@ -1,0 +1,1561 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Referência da API QuerySet &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Modelos" href="index.html" />
+    <link rel="next" title="Objetos de requisição e resposta" href="../request-response.html" />
+    <link rel="prev" title="Referência das instâncias de Model" href="instances.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="instances.html" title="Referência das instâncias de Model">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="../request-response.html" title="Objetos de requisição e resposta">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-models-querysets">
+            
+  <div class="section" id="s-referencia-da-api-queryset">
+<span id="referencia-da-api-queryset"></span><h1>Referência da API QuerySet<a class="headerlink" href="#referencia-da-api-queryset" title="Permalink to this headline">¶</a></h1>
+<p>Este documento descreve os detalhes da API do <tt class="docutils literal"><span class="pre">QuerySet</span></tt>. Ela se baseia no
+material apresentado nos guias <a class="reference internal" href="../../topics/db/models.html"><em>model</em></a> e <a class="reference internal" href="../../topics/db/queries.html"><em>query de
+banco de dados</em></a>, então você provavelmente vai querer ler e
+entender esses documentos antes de ler este aqui.</p>
+<p>Por toda essa referência nós iremos usar os <a class="reference internal" href="../../topics/db/queries.html#queryset-model-example"><em>models do exemplo weblog</em></a> apresentado em <a class="reference internal" href="../../topics/db/queries.html"><em>guia de consulta de banco de
+dados</em></a>.</p>
+<div class="section" id="s-quando-querysets-sao-avaliados">
+<span id="s-when-querysets-are-evaluated"></span><span id="quando-querysets-sao-avaliados"></span><span id="when-querysets-are-evaluated"></span><h2>Quando QuerySets são avaliados<a class="headerlink" href="#quando-querysets-sao-avaliados" title="Permalink to this headline">¶</a></h2>
+<p>Internamente, um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> pode ser construído, filtrado, dividido, e
+geralmente passado adiante sem, bem na verdade, atingir o banco de dados.
+Nenhuma atividade de banco de dados realmente ocorre, até que você faça algo
+que avalie o queryset.</p>
+<p>Você pode avaliar um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> das seguintes formas:</p>
+<ul>
+<li><p class="first"><strong>Iteração.</strong> Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> é iterável, e ele executa suas consultas de
+banco de dados na primeira vez que você itera sobre ele. Por exemplo, isso
+irá imprimir o título de todas as entradas do banco de dados:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+    <span class="k">print</span> <span class="n">e</span><span class="o">.</span><span class="n">headline</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Fatiando/Dividindo.</strong> Como explicado em <a class="reference internal" href="../../topics/db/queries.html#limiting-querysets"><em>Limitando QuerySets</em></a>, um
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> pode ser dividido, usando a sintaxe de fatiamento do Python.
+Geralmente fatiar um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> retorna um outro (não avalidado)
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt>, mas o Django executará a consulta do banco de dados se você
+usar o parametro &quot;step&quot; da sintaxe de fatiamento.</p>
+</li>
+<li><p class="first"><strong>Preservamento/Cacheamento.</strong> Veja a seguinte seção para detalhes que é
+envolvida quando se <a class="reference internal" href="#preservando-querysets">preservando QuerySets</a>. A coisa importante para
+proposta desta seção é que os resultados são lidos do banco de dados.</p>
+</li>
+<li><p class="first"><strong>repr().</strong> Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> é avaliado quando você chama <tt class="docutils literal"><span class="pre">repr()</span></tt> sobre
+ele. Este é por conveniencia um interpretador Python interativo, então
+você pode imediatamente ver seus resultados quando estiver usando a API
+interativamente.</p>
+</li>
+<li><p class="first"><strong>len().</strong> Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> e avaliado quando você chama <tt class="docutils literal"><span class="pre">len()</span></tt> sobre
+ele. Isso, como você pode esperar, retorna o comprimento da lista de
+resultados.</p>
+<p>Nota: <em>Não</em> use <tt class="docutils literal"><span class="pre">len()</span></tt> sobre <tt class="docutils literal"><span class="pre">QuerySet</span></tt>s se tudo que você quer fazer
+é determinar o número de dados de um conjunto. É muito mais eficiente
+manipular um contador a nível de banco de dados, usando um SQL
+<tt class="docutils literal"><span class="pre">SELECT</span> <span class="pre">COUNT(*)</span></tt>, e o Django provê um método <tt class="docutils literal"><span class="pre">count()</span></tt> justamente
+por esta razão. Veja <tt class="docutils literal"><span class="pre">count()</span></tt> abaixo.</p>
+</li>
+<li><p class="first"><strong>list().</strong> Força a avaliação de um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> chamando <tt class="docutils literal"><span class="pre">list()</span></tt> sobre
+ele. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">entry_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Esteja avisado, no entanto, que isso poderia resultar num grande consumo
+de memória, porque o Django carregará cada elemento da lista na sua
+memória. Em contrast, iterando sobre um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> você tirará vantagem
+de seu banco de dados para carregar os dados e instânciar os objetos sobre
+quando precisar deles.</p>
+</li>
+<li><p class="first"><strong>bool().</strong> Testing a <tt class="docutils literal"><span class="pre">QuerySet</span></tt> in a boolean context, such as using
+<tt class="docutils literal"><span class="pre">bool()</span></tt>, <tt class="docutils literal"><span class="pre">or</span></tt>, <tt class="docutils literal"><span class="pre">and</span></tt> or an <tt class="docutils literal"><span class="pre">if</span></tt> statement, will cause the query
+to be executed. If there is at least one result, the <tt class="docutils literal"><span class="pre">QuerySet</span></tt> is
+<tt class="xref docutils literal"><span class="pre">True</span></tt>, otherwise <tt class="xref docutils literal"><span class="pre">False</span></tt>. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">if</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline</span><span class="o">=</span><span class="s">&quot;Test&quot;</span><span class="p">):</span>
+   <span class="k">print</span> <span class="s">&quot;There is at least one Entry with the headline Test&quot;</span>
+</pre></div>
+</div>
+<p>Note: <em>Don't</em> use this if all you want to do is determine if at least one
+result exists, and don't need the actual objects. It's more efficient to
+use <tt class="docutils literal"><span class="pre">exists()</span></tt> (see below).</p>
+</li>
+</ul>
+<div class="section" id="s-preservando-querysets">
+<span id="s-pickling-querysets"></span><span id="preservando-querysets"></span><span id="pickling-querysets"></span><h3>Preservando QuerySets<a class="headerlink" href="#preservando-querysets" title="Permalink to this headline">¶</a></h3>
+<p>Se você <a class="reference external" href="http://docs.python.org/lib/module-pickle.html">preserva</a> um <tt class="docutils literal"><span class="pre">QuerySet</span></tt>, este forçará todos os resultados a serem
+carregados em memória para conservação. O preservamento é geralmente usado como
+um precursor para o cache, quando o cache do queryset é reacarregado, você
+terá os resultados já presentes e prontos para o uso (lendo do banco de dados
+pode tomar algum tempo, anulando a proposta do cache). Isto significa que quando
+você desconserva um <tt class="docutils literal"><span class="pre">QuerySet</span></tt>, ele contém os resultados do momento em que foi
+preservado, ao invés dos resultados que estão atualmente no banco de dados.</p>
+<p>Se você somente quer preservar as informações necessárias para recriar o
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> do banco de dados desde a última vez, conserve o atributo <tt class="docutils literal"><span class="pre">query</span></tt>
+do <tt class="docutils literal"><span class="pre">QuerySet</span></tt>. Você pode então recriar o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> original (sem qualquer
+resultado carregado) usando algum código como este:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">query</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>     <span class="c"># Assumindo &#39;s&#39; como uma string conservada.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qs</span> <span class="o">=</span> <span class="n">MyModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qs</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>            <span class="c"># Restaura o &#39;query&#39; original.</span>
+</pre></div>
+</div>
+<p>O atributo <tt class="docutils literal"><span class="pre">query</span></tt> é um objeto opaco. Ele representa o construção interna da
+query e não parte da API pública. Entretanto, ele é seguro (e completamente
+suportado) para preservar e reconstruir os conteúdos dos atributos como descrito
+aqui.</p>
+</div>
+</div>
+<div class="section" id="s-api-queryset">
+<span id="s-queryset-api"></span><span id="api-queryset"></span><span id="queryset-api"></span><h2>API QuerySet<a class="headerlink" href="#api-queryset" title="Permalink to this headline">¶</a></h2>
+<p>Embora você geralmente não criará uma manualmente -- você passará um
+<a class="reference internal" href="../../topics/db/managers.html#django.db.models.Manager" title="django.db.models.Manager"><tt class="xref py py-class docutils literal"><span class="pre">Manager</span></tt></a> -- aqui tem a declaração formal de um <tt class="docutils literal"><span class="pre">QuerySet</span></tt>:</p>
+<dl class="class">
+<dt id="django.db.models.QuerySet">
+<em class="property">class </em><tt class="descname">QuerySet</tt>(<span class="optional">[</span><em>model=None</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.QuerySet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Normalemente quando você for interagir com um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> você o usará com
+<a class="reference internal" href="../../topics/db/queries.html#chaining-filters"><em>filtros encadeados</em></a>. Para fazer isto funcionar, a
+maioria dos métodos do <tt class="docutils literal"><span class="pre">QuerySet</span></tt> retorna novos querysets.</p>
+<div class="section" id="s-metodos-de-queryset-que-retornam-novos-querysets">
+<span id="metodos-de-queryset-que-retornam-novos-querysets"></span><h3>Métodos de QuerySet que retornam novos QuerySets<a class="headerlink" href="#metodos-de-queryset-que-retornam-novos-querysets" title="Permalink to this headline">¶</a></h3>
+<p>O Django fornece uma gama de métodos de refinamento do <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que modifica
+cada tipo de resultados retornados pelo <tt class="docutils literal"><span class="pre">QuerySet</span></tt> ou a forma como sua
+consulta SQL é executada.</p>
+<div class="section" id="s-filter-kwargs">
+<span id="filter-kwargs"></span><h4><tt class="docutils literal"><span class="pre">filter(**kwargs)</span></tt><a class="headerlink" href="#filter-kwargs" title="Permalink to this headline">¶</a></h4>
+<p>Retorna um novo <tt class="docutils literal"><span class="pre">QuerySet</span></tt> contendo objetos que combinam com os paramêtros
+dados.</p>
+<p>Os parametros (<tt class="docutils literal"><span class="pre">**kwargs</span></tt>) devem ser no formato descrito em <a class="reference internal" href="#campos-de-pesquisa">Campos de
+Pesquisa</a> abaixo. Vários parametros são mesclados via <tt class="docutils literal"><span class="pre">AND</span></tt> e regras SQL
+subjacentes.</p>
+</div>
+<div class="section" id="s-exclude-kwargs">
+<span id="exclude-kwargs"></span><h4><tt class="docutils literal"><span class="pre">exclude(**kwargs)</span></tt><a class="headerlink" href="#exclude-kwargs" title="Permalink to this headline">¶</a></h4>
+<p>Retorna um novo <tt class="docutils literal"><span class="pre">QuerySet</span></tt> contendo objetos que <em>não</em> combinam com os
+paramêtros dados.</p>
+<p>Os parametros (<tt class="docutils literal"><span class="pre">**kwargs</span></tt>) devem ser no formato descrito em <a class="reference internal" href="#campos-de-pesquisa">Campos de
+Pesquisa</a> abaixo. Vários parametros são mesclados via <tt class="docutils literal"><span class="pre">AND</span></tt> e regras SQL
+subjacentes, e todoa coisa é envolvida por um <tt class="docutils literal"><span class="pre">NOT()</span></tt>.</p>
+<p>Este exemplo exclui todas as entradas cujo <tt class="docutils literal"><span class="pre">pub_date</span></tt> é maior que 2005-1-3
+e (AND) cujo <tt class="docutils literal"><span class="pre">headline</span></tt> é igual &quot;Hello&quot;:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">pub_date__gt</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">headline</span><span class="o">=</span><span class="s">&#39;Hello&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Em termos SQL, isso seria:</p>
+<div class="highlight-python"><pre>SELECT ...
+WHERE NOT (pub_date &gt; '2005-1-3' AND headline = 'Hello')</pre>
+</div>
+<p>Este exemplo exclui entradas cujo <tt class="docutils literal"><span class="pre">pub_date</span></tt> é maior que 2005-1-3 ou (OR) cujo
+<tt class="docutils literal"><span class="pre">headline</span></tt> é &quot;Hello&quot;:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">pub_date__gt</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">headline</span><span class="o">=</span><span class="s">&#39;Hello&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Em termos SQL, isso seria:</p>
+<div class="highlight-python"><pre>SELECT ...
+WHERE NOT pub_date &gt; '2005-1-3'
+AND NOT headline = 'Hello'</pre>
+</div>
+<p>Note que o segundo exemplo e mais restritivo.</p>
+</div>
+<div class="section" id="s-order-by-fields">
+<span id="order-by-fields"></span><h4><tt class="docutils literal"><span class="pre">order_by(*fields)</span></tt><a class="headerlink" href="#order-by-fields" title="Permalink to this headline">¶</a></h4>
+<p>Por padrão, os resultados retornados por um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> são ordenado por uma
+tupla dada pela opção <tt class="docutils literal"><span class="pre">ordering</span></tt> no <tt class="docutils literal"><span class="pre">Meta</span></tt> do model. Você pode sobrescrever
+isso para uma <tt class="docutils literal"><span class="pre">QuerySet</span></tt> basicamente usando o método <tt class="docutils literal"><span class="pre">order_by</span></tt>.
+Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__year</span><span class="o">=</span><span class="mi">2005</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-pub_date&#39;</span><span class="p">,</span> <span class="s">&#39;headline&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>O resultado acima será ordenado por <tt class="docutils literal"><span class="pre">pub_date</span></tt> descrescendo, e então por
+<tt class="docutils literal"><span class="pre">headline</span></tt> ascendendo. O sinal negativo na frente do <tt class="docutils literal"><span class="pre">&quot;-pub_date&quot;</span></tt> indica
+o ordenamento <em>descendente</em>. O ordenamento ascendente é implícito. Para ordenar
+randômicamente, use <tt class="docutils literal"><span class="pre">&quot;?&quot;</span></tt>, desta forma:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;?&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Nota: a consulta <tt class="docutils literal"><span class="pre">order_by('?')</span></tt> pode ser custosa e lenta, dependendo do
+backend e banco de dados que estiver usando.</p>
+<p>Para ordenar por um campo de um model diferente, use a mesma sintaxe como quando
+você consulta através de relações de models. Isto é, o nome do campo, seguido
+por um underscore duplo (<tt class="docutils literal"><span class="pre">__</span></tt>), seguido pelo nome do campo no novo model, faça
+assim para todos os models que você deseja juntar na consulta. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;blog__name&#39;</span><span class="p">,</span> <span class="s">&#39;headline&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Se você tentar ordenar por um campo que é relacionado a outro model, o Django
+usará o ordenamento padrão do model relacionado (ou ordenará pela chave primária
+do model relacionado se ele não tiver um <tt class="docutils literal"><span class="pre">Meta.ordering</span></tt> especificado. Por
+exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;blog&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>...é identico a:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;blog__id&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>...desde que o model <tt class="docutils literal"><span class="pre">Blog</span></tt> não tenha o ordenamento especificado.</p>
+<p>Seja cauteloso quando ordenar por campos de models relacionados se você também
+estiver usando <tt class="docutils literal"><span class="pre">distinct()</span></tt>. Veja a nota na seção <a class="reference internal" href="#distinct">distinct()</a> para uma
+explicação e como um model relacionado ordenado pode mudar os resultados
+esperados.</p>
+<p>É permissível especificar um campo com valores múltiplos para ordenar os
+resultados (por exemplo, um campo <tt class="docutils literal"><span class="pre">ManyToMany</span></tt>). Normalmente isso não será uma
+coisa sensível a se fazer e realmente não é uma funcionalidade avançada.
+Entretanto, se você sabe que a filtragem de seu queryset ou dados absolutos
+implica que haverá somente um ordenamento de parte dos dados para cada um dos
+ítens principais que você estiver selecionando, o ordenamento pode bem ser
+exatamente o que você precisa fazer. use o ordenamento em campos com
+multi-valores com cuidado e assegure-se de que os resultados sejam os que você
+espera.</p>
+<p>Admite-se especificar um campo com multi-valor para ordenar resultados (por
+exemplo, um campo <tt class="docutils literal"><span class="pre">ManyToMany</span></tt>). Normalmente isso não será uma coisa sensível
+a se fazer e ele realmente é uma funcionalidade avançada de uso.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Se você não quer que qualquer ordenamento seja aplicado a consulta, nem mesmo o
+ordenamento padrão, chame <tt class="docutils literal"><span class="pre">order_by()</span></tt> sem parametros.
+.. versionadded:: 1.0</p>
+<p>A sintax de para ordenamento através de models relacionados mudou. Veja a
+<a class="reference external" href="http://www.djangoproject.com/documentation/0.96/model-api/#floatfield">documentação do Django 0.96</a> para os comportamentos antigos.</p>
+<p>Não há formas de especificar se o ordenamento deve ser sensível a maiúsculas e
+minúsculas. Com respeito a case-sensitivity, o Django não ordena resultados por
+mais que seu backend de banco de dados normalmente o faça.</p>
+</div>
+<div class="section" id="s-reverse">
+<span id="reverse"></span><h4><tt class="docutils literal"><span class="pre">reverse()</span></tt><a class="headerlink" href="#reverse" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Use o método <tt class="docutils literal"><span class="pre">reverse()</span></tt> para reverter a ordem em que os elementos de uma
+queryset são retornados. Chamando <tt class="docutils literal"><span class="pre">reverse()</span></tt> uma segunda vez restaura a
+ordem de volta a direção normal.</p>
+<p>Para receber os ''últimos'' cinco elementos de um queryset, você pode fazer
+isso:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">my_queryset</span><span class="o">.</span><span class="n">reverse</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Perceba que isto não é a mesma coisa que tirar um pedação ao final de uma
+sequência no Python. O exemplo acima retornará o último ítem primeiro, e então
+o penultimo item e assim por diante. Se nós temos uma sequência do Python e
+olhamos em <tt class="docutils literal"><span class="pre">seq[-5:]</span></tt>, nós veriamos o quinto-último elemento primeiro. O
+Django não suporta este modo de acesso (fatiamento ao final), porquê ele não é
+possível de ser feito eficientemente no SQL.</p>
+<p>Também, note que o <tt class="docutils literal"><span class="pre">reverse()</span></tt> geralmente só deve ser chamado sobre um
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> que tem um ordenamento definido (e.g. quando a consulta é feita
+contra um model que tem o ordenamento definido, ou quando usa-se o
+<tt class="docutils literal"><span class="pre">order_by()</span></tt>). Se nenhum ordenamento foi definido para o <tt class="docutils literal"><span class="pre">QuerySet</span></tt>, chamar
+o <tt class="docutils literal"><span class="pre">reverse()</span></tt> sobre ele não terá o efeito real (o ordenamento estava
+indefinido antes da chamada do <tt class="docutils literal"><span class="pre">reverse()</span></tt>, e permanecerá undefinido depois).</p>
+</div>
+<div class="section" id="s-distinct">
+<span id="distinct"></span><h4><tt class="docutils literal"><span class="pre">distinct()</span></tt><a class="headerlink" href="#distinct" title="Permalink to this headline">¶</a></h4>
+<p>Retorna um novo <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que usa <tt class="docutils literal"><span class="pre">SELECT</span> <span class="pre">DISTINCT</span></tt> na sua consulta SQL.
+Isso elimina duplicatas nos resultados da consulta.</p>
+<p>Por padrão, um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> não eliminará linhas duplicadas. Na prática, isto
+raramente é um problema, porque consultas simples como <tt class="docutils literal"><span class="pre">Blog.objects.all()</span></tt>
+não introduzem a possibilidade de duplicatas no resultado. No entanto, se sua
+consulta atinge várias tabelas, é possível receber resultados duplicados quando
+um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> for avaliado. Nessas horas você deve usar <tt class="docutils literal"><span class="pre">distinct()</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Quaisquer campos usados numa chamada <a class="reference internal" href="#order-by-fields">order_by(*fields)</a> são incluídos nas
+colunas do SQL <tt class="docutils literal"><span class="pre">SELECT</span></tt>. Isso pode conduzir, as vezes, a resultados
+inesperados quando usa em conjunto com <tt class="docutils literal"><span class="pre">distinct()</span></tt>. Se você ordena por
+campos de um model relacionado, estes campos podem ser adicionados as
+colunas selecionadas e eles podem fazer, de outra forma, as linhas
+duplicadas parecerem ser distintas. Desde que as colunas extras não aparecem
+nos resultados retornados (eles somente estão lá para apoiar o ordenamento),
+algumas vezes parecem como se resultados não distintos estão sendo
+devolvidos.</p>
+<p>Similarmente, se você usa uma consulta <tt class="docutils literal"><span class="pre">values()</span></tt> para as colunas
+restritas selecionadas, as colunas usadas em qualquer <tt class="docutils literal"><span class="pre">order_by()</span></tt> (ou
+ordenamento padrão do model) ainda estarão envolvidos e pode afetar a
+unicidade dos resultados.</p>
+<p class="last">A moral aqui é que se você estiver usando <tt class="docutils literal"><span class="pre">distinct()</span></tt> deve ser cuidadoso
+com o ordenamento por models relacionados. Identicamente, quando usamos
+<tt class="docutils literal"><span class="pre">distinct()</span></tt> e <tt class="docutils literal"><span class="pre">values()</span></tt> juntos, deve-se ter cuidado ao ordenar por
+campos que não estão na chamada <tt class="docutils literal"><span class="pre">values()</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="s-values-fields">
+<span id="values-fields"></span><h4><tt class="docutils literal"><span class="pre">values(*fields)</span></tt><a class="headerlink" href="#values-fields" title="Permalink to this headline">¶</a></h4>
+<p>Retorna um <tt class="docutils literal"><span class="pre">ValuesQuerySet()</span></tt> -- um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que avalia para uma lista de
+dicionários ao invés de objetos de instância de models.</p>
+<p>Cada um destes dicionários representa um objeto, com as chaves correspondendo
+aos nomes dos atributos dos objetos de model.</p>
+<p>Este exemplo compara os dicionários de <tt class="docutils literal"><span class="pre">values()</span></tt> com os objetos normais de
+model:</p>
+<div class="highlight-python"><pre># Esta lista contém um objeto Blog.
+&gt;&gt;&gt; Blog.objects.filter(name__startswith='Beatles')
+[&lt;Blog: Beatles Blog&gt;]
+
+# Esta lista contém um dicionário.
+&gt;&gt;&gt; Blog.objects.filter(name__startswith='Beatles').values()
+[{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]</pre>
+</div>
+<p><tt class="docutils literal"><span class="pre">values()</span></tt> recebe argumentos posicionais opcionais, <tt class="docutils literal"><span class="pre">*fields</span></tt>, que
+especificam nomes de campos aos quais o <tt class="docutils literal"><span class="pre">SELECT</span></tt> deve ser limitado. Se você
+especificar os fields, cada dicionário conterá somente o campo chave/valor para
+os campos que você determinou. Se você não especificar os campos, cada
+dicionário terá uma chave e um valor para todos os campos da tabela do banco de
+dados.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+<span class="go">[{&#39;id&#39;: 1, &#39;name&#39;: &#39;Beatles Blog&#39;, &#39;tagline&#39;: &#39;All the latest Beatles news.&#39;}],</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: 1, &#39;name&#39;: &#39;Beatles Blog&#39;}]</span>
+</pre></div>
+</div>
+<p>Algumas sutilesas que valem a pena mencionar:</p>
+<ul>
+<li><p class="first">O método <tt class="docutils literal"><span class="pre">values()</span></tt> não retorna nada para atributos
+<a class="reference internal" href="fields.html#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><tt class="xref py py-class docutils literal"><span class="pre">ManyToManyField</span></tt></a> e gerará um erro se você
+tentar passar este tipo de campo para ele.</p>
+</li>
+<li><p class="first">Se você tem um campo chamado <tt class="docutils literal"><span class="pre">foo</span></tt> que é um
+<a class="reference internal" href="fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><tt class="xref py py-class docutils literal"><span class="pre">ForeignKey</span></tt></a>, a chamada padrão de <tt class="docutils literal"><span class="pre">values()</span></tt>
+retornará uma chave de dicionário chamada <tt class="docutils literal"><span class="pre">foo_id</span></tt>, uma vez que este é o
+nome do atributo oculto do model que armazena o valor real (o atributo
+<tt class="docutils literal"><span class="pre">foo</span></tt> refere-se ao model relacionado). Quando você estiver chamando
+<tt class="docutils literal"><span class="pre">values()</span></tt> e passando em nomes de campos, você pdoe passar ambos <tt class="docutils literal"><span class="pre">foo</span></tt>
+ou <tt class="docutils literal"><span class="pre">foo_id</span></tt> e você terá de volta a mesma coisa (a chave do dicionário
+combinará o nome do campo que você passou).</p>
+<p>Por Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+<span class="go">[{&#39;blog_id: 1, &#39;headline&#39;: u&#39;First Entry&#39;, ...}, ...]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s">&#39;blog&#39;</span><span class="p">)</span>
+<span class="go">[{&#39;blog&#39;: 1}, ...]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s">&#39;blog_id&#39;</span><span class="p">)</span>
+<span class="go">[{&#39;blog_id&#39;: 1}, ...]</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Quando estiver usando <tt class="docutils literal"><span class="pre">values()</span></tt> junto com <tt class="docutils literal"><span class="pre">distinct()</span></tt>, esteja alerta
+pois o ordenamento pode afetar os resultados. Veja a nota na seção
+<a class="reference internal" href="#distinct">distinct()</a>, acima, para detalhes.</p>
+</li>
+</ul>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Anteriormente, não seria possível passar <tt class="docutils literal"><span class="pre">blog_id</span></tt> ao <tt class="docutils literal"><span class="pre">values()</span></tt> no exemplo
+acima, somente <tt class="docutils literal"><span class="pre">blog</span></tt>.</p>
+<p>Um <tt class="docutils literal"><span class="pre">ValuesQuerySet</span></tt> é útil quando você sabe que vai precisar de valores de um
+pequeno número de campos disponíveis e você não precisa de funcionalidade de um
+objeto de instância de model. É mais eficiente selecionar somente os campos que
+você precisa usar.</p>
+<p>Finalmente, perceba que um <tt class="docutils literal"><span class="pre">ValuesQuerySet</span></tt> é uma subclasse de <tt class="docutils literal"><span class="pre">QuerySet</span></tt>,
+então ele terá todos os método do <tt class="docutils literal"><span class="pre">QuerySet</span></tt>. Você pode chamar o <tt class="docutils literal"><span class="pre">filter()</span></tt>
+sobre ele, ou <tt class="docutils literal"><span class="pre">order_by()</span></tt>, ou ou que seja. Sim, isto significa que essas duas
+chamadas são identicas:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span>
+<span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>As pessoas que fizeram o Django preferem colocar todos os métodos que afetam SQL
+primeiro, seguidos (opicionalmente) por quaisquer métodos que afetam a saída (
+como o <tt class="docutils literal"><span class="pre">values()</span></tt>), mas isso não importa realmente. Esta é a sua chance de
+ostentar seu individualismo.</p>
+</div>
+<div class="section" id="s-values-list-fields">
+<span id="values-list-fields"></span><h4><tt class="docutils literal"><span class="pre">values_list(*fields)</span></tt><a class="headerlink" href="#values-list-fields" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Este é similar ao <tt class="docutils literal"><span class="pre">values()</span></tt> exceto que ao invés de retornar uma lista de
+dicionários, ele retorna uma lista de tuplas. Cada tupla contém o valor do
+respectivo campo passado dentro da chamada <tt class="docutils literal"><span class="pre">values_list()</span></tt> -- então o primeiro
+item é o primeiro campo, etc. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="s">&#39;headline&#39;</span><span class="p">)</span>
+<span class="go">[(1, u&#39;First entry&#39;), ...]</span>
+</pre></div>
+</div>
+<p>Se você somente passa um campo singular, você também pode passar num paramêtro
+<tt class="docutils literal"><span class="pre">flat</span></tt>. Se <tt class="xref docutils literal"><span class="pre">True</span></tt>, isto significará que os resultados retornados são valores
+únicos, ao invés de uma tupla. Um exemplo deve fazer a diferença:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span>
+<span class="go">[(1,), (2,), (3,), ...]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span>
+<span class="go">[1, 2, 3, ...]</span>
+</pre></div>
+</div>
+<p>É um erro passa o <tt class="docutils literal"><span class="pre">flat</span></tt> quando há mais de um campo.</p>
+<p>Se você não passar quaisquer valores ao <tt class="docutils literal"><span class="pre">values_list()</span></tt>, ele irá retornar
+todos os campos no model, na ordem em que foram declarados.</p>
+</div>
+<div class="section" id="s-dates-field-kind-order-asc">
+<span id="dates-field-kind-order-asc"></span><h4><tt class="docutils literal"><span class="pre">dates(field,</span> <span class="pre">kind,</span> <span class="pre">order='ASC')</span></tt><a class="headerlink" href="#dates-field-kind-order-asc" title="Permalink to this headline">¶</a></h4>
+<p>Retorna um <tt class="docutils literal"><span class="pre">DateQuerySet</span></tt> -- um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que avalia uma lista de objetos
+<tt class="docutils literal"><span class="pre">datetime.datetime</span></tt> representando todos as datas disponíveis de um tipo
+particular dentro dos conteúdos do <tt class="docutils literal"><span class="pre">QuerySet</span></tt>.</p>
+<p>O <tt class="docutils literal"><span class="pre">field</span></tt> deve ser o nome de um <tt class="docutils literal"><span class="pre">DateField</span></tt> ou <tt class="docutils literal"><span class="pre">DateTimeField</span></tt> de seu
+model.</p>
+<p>O <tt class="docutils literal"><span class="pre">kind</span></tt> deve ser <tt class="docutils literal"><span class="pre">&quot;year&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;month&quot;</span></tt> ou <tt class="docutils literal"><span class="pre">&quot;day&quot;</span></tt>. Cada objeto
+<tt class="docutils literal"><span class="pre">datetime.datetime</span></tt> na lista de resultados é &quot;trucado&quot; para o <tt class="docutils literal"><span class="pre">type</span></tt> dado.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">&quot;year&quot;</span></tt> retorna uma lista de todos os valores de anos distintos para o
+campo.</li>
+<li><tt class="docutils literal"><span class="pre">&quot;month&quot;</span></tt> retorna uma lista de todos os valores anos/mês para o campo.</li>
+<li><tt class="docutils literal"><span class="pre">&quot;day&quot;</span></tt> retorna uma lista de todos os valores ano/mês/dia para o campo.</li>
+</ul>
+<p>O <tt class="docutils literal"><span class="pre">order</span></tt>, que por padrão é <tt class="docutils literal"><span class="pre">'ASC'</span></tt>, deve ser <tt class="docutils literal"><span class="pre">'ASC'</span></tt> ou <tt class="docutils literal"><span class="pre">'DESC'</span></tt>. Isto
+especifica como ordenar os resultados.</p>
+<p>Exemplos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">dates</span><span class="p">(</span><span class="s">&#39;pub_date&#39;</span><span class="p">,</span> <span class="s">&#39;year&#39;</span><span class="p">)</span>
+<span class="go">[datetime.datetime(2005, 1, 1)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">dates</span><span class="p">(</span><span class="s">&#39;pub_date&#39;</span><span class="p">,</span> <span class="s">&#39;month&#39;</span><span class="p">)</span>
+<span class="go">[datetime.datetime(2005, 2, 1), datetime.datetime(2005, 3, 1)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">dates</span><span class="p">(</span><span class="s">&#39;pub_date&#39;</span><span class="p">,</span> <span class="s">&#39;day&#39;</span><span class="p">)</span>
+<span class="go">[datetime.datetime(2005, 2, 20), datetime.datetime(2005, 3, 20)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">dates</span><span class="p">(</span><span class="s">&#39;pub_date&#39;</span><span class="p">,</span> <span class="s">&#39;day&#39;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;DESC&#39;</span><span class="p">)</span>
+<span class="go">[datetime.datetime(2005, 3, 20), datetime.datetime(2005, 2, 20)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline__contains</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dates</span><span class="p">(</span><span class="s">&#39;pub_date&#39;</span><span class="p">,</span> <span class="s">&#39;day&#39;</span><span class="p">)</span>
+<span class="go">[datetime.datetime(2005, 3, 20)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-none">
+<span id="none"></span><h4><tt class="docutils literal"><span class="pre">none()</span></tt><a class="headerlink" href="#none" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Retorna um <tt class="docutils literal"><span class="pre">EmptyQuerySet</span></tt> -- um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que sempre avalia para uma lista
+vazia. Este pode ser usado nos casos onde você sabe que você deve retornar uma
+lista de resultados vazia e sua chamada está esperando um objeto <tt class="docutils literal"><span class="pre">QuerySet</span></tt>
+(ao invés de retornar uma lista vazia, por exemplo.)</p>
+<p>Exemplos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">()</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-all">
+<span id="all"></span><h4><tt class="docutils literal"><span class="pre">all()</span></tt><a class="headerlink" href="#all" title="Permalink to this headline">¶</a></h4>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Retorna uma ''cópia'' do <tt class="docutils literal"><span class="pre">QuerySet</span></tt> atual (ou extende o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que você
+passou). Isso pode ser útil em algumas situações onde você pode querer passar
+em cada model manager ou um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> e fazer uma filtragem maior do
+resultado. Você pode seguramente chamar <tt class="docutils literal"><span class="pre">all()</span></tt> em cada objeto e então você
+definitivamente terá um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> para trabalhar com.</p>
+</div>
+<div class="section" id="s-select-related">
+<span id="s-id1"></span><span id="select-related"></span><span id="id1"></span><h4><tt class="docutils literal"><span class="pre">select_related()</span></tt><a class="headerlink" href="#select-related" title="Permalink to this headline">¶</a></h4>
+<p>Retorna um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que automaticamente &quot;seguirá&quot; chaves estrangeiras de
+relacionamentos, selecionando os dados adicionais de objetos relacionados quando
+executar sua consulta. Isso é um aumentador de performance com resultados em
+(algumas vezes mais) consultas maiores, mas significa mais uso de
+relacionamentos de chave estrangeira que não vão exigir consultas de banco de
+dados.</p>
+<p>O seguinte exemplo ilustra a diferença entre pesquisas planas e pesquisas
+<tt class="docutils literal"><span class="pre">select_related()</span></tt>. Aqui a pesquisa padrão:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Acerta o banco de dados.</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c"># Acerta o banco de dados novmante para pegar o objeto Blog relacionado.</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">blog</span>
+</pre></div>
+</div>
+<p>E aqui uma pesquisa <tt class="docutils literal"><span class="pre">select_related</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Acerta o banco de dados.</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c"># Não acerta o banco de dados, porque e.blog já foi populado numa consulta</span>
+<span class="c"># anterior.</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">blog</span>
+</pre></div>
+</div>
+<p>O <tt class="docutils literal"><span class="pre">select_related()</span></tt> segue chaves estrangeiras tão longe quanto possível. Se
+você tem os seguintes models:</p>
+<div class="highlight-python"><pre>class City(models.Model):
+    # ...
+
+class Person(models.Model):
+    # ...
+    hometown = models.ForeignKey(City)
+
+class Book(models.Model):
+    # ...
+    author = models.ForeignKey(Person)</pre>
+</div>
+<p>...então uma chamada para <tt class="docutils literal"><span class="pre">Book.objects.select_related().get(id=4)</span></tt> fará cache
+do objeto relacionado <tt class="docutils literal"><span class="pre">Person</span></tt> <em>e</em> do <tt class="docutils literal"><span class="pre">City</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">b</span> <span class="o">=</span> <span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">author</span>         <span class="c"># Não acerta o banco de dados.</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">hometown</span>       <span class="c"># Não acerta o banco de dados.</span>
+
+<span class="n">b</span> <span class="o">=</span> <span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="c"># Nenhum select_related() neste exemplo.</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">author</span>         <span class="c"># Acerta o banco de dados.</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">hometown</span>       <span class="c"># Acerta o banco de dados.</span>
+</pre></div>
+</div>
+<p>Note que, por padrão, <tt class="docutils literal"><span class="pre">selected_related()</span></tt> não segue chaves estrangeiras que
+tenham <tt class="docutils literal"><span class="pre">null=True</span></tt>.</p>
+<p>Normalmente, usar o <tt class="docutils literal"><span class="pre">select_related()</span></tt> pode melhorar muito a performance
+pois sua aplicação pode evitar muitas chamadas de banco de dados. Entretanto,
+em situações com conjuntos profundamente aninhados de relacionamentos, o
+<tt class="docutils literal"><span class="pre">select_related</span></tt> pode algumas vezes acabar seguindo &quot;relacionamentos de mais&quot;,
+e pode gerar consultas tão grandes que elas acabam sendo lentas.</p>
+<p>Nestas situações, você pode usar o argumento <tt class="docutils literal"><span class="pre">depth</span></tt> para controlar quantos
+&quot;níveis&quot; de relações o <tt class="docutils literal"><span class="pre">select_related()</span></tt> realmente irá seguir:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">b</span> <span class="o">=</span> <span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">author</span>         <span class="c"># Não acerta o banco de dados.</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">hometown</span>       <span class="c"># Requer uma chamada de banco de dados.</span>
+</pre></div>
+</div>
+<p>Algumas vezes você somente quer acessar um model específico que está relacionado
+ao seu model raiz, não todos os models relacionados. Nestes casos, você pode
+passar os nomes dos campos ao <tt class="docutils literal"><span class="pre">select_related()</span></tt> e ele somente seguirá estas
+relações.
+Você pode até fazer isso para os models que estão a mais de uma relação de
+distância, separando os nomes dos campos com underscores duplos, assim como nos
+filtros. Por exemplo, se você tem este model:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Room</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c"># ...</span>
+    <span class="n">building</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Group</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c"># ...</span>
+    <span class="n">teacher</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="n">room</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Room</span><span class="p">)</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>...e você somente precisa trabalhar com os atributos <tt class="docutils literal"><span class="pre">room</span></tt> e <tt class="docutils literal"><span class="pre">subject</span></tt>,
+você poderia escrever isso:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">g</span> <span class="o">=</span> <span class="n">Group</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s">&#39;room&#39;</span><span class="p">,</span> <span class="s">&#39;subject&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Isso também é válido:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">g</span> <span class="o">=</span> <span class="n">Group</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s">&#39;room__building&#39;</span><span class="p">,</span> <span class="s">&#39;subject&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>...e também puxar a relação <tt class="docutils literal"><span class="pre">building</span></tt>.</p>
+<p>Você somente pode referenciar à relações <tt class="docutils literal"><span class="pre">ForeignKey</span></tt> na lista de campos
+passada ao <tt class="docutils literal"><span class="pre">selected_related</span></tt>. Você <em>pode</em> referenciar chaves estrangeiras que
+tenham <tt class="docutils literal"><span class="pre">null=True</span></tt> (indiferente da chamada padrão do <tt class="docutils literal"><span class="pre">select_related()</span></tt>). É
+um erro usar ambos, uma lista de campos e o paramêtro <tt class="docutils literal"><span class="pre">depth</span></tt>, na mesma
+chamada do <tt class="docutils literal"><span class="pre">select_related()</span></tt>, já que eles são opções conflitantes.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Ambos, o argumento <tt class="docutils literal"><span class="pre">depth</span></tt> e a abilidade de especificar nomes de campos em
+chamadas do <tt class="docutils literal"><span class="pre">select_related()</span></tt>, são novidades do Django 1.0.</p>
+</div>
+<div class="section" id="s-extra-select-none-where-none-params-none-tables-none-order-by-none-select-params-none">
+<span id="s-extra"></span><span id="extra-select-none-where-none-params-none-tables-none-order-by-none-select-params-none"></span><span id="extra"></span><h4><tt class="docutils literal"><span class="pre">extra(select=None,</span> <span class="pre">where=None,</span> <span class="pre">params=None,</span> <span class="pre">tables=None,</span> <span class="pre">order_by=None,</span> <span class="pre">select_params=None)</span></tt><a class="headerlink" href="#extra-select-none-where-none-params-none-tables-none-order-by-none-select-params-none" title="Permalink to this headline">¶</a></h4>
+<p>Algumas vezes, a sintaxe de consulta do Django, por si só, não expressa um
+cláusula complexa <tt class="docutils literal"><span class="pre">WHERE</span></tt>. Para esta orla de casos, o Django fornece o
+modificador <tt class="docutils literal"><span class="pre">extra()</span></tt> do <tt class="docutils literal"><span class="pre">QuerySet</span></tt> -- um hook para injetar clausulas
+específicas dentro do SQL gerado pelo <tt class="docutils literal"><span class="pre">QuerySet</span></tt>.</p>
+<p>Por definição, estas pesquisas extra podem não ser portáveis para diferentes
+bancos de dados (pois você está escrevendo código SQL explicitamente) e violando
+o principio DRY, então você deve evitá-los se possível.</p>
+<p>Especificar um ou mais de <tt class="docutils literal"><span class="pre">params</span></tt>, <tt class="docutils literal"><span class="pre">select</span></tt>, <tt class="docutils literal"><span class="pre">where</span></tt> ou <tt class="docutils literal"><span class="pre">tables</span></tt>.
+Nenhum dos argumentos é obrigatório, mas você deve usar pelo menos um deles.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">select</span></tt></dt>
+<dd><p class="first">O argumento <tt class="docutils literal"><span class="pre">select</span></tt> deixa você colocar campos extras na cláusula
+<tt class="docutils literal"><span class="pre">SELECT</span></tt>. Ele deve ser um dicionário que mapea nomes de atributos para que
+a cláusula SQL calcule estes atributos.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">extra</span><span class="p">(</span><span class="n">select</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;is_recent&#39;</span><span class="p">:</span> <span class="s">&quot;pub_date &gt; &#39;2006-01-01&#39;&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Como um resultado, cada objeto <tt class="docutils literal"><span class="pre">Entry</span></tt> terá um atributo extra,
+<tt class="docutils literal"><span class="pre">is_recent</span></tt>, um booleano representando se o <tt class="docutils literal"><span class="pre">pub_date</span></tt> da entrada é
+maior que Jan. 1, 2006.</p>
+<p>O Django insere o dado pedaço de SQL diretamente dentor da regra <tt class="docutils literal"><span class="pre">SELECT</span></tt>,
+então o SQL resultante do exemplo acima deveria ser:</p>
+<div class="highlight-python"><pre>SELECT blog_entry.*, (pub_date &gt; '2006-01-01')
+FROM blog_entry;</pre>
+</div>
+<p>o próximo exemplo é mais avançado; ele faz uma sub-consulta para cada objeto
+<tt class="docutils literal"><span class="pre">Blog</span></tt> resultando num atributo <tt class="docutils literal"><span class="pre">entry_count</span></tt>, um contador inteiro de
+objetos <tt class="docutils literal"><span class="pre">Entry</span></tt> associados:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">extra</span><span class="p">(</span>
+    <span class="n">select</span><span class="o">=</span><span class="p">{</span>
+        <span class="s">&#39;entry_count&#39;</span><span class="p">:</span> <span class="s">&#39;SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id&#39;</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>(Neste caso particular, nós estamos explorando o fato de que a consulta
+já conterá a tabela <tt class="docutils literal"><span class="pre">blog_blog</span></tt> na cláusula <tt class="docutils literal"><span class="pre">FROM</span></tt>.)</p>
+<p>O SQL resultante do exemplo acima deveria ser:</p>
+<div class="highlight-python"><pre>SELECT blog_blog.*, (SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id) AS entry_count
+FROM blog_blog;</pre>
+</div>
+<p>Note que os parenteses requeridos pela maioria dos bancos de dados a volta
+da sub-consulta não são obrigatório na cláusula <tt class="docutils literal"><span class="pre">select</span></tt> do Django. Também
+note que alguns backends de banco de dados, como algumas versões do MySQL,
+não suportam sub-consultas.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Em alguns casos raros, você pode querer passar paramêtros para os fragmentos
+SQL no <tt class="docutils literal"><span class="pre">extra(select=...)</span></tt>. Para este proposito, use o paramêtro
+<tt class="docutils literal"><span class="pre">select_params</span></tt>. Já que  <tt class="docutils literal"><span class="pre">select_params</span></tt> é uma sequência de atributos
+<tt class="docutils literal"><span class="pre">select</span></tt> como um dicionário, algums cuidados são requeridos para que os
+parametros sejam combinados corretamente com as partes do select extra.
+Nesta situação, você deve usar um <tt class="docutils literal"><span class="pre">django.utils.datastructures.SortedDict</span></tt>
+para o valor <tt class="docutils literal"><span class="pre">select</span></tt>, não somente um dicionário normal do Python.</p>
+<p>Isso funcionará, por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">extra</span><span class="p">(</span>
+    <span class="n">select</span><span class="o">=</span><span class="n">SortedDict</span><span class="p">([(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span><span class="p">)]),</span>
+    <span class="n">select_params</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;one&#39;</span><span class="p">,</span> <span class="s">&#39;two&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p class="last">A única coisa que se deve ter cuidado quando usar parametros de select no
+<tt class="docutils literal"><span class="pre">extra()</span></tt> é para evitar usar um substring <tt class="docutils literal"><span class="pre">&quot;%%s&quot;</span></tt> (que são dois
+caracteres porcento antes do <tt class="docutils literal"><span class="pre">s</span></tt>) nas strings select. O monitoramento de
+parametros do Django procura por <tt class="docutils literal"><span class="pre">%s</span></tt> e um caracter de escape <tt class="docutils literal"><span class="pre">%</span></tt> como
+este não detectado. Isso conduzirá a resultados incorretos.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">where</span></tt> / <tt class="docutils literal"><span class="pre">tables</span></tt></dt>
+<dd><p class="first">Você pode definir explicitamnte uma cláusula SQL <tt class="docutils literal"><span class="pre">WHERE</span></tt> -- talvez para
+executar joins não explícitos -- usando <tt class="docutils literal"><span class="pre">where</span></tt>. Você pode manual
+adicionar tabelas a cláusula SQL <tt class="docutils literal"><span class="pre">FROM</span></tt> usando <tt class="docutils literal"><span class="pre">tables</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">where</span></tt> e <tt class="docutils literal"><span class="pre">tables</span></tt> ambos recebem uma lista de strings. Todos os
+paramêtros de <tt class="docutils literal"><span class="pre">where</span></tt> são separados por &quot;AND&quot; para qualquer critério de
+busca.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">extra</span><span class="p">(</span><span class="n">where</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;id IN (3, 4, 5, 20)&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>...é traduzido (aproximadamente) para o seguinte SQL:</p>
+<div class="highlight-python"><pre>SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);</pre>
+</div>
+<p>Seja cuidadoso quando estiver usando o parametro <tt class="docutils literal"><span class="pre">tables</span></tt> se você estiver
+especificando tabelas que já são usadas na consulta. Quando você adiciona
+tabelas extras via paramêtro <tt class="docutils literal"><span class="pre">tables</span></tt>, o Django assume que você quer que
+aquela tabela tenha uma inclusão extra, se ela á estiver incluída. Isto cria
+um problema, já que o nome da tabela terá de ser um alias. Se a tabela
+aparece várias vezes no SQL, a segunda e subsequentes ocorrencias devem usar
+pseudônimos, desta forma o banco de dados pode distringui-las. Se você está
+referindo-se a tabelas extras que você adicionou no parametro <tt class="docutils literal"><span class="pre">where</span></tt> isto
+causará erros.</p>
+<p class="last">Normalmente você somente adicionará tabelas extra que já não estão
+aparecendo na consulta. Entretanto, se o caso mostrado acima ocorrer, há
+poucas soluções. Primeiro, veja se você pode obter resultado sem incluir a
+tabela extra que já esteja na consulta. Se isso não for possível, coloque
+sua chamada <tt class="docutils literal"><span class="pre">extra()</span></tt> na frente da construção do queryset de modo que esse
+será o primeiro uso desta tabela. O alias será o mesmo cada vez que você
+construir o queryset da mesma forma, então você pode confiar que o nome do
+alias não mudará.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">order_by</span></tt></dt>
+<dd><p class="first">Se você precisa ordenar o queryset resultante usando algum dos novos campos
+ou tabelas que você incluiu via <tt class="docutils literal"><span class="pre">extra()</span></tt> use o paramêtro <tt class="docutils literal"><span class="pre">order_by()</span></tt>
+e passe uma sequencia de strings. Estas strings devem ser os campos dos
+models (como um método <tt class="docutils literal"><span class="pre">order_by</span></tt> normal de queryset), no formato
+<tt class="docutils literal"><span class="pre">nome_da_tabela.nome_da_coluna</span></tt> ou um alias para uma coluna que você
+especificou no paramêtro <tt class="docutils literal"><span class="pre">select</span></tt> do <tt class="docutils literal"><span class="pre">extra()</span></tt>.</p>
+<p>Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">q</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">extra</span><span class="p">(</span><span class="n">select</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;is_recent&#39;</span><span class="p">:</span> <span class="s">&quot;pub_date &gt; &#39;2006-01-01&#39;&quot;</span><span class="p">})</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">extra</span><span class="p">(</span><span class="n">order_by</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;-is_recent&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Isso sortiaria todos os ítens para que <tt class="docutils literal"><span class="pre">is_recent</span></tt> seja vertadeiro e
+postos na frente do conjunto de resultados (<tt class="xref docutils literal"><span class="pre">True</span></tt> é ordenado na frente,
+e <tt class="xref docutils literal"><span class="pre">False</span></tt> no ordenamento descendente).</p>
+<p class="last">Isso mostra, a propósito, que você pode fazer várias chamadas para o
+<tt class="docutils literal"><span class="pre">extra()</span></tt> e ele se comportará como você espera (adicionando novos
+limitadores a cada vez).</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">params</span></tt></dt>
+<dd><p class="first">O parametro <tt class="docutils literal"><span class="pre">where</span></tt> descrito acima pode usar marcadores de string de banco
+de dados padrão do Python -- <tt class="docutils literal"><span class="pre">'%s'</span></tt> para indicar parametros do banco de
+dados que devem ser citados automaticamente. O argumento <tt class="docutils literal"><span class="pre">params</span></tt> é uma
+lista de qualquer paramêtro extra a ser substituído.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">extra</span><span class="p">(</span><span class="n">where</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;headline=</span><span class="si">%s</span><span class="s">&#39;</span><span class="p">],</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Lennon&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Sempre use <tt class="docutils literal"><span class="pre">params</span></tt> ao invé sde embutir valores diretamente dentor do
+<tt class="docutils literal"><span class="pre">where</span></tt>, porque <tt class="docutils literal"><span class="pre">params</span></tt> irá assegurar que os valores são colocados
+entre aspas corretamente de acordo com o seu backend particular. (Por
+exemplo, aspas podem ser escapadas corretamente.)</p>
+<p>Ruim:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">extra</span><span class="p">(</span><span class="n">where</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;headline=&#39;Lennon&#39;&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Bom:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">extra</span><span class="p">(</span><span class="n">where</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;headline=</span><span class="si">%s</span><span class="s">&#39;</span><span class="p">],</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Lennon&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="s-metodos-do-queryset-que-nao-retornam-querysets">
+<span id="metodos-do-queryset-que-nao-retornam-querysets"></span><h3>Métodos do QuerySet que não retornam QuerySets<a class="headerlink" href="#metodos-do-queryset-que-nao-retornam-querysets" title="Permalink to this headline">¶</a></h3>
+<p>Os seguintes métodos do <tt class="docutils literal"><span class="pre">QuerySet</span></tt> avaliam o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> e retornam <em>algo</em>
+diferente de um <tt class="docutils literal"><span class="pre">QuerySet</span></tt>.</p>
+<p>Estes métodos não usam um cache (veja <a class="reference internal" href="../../topics/db/queries.html#caching-and-querysets"><em>Cacheamento e QuerySets</em></a>). Ao invés,
+eles consultam o banco de dados toda vez que são chamados.</p>
+<div class="section" id="s-get-kwargs">
+<span id="s-id2"></span><span id="get-kwargs"></span><span id="id2"></span><h4><tt class="docutils literal"><span class="pre">get(**kwargs)</span></tt><a class="headerlink" href="#get-kwargs" title="Permalink to this headline">¶</a></h4>
+<p>Retorna o objeto combinado com o dado parametro, que deve estar no formato
+descrito em <a class="reference internal" href="#campos-de-pesquisa">Campos de pesquisa</a>.</p>
+<p>O <tt class="docutils literal"><span class="pre">get()</span></tt> lança um <tt class="docutils literal"><span class="pre">MultipleObjectsReturned</span></tt> se mais de um objeto for
+encontrado. A exceção <tt class="docutils literal"><span class="pre">MultipleObjectsReturned</span></tt> é um atributo da classe model.</p>
+<p>O <tt class="docutils literal"><span class="pre">get()</span></tt> lança uma exceção <tt class="docutils literal"><span class="pre">DoesNotExist</span></tt> se um objeto não foi encontrado
+para os parametros dados. Esta exceção também é um atributo da classe model.
+Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">)</span> <span class="c"># raises Entry.DoesNotExist</span>
+</pre></div>
+</div>
+<p>A exceção <tt class="docutils literal"><span class="pre">DoesNotExist</span></tt> herda do
+<tt class="docutils literal"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></tt>, então você pode atingir várias
+exceções <tt class="docutils literal"><span class="pre">DoesNotExist</span></tt>. Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">ObjectDoesNotExist</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">ObjectDoesNotExist</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Ou entry ou blog não existe.&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-create">
+<span id="create"></span><h4>create<a class="headerlink" href="#create" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="django.db.models.create">
+<tt class="descname">create</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.db.models.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um método conveniente para criar um objeto e salvá-lo em um passo. Deste modo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">p</span> <span class="o">=</span> <span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">first_name</span><span class="o">=</span><span class="s">&quot;Bruce&quot;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&quot;Springsteen&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>e:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">p</span> <span class="o">=</span> <span class="n">Person</span><span class="p">(</span><span class="n">first_name</span><span class="o">=</span><span class="s">&quot;Bruce&quot;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&quot;Springsteen&quot;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">force_insert</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>são equivalentes.</p>
+<p>O paramêtro <a class="reference internal" href="instances.html#ref-models-force-insert"><em>force_insert</em></a> é documentado em outro
+lugar, mas tudo isso significa que um novo objeto sempre será criado.
+Normalmente você não vai precisar se preocupar com isto. Entretanto, se seu
+model contém uma chave primária de valor manual, que você seta e se este valor
+já existe no banco de dados, uma chama do <tt class="docutils literal"><span class="pre">create()</span></tt> falhará com um
+<tt class="docutils literal"><span class="pre">IntegerityError</span></tt> já que a chave primária deve ser única. Então lembre-se de
+estar preparado para tratar essa exceção se você estiver usando chaves primárias
+manuais.</p>
+</div>
+<div class="section" id="s-get-or-create-kwargs">
+<span id="get-or-create-kwargs"></span><h4><tt class="docutils literal"><span class="pre">get_or_create(**kwargs)</span></tt><a class="headerlink" href="#get-or-create-kwargs" title="Permalink to this headline">¶</a></h4>
+<p>Um método conveniente para procurar um objeto com os argumentos, e criá-lo se
+necessário.</p>
+<p>Retorna um tupla de <tt class="docutils literal"><span class="pre">(object,</span> <span class="pre">created)</span></tt>, onde <tt class="docutils literal"><span class="pre">object</span></tt> é objeto recebido ou
+criado e <tt class="docutils literal"><span class="pre">created</span></tt> é um booleano especificando se um novo objeto foi criado.</p>
+<p>Isto age como um atalho de código e é mais útil para scripts de importação de
+dados. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">first_name</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">Person</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">Person</span><span class="p">(</span><span class="n">first_name</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">,</span> <span class="n">birthday</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1940</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+    <span class="n">obj</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Este padrão fica muito pesado quando o número de campos de um model se eleva.
+O exemplo acima pode ser rescrito usando <tt class="docutils literal"><span class="pre">get_or_create()</span></tt> desta forma:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">obj</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">first_name</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">,</span>
+                  <span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;birthday&#39;</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">1940</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">)})</span>
+</pre></div>
+</div>
+<p>Qualquer argumento nomeado passado para o <tt class="docutils literal"><span class="pre">get_or_create()</span></tt> -- <em>exceto</em> um
+opcional chamado <tt class="docutils literal"><span class="pre">defaults</span></tt> -- serão usado numa chamada <tt class="docutils literal"><span class="pre">get()</span></tt>. Se um
+objeto é encontrado, <tt class="docutils literal"><span class="pre">get_or_create()</span></tt> retorna uma tupla deste objeto e
+<tt class="xref docutils literal"><span class="pre">False</span></tt>. Se um objeto <em>não</em> é encontrado, <tt class="docutils literal"><span class="pre">get_or_create()</span></tt> instânciará e
+salvará um novo objeto, retornando uma tupla do novo objeto e <tt class="xref docutils literal"><span class="pre">True</span></tt>. O novo
+objeto será criado aproximadamente de acordo com este algorítimo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">defaults</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;defaults&#39;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="s">&#39;__&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">k</span><span class="p">])</span>
+<span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">defaults</span><span class="p">)</span>
+<span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+<span class="n">obj</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Em ingês, isso significar começar com um argumento nomeado não-<tt class="docutils literal"><span class="pre">'defaults'</span></tt>
+que não contém um underscore duplo (o que poderia indicar uma pesquisão
+inexata). Então adicione os conteúdos do <tt class="docutils literal"><span class="pre">defaults</span></tt>, sobrecrevendo qualquer
+chave se necesário, e use o resultado como um argumento nomeado para a classe
+model. Como insinuado acima, esta é uma simplificação do algorítimo que é usado,
+mas ele contém todos os detalhes pertinente. A implementação interna tem mais
+checagens de erro que estas e manipula algmas condições extras afiadas; se você
+estiver interessado, leia o código.</p>
+<p>Se você tem um campo chamado <tt class="docutils literal"><span class="pre">defaults</span></tt> e quer usá-lo numa pesquisa exata no
+<tt class="docutils literal"><span class="pre">get_or_create()</span></tt>, é só usar <tt class="docutils literal"><span class="pre">'defaults__extact'</span></tt>, desta forma:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Foo</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">defaults__exact</span><span class="o">=</span><span class="s">&#39;bar&#39;</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;defaults&#39;</span><span class="p">:</span> <span class="s">&#39;baz&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>o método <tt class="docutils literal"><span class="pre">get_or_create()</span></tt> tem um comportamento de erro semelhante ao
+<tt class="docutils literal"><span class="pre">create()</span></tt> quando você está especificando chaves primárias manualmente. Se um
+objeto precisa ser criado e a chave já existe no banco de dados, um
+<tt class="docutils literal"><span class="pre">IntegrityError</span></tt> será lançado.</p>
+<p>Finalmente, uma palabra em uso <tt class="docutils literal"><span class="pre">get_or_create()</span></tt> nos views do Django. Como
+mencionado antes, <tt class="docutils literal"><span class="pre">get_or_create()</span></tt> é útil principalmente em scripts que
+precisam parsear dados e criar novos registros se não existirem disponíveis.
+Porém, se você prexia usar <tt class="docutils literal"><span class="pre">get_or_create()</span></tt> num view, por favor, esteja certo
+de usá-lo em requisições <tt class="docutils literal"><span class="pre">POST</span></tt> exceto que você tenha uma boa razão para não
+fazê-lo. Requisições <tt class="docutils literal"><span class="pre">GET</span></tt> não devem ter dados efetivos; Use <tt class="docutils literal"><span class="pre">POST</span></tt> sempre
+num requisição a uma página que tenha efeito unilateral nos seus dados. Para
+mais, veja <a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1">Métodos seguros</a> na especificação do HTTP.</p>
+</div>
+<div class="section" id="s-count">
+<span id="count"></span><h4>count<a class="headerlink" href="#count" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="django.db.models.count">
+<tt class="descname">count</tt>()<a class="headerlink" href="#django.db.models.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Retorna um inteiro representando o número de objetos no banco de dados
+combinando com o <tt class="docutils literal"><span class="pre">QuerySet</span></tt>. O <tt class="docutils literal"><span class="pre">count()</span></tt> nunca lança exceções.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Retorna o numero total de entradas no banco de dados.</span>
+<span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+<span class="c"># Retorna o número de entradas cujo headline contém &#39;Lennon&#39;</span>
+<span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline__contains</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>O <tt class="docutils literal"><span class="pre">count()</span></tt> realiza um <tt class="docutils literal"><span class="pre">SELECT</span> <span class="pre">COUNT(*)</span></tt> por trás das cenas, então você deve
+sempre usar <tt class="docutils literal"><span class="pre">count()</span></tt> ao invés de carregar todos os objetos do banco e chamar
+<tt class="docutils literal"><span class="pre">len()</span></tt> sobre o resultado.</p>
+<p>Dependendo de qual banco de dados você estiver usando (e.g. PostgreSQL vs.
+MySQL), <tt class="docutils literal"><span class="pre">count()</span></tt> pode retornar um inteiro long ao invés de um inteiro normal
+do Python. Esta é uma implementação evasiva subjacente que não deve causar
+quaisquer problemas no mundo real.</p>
+</div>
+<div class="section" id="s-in-bulk-id-list">
+<span id="in-bulk-id-list"></span><h4><tt class="docutils literal"><span class="pre">in_bulk(id_list)</span></tt><a class="headerlink" href="#in-bulk-id-list" title="Permalink to this headline">¶</a></h4>
+<p>Recebe uma lista de valores de chaves primárias e retorna um dicionário mapeando
+cada valor de chave primária para uma instância de objeto com o dado ID.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">in_bulk</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">{1: &lt;Blog: Beatles Blog&gt;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">in_bulk</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="go">{1: &lt;Blog: Beatles Blog&gt;, 2: &lt;Blog: Cheddar Talk&gt;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">in_bulk</span><span class="p">([])</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
+<p>Se você passar ao <tt class="docutils literal"><span class="pre">in_bulk()</span></tt> uma lista vazia, você terá um dicionário vazio.</p>
+</div>
+<div class="section" id="s-iterator">
+<span id="iterator"></span><h4>iterator<a class="headerlink" href="#iterator" title="Permalink to this headline">¶</a></h4>
+<dl class="method">
+<dt id="django.db.models.iterator">
+<tt class="descname">iterator</tt>()<a class="headerlink" href="#django.db.models.iterator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Avalia o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> (para realizar uma consulta) e retorna um <a class="reference external" href="http://www.python.org/dev/peps/pep-0234/">iterador</a>
+sobre os resultados. Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> tipicamente lê todos os seus resultados e
+instancia todos os objetos correspondentes na primeira vez que você acessá-los;
+o <tt class="docutils literal"><span class="pre">iterator()</span></tt>, no entanto, lerá os resultados e instanciará objetos em
+pedaços discretos, fornecendo-os um por vez. Para um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que retorna um
+número grande de objetos, este frequentemente resulta em melhor performance e
+redução significante no uso de memória.</p>
+<p>Note que usando o <tt class="docutils literal"><span class="pre">iterator()</span></tt> sobre um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que já foi avaliado, irá
+forçá-lo a avaliá-lo novamente, repetindo a consulta.</p>
+</div>
+<div class="section" id="s-latest-field-name-none">
+<span id="latest-field-name-none"></span><h4><tt class="docutils literal"><span class="pre">latest(field_name=None)</span></tt><a class="headerlink" href="#latest-field-name-none" title="Permalink to this headline">¶</a></h4>
+<p>Retorna o último objeto na tabela, por data, usando o <tt class="docutils literal"><span class="pre">field_name</span></tt> fornecido
+como o campo de data.</p>
+<p>Este exemplo retorna a última <tt class="docutils literal"><span class="pre">Entry</span></tt> na tabela, de acordo com o campo
+<tt class="docutils literal"><span class="pre">pub_date</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">latest</span><span class="p">(</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Se o <tt class="docutils literal"><span class="pre">Meta</span></tt> do seu model especifica <tt class="docutils literal"><span class="pre">get_latest_by</span></tt>, você pode deixar vazio
+o argumento <tt class="docutils literal"><span class="pre">field_name</span></tt> do <tt class="docutils literal"><span class="pre">latest()</span></tt>. O Django usará o campo especificado
+em <cite>get_latest_by`</cite> por padrão.</p>
+<p>Assim como <tt class="docutils literal"><span class="pre">get()</span></tt>, <tt class="docutils literal"><span class="pre">latest()</span></tt> lançam <tt class="docutils literal"><span class="pre">DoesNotExist</span></tt> se um objeto não existe com
+os paramêtros fornecidos.</p>
+<p>Note que <tt class="docutils literal"><span class="pre">latest()</span></tt> existe puramente por conveniência e legibilidade.</p>
+</div>
+</div>
+<div class="section" id="s-campos-de-pesquisa">
+<span id="s-field-lookups"></span><span id="campos-de-pesquisa"></span><span id="field-lookups"></span><h3>Campos de Pesquisa<a class="headerlink" href="#campos-de-pesquisa" title="Permalink to this headline">¶</a></h3>
+<p>Campos de pesquis são como você especifica o cerne de uma cláusula SQL
+<tt class="docutils literal"><span class="pre">WHERE</span></tt>. Eles são especificados como argumentos nomeados dos métodos do
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> <tt class="docutils literal"><span class="pre">filter()</span></tt>, <tt class="docutils literal"><span class="pre">exclude()</span></tt> e <tt class="docutils literal"><span class="pre">get()</span></tt>.</p>
+<p>Para uma introdução, veja <a class="reference internal" href="../../topics/db/queries.html#field-lookups-intro"><em>Campos de pesquisa</em></a>.</p>
+<div class="section" id="s-exact">
+<span id="exact"></span><h4>exact<a class="headerlink" href="#exact" title="Permalink to this headline">¶</a></h4>
+<p>Combinação exata. Se o valor fornecido para comparação for <tt class="xref docutils literal"><span class="pre">None</span></tt>, ele será
+interpretado como um SQL <tt class="docutils literal"><span class="pre">NULL</span></tt> (Veja <a class="reference internal" href="#isnull">isnull</a> para mais detalhes).</p>
+<p>Exemplos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id__exact</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id__exact</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE id = 14;
+SELECT ... WHERE id IS NULL;</pre>
+</div>
+<div class="versionchanged">
+<span class="title">Changed in Django 1.0:</span> A semântica de <tt class="docutils literal"><span class="pre">id__exact=None</span></tt> mudou no Django 1.0. Anteriormente, ela era
+(intencionalmente) convetido para <tt class="docutils literal"><span class="pre">WHERE</span> <span class="pre">id</span> <span class="pre">=</span> <span class="pre">NULL</span></tt> a nível de SQL, o que
+nunca combinaria com nada. Agora ela foi mudada para fazer o mesmo utilizando
+<tt class="docutils literal"><span class="pre">id__isnull=True</span></tt>.</div>
+<div class="admonition-mysql-comparisons admonition ">
+<p class="first admonition-title">MySQL comparisons</p>
+<p class="last">No MySQL, uma configuração de &quot;collation&quot; de tabela do banco de dados
+determina se comparações <tt class="docutils literal"><span class="pre">exact</span></tt> são sensíveis a maiúsculas. Essa é uma
+configuração de banco de dados, <em>não</em> uma configuração do Django. É possível
+configurar suas tabelas MySQL para usar a comparação sensível a maiúsculas,
+mas algumas pecinhas estão envolvidas. Para mais informação sobre isto, veja
+a <a class="reference internal" href="../databases.html#mysql-collation"><em>seção collation</em></a> na documentação de
+<a class="reference internal" href="../databases.html"><em>banco de dados</em></a>.</p>
+</div>
+</div>
+<div class="section" id="s-iexact">
+<span id="iexact"></span><h4>iexact<a class="headerlink" href="#iexact" title="Permalink to this headline">¶</a></h4>
+<p>Combinação exata sensível a maiúsculas.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name__iexact</span><span class="o">=</span><span class="s">&#39;beatles blog&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE name ILIKE 'beatles blog';</pre>
+</div>
+<p>Note que isto combinará <tt class="docutils literal"><span class="pre">'Beatles</span> <span class="pre">Blog'</span></tt>, <tt class="docutils literal"><span class="pre">'beatles</span> <span class="pre">blog'</span></tt>, <tt class="docutils literal"><span class="pre">'BeAtLes</span>
+<span class="pre">BLoG'</span></tt>, etc.</p>
+<div class="admonition-sqlite-users admonition ">
+<p class="first admonition-title">SQLite users</p>
+<p class="last">Quando estiver usando o backend SQLite e strings Unicode (não ASCII), tenha
+em mente a <a class="reference internal" href="../databases.html#sqlite-string-matching"><em>anotação de banco de dados</em></a> sobre
+comparação de strings. O SQLite não faz checagem não sensivel a maiúsculas
+em strings Unicode.</p>
+</div>
+</div>
+<div class="section" id="s-contains">
+<span id="contains"></span><h4>contains<a class="headerlink" href="#contains" title="Permalink to this headline">¶</a></h4>
+<p>Teste de contimento sensível a maiúsculas.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">headline__contains</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE headline LIKE '%Lennon%';</pre>
+</div>
+<p>Note que este combinará o headline  <tt class="docutils literal"><span class="pre">'Today</span> <span class="pre">Lennon</span> <span class="pre">honored'</span></tt> mas não
+<tt class="docutils literal"><span class="pre">'today</span> <span class="pre">lennon</span> <span class="pre">honored'</span></tt>.</p>
+<p>O SQLite não suporta regras <tt class="docutils literal"><span class="pre">LIKE</span></tt> sensíveis a maiúsculas; <tt class="docutils literal"><span class="pre">contains</span></tt> age
+como <tt class="docutils literal"><span class="pre">icontains</span></tt> no SQLite.</p>
+</div>
+<div class="section" id="s-icontains">
+<span id="icontains"></span><h4>icontains<a class="headerlink" href="#icontains" title="Permalink to this headline">¶</a></h4>
+<p>Teste de contimento insensível a maiúsculas.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">headline__icontains</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE headline ILIKE '%Lennon%';</pre>
+</div>
+<div class="admonition-sqlite-users admonition ">
+<p class="first admonition-title">SQLite users</p>
+<p class="last">Quando estiver usando o backend SQLite e strings Unicode (não ASCII), tenha
+em mente a <a class="reference internal" href="../databases.html#sqlite-string-matching"><em>anotação de banco de dados</em></a> sobre
+comparação de strings.</p>
+</div>
+</div>
+<div class="section" id="s-in">
+<span id="in"></span><h4>in<a class="headerlink" href="#in" title="Permalink to this headline">¶</a></h4>
+<p>Numa dada lista.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE id IN (1, 3, 4);</pre>
+</div>
+<p>Você pode também usar um queryset para avaliar dinamicamente a lista de valores
+ao invés de fornecer uma lista de valores literais. O queryset deve ser reduzido
+a uma lista de valores individuais usando o método <tt class="docutils literal"><span class="pre">values()</span></tt>, e então
+convertido dentro de uma consulta usando o atributo <tt class="docutils literal"><span class="pre">query</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">q</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name__contains</span><span class="o">=</span><span class="s">&#39;Cheddar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s">&#39;pk&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">query</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">blog__in</span><span class="o">=</span><span class="n">q</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Este atributo <tt class="docutils literal"><span class="pre">query</span></tt> deve ser considerado um atributo interno opaco. É
+legal usá-lo como acima, mas sua API pode mudar entre as versões do Django.</p>
+</div>
+<p>Este queryset será avaliado como uma regra de subselect:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE blog.id IN (SELECT id FROM ... WHERE NAME LIKE '%Cheddar%')</pre>
+</div>
+</div>
+<div class="section" id="s-gt">
+<span id="gt"></span><h4>gt<a class="headerlink" href="#gt" title="Permalink to this headline">¶</a></h4>
+<p>Maior que.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__gt</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE id &gt; 4;</pre>
+</div>
+</div>
+<div class="section" id="s-gte">
+<span id="gte"></span><h4>gte<a class="headerlink" href="#gte" title="Permalink to this headline">¶</a></h4>
+<p>Maior ou igual a.</p>
+</div>
+<div class="section" id="s-lt">
+<span id="lt"></span><h4>lt<a class="headerlink" href="#lt" title="Permalink to this headline">¶</a></h4>
+<p>Menor que.</p>
+</div>
+<div class="section" id="s-lte">
+<span id="lte"></span><h4>lte<a class="headerlink" href="#lte" title="Permalink to this headline">¶</a></h4>
+<p>Menor ou igual a.</p>
+</div>
+<div class="section" id="s-startswith">
+<span id="startswith"></span><h4>startswith<a class="headerlink" href="#startswith" title="Permalink to this headline">¶</a></h4>
+<p>Começa com sensível a maiúsculas.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline__startswith</span><span class="o">=</span><span class="s">&#39;Will&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE headline LIKE 'Will%';</pre>
+</div>
+<p>O SQLite não suporta regras <tt class="docutils literal"><span class="pre">LIKE</span></tt> sensíveis a maiúsculas; o <tt class="docutils literal"><span class="pre">startswith</span></tt>
+age como <tt class="docutils literal"><span class="pre">istartswith</span></tt> no SQLite.</p>
+</div>
+<div class="section" id="s-istartswith">
+<span id="istartswith"></span><h4>istartswith<a class="headerlink" href="#istartswith" title="Permalink to this headline">¶</a></h4>
+<p>Começa com insensível a maiúsculas.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline__istartswith</span><span class="o">=</span><span class="s">&#39;will&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE headline ILIKE 'Will%';</pre>
+</div>
+<div class="admonition-sqlite-users admonition ">
+<p class="first admonition-title">SQLite users</p>
+<p class="last">Quando estiver usando o backend SQLite e strings Unicode (não ASCII), tenha
+em mente a <a class="reference internal" href="../databases.html#sqlite-string-matching"><em>anotação de banco de dados</em></a> sobre
+comparação de strings.</p>
+</div>
+</div>
+<div class="section" id="s-endswith">
+<span id="endswith"></span><h4>endswith<a class="headerlink" href="#endswith" title="Permalink to this headline">¶</a></h4>
+<p>Termina com sensível a maiúsculas.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline__endswith</span><span class="o">=</span><span class="s">&#39;cats&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE headline LIKE '%cats';</pre>
+</div>
+<p>O SQLite não suporta regras <tt class="docutils literal"><span class="pre">LIKE</span></tt> sensíveis a maiúsculas; o <tt class="docutils literal"><span class="pre">endswith</span></tt>
+age como <tt class="docutils literal"><span class="pre">iendswith</span></tt> no SQLite.</p>
+</div>
+<div class="section" id="s-iendswith">
+<span id="iendswith"></span><h4>iendswith<a class="headerlink" href="#iendswith" title="Permalink to this headline">¶</a></h4>
+<p>Termina com insensível a maiúsculas.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline__iendswith</span><span class="o">=</span><span class="s">&#39;will&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE headline ILIKE '%will'</pre>
+</div>
+<div class="admonition-sqlite-users admonition ">
+<p class="first admonition-title">SQLite users</p>
+<p class="last">Quando estiver usando o backend SQLite e strings Unicode (não ASCII), tenha
+em mente a <a class="reference internal" href="../databases.html#sqlite-string-matching"><em>anotação de banco de dados</em></a> sobre
+comparação de strings.</p>
+</div>
+</div>
+<div class="section" id="s-range">
+<span id="range"></span><h4>range<a class="headerlink" href="#range" title="Permalink to this headline">¶</a></h4>
+<p>Teste de faixa (inclusivo).</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">end_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+<span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__range</span><span class="o">=</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE pub_date BETWEEN '2005-01-01' and '2005-03-31';</pre>
+</div>
+<p>Você pode usar <tt class="docutils literal"><span class="pre">range</span></tt> onde você puder usar <tt class="docutils literal"><span class="pre">BETWEEN</span></tt> no SQL -- para datas,
+números ou mesmo caracteres.</p>
+</div>
+<div class="section" id="s-year">
+<span id="year"></span><h4>year<a class="headerlink" href="#year" title="Permalink to this headline">¶</a></h4>
+<p>Para campos date/datetime, combinação exata de ano. Recebe um ano com quatro
+dígitos.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__year</span><span class="o">=</span><span class="mi">2005</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE EXTRACT('year' FROM pub_date) = '2005';</pre>
+</div>
+<p>(A sintaxe exata do SQL varia para cada motor de banco de dados.)</p>
+</div>
+<div class="section" id="s-month">
+<span id="month"></span><h4>month<a class="headerlink" href="#month" title="Permalink to this headline">¶</a></h4>
+<p>Para campos date/datetime, combinação exata de mês. Recebe um inteiro 1
+(Janeiro) até 12 (Dezembro).</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__month</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE EXTRACT('month' FROM pub_date) = '12';</pre>
+</div>
+<p>(A sintaxe exata do SQL varia para cada motor de banco de dados.)</p>
+</div>
+<div class="section" id="s-day">
+<span id="day"></span><h4>day<a class="headerlink" href="#day" title="Permalink to this headline">¶</a></h4>
+<p>Para campos date/datetime, combinação exata de dia.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__day</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE EXTRACT('day' FROM pub_date) = '3';</pre>
+</div>
+<p>(A sintaxe exata do SQL varia para cada motor de banco de dados.)</p>
+<p>Note que isto combinará com qualquer dado com um pub_date no terceiro dia do
+mês, como Janeiro 3, Julho 3, etc.</p>
+</div>
+<div class="section" id="s-isnull">
+<span id="isnull"></span><h4>isnull<a class="headerlink" href="#isnull" title="Permalink to this headline">¶</a></h4>
+<p>Recebe um <tt class="xref docutils literal"><span class="pre">True</span></tt> ou <tt class="xref docutils literal"><span class="pre">False</span></tt>, que coresponde a consultas SQL <tt class="docutils literal"><span class="pre">IS</span> <span class="pre">NULL</span></tt> e
+<tt class="docutils literal"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">NULL</span></tt>, respectivamente.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__isnull</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE pub_date IS NULL;</pre>
+</div>
+</div>
+<div class="section" id="s-search">
+<span id="search"></span><h4>search<a class="headerlink" href="#search" title="Permalink to this headline">¶</a></h4>
+<p>Um booleano de busca full-text, recebendo vantagem do indexamento full-text.
+Este é como o <tt class="docutils literal"><span class="pre">contains</span></tt> mas é significativamente mais rápido, devido ao
+indexamento full-text.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline__search</span><span class="o">=</span><span class="s">&quot;+Django -jazz Python&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalente:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE MATCH(tablename, headline) AGAINST (+Django -jazz Python IN BOOLEAN MODE);</pre>
+</div>
+<p>Note que isso somente está disponível no MySQL e requer manipulação direta do
+banco de dados para adicionar o index full-text. Por padrão o Django usa
+BOOLEAN MODE nas buscas em full-text. <a class="reference external" href="http://dev.mysql.com/doc/refman/5.1/en/fulltext-boolean.html">Por favor verifique a documentação do
+MySQL para detalhes adicionais.</a></p>
+</div>
+<div class="section" id="s-regex">
+<span id="s-std:fieldlookup-regex"></span><span id="regex"></span><span id="std:fieldlookup-regex"></span><h4>regex<a class="headerlink" href="#regex" title="Permalink to this headline">¶</a></h4>
+<p>Combinação por expressão regular sensível a maiúsculas.</p>
+<p>A sintaxe de expressão regular é a que o beckend do banco de dados usa. No caso
+do SQLite, que não suporta nativamente, pesquisa com expressões regulares, a
+sintaxe é a do módulo Python <tt class="docutils literal"><span class="pre">re</span></tt>.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">title__regex</span><span class="o">=</span><span class="s">r&#39;^(An?|The) +&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalentes:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE title REGEXP BINARY '^(An?|The) +'; -- MySQL
+
+SELECT ... WHERE REGEXP_LIKE(title, '^(an?|the) +', 'c'); -- Oracle
+
+SELECT ... WHERE title ~ '^(An?|The) +'; -- PostgreSQL
+
+SELECT ... WHERE title REGEXP '^(An?|The) +'; -- SQLite</pre>
+</div>
+<p>Using raw strings (e.g., <tt class="docutils literal"><span class="pre">r'foo'</span></tt> instead of <tt class="docutils literal"><span class="pre">'foo'</span></tt>) for passing in the
+regular expression syntax is recommended.</p>
+</div>
+<div class="section" id="s-iregex">
+<span id="s-std:fieldlookup-iregex"></span><span id="iregex"></span><span id="std:fieldlookup-iregex"></span><h4>iregex<a class="headerlink" href="#iregex" title="Permalink to this headline">¶</a></h4>
+<p>Combinação por expressão regular insensível a maiúsculas.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">title__iregex</span><span class="o">=</span><span class="s">r&#39;^(an?|the) +&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQL equivalentes:</p>
+<div class="highlight-python"><pre>SELECT ... WHERE title REGEXP '^(an?|the) +'; -- MySQL
+
+SELECT ... WHERE REGEXP_LIKE(title, '^(an?|the) +', 'i'); -- Oracle
+
+SELECT ... WHERE title ~* '^(an?|the) +'; -- PostgreSQL
+
+SELECT ... WHERE title REGEXP '(?i)^(an?|the) +'; -- SQLite</pre>
+</div>
+</div>
+</div>
+<div class="section" id="s-aggregation-functions">
+<span id="s-id3"></span><span id="aggregation-functions"></span><span id="id3"></span><h3>Aggregation functions<a class="headerlink" href="#aggregation-functions" title="Permalink to this headline">¶</a></h3>
+<p>Django provides the following aggregation functions in the
+<tt class="docutils literal"><span class="pre">django.db.models</span></tt> module. For details on how to use these
+aggregate functions, see
+<a class="reference internal" href="../../topics/db/aggregation.html"><em>the topic guide on aggregation</em></a>.</p>
+<div class="section" id="s-avg">
+<span id="avg"></span><h4>Avg<a class="headerlink" href="#avg" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="django.db.models.Avg">
+<em class="property">class </em><tt class="descname">Avg</tt>(<em>field</em>)<a class="headerlink" href="#django.db.models.Avg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mean value of the given field.</p>
+<ul class="simple">
+<li>Default alias: <tt class="docutils literal"><span class="pre">&lt;field&gt;__avg</span></tt></li>
+<li>Return type: float</li>
+</ul>
+</dd></dl>
+
+</div>
+<div class="section" id="s-id4">
+<span id="id4"></span><h4>Count<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="django.db.models.Count">
+<em class="property">class </em><tt class="descname">Count</tt>(<em>field</em>, <em>distinct=False</em>)<a class="headerlink" href="#django.db.models.Count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of objects that are related through the provided field.</p>
+<ul class="simple">
+<li>Default alias: <tt class="docutils literal"><span class="pre">&lt;field&gt;__count</span></tt></li>
+<li>Return type: integer</li>
+</ul>
+<p>Has one optional argument:</p>
+<dl class="attribute">
+<dt id="django.db.models.Count.distinct">
+<tt class="descname">distinct</tt><a class="headerlink" href="#django.db.models.Count.distinct" title="Permalink to this definition">¶</a></dt>
+<dd><p>If distinct=True, the count will only include unique instances. This has
+the SQL equivalent of <tt class="docutils literal"><span class="pre">COUNT(DISTINCT</span> <span class="pre">field)</span></tt>. Default value is <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="s-max">
+<span id="max"></span><h4>Max<a class="headerlink" href="#max" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="django.db.models.Max">
+<em class="property">class </em><tt class="descname">Max</tt>(<em>field</em>)<a class="headerlink" href="#django.db.models.Max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the maximum value of the given field.</p>
+<ul class="simple">
+<li>Default alias: <tt class="docutils literal"><span class="pre">&lt;field&gt;__max</span></tt></li>
+<li>Return type: same as input field</li>
+</ul>
+</dd></dl>
+
+</div>
+<div class="section" id="s-min">
+<span id="min"></span><h4>Min<a class="headerlink" href="#min" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="django.db.models.Min">
+<em class="property">class </em><tt class="descname">Min</tt>(<em>field</em>)<a class="headerlink" href="#django.db.models.Min" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the minimum value of the given field.</p>
+<ul class="simple">
+<li>Default alias: <tt class="docutils literal"><span class="pre">&lt;field&gt;__min</span></tt></li>
+<li>Return type: same as input field</li>
+</ul>
+</dd></dl>
+
+</div>
+<div class="section" id="s-stddev">
+<span id="stddev"></span><h4>StdDev<a class="headerlink" href="#stddev" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="django.db.models.StdDev">
+<em class="property">class </em><tt class="descname">StdDev</tt>(<em>field</em>, <em>sample=False</em>)<a class="headerlink" href="#django.db.models.StdDev" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the standard deviation of the data in the provided field.</p>
+<ul class="simple">
+<li>Default alias: <tt class="docutils literal"><span class="pre">&lt;field&gt;__stddev</span></tt></li>
+<li>Return type: float</li>
+</ul>
+<p>Has one optional argument:</p>
+<dl class="attribute">
+<dt id="django.db.models.StdDev.sample">
+<tt class="descname">sample</tt><a class="headerlink" href="#django.db.models.StdDev.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>By default, <tt class="docutils literal"><span class="pre">StdDev</span></tt> returns the population standard deviation. However,
+if <tt class="docutils literal"><span class="pre">sample=True</span></tt>, the return value will be the sample standard deviation.</p>
+</dd></dl>
+
+<div class="admonition-sqlite admonition ">
+<p class="first admonition-title">SQLite</p>
+<p class="last">SQLite doesn't provide <tt class="docutils literal"><span class="pre">StdDev</span></tt> out of the box. An implementation is
+available as an extension module for SQLite. Consult the SQlite
+documentation for instructions on obtaining and installing this extension.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="s-sum">
+<span id="sum"></span><h4>Sum<a class="headerlink" href="#sum" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="django.db.models.Sum">
+<em class="property">class </em><tt class="descname">Sum</tt>(<em>field</em>)<a class="headerlink" href="#django.db.models.Sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the sum of all values of the given field.</p>
+<ul class="simple">
+<li>Default alias: <tt class="docutils literal"><span class="pre">&lt;field&gt;__sum</span></tt></li>
+<li>Return type: same as input field</li>
+</ul>
+</dd></dl>
+
+</div>
+<div class="section" id="s-variance">
+<span id="variance"></span><h4>Variance<a class="headerlink" href="#variance" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="django.db.models.Variance">
+<em class="property">class </em><tt class="descname">Variance</tt>(<em>field</em>, <em>sample=False</em>)<a class="headerlink" href="#django.db.models.Variance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the variance of the data in the provided field.</p>
+<ul class="simple">
+<li>Default alias: <tt class="docutils literal"><span class="pre">&lt;field&gt;__variance</span></tt></li>
+<li>Return type: float</li>
+</ul>
+<p>Has one optional argument:</p>
+<dl class="attribute">
+<dt id="django.db.models.Variance.sample">
+<tt class="descname">sample</tt><a class="headerlink" href="#django.db.models.Variance.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>By default, <tt class="docutils literal"><span class="pre">Variance</span></tt> returns the population variance. However,
+if <tt class="docutils literal"><span class="pre">sample=True</span></tt>, the return value will be the sample variance.</p>
+</dd></dl>
+
+<div class="admonition-sqlite admonition ">
+<p class="first admonition-title">SQLite</p>
+<p class="last">SQLite doesn't provide <tt class="docutils literal"><span class="pre">Variance</span></tt> out of the box. An implementation is
+available as an extension module for SQLite. Consult the SQlite
+documentation for instructions on obtaining and installing this extension.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Referência da API QuerySet</a><ul>
+<li><a class="reference internal" href="#quando-querysets-sao-avaliados">Quando QuerySets são avaliados</a><ul>
+<li><a class="reference internal" href="#preservando-querysets">Preservando QuerySets</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#api-queryset">API QuerySet</a><ul>
+<li><a class="reference internal" href="#metodos-de-queryset-que-retornam-novos-querysets">Métodos de QuerySet que retornam novos QuerySets</a><ul>
+<li><a class="reference internal" href="#filter-kwargs"><tt class="docutils literal"><span class="pre">filter(**kwargs)</span></tt></a></li>
+<li><a class="reference internal" href="#exclude-kwargs"><tt class="docutils literal"><span class="pre">exclude(**kwargs)</span></tt></a></li>
+<li><a class="reference internal" href="#order-by-fields"><tt class="docutils literal"><span class="pre">order_by(*fields)</span></tt></a></li>
+<li><a class="reference internal" href="#reverse"><tt class="docutils literal"><span class="pre">reverse()</span></tt></a></li>
+<li><a class="reference internal" href="#distinct"><tt class="docutils literal"><span class="pre">distinct()</span></tt></a></li>
+<li><a class="reference internal" href="#values-fields"><tt class="docutils literal"><span class="pre">values(*fields)</span></tt></a></li>
+<li><a class="reference internal" href="#values-list-fields"><tt class="docutils literal"><span class="pre">values_list(*fields)</span></tt></a></li>
+<li><a class="reference internal" href="#dates-field-kind-order-asc"><tt class="docutils literal"><span class="pre">dates(field,</span> <span class="pre">kind,</span> <span class="pre">order='ASC')</span></tt></a></li>
+<li><a class="reference internal" href="#none"><tt class="docutils literal"><span class="pre">none()</span></tt></a></li>
+<li><a class="reference internal" href="#all"><tt class="docutils literal"><span class="pre">all()</span></tt></a></li>
+<li><a class="reference internal" href="#select-related"><tt class="docutils literal"><span class="pre">select_related()</span></tt></a></li>
+<li><a class="reference internal" href="#extra-select-none-where-none-params-none-tables-none-order-by-none-select-params-none"><tt class="docutils literal"><span class="pre">extra(select=None,</span> <span class="pre">where=None,</span> <span class="pre">params=None,</span> <span class="pre">tables=None,</span> <span class="pre">order_by=None,</span> <span class="pre">select_params=None)</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#metodos-do-queryset-que-nao-retornam-querysets">Métodos do QuerySet que não retornam QuerySets</a><ul>
+<li><a class="reference internal" href="#get-kwargs"><tt class="docutils literal"><span class="pre">get(**kwargs)</span></tt></a></li>
+<li><a class="reference internal" href="#create">create</a></li>
+<li><a class="reference internal" href="#get-or-create-kwargs"><tt class="docutils literal"><span class="pre">get_or_create(**kwargs)</span></tt></a></li>
+<li><a class="reference internal" href="#count">count</a></li>
+<li><a class="reference internal" href="#in-bulk-id-list"><tt class="docutils literal"><span class="pre">in_bulk(id_list)</span></tt></a></li>
+<li><a class="reference internal" href="#iterator">iterator</a></li>
+<li><a class="reference internal" href="#latest-field-name-none"><tt class="docutils literal"><span class="pre">latest(field_name=None)</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#campos-de-pesquisa">Campos de Pesquisa</a><ul>
+<li><a class="reference internal" href="#exact">exact</a></li>
+<li><a class="reference internal" href="#iexact">iexact</a></li>
+<li><a class="reference internal" href="#contains">contains</a></li>
+<li><a class="reference internal" href="#icontains">icontains</a></li>
+<li><a class="reference internal" href="#in">in</a></li>
+<li><a class="reference internal" href="#gt">gt</a></li>
+<li><a class="reference internal" href="#gte">gte</a></li>
+<li><a class="reference internal" href="#lt">lt</a></li>
+<li><a class="reference internal" href="#lte">lte</a></li>
+<li><a class="reference internal" href="#startswith">startswith</a></li>
+<li><a class="reference internal" href="#istartswith">istartswith</a></li>
+<li><a class="reference internal" href="#endswith">endswith</a></li>
+<li><a class="reference internal" href="#iendswith">iendswith</a></li>
+<li><a class="reference internal" href="#range">range</a></li>
+<li><a class="reference internal" href="#year">year</a></li>
+<li><a class="reference internal" href="#month">month</a></li>
+<li><a class="reference internal" href="#day">day</a></li>
+<li><a class="reference internal" href="#isnull">isnull</a></li>
+<li><a class="reference internal" href="#search">search</a></li>
+<li><a class="reference internal" href="#regex">regex</a></li>
+<li><a class="reference internal" href="#iregex">iregex</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#aggregation-functions">Aggregation functions</a><ul>
+<li><a class="reference internal" href="#avg">Avg</a></li>
+<li><a class="reference internal" href="#id4">Count</a></li>
+<li><a class="reference internal" href="#max">Max</a></li>
+<li><a class="reference internal" href="#min">Min</a></li>
+<li><a class="reference internal" href="#stddev">StdDev</a></li>
+<li><a class="reference internal" href="#sum">Sum</a></li>
+<li><a class="reference internal" href="#variance">Variance</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="instances.html">Referência das instâncias de Model</a></li>
+    
+    
+      <li>Next: <a href="../request-response.html">Objetos de requisição e resposta</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Referência da API</a>
+        
+          <ul><li><a href="index.html">Modelos</a>
+        
+        <ul><li>Referência da API QuerySet</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/models/querysets.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="instances.html" title="Referência das instâncias de Model">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="../request-response.html" title="Objetos de requisição e resposta">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

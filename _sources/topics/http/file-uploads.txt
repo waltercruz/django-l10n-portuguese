@@ -1,0 +1,403 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _topics-file-uploads:
+
+==================
+Upload de arquivos
+==================
+
+.. currentmodule:: django.core.files
+
+.. versionadded:: 1.0
+
+Quando o Django manipula um upload de arquivo, os dados do arquivo são
+acessíveis pelo ``request.FILES`` (para saber mais sobre o objeto ``request``,
+veja a documentação dos :ref:`objetos request e response
+<ref-request-response>`). Este documento explica como os arquivos são
+armazenados no disco e na memória, e como personalizar o comportamento padrão.
+
+Upload de arquivos básico
+=========================
+
+Considere um simples formulário contendo um ``FileField``::
+
+    from django import forms
+
+    class UploadFileForm(forms.Form):
+        title = forms.CharField(max_length=50)
+        file  = forms.FileField()
+
+Um view que manipula este form receberá os dados do arquivo no
+``request.FILES``, é um dicionário contendo uma chave para cada ``FileField``
+(ou ``ImageField``, outra subclasse de ``FileField``) no formulário. De modo que
+os dados do formulário acima seriam acessíveis como ``request.FILES['file']``.
+
+Note que ``request.FILES`` somente conterá dados se o método request for
+``POST`` e o ``<form>`` postado tiver um atributo
+``enctype="multipart/form-data"``. Caso contrário, ``request.FILES`` será vazio.
+
+Na maior parte do tempo, você simplesmente passará os dados do arquivo do
+``request`` como descrito em :ref:`binding-uploaded-files`. Isso deveria parecer
+com algo tipo::
+
+    from django.http import HttpResponseRedirect
+    from django.shortcuts import render_to_response
+
+    # Função imaginária para manipular um upload de arquivo.
+    from somewhere import handle_uploaded_file
+
+    def upload_file(request):
+        if request.method == 'POST':
+            form = UploadFileForm(request.POST, request.FILES)
+            if form.is_valid():
+                handle_uploaded_file(request.FILES['file'])
+                return HttpResponseRedirect('/success/url/')
+        else:
+            form = UploadFileForm()
+        return render_to_response('upload.html', {'form': form})
+
+Observe que nós temos de passar ``request.FILES`` para o construtor do
+formulário, é assim que o dos dados do arquivo são incorporados pelo form.
+
+Manipulando arquivos enviados
+-----------------------------
+
+A peça final do quebra-cabeça é manipular os dados do arquivo do
+``request.FILES``. Cada entrada neste dicionário é um objeto ``UploadedFile``
+-- uma simples classe que envolve o arquivo enviado. Você pode habitualmente
+usar um destes métodos para acessar o conteúdo submetido:
+
+    ``UploadedFile.read()``
+        Ler todos os dados enviados do arquivo. Seja cuidadoso com este método:
+        se o arquivo enviado for muito grande ele pode sobrecarregar o sistema
+        se você tentar carregá-lo na memória. Você provavelmente vai querer usar
+        ``chuncks()`` ao invés, veja abaixo.
+
+    ``UploadedFile.multiple_chunks()``
+        Retorna ``True`` se o arquivo enviado é grande o suficiente para ser
+        lido em vários pedaços. Por padrão este será qualquer arquivo maior que
+        2.5 megabytes, mas isto é configurável; veja abaixo.
+
+    ``UploadedFile.chunks()``
+        Um gerador retornando pedaços do arquivo. Se ``multiple_chunks()`` for
+        ``True``, você deve usar este método num loop ao invés de ``read()``.
+
+        Na prática, é frequentemente muito mais fácil usar ``chunks()`` o tempo
+        todo; veja o exemplo abaixo.
+
+    ``UploadedFile.name``
+        O nome do arquivo enviado (e.g. ``my_file.txt``).
+
+    ``UploadedFile.size``
+        O tamanho, em bytes, do arquivo enviado.
+
+Existem uns outros métodos e atributos disponíveis nos objetos ``UploadedFile``;
+veja `Objeto UploadedFile`_ para uma referência completa.
+
+Colando tudo isso junto, temos uma forma comum de manipular o upload de um
+arquivo::
+
+    def handle_uploaded_file(f):
+        destination = open('some/file/name.txt', 'wb+')
+        for chunk in f.chunks():
+            destination.write(chunk)
+        destination.close()
+
+Iterando sobre ``UploadedFile.chunks()`` no lugar de usar ``read()`` assegura
+que arquivos grandes não sobrecarreguem a memória do seu sistema.
+
+Onde os dados enviados são armazenados
+--------------------------------------
+
+Antes de salvar os arquivos enviados, os dados precisam ser armazenados em
+algum lugar.
+
+Por padrão, se um upload é menor que 2.5 megabytes, o Django irá tratar o
+conteúdo inteiramente na memória. Isto significa que salvar o arquivo envolve
+somente ler da memória e escrever no disco e isto é muito rápido.
+
+No entando, se um upload é muito grande, o Django armazenará o arquivo enviado
+num arquivo temporário, dentro do diretório temporário do seu sistema. Numa
+plataforma baseada no Unix, isto significa que o Django gerará um arquivo com
+um nome tipo ``/tmp/tmpzfp6I6.upload``. Se um arquivo é garnde o suficiente,
+você pode assistir o crescimento deste arquivo este arquivo a medida que o
+Django realiza a transferência para o disco.
+
+Estas especificidades -- 2.5 megabytes; ``/tmp``; etc. -- são simplesmente
+"padrões razoáveis". Leia sobre, para saber detalhes de como você pode
+personalizar ou substituir completamente o comportamento do upload.
+
+Mudando o comportamento do manipulador de upload
+------------------------------------------------
+
+Três configurações controlam o comportamento do upload de arquivo do Django:
+
+    :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
+        O tamanho máximo, em bytes, para arquivos que serão armazenados em
+        memória. Arquivos maiores que :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
+        serão manipulados por disco.
+
+        Padrão é 2.5 megabytes.
+
+    :setting:`FILE_UPLOAD_TEMP_DIR`
+        O diretório onde os arquivos enviado maiores que o
+        :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` serão armazenados.
+
+        Ele segue o padrão do diretório temporário do seu sistema (i.e.
+        ``/tmp`` nos sistemas baseados no Unix).
+
+    :setting:`FILE_UPLOAD_PERMISSIONS`
+        O modo número (i.e. ``0644``) para setar o novo arquivo enviado. Para
+        mais informações sobre o que estes modos significam, veja a
+        `documentação do os.chmod`_
+
+        Se este não for dado ou for ``None``, você terá o comportamento
+        inerente do sistema operacional. Na maioria das plataformas, os arquivos
+        temporários são salvos usando o padrão do sistema umask.
+
+        .. warning::
+
+            Se você não está familiarizado com os modos de arquivos, por favor
+            note que o ``0`` que fica na frente é muito importante: ele indica
+            um número octal, que é a forma como os modos são especificados. Se
+            você tentar usar ``644``, você receberá um comportamento totalmente
+            incorreto.
+
+            **Sempre prefixe o modo com um 0.**
+
+    :setting:`FILE_UPLOAD_HANDLERS`
+
+        O manipulador atual para os arquivos enviados. Mudando esta configuração
+        permite uma completa personalização -- ou mesmo substituição -- do
+        processo de upload do Django. Veja `manipuladores de upload`_ abaixo,
+        para detalhes.
+
+        O padrão é::
+
+            ("django.core.files.uploadhandler.MemoryFileUploadHandler",
+             "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+
+        O que significa "tente fazer o upload em memória primeiro, e então faça
+        com arquivo temporário."
+
+.. _documentação do os.chmod: http://docs.python.org/lib/os-file-dir.html
+
+Objeto ``UploadedFile``
+=======================
+
+.. class:: UploadedFile
+
+Além de extender a classe :class:`File`, todo objeto ``UploadedFile`` define os
+seguintes métodos/atributos:
+
+    ``UploadedFile.content_type``
+        O cabeçalho content-type enviado com o arquivo (e.g. ``text/plain`` ou
+        ``application/pdf``). Como qualquer dado fornecido pelo usuário, você
+        não deve confiar que o arquivos enviado seja realmente deste tipo. Você
+        ainda precisará validar este arquivo, verificando se ele possui o
+        conteúdo que seu cabeçalho content-type informa -- "confar mas
+        verificar."
+
+    ``UploadedFile.charset``
+        Para content-types ``text/*``, o cojunto de caracteres (i.e. ``utf8``)
+        fornecido pelo navegador. Novamente, "confiar mas verificar" é a melhor
+        política aqui.
+
+    ``UploadedFile.temporary_file_path()``
+        Somente arquivos que tiveram o upload realizado por disco terão este
+        método; ele retorna o caminho completo para o arquivo temporário.
+
+.. note::
+
+    Como arquivos regulares do Python, você pode ler o arquivos linha-por-linha
+    simplesmente iterando sobre o arquivos enviado:
+
+    .. code-block:: python
+
+        for line in uploadedfile:
+            do_something_with(line)
+
+    Entretanto, *ao contrário* dos arquivos padrões do Python, o
+    :class:`UploadedFile` somente entende ``\n`` (também conhecino como
+    "Unix-style") como final de linha. Se você sabe que precisa manipular
+    arquivos diferentes tipos de finalização de linha, então você precisará
+    fazê-lo no seu view.
+
+Manipuladores de upload
+=======================
+
+When a user uploads a file, Django passes off the file data to an *upload
+handler* -- a small class that handles file data as it gets uploaded. Upload
+handlers are initially defined in the ``FILE_UPLOAD_HANDLERS`` setting, which
+defaults to::
+
+    ("django.core.files.uploadhandler.MemoryFileUploadHandler",
+     "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+
+Together the ``MemoryFileUploadHandler`` and ``TemporaryFileUploadHandler``
+provide Django's default file upload behavior of reading small files into memory
+and large ones onto disk.
+
+You can write custom handlers that customize how Django handles files. You
+could, for example, use custom handlers to enforce user-level quotas, compress
+data on the fly, render progress bars, and even send data to another storage
+location directly without storing it locally.
+
+Modifying upload handlers on the fly
+------------------------------------
+
+Algumas vezse views particulares requerem um comportamento de upload diferente.
+Nestes casos, você pode sobrescrever os manipuladores de upload, basicamente
+modificando o ``request.upload_handlers``. Por padrão, esta lista conterá os
+mainpuladores de upload dados pelo ``FILE_UPLOAD_HANDLERS``, mas você pode
+modificar a lista como se você qualquer outra lista.
+
+Para instâncias, suponhamos que você tenha estrico um
+``ProgressBarUploadHandler`` que provê uma resposta sobre o progresso do upload
+para algum tipo de widget AJAX. Você poderia adicionar este handler ao seu
+manipulador de upload desta forma::
+
+    request.upload_handlers.insert(0, ProgressBarUploadHandler())
+
+Você poderia provavelmente querer usar o ``list.insert()`` neste caso (ao invés
+de ``append()``) porquê um manipulador de barra de progresso precisaria rodar
+*antes* de qualquer outro manipulador. Lembre-se, os manipuladores de upload são
+processados em ordem.
+
+Se você deseja substituir o manipulador de upload completamente, você pode
+somente atribuir uma nova lista::
+
+   request.upload_handlers = [ProgressBarUploadHandler()]
+
+.. note::
+
+    Você pode somente modificar mainpuladores de upload *antes* deles acessarem
+    o ``request.POST`` ou ``request.FILES`` -- pois não faz sentido mudar o
+    manipulador depois que ele já tiver iniciado. Se você tentar modificar
+    ``request.upload_handlers`` depois que estiver lendo o ``request.POST`` ou
+    ``request.FILES`` o Django gerará um erro.
+
+    Sendo assim, você deve sempre modificar os manipuladores de upload o mais
+    cedo possível dentro do seu view.
+
+Escrevendo um manipulador de upload personalizado
+-------------------------------------------------
+
+Todo manipulador de upload de arquivo deve ser uma subclasse de
+``django.core.files.uploadhandler.FileUploadHandler``. Você pode definir o
+manipulador de upload aonde você desejar.
+
+Métodos obrigatórios
+~~~~~~~~~~~~~~~~~~~~
+
+Manipuladores de arquivos personalizados **devem** definir os seguintes
+métodos::
+
+    ``FileUploadHandler.receive_data_chunk(self, raw_data, start)``
+        Recebe um "pedaço" de dado do arquivos enviado.
+
+        ``raw_data`` é uma byte string contendo o dado enviado.
+
+        ``start`` é a posição no arquivo onde este pedaço ``raw_data`` começa.
+
+        Os dados que você retornar serão alimentados num método subsequente do
+        manipulador de upload ``receive_data_chunck``. Desta forma, um
+        manipulador pode ser um "filter" para outros manipuladores.
+
+        Retorna ``None`` do ``receive_data_chunk`` lembrando o manipulador de
+        upload para começar este pedaço. Isso é usual se você estiver
+        armazenando o arquivo enviado você mesmo, e não quer que os próximos
+        manipuladores façam uma cópia dos dados.
+
+        Se você lançar uma exceção ``StopUpload`` ou ``SkipFile``, o upload será
+        abortado ou o arquivo pulado.
+
+    ``FileUploadHandler.file_complete(self, file_size)``
+        Chamado quando o arquivos finalizou o upload.
+
+        O manipulador deve retornar um objeto ``UploadedFile`` que será
+        armazenado em ``request.FILES``. Manipuladores podem também retornar
+        ``None`` para indicar que o objeto ``UploadedFile`` deveria vir de uma
+        manipulador subsequente.
+
+Métodos opicionais
+~~~~~~~~~~~~~~~~~~
+
+Um manipulador de upload personalizado também definie qualquer um dos sequintes
+métodos ou atributos opcionais:
+
+    ``FileUploadHandler.chunk_size``
+        Tamanho, em bytes, dos "pedaços" que o Django deve armazenar em memória
+        dentro do manipulador. Isto é, este atributo controla o tamanho dos
+        pedaços dentro do ``FileUploadHandler.receive_data_chunk``.
+
+        Para uma performance máxima o tamanho dos arquivos devem ser divisíveis
+        por ``4`` e não devem exceder 2GB (2\ :sup:`31` bytes). Quando existem
+        vários tamanhos de pedaços fornecididos por vários manipuladores, o
+        Django usará o menor tamanho definido para qualquer manipulador.
+
+
+        O tamanho padrão é 64*2\ :sup:`10` bytes, ou 64KB.
+
+    ``FileUploadHandler.new_file(self, field_name, file_name, content_type, content_length, charset)``
+        Um callback sinalizando que um novo upload de arquivo começou. Este é
+        chamado antes de qualquer dado ser alimentado qualquer manipulador de
+        upload.
+
+        ``field_name`` é uma string com o nome do campo de arquivo ``<input>``.
+
+        ``file_name`` é o nome do arquivo unicode que foi fornecido pelo
+        navegador.
+
+        ``content_type`` é o tipo MIME fornecido pelo navegador -- E.g
+        ``'image/jpeg'``.
+
+        ``content_length`` é o comprimento da imagem dado pelo navegador.
+        As vezes ele não será fornecido e será ``None``., ``None`` caso
+        contrário.
+
+        ``charset`` é o conjunto de caracteres (i.e. ``utf8``) dado pelo
+        navegador. Como o ``content_length``, algumas vezes ele não será
+        fornecido.
+
+        Este método pode lançar uma exceção ``StopFutureHandlers`` para previnir
+        que os próximos handlers de manipular este arquivo.
+
+    ``FileUploadHandler.upload_complete(self)``
+        Uma callback sinalizando que o upload inteiro (todos os arquivos) foi
+        completado.
+
+    ``FileUploadHandler.handle_raw_input(self, input_data, META, content_length, boundary, encoding)``
+        Permite o manipulador sobrescrever completamente o parseamento da
+        entrada pura do HTTP.
+
+        ``input_data`` é um objeto, tipo arquivo, que suporta leitura pelo
+        ``read()``.
+
+        ``META`` é o mesmo objeto como ``request.META``.
+
+        ``content_length`` é o comprimento de dados no ``input_data``. Não leia
+        mais bytes do ``content_length`` do que tem no ``input_data``.
+
+        ``boundary`` é o limite do MIME para esta requisição.
+
+        ``encoding`` é a codificação da requisição.
+
+        Retorna ``None`` se você quer que o manipulador de upload continue, ou
+        uma tupla com ``(POST, FILES)`` se você quiser retornar a nova estrutura
+        de dados adequada para a requisição diretamente.
+

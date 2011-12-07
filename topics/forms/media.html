@@ -1,0 +1,468 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Form Media &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Trabalhando com formulários" href="index.html" />
+    <link rel="next" title="A linguagem de template do Django" href="../templates.html" />
+    <link rel="prev" title="Formsets" href="formsets.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="formsets.html" title="Formsets">previous</a> 
+     |
+    <a href="../index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="../templates.html" title="A linguagem de template do Django">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-forms-media">
+            
+  <div class="section" id="s-form-media">
+<span id="s-topics-forms-media"></span><span id="form-media"></span><span id="topics-forms-media"></span><h1>Form Media<a class="headerlink" href="#form-media" title="Permalink to this headline">¶</a></h1>
+<p>Renderizar um formulário atrativo e fácil de usar requer mais do que só
+HTML - ele requer CSS, e se você quiser usar widgets de &#8220;Web2.0&#8221;, você poderá
+também precisar de algum JavaScript em cada página. A combinação exata de CSS e
+JavaScript requerida por qualquer página depende dos widgets que você estiver
+usando.</p>
+<p>É aí que as definições de media do Django entram. O Django permite você associar
+diferentes arquivos de media com os formulários e widgets que necessitam delas.
+Por exemplo, se você quiser usar um renderizador de calendários para DateFields,
+você pode definir um widget Calendar customizado. Este widget pode então ser
+associado ao CSS e JavaScript que é requerido para renderizar o calendário.
+Quando o widget Calendar for usado num formulário, o Django estará pronto para
+identificar os arquivos CSS e JavaScript necessários, e fornecer a lista de
+nomes de arquivos num formato adequado para fácil inclusão em sua página Web.</p>
+<div class="admonition-media-e-o-django-admin admonition ">
+<p class="first admonition-title">Media e o Django Admin</p>
+<p>A aplicação Django Admin define vários widgets customizados para
+calendários, seleções filtradas, e assim por diante. Estes widgets definem
+requerimentos de media, e o Django Admin usa os widgets customizados no
+lugar dos padrão do Django. Os templates do Admin somente incluírão estes
+arquivos de media que são necessários para renderizar os widgets em qualquer
+página.</p>
+<p class="last">Se você gosta dos widgets que a aplicação Django Admin utiliza, sinta-se
+livre para usá-los em suas aplicações! Elas estão todas armazenadas em
+<tt class="docutils literal"><span class="pre">django.contrib.admin.widgets</span></tt>.</p>
+</div>
+<div class="admonition-qual-toolkit-javascript admonition ">
+<p class="first admonition-title">Qual toolkit JavaScript?</p>
+<p class="last">Existem muitos toolkits JavaScript, e muitos deles incluem widgets (como
+os widgets de calendário) que podem ser utilizado para melhorar sua
+aplicação. O Django deliberadamente evitar apologias a qualquer toolkit
+Javascript. Cada toolkit tem seus próprios pontos fortes e fracos - use
+qualquer toolkit que atenda suas necessidades. O Django é hábil em
+integrar-se com qualquer toolkit JavaScript.</p>
+</div>
+<div class="section" id="s-media-como-uma-definicao-estatica">
+<span id="media-como-uma-definicao-estatica"></span><h2>Media como uma definição estática<a class="headerlink" href="#media-como-uma-definicao-estatica" title="Permalink to this headline">¶</a></h2>
+<p>A forma mais fácil de definir media é como uma definição estática. Usando este
+método, a declaração media fica numa classe interna. As propriedades dessa
+classe interna definem os requerimentos de media.</p>
+<p>Aqui tem um exemplo simples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">CalendarWidget</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">TextInput</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Media</span><span class="p">:</span>
+        <span class="n">css</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;all&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;pretty.css&#39;</span><span class="p">,)</span>
+        <span class="p">}</span>
+        <span class="n">js</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;animations.js&#39;</span><span class="p">,</span> <span class="s">&#39;actions.js&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Este código define um <tt class="docutils literal"><span class="pre">CalendarWidget</span></tt>, que será baseado no <tt class="docutils literal"><span class="pre">TextInput</span></tt>.
+Toda vez que o CalendarWidget for usado num formulário, este formulário incluirá
+diretamente o arquivo de CSS <tt class="docutils literal"><span class="pre">pretty.css</span></tt>, e os arquivos de JavaScript
+<tt class="docutils literal"><span class="pre">animations.js</span></tt> e <tt class="docutils literal"><span class="pre">actions.js</span></tt>.</p>
+<p>Esta definição estática de media é convertida, em tempo de execução, numa
+propriedade chamada <tt class="docutils literal"><span class="pre">media</span></tt>. As medias para uma instância do CalendarWidget
+podem ser acessadas através desta propriedade:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">w</span> <span class="o">=</span> <span class="n">CalendarWidget</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">w</span><span class="o">.</span><span class="n">media</span>
+<span class="go">&lt;link href=&quot;http://media.example.com/pretty.css&quot; type=&quot;text/css&quot; media=&quot;all&quot; rel=&quot;stylesheet&quot; /&gt;</span>
+<span class="go">&lt;script type=&quot;text/javascript&quot; src=&quot;http://media.example.com/animations.js&quot;&gt;&lt;/script&gt;</span>
+<span class="go">&lt;script type=&quot;text/javascript&quot; src=&quot;http://media.example.com/actions.js&quot;&gt;&lt;/script&gt;</span>
+</pre></div>
+</div>
+<p>Aqui tem uma lista de todas as opções possíveis de <tt class="docutils literal"><span class="pre">Media</span></tt>. Não há opções
+obrigatórias.</p>
+<div class="section" id="s-css">
+<span id="css"></span><h3><tt class="docutils literal"><span class="pre">css</span></tt><a class="headerlink" href="#css" title="Permalink to this headline">¶</a></h3>
+<p>Um dicionário descrevendo os arquivos CSS requeridos para as diversas formas de
+saídas de media.</p>
+<p>Os valores no dicionário devem ser uma tupla/lista de nomes de arquivos. Veja
+a <a class="reference internal" href="#caminhos-em-definicoes-de-media">seção sobre caminhos de media</a> para mais detalhes de como especificar os
+caminhos dos arquivos de media.</p>
+<p>As chaves no dicionário são os tipos de saídas de media. Este são os mesmos
+tipos aceitos por arquivos CSS em declarações de media: 'all', 'aural',
+'braille', 'embossed', 'handheld', 'print', 'projection', 'screen', 'tty' e
+'tv'. Se você precisa ter diferentes folhas de estilo para tipos diferentes de
+media, forneça a lista de arquivos CSS para cada ambiente de saída. o exemplo a
+seguir provê duas opções de CSS -- um para screen, e um para print:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Media</span><span class="p">:</span>
+    <span class="n">css</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;screen&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;pretty.css&#39;</span><span class="p">,),</span>
+        <span class="s">&#39;print&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;newspaper.css&#39;</span><span class="p">,)</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>Se um grupo de arquivos CSS são adequados para múltiplas tipos de saídas, a
+chave do dicionário pode ser uma lista separada por vírgula dos tipos de media.
+No exemplo a seguir, TV e projectors terão o mesmo requerimento de media:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Media</span><span class="p">:</span>
+    <span class="n">css</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;screen&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;pretty.css&#39;</span><span class="p">,),</span>
+        <span class="s">&#39;tv,projector&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;lo_res.css&#39;</span><span class="p">,),</span>
+        <span class="s">&#39;print&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;newspaper.css&#39;</span><span class="p">,)</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>Se esta última definição de CSS fosse renderizada, elá poderia tornar-se o
+seguinte HTML:</p>
+<div class="highlight-python"><pre>&lt;link href="http://media.example.com/pretty.css" type="text/css" media="screen" rel="stylesheet" /&gt;
+&lt;link href="http://media.example.com/lo_res.css" type="text/css" media="tv,projector" rel="stylesheet" /&gt;
+&lt;link href="http://media.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet" /&gt;</pre>
+</div>
+</div>
+<div class="section" id="s-js">
+<span id="js"></span><h3><tt class="docutils literal"><span class="pre">js</span></tt><a class="headerlink" href="#js" title="Permalink to this headline">¶</a></h3>
+<p>Uma tupla descrevendo os arquivos JavaScript requeridos. Veja a <a class="reference internal" href="#caminhos-em-definicoes-de-media">seção sobre
+caminhos de media</a> para mais detalhes de como especificar os caminhos para os
+arquivos de media.</p>
+</div>
+<div class="section" id="s-extend">
+<span id="extend"></span><h3><tt class="docutils literal"><span class="pre">extend</span></tt><a class="headerlink" href="#extend" title="Permalink to this headline">¶</a></h3>
+<p>Um booleano definindo comportamento de herança para declarações de media.</p>
+<p>Por padrão, qualquer objeto usando uma definição estática de media herdará todas
+as medias associadas do widget pai. Isto ocorre indiferente de como o widget pai
+define seus requerimentos de media. Por exemplo, se nós formos extender nosso
+widget básico Calendar, do exemplo acima:</p>
+<div class="highlight-python"><pre>class FancyCalendarWidget(CalendarWidget):
+    class Media:
+        css = {
+            'all': ('fancy.css',)
+        }
+        js = ('whizbang.js',)
+
+&gt;&gt;&gt; w = FancyCalendarWidget()
+&gt;&gt;&gt; print w.media
+&lt;link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" /&gt;
+&lt;link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" /&gt;
+&lt;script type="text/javascript" src="http://media.example.com/animations.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://media.example.com/actions.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://media.example.com/whizbang.js"&gt;&lt;/script&gt;</pre>
+</div>
+<p>O widget FancyCalendarWidget herda todas as medias de seu widget pai. Se você
+não quer que o media seja herdado desta forma, adicione uma declaração
+<tt class="docutils literal"><span class="pre">extend=False</span></tt> para a declaração media:</p>
+<div class="highlight-python"><pre>class FancyCalendarWidget(CalendarWidget):
+    class Media:
+        extend = False
+        css = {
+            'all': ('fancy.css',)
+        }
+        js = ('whizbang.js',)
+
+&gt;&gt;&gt; w = FancyCalendarWidget()
+&gt;&gt;&gt; print w.media
+&lt;link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" /&gt;
+&lt;script type="text/javascript" src="http://media.example.com/whizbang.js"&gt;&lt;/script&gt;</pre>
+</div>
+<p>Se você necessita de ainda mais controle sobre a herança de media, defina sua
+media utilizando uma <a class="reference internal" href="#media-como-uma-propriedade-dinamica">propriedade dinâmica</a>. Propriedades dinâmicas dão a você
+controle completo sobre quais arquivos de media são herdados, e quais não são.</p>
+</div>
+</div>
+<div class="section" id="s-media-como-uma-propriedade-dinamica">
+<span id="media-como-uma-propriedade-dinamica"></span><h2>Media como uma propriedade dinâmica<a class="headerlink" href="#media-como-uma-propriedade-dinamica" title="Permalink to this headline">¶</a></h2>
+<p>Se você necessita realizar alguma manipulação mais sofisticada nos requerimentos
+de media, você pode definir a propriedade media diretamente. Isto é feito
+definindo uma propriedade do model que retorna uma instância de <tt class="docutils literal"><span class="pre">forms.Media</span></tt>.
+O construtor de <tt class="docutils literal"><span class="pre">forms.Media</span></tt> aceita os argumentos nomeados <tt class="docutils literal"><span class="pre">css</span></tt> e <tt class="docutils literal"><span class="pre">js</span></tt>
+no mesmo formato que é usado na definição estática do media.</p>
+<p>Por exemplo, a definição estática de media para nosso Widget Calendar poderia
+também ser definido de forma dinâmica:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">CalendarWidget</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">TextInput</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_media</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">forms</span><span class="o">.</span><span class="n">Media</span><span class="p">(</span><span class="n">css</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;all&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;pretty.css&#39;</span><span class="p">,)},</span>
+                           <span class="n">js</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;animations.js&#39;</span><span class="p">,</span> <span class="s">&#39;actions.js&#39;</span><span class="p">))</span>
+    <span class="n">media</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_media</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Veja a seção sobre <a class="reference internal" href="#objetos-media">Objetos Media</a> para mais detalhes sobre como construir
+retornos de valores para propriedades dinâmicas de media.</p>
+</div>
+<div class="section" id="s-caminhos-em-definicoes-de-media">
+<span id="s-form-media-paths"></span><span id="caminhos-em-definicoes-de-media"></span><span id="form-media-paths"></span><h2>Caminhos em definições de media<a class="headerlink" href="#caminhos-em-definicoes-de-media" title="Permalink to this headline">¶</a></h2>
+<p>Caminhos usados para especificar media podem ser ambos relativos e absolutos. Se
+um caminho começa com '/', '<a class="reference external" href="http://">http://</a>' ou '<a class="reference external" href="https://">https://</a>', ele será interpretado como
+um caminho absoluto, e deixado como está. Todos os outros caminhos serão
+prefixados com valor de <tt class="docutils literal"><span class="pre">settings.MEDIA_URL</span></tt>. Por exemplo, se o MEDIA_URL para
+seu site for <tt class="docutils literal"><span class="pre">http://media.example.com/</span></tt>:</p>
+<div class="highlight-python"><pre>class CalendarWidget(forms.TextInput):
+    class Media:
+        css = {
+            'all': ('/css/pretty.css',),
+        }
+        js = ('animations.js', 'http://othersite.com/actions.js')
+
+&gt;&gt;&gt; w = CalendarWidget()
+&gt;&gt;&gt; print w.media
+&lt;link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" /&gt;
+&lt;script type="text/javascript" src="http://media.example.com/animations.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://othersite.com/actions.js"&gt;&lt;/script&gt;</pre>
+</div>
+</div>
+<div class="section" id="s-objetos-media">
+<span id="objetos-media"></span><h2>Objetos Media<a class="headerlink" href="#objetos-media" title="Permalink to this headline">¶</a></h2>
+<p>Quando você interroga o atributo media de um widget ou formulário, o valor que é
+retornado é um objeto <tt class="docutils literal"><span class="pre">forms.Media</span></tt>. Como nós já temos visto, a representação
+em string de um objeto Media é um HTML necessário para incluir a media no bloco
+<tt class="docutils literal"><span class="pre">&lt;head&gt;</span></tt> de sua página HTML.</p>
+<p>No entanto, objetos Media tem algumas outras propriedades interessantes.</p>
+<div class="section" id="s-media-subsets">
+<span id="media-subsets"></span><h3>Media subsets<a class="headerlink" href="#media-subsets" title="Permalink to this headline">¶</a></h3>
+<p>Se você somente quer media de um tipo particular, você pode usar o operador
+subscript para filtrar a media que interessa. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">w</span> <span class="o">=</span> <span class="n">CalendarWidget</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">w</span><span class="o">.</span><span class="n">media</span>
+<span class="go">&lt;link href=&quot;http://media.example.com/pretty.css&quot; type=&quot;text/css&quot; media=&quot;all&quot; rel=&quot;stylesheet&quot; /&gt;</span>
+<span class="go">&lt;script type=&quot;text/javascript&quot; src=&quot;http://media.example.com/animations.js&quot;&gt;&lt;/script&gt;</span>
+<span class="go">&lt;script type=&quot;text/javascript&quot; src=&quot;http://media.example.com/actions.js&quot;&gt;&lt;/script&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">w</span><span class="o">.</span><span class="n">media</span><span class="p">[</span><span class="s">&#39;css&#39;</span><span class="p">]</span>
+<span class="go">&lt;link href=&quot;http://media.example.com/pretty.css&quot; type=&quot;text/css&quot; media=&quot;all&quot; rel=&quot;stylesheet&quot; /&gt;</span>
+</pre></div>
+</div>
+<p>Quando você usa um operador subscript, o valor que é retornado é um novo objeto
+Media -- mas um que contém somente as medias que interessa.</p>
+</div>
+<div class="section" id="s-combinando-objetos-media">
+<span id="combinando-objetos-media"></span><h3>Combinando objetos media<a class="headerlink" href="#combinando-objetos-media" title="Permalink to this headline">¶</a></h3>
+<p>Objetos Media pode também ser adicionados juntos. Quando dois objetos media são
+adicionados o objeto resultante contém a união de media de ambos os arquivos:</p>
+<div class="highlight-python"><pre>class CalendarWidget(forms.TextInput):
+    class Media:
+        css = {
+            'all': ('pretty.css',)
+        }
+        js = ('animations.js', 'actions.js')
+
+class OtherWidget(forms.TextInput):
+    class Media:
+        js = ('whizbang.js',)
+
+&gt;&gt;&gt; w1 = CalendarWidget()
+&gt;&gt;&gt; w2 = OtherWidget()
+&gt;&gt;&gt; print w1.media + w2.media
+&lt;link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" /&gt;
+&lt;script type="text/javascript" src="http://media.example.com/animations.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://media.example.com/actions.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://media.example.com/whizbang.js"&gt;&lt;/script&gt;</pre>
+</div>
+</div>
+</div>
+<div class="section" id="s-media-nos-forms">
+<span id="media-nos-forms"></span><h2>Media nos Forms<a class="headerlink" href="#media-nos-forms" title="Permalink to this headline">¶</a></h2>
+<p>Regardless of whether you define a media declaration, <em>all</em> Form objects
+have a media property. The default value for this property is the result
+of adding the media definitions for all widgets that are part of the form::
+Indiferente de você definir uma declaração media, <em>todos</em> os objetos Form
+possuem uma propriedade media. O valor padrão para esta propriedade é o
+resultado da soma das definições de media de todos os widgets que fazem parte do
+formulário:</p>
+<div class="highlight-python"><pre>class ContactForm(forms.Form):
+    date = DateField(widget=CalendarWidget)
+    name = CharField(max_length=40, widget=OtherWidget)
+
+&gt;&gt;&gt; f = ContactForm()
+&gt;&gt;&gt; f.media
+&lt;link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" /&gt;
+&lt;script type="text/javascript" src="http://media.example.com/animations.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://media.example.com/actions.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://media.example.com/whizbang.js"&gt;&lt;/script&gt;</pre>
+</div>
+<p>Se você quiser associar media adicional ao formulário -- por exemplo, CSS para
+o layout do formulário -- simplesmente adicione uma declaração media para no
+formulário:</p>
+<div class="highlight-python"><pre>class ContactForm(forms.Form):
+    date = DateField(widget=CalendarWidget)
+    name = CharField(max_length=40, widget=OtherWidget)
+
+    class Media:
+        css = {
+            'all': ('layout.css',)
+        }
+
+&gt;&gt;&gt; f = ContactForm()
+&gt;&gt;&gt; f.media
+&lt;link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" /&gt;
+&lt;link href="http://media.example.com/layout.css" type="text/css" media="all" rel="stylesheet" /&gt;
+&lt;script type="text/javascript" src="http://media.example.com/animations.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://media.example.com/actions.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://media.example.com/whizbang.js"&gt;&lt;/script&gt;</pre>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Form Media</a><ul>
+<li><a class="reference internal" href="#media-como-uma-definicao-estatica">Media como uma definição estática</a><ul>
+<li><a class="reference internal" href="#css"><tt class="docutils literal"><span class="pre">css</span></tt></a></li>
+<li><a class="reference internal" href="#js"><tt class="docutils literal"><span class="pre">js</span></tt></a></li>
+<li><a class="reference internal" href="#extend"><tt class="docutils literal"><span class="pre">extend</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#media-como-uma-propriedade-dinamica">Media como uma propriedade dinâmica</a></li>
+<li><a class="reference internal" href="#caminhos-em-definicoes-de-media">Caminhos em definições de media</a></li>
+<li><a class="reference internal" href="#objetos-media">Objetos Media</a><ul>
+<li><a class="reference internal" href="#media-subsets">Media subsets</a></li>
+<li><a class="reference internal" href="#combinando-objetos-media">Combinando objetos media</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#media-nos-forms">Media nos Forms</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="formsets.html">Formsets</a></li>
+    
+    
+      <li>Next: <a href="../templates.html">A linguagem de template do Django</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Usando o Django</a>
+        
+          <ul><li><a href="index.html">Trabalhando com formulários</a>
+        
+        <ul><li>Form Media</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/topics/forms/media.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="formsets.html" title="Formsets">previous</a> 
+     |
+    <a href="../index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="../templates.html" title="A linguagem de template do Django">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

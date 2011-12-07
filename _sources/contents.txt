@@ -1,0 +1,52 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done $
+..   $OriginalRevision: 11274 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _contents:
+
+==================================
+Conteúdo da documentação do Django
+==================================
+
+.. toctree::
+   :maxdepth: 2
+   
+   intro/index
+   topics/index
+   howto/index
+   faq/index
+   ref/index
+   misc/index
+   glossary
+   releases/index
+   internals/index
+
+Índices, glossário e tabelas
+============================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`glossary`
+
+Documentação depreciada/obsoleta
+================================
+
+A documentação a seguir cobre funcionalidades que estão entrando em desuso ou
+que serão substituídas nas novas versões do Django.
+
+.. toctree::
+   :maxdepth: 2
+   
+   obsolete/index

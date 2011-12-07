@@ -1,0 +1,250 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Performing raw SQL queries &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Models e bancos de dados" href="index.html" />
+    <link rel="next" title="Gerenciando transações de banco de dados" href="transactions.html" />
+    <link rel="prev" title="Managers" href="managers.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="managers.html" title="Managers">previous</a> 
+     |
+    <a href="../index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="transactions.html" title="Gerenciando transações de banco de dados">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-db-sql">
+            
+  <div class="section" id="s-performing-raw-sql-queries">
+<span id="performing-raw-sql-queries"></span><h1>Performing raw SQL queries<a class="headerlink" href="#performing-raw-sql-queries" title="Permalink to this headline">¶</a></h1>
+<p>Sinta-se livre para escrever consultas SQL nos métodos de seus modelos e métodos
+a nível de módulo. O objeto <tt class="docutils literal"><span class="pre">django.db.connection</span></tt> representa a conexão
+atual com o banco de dados, e <tt class="docutils literal"><span class="pre">django.db.transaction</span></tt> representa
+a transação atual do banco de dados. Para usá-lo, chame <tt class="docutils literal"><span class="pre">connection.cursor()</span></tt> para
+capturar o objeto cursor. Então, chame <tt class="docutils literal"><span class="pre">cursor.execute(sql,</span> <span class="pre">[params])</span></tt> para
+executar o SQL e <tt class="docutils literal"><span class="pre">cursor.fetchone()</span></tt> ou <tt class="docutils literal"><span class="pre">cursor.fechall()</span></tt> para retornar o
+resultado em linhas. Após performar a operação que modica os dados, você deve então chamar
+<tt class="docutils literal"><span class="pre">transaction.commit_unless_managed()</span></tt> para garantir que as mudanças estejam confirmadas
+no banco de dados. Se sua consulta é puramente uma operção de leitura de dados, nenhum commit
+é requerido. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">my_custom_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">connection</span><span class="p">,</span> <span class="n">transaction</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+    <span class="c"># Operação de modificação de dado - commit obrigatório</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;UPDATE bar SET foo = 1 WHERE baz = </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">baz</span><span class="p">])</span>
+    <span class="n">transaction</span><span class="o">.</span><span class="n">commit_unless_managed</span><span class="p">()</span>
+
+    <span class="c"># Operação de recebimento de dado - não é necessário o commit</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT foo FROM bar WHERE baz = </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">baz</span><span class="p">])</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">row</span>
+</pre></div>
+</div>
+<div class="section" id="s-transacoes-e-sql-puro">
+<span id="s-transactions-and-raw-sql"></span><span id="transacoes-e-sql-puro"></span><span id="transactions-and-raw-sql"></span><h2>Transações e SQL puro<a class="headerlink" href="#transacoes-e-sql-puro" title="Permalink to this headline">¶</a></h2>
+<p>Se você está usando decoradores de transações (como <tt class="docutils literal"><span class="pre">commit_on_success</span></tt>) para
+envolver seus views e prover controle de transações, você não terá que fazer uma
+chamada manual para <tt class="docutils literal"><span class="pre">transaction.commit_unless_managed()</span></tt> -- você pode comitar
+manualmente se você quiser, mas você não será obrigado, desde que o decorador
+commita por você. No entanto, se você não comitar manualmente suas mudanças,
+você terá de marcar, manualmente, a transação como suja, usando
+<tt class="docutils literal"><span class="pre">transaction.set_dirty()</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@commit_on_success</span>
+<span class="k">def</span> <span class="nf">my_custom_sql_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">connection</span><span class="p">,</span> <span class="n">transaction</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+    <span class="c"># Operação de modificação de dado</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;UPDATE bar SET foo = 1 WHERE baz = </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">value</span><span class="p">])</span>
+
+    <span class="c"># Se nós modificamos dados, marcamos a trasação como suja</span>
+    <span class="n">transaction</span><span class="o">.</span><span class="n">set_dirty</span><span class="p">()</span>
+
+    <span class="c"># Operação de recebimento de dado. Isso não suja a transação,</span>
+    <span class="c"># então não é obrigatório chamar set_dirty()</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT foo FROM bar WHERE baz = </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">value</span><span class="p">])</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;template.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;row&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>A chamada para <tt class="docutils literal"><span class="pre">set_dirty()</span></tt> é feita automaticamente quando você usa o ORM do
+Django para fazer moficações no banco de dados. Entretanto, quando você usa um
+SQL puro, o Django não tem como sber se seu SQL modifica dados ou não. A chamada
+manual <tt class="docutils literal"><span class="pre">set_dirty()</span></tt> assegura que o Django saiba que estes são dados
+modificados que devem ser comitados.</p>
+</div>
+<div class="section" id="s-connections-e-cursors">
+<span id="connections-e-cursors"></span><h2>Connections e cursors<a class="headerlink" href="#connections-e-cursors" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">connection</span></tt> e <tt class="docutils literal"><span class="pre">cursor</span></tt> maioritariamente implementa a
+<a class="reference external" href="http://www.python.org/peps/pep-0249.html">DB-API padrão do Python</a> (exceto quando se trata de <a class="reference internal" href="transactions.html"><em>manipulação de
+transações</em></a>). Se você não está familiarizado com a
+DB-API do Python, note que a consulta SQL em <tt class="docutils literal"><span class="pre">cursor.execute()</span></tt> possui
+marcadores, <tt class="docutils literal"><span class="pre">&quot;%s&quot;</span></tt>, ao invés de adicionar paramêtros diretamente dentro do SQL.
+Se você usa esta técnica, as bibliotecas de banco de dados subjacentes irão
+automaticamente addicionar aspas e espacar seus paramêtros quando necessário.
+(Também atente que o Django espera pelo marcador <tt class="docutils literal"><span class="pre">&quot;%s&quot;</span></tt>, <em>não</em> pelo marcador
+<tt class="docutils literal"><span class="pre">&quot;?&quot;</span></tt>, que é utilizado pelos bindings para Python do SQLite. Isto é por uma
+questão de coerência e bom senso.)</p>
+<p>Um lembrete final: Se tudo que você quer é fazer uma clausula <tt class="docutils literal"><span class="pre">WHERE</span></tt>
+customizada, você pode somente usar os argumentos <tt class="docutils literal"><span class="pre">where</span></tt>, <tt class="docutils literal"><span class="pre">tables</span></tt> e
+<tt class="docutils literal"><span class="pre">params</span></tt> da API padrão.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Performing raw SQL queries</a><ul>
+<li><a class="reference internal" href="#transacoes-e-sql-puro">Transações e SQL puro</a></li>
+<li><a class="reference internal" href="#connections-e-cursors">Connections e cursors</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="managers.html">Managers</a></li>
+    
+    
+      <li>Next: <a href="transactions.html">Gerenciando transações de banco de dados</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Usando o Django</a>
+        
+          <ul><li><a href="index.html">Models e bancos de dados</a>
+        
+        <ul><li>Performing raw SQL queries</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/topics/db/sql.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="managers.html" title="Managers">previous</a> 
+     |
+    <a href="../index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="transactions.html" title="Gerenciando transações de banco de dados">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,197 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Configurações de Comentários &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Framework de comentários do Django" href="index.html" />
+    <link rel="next" title="Sinais enviados pela aplicação comments" href="signals.html" />
+    <link rel="prev" title="Os models embutidos do Comment" href="models.html" />
+ 
+<script type="text/javascript" src="../../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="models.html" title="Os models embutidos do Comment">previous</a> 
+     |
+    <a href="../../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="signals.html" title="Sinais enviados pela aplicação comments">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-comments-settings">
+            
+  <div class="section" id="s-configuracoes-de-comentarios">
+<span id="s-ref-contrib-comments-settings"></span><span id="configuracoes-de-comentarios"></span><span id="ref-contrib-comments-settings"></span><h1>Configurações de Comentários<a class="headerlink" href="#configuracoes-de-comentarios" title="Permalink to this headline">¶</a></h1>
+<p>Estas configurações ajustam o comportamento do framework de comentários:</p>
+<div class="section" id="s-comments-hide-removed">
+<span id="s-std:setting-COMMENTS_HIDE_REMOVED"></span><span id="comments-hide-removed"></span><span id="std:setting-COMMENTS_HIDE_REMOVED"></span><h2>COMMENTS_HIDE_REMOVED<a class="headerlink" href="#comments-hide-removed" title="Permalink to this headline">¶</a></h2>
+<p>Se <tt class="xref docutils literal"><span class="pre">True</span></tt> (padrão), comentários removidos serão excluídos da lista/contagem
+de comentários (bem como das tags de template). Por outro lado o autor do
+template é responsável por alguma mensagem tipo &#8220;este comentário foi removido
+pelo site&#8221;.</p>
+</div>
+<div class="section" id="s-comment-max-length">
+<span id="s-std:setting-COMMENT_MAX_LENGTH"></span><span id="comment-max-length"></span><span id="std:setting-COMMENT_MAX_LENGTH"></span><h2>COMMENT_MAX_LENGTH<a class="headerlink" href="#comment-max-length" title="Permalink to this headline">¶</a></h2>
+<p>O comprimento máximo do campo de comentário, em caracteres. Comentários mais
+longos serão rejeitados. O padrão é 3000.</p>
+</div>
+<div class="section" id="s-comments-app">
+<span id="s-std:setting-COMMENTS_APP"></span><span id="comments-app"></span><span id="std:setting-COMMENTS_APP"></span><h2>COMMENTS_APP<a class="headerlink" href="#comments-app" title="Permalink to this headline">¶</a></h2>
+<p>A aplicação (estando inscrita no <tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt>) responsável por toda
+&#8220;lógica de negócios.&#8221; Você pode mudar isto provendo models e formulários
+customizados, acredito que isso não esteja documentado.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configurações de Comentários</a><ul>
+<li><a class="reference internal" href="#comments-hide-removed">COMMENTS_HIDE_REMOVED</a></li>
+<li><a class="reference internal" href="#comment-max-length">COMMENT_MAX_LENGTH</a></li>
+<li><a class="reference internal" href="#comments-app">COMMENTS_APP</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="models.html">Os models embutidos do Comment</a></li>
+    
+    
+      <li>Next: <a href="signals.html">Sinais enviados pela aplicação comments</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../../index.html">Referência da API</a>
+        
+          <ul><li><a href="../index.html">Os add-ons &#8220;django.contrib&#8221;</a>
+        
+          <ul><li><a href="index.html">Framework de comentários do Django</a>
+        
+        <ul><li>Configurações de Comentários</li></ul>
+        </li></ul></li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/ref/contrib/comments/settings.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="models.html" title="Os models embutidos do Comment">previous</a> 
+     |
+    <a href="../../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="signals.html" title="Sinais enviados pela aplicação comments">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

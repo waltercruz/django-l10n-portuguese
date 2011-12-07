@@ -1,0 +1,29 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11348 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-files-index:
+
+Referência de manipulação de arquivos
+=====================================
+
+.. module:: django.core.files
+   :synopsis: Manipulação de arquivos e armazenamento
+
+.. toctree::
+   :maxdepth: 1
+   
+   file
+   storage

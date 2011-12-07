@@ -1,0 +1,322 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Bruno Tikami, Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+======================
+Como instalar o Django
+======================
+
+Este documento colocará o seu Django para funcionar.
+
+Instalando o Python
+===================
+
+Por ser um framework escrito em Python, a instalação do Django precisa da instalação do Python.
+
+Ele roda com Python desde a versão 2.3 a 2.6 (devido a questões
+de imcompatibilidade retroativa no Python 3.0, o Django não funciona atualmente com o
+Python 3.0; veja :ref:`a FAQ do Django<faq-install>` para mais
+informação das versões suportadas do Python e s transição para o 3.0).
+
+Baixe o Python de http://python.org. Se você estiver usando Linux ou Max OS X, você
+provavelmente já o tem instalado.
+
+.. admonition:: Django on Jython
+
+    Se você usa o Jython_ (uma implementação do Python para plataforma Java),
+    você precisará serguir alguns passos adicionais. Veja :doc:`/howto/jython`
+    para mais detalhes.
+
+.. _jython: http://jython.org/
+
+Instalando Apache e mod_wsgi
+==============================
+
+Se você quiser apenas experimentar o Django, avance para a próxima sessão.
+O Django vem com um servidor Web bem leve que você pode usar para testes, de forma
+que você não precise instalar e configurar o Apache antes de colocar o Django
+em produção.
+
+Se você quer usar usar o Django em um site em produção, use o Apache com
+`mod_wsgi`_. mod_wsgi é similar ao mod_perl, ele embute o Python dentro do
+Apache e carrega na memória códigos-fonte escritos em Python quando o servidor é
+iniciado. Este código fica na memória durante toda a vida do processo do Apache,
+o que leva a um ganho de desempenho significativo sobre outras configurações de
+servidor. Garanta que você tem o Apache instalado e que o módulo mod_wsgi
+esteja ativo. O Django irá funcionar com qualquer versão do Apache que
+suporte o mod_wsgi.
+
+Leia :doc:`Como usar o Django com mod_wsgi </howto/deployment/modwsgi>` para
+mais informações sobre como configurar o mod_wsgi uma vez que você o tenha
+instalado.
+
+Se você não puder usar o mod_wsgi por qualquer motivo, não se desespere:
+o Django suppora muitos outras opções de implantação. Uma grande segunda escolha é
+:doc:`mod_python </howto/deployment/modpython>`, o predecessor do mod_wsgi. Além disso,
+o Django segue a especificação WSGI, o que permite que ele rode em uma variedade
+de plataformas de servidor. Leia o wiki `server-arrangements`_ para
+informações específicas de instalação em cada plataforma.
+
+.. _Apache: http://httpd.apache.org/
+.. _mod_wsgi: http://code.google.com/p/modwsgi/
+.. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _server-arrangements: http://code.djangoproject.com/wiki/ServerArrangements
+
+.. _database-installation:
+
+Ponha seu banco de dados para funcionar
+=======================================
+
+Se você pretende usar a API de banco de dados do Django, você vai precisar ter
+certeza de que seu servidor de banco de dados está funcionando. Django suporta muitos
+backends de dancos de dados e é oficialmente suportado por PostgreSQL_, MySQL_,
+Oracle_ e SQLite_ (apesar do SQLite não precisar de um
+servidor separado para rodar).
+
+Além dos bancos de dados oficialmente suportados, há backends de terceiros
+que permite você usar outros bancos de dados com Django:
+
+* `Sybase SQL Anywhere`_
+* `IBM DB2`_
+* `Microsoft SQL Server 2005`_
+* Firebird_
+* ODBC_
+
+As versões do Django e funcionalidades do ORM suportadas por estes backends não
+oficiais variam consideravelmente. Questões específicas relativas a estes
+backends não oficiais, juntamente com qualquer suporte a consultas, devem ser
+direcionadas para os canais de suporte fornecidos pelos projetos terceiros.
+
+Em adição ao banco de dados, você vai precisar ter certeza de que as suas bibliotecas Python de
+acesso ao banco de dados estão instaladas.
+
+* Se você está usando PostgreSQL, você vai precisar do pacote psycopg_, o Django
+  suporta as versões 1 e 2. (Quando você for configurar a camada de banco de
+  dados do Django, escolha ``postgresql`` para a versão 1 ou
+  ``postgresql_psycopg2`` para a versão 2.)
+
+  Se você estiver usando Windows, olhe a `versão não-oficial compilada para
+  Windows`_.
+
+* Se você estiver usando MySQL, você vai precisar da biblioteca MySQLdb_ (versão
+  1.2.1p2 ou superior).
+  Você também vai quiser ler as observações específicas de bancos de dados
+  para o :ref:`backend MySQL <mysql-notes>`.
+
+* Se você estiver usando SQLite e Python 2.3 ou Python 2.4, vai precisar da
+  biblioteca pysqlite_. Use a versão 2.0.3 ou superior. A versão 2.5 do Python
+  já vem com um wrapper sqlite na biblioteca padrão, então você não precisa
+  instalar mais nada neste caso. Please read the SQLite backend :ref:`notes<sqlite-notes>`.
+
+* Se você estiver usando Oracle, você precisará de uma cópia do cx_Oracle_, mas
+  por favor, leia as notas específicas do banco de dados para o :ref:`backend
+  Oracle <oracle-notes>` para informações importantes.
+
+* Se você está usando um backed não oficial de terceiros, por favor consulte a
+  documentação fornecida para quaisquer requerimentos adicionais.
+
+Se você pretende usar o comando ``manage.py syncdb`` do Django para criar
+automaticamente as tabelas para os seus modelos, você precisa garantir que
+o Django tem permissão para criar tabelas no banco de dados que você está
+usando.
+Se você pretende criar as tabelas manualmente, precisa apenas dar permissão de
+``SELECT``, ``INSERT``, ``UPDATE`` e ``DELETE`` para o usuário do Django
+(configurado em settings.py, atributo DATABASE_USER). O Django não usa comandos
+``ALTER TABLE``, então não precisa de permissão para isso.
+
+Se você pretende usar o :doc:`framework de teste </topics/testing>` do Django com
+'data fixtures', o Django também vai precisar de permissão para criar um bando
+de dados de teste temporário.
+
+.. _PostgreSQL: http://www.postgresql.org/
+.. _MySQL: http://www.mysql.com/
+.. _Django's ticket system: http://code.djangoproject.com/report/1
+.. _psycopg: http://initd.org/pub/software/psycopg/
+.. _versão não-oficial compilada para Windows: http://stickpeople.com/projects/python/win-psycopg/
+.. _MySQLdb: http://sourceforge.net/projects/mysql-python
+.. _SQLite: http://www.sqlite.org/
+.. _pysqlite: http://pysqlite.org/
+.. _cx_Oracle: http://cx-oracle.sourceforge.net/
+.. _Oracle: http://www.oracle.com/
+.. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
+.. _IBM DB2: http://code.google.com/p/ibm-db/
+.. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
+.. _Firebird: http://code.google.com/p/django-firebird/
+.. _ODBC: http://code.google.com/p/django-pyodbc/
+.. _removing-old-versions-of-django:
+
+Remova qualquer versão antiga do Django
+=======================================
+
+Se você está atualizando sua instalação do Django, vai precisar desinstalar
+a versão antiga antes de instalar a nova.
+
+Se você instalou o Django usando ``setup.py install``, o processo de
+desinstalação é simples: basta apagar o diretório ``django`` de seu diretório
+``site-packages``.
+
+Se você instalou o Django usando um egg Python, remova o arquivo ``.egg``
+do Django e remova a referência a ele no arquivo ``easy-install.pth`` (dentro
+do diretório site-packages).
+
+.. admonition:: Onde fica o diretório ``site-packages`` ?
+
+    A localização do diretório ``site-packages`` depende de seu sistema
+    operacional e o local em que o Python foi instalado. Para descobrir a
+    localização de seu ``site-packages``, execute o seguinte comando::
+
+    .. code-block:: bash
+
+        python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
+
+    (Observe que este comando deve ser executado em um terminal, não no prompt
+    interativo do Python)
+
+.. _install-django-code:
+
+Instalando o Django
+===================
+
+As instruções de instalação são um tanto diferentes, dependendo se você
+está instalando um pacote de uma distribuição específica, baixando a última
+versão oficial lançada ou usando a versão em desenvolvimento.
+
+O processo é simples, independentemente de qual você escolher.
+
+Instalando um pacote de uma distribuição específica
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Verifique as :ref:`observações específicas de distribuições <misc-distributions>`
+para ver se a sua plataforma/distribuição fornece pacotes/instaladores oficiais
+do Django. Pacotes fornecidos por distribuições geralmente permitem a instalação
+automática de dependências e atualizações fáceis.
+
+.. _installing-official-release:
+
+Instalando uma versão oficial
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    1. Baixe a última versão oficial lançada da `página de download`_ do Django.
+
+    2. Descompacte o arquivo baixado (por exemplo: ``tar xzvf Django-NNN.tar.gz``,
+       onde ``NNN`` é o número da última versão lançada).
+       Se você estiver usando Windows, você pode baixar a ferramenta linha de
+       comando bsdtar_ para fazer isso, ou você usar uma ferramenta com
+       interface gráfica como a 7-zip_.
+
+    3. Entre no diretório criado pelo passo 2 (por exemplo: ``cd Django-NNN``).
+
+    4. Se você estiver usando Linux, Mac OS X ou algum outro tipo de Linux,
+       execute o comando ``sudo python setup.py install`` no terminal.
+       Se você estiver usando Windows, abra um prompt (DOS) com privilégios de
+       administrador e execute o comando ``python setup.py install``.
+
+Estes comandos instalarão o Django em seu diretório ``site-packages`` da
+instalação do Python.
+
+.. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
+.. _7-zip: http://www.7-zip.org/
+
+.. _installing-development-version:
+
+
+Instalando a versão em desenvolvimento
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. admonition:: Tracking Django development
+
+    Se você decidiu usar a última versão de desenvolvimento do Django, você
+    terá que prestar muita atenção na `linha do tempo do desenvolvimento`_ e
+    você terá que manter um olho sobre `a lista de mudanças de
+    retro-compatibilidade`_. Isto irá ajudá-lo a estar atualizado quanto a
+    qualquer funcionalidade que você queira usar, bem como qualquer mudança que
+    você precisará fazer em seu código quando atualizar suas instalações do
+    Django. (Para versões estáveis, qualquer mudança necessária está documentada
+    nas notas de lançamento.)
+
+.. _linha do tempo do desenvolvimento: http://code.djangoproject.com/timeline
+.. _a lista de mudanças de retro-compatibilidade: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+
+Se você gostaria de poder atualizar seu Django ocasionalmente com as
+últimas correções de bugs e melhorias, siga estas instruções:
+
+1. Certifique-se de que você tem o Subversion_ instalado e que você pode
+   executar seus comandos em um terminal. (Digite ``svn help`` no terminal
+   para testar.)
+
+2. Baixe o branch principal de desenvolvimento do Django (o 'trunk')::
+
+   .. code-block:: bash
+
+       svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
+
+3. Depois, certifique-se de que o interpretador Python consegue carregar o
+   código Django. Existem várias maneiras de fazer isso. Uma das mais
+   convenientes, em Linux, Mac OS X ou outros sistemas Unix é usar um link
+   simbólico:
+
+   .. code-block:: bash
+
+       ln -s `pwd`/django-trunk/django SITE-PACKAGES-DIR/django
+
+   (Na linha acima, troque ``SITE_PACKAGES-DIR`` pela localização do diretório
+   ``site-packages`` no seu sistema, como explicado em
+   "Onde fica o diretório ``site-packages``?").
+
+   Alternativamente, você pode definir sua variável de ambiente ``PYTHONPATH``
+   para que ela inclua o diretório ``django`` - sub-diretório de
+   ``django-trunk``.
+   Talvez essa seja a solução mais conveniente para o Windows, que não oferece
+   suporte a links simbólicos. (Variáveis de ambiente podem ser definidas no
+   Windows `pelo Painel de Controle`_)
+
+   .. admonition:: E o Apache e mod_python?
+
+      Se você escolher a solução de definir sua ``PYTHONPATH`` você precisa
+      lembrar de fazer o mesmo na sua configuração do Apache quando for colocar
+      seu site em produção. Faça isso definindo ``PythonPath`` no seu arquivo
+      de configuração do Apache.
+
+      Mais informações sobre implementações em produção, é lógico, estão
+      disponíveis na documentação :doc:`Como usar o Django com mod_python
+      </howto/deployment/modpython>`.
+
+      .. _Como usar o Django com mod_python: http://www.djangoproject.com/documentation/modpython/
+
+4. Em sistemas Unix, crie um link simbólico para o arquivo
+   ``django-trunk/django/bin/django-admin.py`` para um diretório no seu
+   'system path', por exemplo: ``/usr/local/bin``::
+
+   .. code-block:: bash
+
+       ln -s `pwd`/django-trunk/django/bin/django-admin.py /usr/local/bin
+
+   Isso permite a você simplesmente digitar ``django-admin.py`` de qualquer
+   diretório, em vez de de ter que escrever o caminho inteiro para o script.
+
+   Quando em Windows, o mesmo resultado pode ser obtido copiando o arquivo
+   ``django-trunk/django/bin/django-admin.py`` para algum lugar no seu
+   'system path'. Por exemplo: ``C:\Python24\Scripts``.
+
+Você *não* precisa executar ``python setup.py intall``, pois você já fez
+o equivalente nos passos 3 e 4.
+
+Quando você quiser atualizar a sua cópia do código-fonte do Django,
+apenas execute ``svn update`` dentro do diretório ``django-trunk``.
+Ao fazer isso, o Subversion vai automaticamente baixar as atualizações.
+
+.. _página de download: http://www.djangoproject.com/download/
+.. _Subversion: http://subversion.tigris.org/
+.. _pelo Painel de Controle: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/sysdm_advancd_environmnt_addchange_variable.mspx
+

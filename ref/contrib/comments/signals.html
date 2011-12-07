@@ -1,0 +1,256 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sinais enviados pela aplicação comments &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Framework de comentários do Django" href="index.html" />
+    <link rel="next" title="Atualizando o sistema de comentários de um Django anterior" href="upgrade.html" />
+    <link rel="prev" title="Configurações de Comentários" href="settings.html" />
+ 
+<script type="text/javascript" src="../../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="settings.html" title="Configurações de Comentários">previous</a> 
+     |
+    <a href="../../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="upgrade.html" title="Atualizando o sistema de comentários de um Django anterior">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-comments-signals">
+            
+  <div class="section" id="s-module-django.contrib.comments.signals">
+<span id="s-sinais-enviados-pela-aplicacao-comments"></span><span id="s-ref-contrib-comments-signals"></span><span id="module-django.contrib.comments.signals"></span><span id="sinais-enviados-pela-aplicacao-comments"></span><span id="ref-contrib-comments-signals"></span><h1>Sinais enviados pela aplicação comments<a class="headerlink" href="#module-django.contrib.comments.signals" title="Permalink to this headline">¶</a></h1>
+<p>A aplicação comment envia uma série de <a class="reference internal" href="../../../topics/signals.html#topics-signals"><em>sinais (signals)</em></a>
+para permitir a moderação de comentários em atividades semelhantes. Veja
+<a class="reference internal" href="../../../topics/signals.html#topics-signals"><em>a introdução aos sinais</em></a> para mais informações sobre como
+registar e receber estes sinais.</p>
+<div class="section" id="s-comment-will-be-posted">
+<span id="comment-will-be-posted"></span><h2>comment_will_be_posted<a class="headerlink" href="#comment-will-be-posted" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="django.contrib.comments.signals.comment_will_be_posted">
+<tt class="descclassname">django.contrib.comments.signals.</tt><tt class="descname">comment_will_be_posted</tt><a class="headerlink" href="#django.contrib.comments.signals.comment_will_be_posted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Enviado somente depois que um comentário foi salvo, depois de checada sua
+sanidade e submetido. Este pode ser usado para modificar o comentário (in place)
+com detalhes da postagem, ou outroas ações.</p>
+<p>Se qualquer receptor retorna <tt class="xref docutils literal"><span class="pre">False</span></tt> o comentário será descartado e uma
+resposta 403 (not allowed) será retornada.</p>
+<p>Este sinal é enviado mais ou menos ao mesmo tempo (pouco antes, na verdade) que
+o sinal <a class="reference internal" href="../../signals.html#django.db.models.signals.pre_save" title="django.db.models.signals.pre_save"><tt class="xref py py-data docutils literal"><span class="pre">pre_save</span></tt></a> do objeto <tt class="docutils literal"><span class="pre">Comment</span></tt>.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>O model comment.</dd>
+<dt><tt class="docutils literal"><span class="pre">comment</span></tt></dt>
+<dd>A instância de comment que foi postada. Note que ela não deve ter sido
+salva no banco de dados ainda, então ela não tem uma chave primária, e
+quaisquer relações pode não funcionar corretamente ainda.</dd>
+<dt><tt class="docutils literal"><span class="pre">request</span></tt></dt>
+<dd>O <a class="reference internal" href="../../request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a> que foi postado no comentário.</dd>
+</dl>
+</div>
+<div class="section" id="s-comment-was-posted">
+<span id="comment-was-posted"></span><h2>comment_was_posted<a class="headerlink" href="#comment-was-posted" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="django.contrib.comments.signals.comment_was_posted">
+<tt class="descclassname">django.contrib.comments.signals.</tt><tt class="descname">comment_was_posted</tt><a class="headerlink" href="#django.contrib.comments.signals.comment_was_posted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Enviado logo após o comentário ser salvo.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>O model comment.</dd>
+<dt><tt class="docutils literal"><span class="pre">comment</span></tt></dt>
+<dd>A instância de comment que foi postada. Note que ela já foi salva, então
+se você modificá-la, precisará chamar o método
+<a class="reference internal" href="../../models/instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><tt class="xref py py-meth docutils literal"><span class="pre">save()</span></tt></a> novamente.</dd>
+<dt><tt class="docutils literal"><span class="pre">request</span></tt></dt>
+<dd>O <a class="reference internal" href="../../request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a> que foi postado no comentário.</dd>
+</dl>
+</div>
+<div class="section" id="s-comment-was-flagged">
+<span id="comment-was-flagged"></span><h2>comment_was_flagged<a class="headerlink" href="#comment-was-flagged" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="django.contrib.comments.signals.comment_was_flagged">
+<tt class="descclassname">django.contrib.comments.signals.</tt><tt class="descname">comment_was_flagged</tt><a class="headerlink" href="#django.contrib.comments.signals.comment_was_flagged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Enviado após um comentário ter sido &#8220;flagged&#8221; de alguma forma. Checa o flag para
+ver se isto foi uma requisição de remoção de um comentário feito por um usuário,
+um moderador aprovando/removendo um comentário, ou algum outro flag de usuário
+customizado.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>O model comment.</dd>
+<dt><tt class="docutils literal"><span class="pre">comment</span></tt></dt>
+<dd>A instância do comentário que foi postada. Note que ela já está salva,
+então se você modificá-la, precisará chamar o método
+<a class="reference internal" href="../../models/instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><tt class="xref py py-meth docutils literal"><span class="pre">save()</span></tt></a> novamente.</dd>
+<dt><tt class="docutils literal"><span class="pre">flag</span></tt></dt>
+<dd>O <tt class="xref py py-class docutils literal"><span class="pre">CommentFlag</span></tt> que foi atachado
+ao comentário.</dd>
+<dt><tt class="docutils literal"><span class="pre">created</span></tt></dt>
+<dd><tt class="xref docutils literal"><span class="pre">True</span></tt> se este é um novo flag; <tt class="xref docutils literal"><span class="pre">False</span></tt> se este é um flag duplicado.</dd>
+<dt><tt class="docutils literal"><span class="pre">request</span></tt></dt>
+<dd>O <a class="reference internal" href="../../request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a> que foi postado no comentário.</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Sinais enviados pela aplicação comments</a><ul>
+<li><a class="reference internal" href="#comment-will-be-posted">comment_will_be_posted</a></li>
+<li><a class="reference internal" href="#comment-was-posted">comment_was_posted</a></li>
+<li><a class="reference internal" href="#comment-was-flagged">comment_was_flagged</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="settings.html">Configurações de Comentários</a></li>
+    
+    
+      <li>Next: <a href="upgrade.html">Atualizando o sistema de comentários de um Django anterior</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../../index.html">Referência da API</a>
+        
+          <ul><li><a href="../index.html">Os add-ons &#8220;django.contrib&#8221;</a>
+        
+          <ul><li><a href="index.html">Framework de comentários do Django</a>
+        
+        <ul><li>Sinais enviados pela aplicação comments</li></ul>
+        </li></ul></li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/ref/contrib/comments/signals.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="settings.html" title="Configurações de Comentários">previous</a> 
+     |
+    <a href="../../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="upgrade.html" title="Atualizando o sistema de comentários de um Django anterior">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

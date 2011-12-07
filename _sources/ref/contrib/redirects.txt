@@ -1,0 +1,91 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 11348 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-contrib-redirects:
+
+===============================
+A aplicação de redirecionamento
+===============================
+
+.. module:: django.contrib.redirects
+   :synopsis: Um framework para gerenciar redirecionamentos.
+
+O Django vem acompanhado de uma aplicação de redirecionamento opcional. Ela
+permite você armazenar redirecionadores no banco de dados e manipula o 
+redirecionamento pra você.
+
+Instalação
+==========
+
+Para instalá-lo, siga os seguintes passos:
+
+    1. Adicione ``'django.contrib.redirects'`` em suas 
+       :setting:`INSTALLED_APPS`.
+    2. Adicione 
+       ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'`` nas
+       suas :setting:`MIDDLEWARE_CLASSES`.
+    3. Execute o commando :djadmin:`manage.py syncdb <syncdb>`.
+
+Como ele funciona
+=================
+
+O ``manage.py syncdb`` cria uma tabela ``django_redirect`` no seu banco de 
+dados. Essa é uma tabela de aparência simples com os campos ``site_id``, 
+``old_path`` e ``new_path``.
+
+O ``RedirectFallbackMiddleware`` faz todo trabalho. Toda vez que uma aplicação
+Django gera um erro 404, esse middleware checa o banco de dados do 
+redirecionador para a URL acessada como um último recurso. Especialmente, ele
+procura por um redirecionador que tenha um ``old_path`` com um ID do site que
+corresponde ao :setting:`SITE_ID` no arquivo settings.py.
+
+    * Se ele encontra uma correspondência, e ``new_path`` não está vazio, ele
+      redireciona para o ``new_path``.
+    * Se ele encontra uma correspondência, e ``new_path`` está vazio, ele envia
+      um cabeçalho HTTP 410 ("Gone") e uma resposta vazia (content-less).
+    * Se ele não encontra uma correspondência, a requisição continua sendo 
+      processada normalmente.
+
+O middleware somente opera sobre 404s -- não para 500s ou respostas de qualquer
+outro código de status.
+
+Note que a ordem do ``MIDDLEWARE_CLASSES`` importa. Geralmente, você pode
+colocar o ``RedirectFallbackMiddleware`` no final da lista, porque ele é um
+último recurso.
+
+Para saber mais sobre o middleware, leia a :doc:`documentação do middleware 
+</topics/http/middleware>`.
+
+Como adicionar, mudar e deletar redirecionadores
+================================================
+
+Via interface de administração
+------------------------------
+
+Se você tem ativada a interface de administração automática do Django, você
+pode ver uma seção "Redirects" na página principal do admin. Edite os 
+redirecionadores como você edita qualquer outro objeto do sistema.
+
+Via API do Python
+-----------------
+.. class:: models.Redirect
+
+    Os redirecionadores são representados por um :doc:`modelo Django 
+    </topics/db/models>` padrão, que se encontram em 
+    `django/contrib/redirects/models.py`_. Você pode acessar os objetos de 
+    redirecionamento utilizando a :doc:`API de banco de dados do Django </topics/db/queries>`.
+
+.. _django/contrib/redirects/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/redirects/models.py

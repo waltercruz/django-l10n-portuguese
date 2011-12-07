@@ -1,0 +1,51 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 11348 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-contrib-comments-settings:
+
+============================
+Configurações de Comentários
+============================
+
+Estas configurações ajustam o comportamento do framework de comentários:
+
+.. setting:: COMMENTS_HIDE_REMOVED
+
+COMMENTS_HIDE_REMOVED
+---------------------
+
+Se ``True`` (padrão), comentários removidos serão excluídos da lista/contagem
+de comentários (bem como das tags de template). Por outro lado o autor do
+template é responsável por alguma mensagem tipo "este comentário foi removido
+pelo site".
+
+.. setting:: COMMENT_MAX_LENGTH
+
+COMMENT_MAX_LENGTH
+------------------
+
+O comprimento máximo do campo de comentário, em caracteres. Comentários mais
+longos serão rejeitados. O padrão é 3000.
+
+.. setting:: COMMENTS_APP
+
+COMMENTS_APP
+------------
+
+A aplicação (estando inscrita no ``INSTALLED_APPS``) responsável por toda
+"lógica de negócios." Você pode mudar isto provendo models e formulários
+customizados, acredito que isso não esteja documentado.
+

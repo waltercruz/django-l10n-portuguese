@@ -1,0 +1,476 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Meta opções do model &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Modelos" href="index.html" />
+    <link rel="next" title="Referência das instâncias de Model" href="instances.html" />
+    <link rel="prev" title="Referência de objetos relacionados" href="relations.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="relations.html" title="Referência de objetos relacionados">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="instances.html" title="Referência das instâncias de Model">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-models-options">
+            
+  <div class="section" id="s-meta-opcoes-do-model">
+<span id="s-ref-models-options"></span><span id="meta-opcoes-do-model"></span><span id="ref-models-options"></span><h1><tt class="docutils literal"><span class="pre">Meta</span></tt> opções do model<a class="headerlink" href="#meta-opcoes-do-model" title="Permalink to this headline">¶</a></h1>
+<p>Este documento explica todas as <a class="reference internal" href="../../topics/db/models.html#meta-options"><em>opções de metadados</em></a> possíveis
+que você pode dar a seu model em sua <tt class="docutils literal"><span class="pre">class</span> <span class="pre">Meta</span></tt>.</p>
+<div class="section" id="s-opcoes-disponiveis-do-meta">
+<span id="opcoes-disponiveis-do-meta"></span><h2>Opções disponíveis do <tt class="docutils literal"><span class="pre">Meta</span></tt><a class="headerlink" href="#opcoes-disponiveis-do-meta" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-abstract">
+<span id="abstract"></span><h3><tt class="docutils literal"><span class="pre">abstract</span></tt><a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.abstract">
+<tt class="descclassname">Options.</tt><tt class="descname">abstract</tt><a class="headerlink" href="#django.db.models.Options.abstract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Se <tt class="xref docutils literal"><span class="pre">True</span></tt>, este model será um <a class="reference internal" href="../../topics/db/models.html#abstract-base-classes"><em>uma classe abstrata básica</em></a>.</p>
+</div>
+<div class="section" id="s-app-label">
+<span id="app-label"></span><h3><tt class="docutils literal"><span class="pre">app_label</span></tt><a class="headerlink" href="#app-label" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.app_label">
+<tt class="descclassname">Options.</tt><tt class="descname">app_label</tt><a class="headerlink" href="#django.db.models.Options.app_label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>If a model exists outside of the standard <tt class="file docutils literal"><span class="pre">models.py</span></tt> (for instance, if
+the app&#8217;s models are in submodules of <tt class="docutils literal"><span class="pre">myapp.models</span></tt>), the model must define
+which app it is part of:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">app_label</span> <span class="o">=</span> <span class="s">&#39;myapp&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-db-table">
+<span id="db-table"></span><h3><tt class="docutils literal"><span class="pre">db_table</span></tt><a class="headerlink" href="#db-table" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.db_table">
+<tt class="descclassname">Options.</tt><tt class="descname">db_table</tt><a class="headerlink" href="#django.db.models.Options.db_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O nome da tabela que será usado pelo model no banco de dados:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db_table</span> <span class="o">=</span> <span class="s">&#39;music_album&#39;</span>
+</pre></div>
+</div>
+<div class="section" id="s-nomes-de-tabelas">
+<span id="s-table-names"></span><span id="nomes-de-tabelas"></span><span id="table-names"></span><h4>Nomes de tabelas<a class="headerlink" href="#nomes-de-tabelas" title="Permalink to this headline">¶</a></h4>
+<p>Para poupar o seu tempo, o Django automaticamente deriva o nome das tabelas de
+banco de dados usando os nomes das classes models e da aplicação que o contém.
+O nomde de uma tabela de um model é construído juntando o &quot;nome da app&quot; do
+model -- o nome usado em <tt class="docutils literal"><span class="pre">manage.py</span> <span class="pre">startapp</span></tt> -- ao nome da classe do model,
+com um underscore entre eles.</p>
+<p>Por exemplo, se você tem uma app <tt class="docutils literal"><span class="pre">bookstore</span></tt> (criada pelo <tt class="docutils literal"><span class="pre">manage.py</span> <span class="pre">startapp</span>
+<span class="pre">bookstore</span></tt>), um modelo definido como <tt class="docutils literal"><span class="pre">class</span> <span class="pre">Book</span></tt> terá uma tabela com o nome
+<tt class="docutils literal"><span class="pre">bookstore_book</span></tt>.</p>
+<p>Para sobrescrever o nome da tabela, use o parametro <tt class="docutils literal"><span class="pre">db_table</span></tt> na
+<tt class="docutils literal"><span class="pre">class</span> <span class="pre">Meta</span></tt>.</p>
+<p>Se o nome da sua tabela  é uma palavra reservada do SQL, ou contém caracteres
+que não são permitidos em nomes de variáveis do Python -- notadamente,
+o hífen -- está OK. O Django colocará crases os nomes das colunas e tabelas sem
+você saber.</p>
+</div>
+</div>
+<div class="section" id="s-db-tablespace">
+<span id="db-tablespace"></span><h3><tt class="docutils literal"><span class="pre">db_tablespace</span></tt><a class="headerlink" href="#db-tablespace" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.db_tablespace">
+<tt class="descclassname">Options.</tt><tt class="descname">db_tablespace</tt><a class="headerlink" href="#django.db.models.Options.db_tablespace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>O nome do tablespace do banco dados utilizado para o model. Se o backend não
+suporta tablespaces, esta opção é ignorada.</p>
+</div>
+<div class="section" id="s-get-latest-by">
+<span id="get-latest-by"></span><h3><tt class="docutils literal"><span class="pre">get_latest_by</span></tt><a class="headerlink" href="#get-latest-by" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.get_latest_by">
+<tt class="descclassname">Options.</tt><tt class="descname">get_latest_by</tt><a class="headerlink" href="#django.db.models.Options.get_latest_by" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O nome de um <a class="reference internal" href="fields.html#django.db.models.DateField" title="django.db.models.DateField"><tt class="xref py py-class docutils literal"><span class="pre">DateField</span></tt></a> ou <a class="reference internal" href="fields.html#django.db.models.DateTimeField" title="django.db.models.DateTimeField"><tt class="xref py py-class docutils literal"><span class="pre">DateTimeField</span></tt></a> no model. Isso
+especifica o campo padrão do seu model que será utilizado pelo método
+<tt class="xref py py-class docutils literal"><span class="pre">latest</span></tt> do <a class="reference internal" href="../../topics/db/managers.html#django.db.models.Manager" title="django.db.models.Manager"><tt class="xref py py-class docutils literal"><span class="pre">Manager</span></tt></a>.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">get_latest_by</span> <span class="o">=</span> <span class="s">&quot;order_date&quot;</span>
+</pre></div>
+</div>
+<p>Veja a documentação para <tt class="xref py py-meth docutils literal"><span class="pre">latest()</span></tt> para mais.</p>
+</div>
+<div class="section" id="s-managed">
+<span id="managed"></span><h3><tt class="docutils literal"><span class="pre">managed</span></tt><a class="headerlink" href="#managed" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.managed">
+<tt class="descclassname">Options.</tt><tt class="descname">managed</tt><a class="headerlink" href="#django.db.models.Options.managed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<p>Defaults to <tt class="xref docutils literal"><span class="pre">True</span></tt>, meaning Django will create the appropriate database
+tables in <a class="reference internal" href="../django-admin.html#django-admin-syncdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">syncdb</span></tt></a> and remove them as part of a <a class="reference internal" href="../django-admin.html#django-admin-reset"><tt class="xref std std-djadmin docutils literal"><span class="pre">reset</span></tt></a>
+management command. That is, Django <em>manages</em> the database tables' lifecycles.</p>
+<p>If <tt class="xref docutils literal"><span class="pre">False</span></tt>, no database table creation or deletion operations will be
+performed for this model. This is useful if the model represents an existing
+table or a database view that has been created by some other means. This is
+the <em>only</em> difference when <tt class="docutils literal"><span class="pre">managed</span></tt> is <tt class="xref docutils literal"><span class="pre">False</span></tt>. All other aspects of
+model handling are exactly the same as normal. This includes</p>
+<ol class="arabic">
+<li><p class="first">Adding an automatic primary key field to the model if you don't declare
+it.  To avoid confusion for later code readers, it's recommended to
+specify all the columns from the database table you are modeling when
+using unmanaged models.</p>
+</li>
+<li><p class="first">If a model with <tt class="docutils literal"><span class="pre">managed=False</span></tt> contains a
+<a class="reference internal" href="fields.html#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><tt class="xref py py-class docutils literal"><span class="pre">ManyToManyField</span></tt></a> that points to another
+unmanaged model, then the intermediate table for the many-to-many join
+will also not be created. However, a the intermediary table between one
+managed and one unmanaged model <em>will</em> be created.</p>
+<p>If you need to change this default behavior, create the intermediary
+table as an explicit model (with <tt class="docutils literal"><span class="pre">managed</span></tt> set as needed) and use the
+<a class="reference internal" href="fields.html#django.db.models.ManyToManyField.through" title="django.db.models.ManyToManyField.through"><tt class="xref py py-attr docutils literal"><span class="pre">ManyToManyField.through</span></tt></a> attribute to make the relation use your
+custom model.</p>
+</li>
+</ol>
+<p>For tests involving models with <tt class="docutils literal"><span class="pre">managed=False</span></tt>, it's up to you to ensure
+the correct tables are created as part of the test setup.</p>
+<p>If you're interested in changing the Python-level behavior of a model class,
+you <em>could</em> use <tt class="docutils literal"><span class="pre">managed=False</span></tt> and create a copy of an existing model.
+However, there's a better approach for that situation: <a class="reference internal" href="../../topics/db/models.html#proxy-models"><em>Proxy models</em></a>.</p>
+</div>
+<div class="section" id="s-order-with-respect-to">
+<span id="order-with-respect-to"></span><h3><tt class="docutils literal"><span class="pre">order_with_respect_to</span></tt><a class="headerlink" href="#order-with-respect-to" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.order_with_respect_to">
+<tt class="descclassname">Options.</tt><tt class="descname">order_with_respect_to</tt><a class="headerlink" href="#django.db.models.Options.order_with_respect_to" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Marca este objeto como &quot;ordenável&quot; em relação ao campo dado. Isso é quase sempre
+utilizado com objetos relacionados para permití-los ser ordenados a respeito de
+um objeto pai. Por exemplo, se um objeto <tt class="docutils literal"><span class="pre">Answer</span></tt> está relacionado a
+um objeto <tt class="docutils literal"><span class="pre">Question</span></tt>, e uma questão tem mais de uma resposta, e a ordem das
+respostas importa, você poderia fazer isso:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Answer</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">question</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Question</span><span class="p">)</span>
+    <span class="c"># ...</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">order_with_respect_to</span> <span class="o">=</span> <span class="s">&#39;question&#39;</span>
+</pre></div>
+</div>
+<p>When <tt class="docutils literal"><span class="pre">order_with_respect_to</span></tt> is set, two additional methods are provided to
+retrieve and to set the order of the related objects: <tt class="docutils literal"><span class="pre">get_RELATED_order()</span></tt>
+and <tt class="docutils literal"><span class="pre">set_RELATED_order()</span></tt>, where <tt class="docutils literal"><span class="pre">RELATED</span></tt> is the lowercased model name. For
+example, assuming that a <tt class="docutils literal"><span class="pre">Question</span></tt> object has multiple related <tt class="docutils literal"><span class="pre">Answer</span></tt>
+objects, the list returned contains the primary keys of the related <tt class="docutils literal"><span class="pre">Answer</span></tt>
+objects:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">question</span> <span class="o">=</span> <span class="n">Question</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">question</span><span class="o">.</span><span class="n">get_answer_order</span><span class="p">()</span>
+<span class="go">[1, 2, 3]</span>
+</pre></div>
+</div>
+<p>The order of a <tt class="docutils literal"><span class="pre">Question</span></tt> object's related <tt class="docutils literal"><span class="pre">Answer</span></tt> objects can be set by
+passing in a list of <tt class="docutils literal"><span class="pre">Answer</span></tt> primary keys:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">question</span><span class="o">.</span><span class="n">set_answer_order</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The related objects also get two methods, <tt class="docutils literal"><span class="pre">get_next_in_order()</span></tt> and
+<tt class="docutils literal"><span class="pre">get_previous_in_order()</span></tt>, which can be used to access those objects in their
+proper order. Assuming the <tt class="docutils literal"><span class="pre">Answer</span></tt> objects are ordered by <tt class="docutils literal"><span class="pre">id</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">answer</span> <span class="o">=</span> <span class="n">Answer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">answer</span><span class="o">.</span><span class="n">get_next_in_order</span><span class="p">()</span>
+<span class="go">&lt;Answer: 3&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">answer</span><span class="o">.</span><span class="n">get_previous_in_order</span><span class="p">()</span>
+<span class="go">&lt;Answer: 1&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-ordering">
+<span id="ordering"></span><h3><tt class="docutils literal"><span class="pre">ordering</span></tt><a class="headerlink" href="#ordering" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.ordering">
+<tt class="descclassname">Options.</tt><tt class="descname">ordering</tt><a class="headerlink" href="#django.db.models.Options.ordering" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O ordenamento padrão de um objeto, para usar quando obtem-se listas de objetos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;-order_date&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Isso é uma tupla ou lista de strings. Cada strin é o nomde de um campo com um
+prefixo opcional &quot;-&quot;, que indica ordem descendente. Campos sem um &quot;-&quot; na frente
+serão ordenados ascendentemente. Use a string &quot;?&quot; para ordenar randomicamente.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Indiferentemente de quão muitos sejam os campos em
+<a class="reference internal" href="#django.db.models.Options.ordering" title="django.db.models.Options.ordering"><tt class="xref py py-attr docutils literal"><span class="pre">ordering</span></tt></a>, o admin usará somente o primeiro campo.</p>
+</div>
+<p>Por exemplo, para ordenar ascendentemente por um campo <tt class="docutils literal"><span class="pre">pub_date</span></tt>, use isto:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;pub_date&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Para ordenar por <tt class="docutils literal"><span class="pre">pub_date</span></tt> descendentemente, use isto:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;-pub_date&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Para ordenar por <tt class="docutils literal"><span class="pre">pub_date</span></tt> descendentemente, e por <tt class="docutils literal"><span class="pre">author</span></tt>
+ascendentemente, use isto:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;-pub_date&#39;</span><span class="p">,</span> <span class="s">&#39;author&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-permissions">
+<span id="permissions"></span><h3><tt class="docutils literal"><span class="pre">permissions</span></tt><a class="headerlink" href="#permissions" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.permissions">
+<tt class="descclassname">Options.</tt><tt class="descname">permissions</tt><a class="headerlink" href="#django.db.models.Options.permissions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Para adicionar permissões extras na tabela de permissões quando criar este
+objeto. Permissões para adicionar, deletar e editar são automaticamente criadas
+para cada objeto que use o <tt class="docutils literal"><span class="pre">admin</span></tt>. Este exemplo expecifica uma permissão
+extra <tt class="docutils literal"><span class="pre">can_deliver_pizzas</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">permissions</span> <span class="o">=</span> <span class="p">((</span><span class="s">&quot;can_deliver_pizzas&quot;</span><span class="p">,</span> <span class="s">&quot;Can deliver pizzas&quot;</span><span class="p">),)</span>
+</pre></div>
+</div>
+<p>Isso é uma lista ou tupla de tuplas duplas no formato <tt class="docutils literal"><span class="pre">(código_da_permissão,</span>
+<span class="pre">nome_da_permissão_legível_por_humanos)</span></tt>.</p>
+</div>
+<div class="section" id="s-proxy">
+<span id="proxy"></span><h3><tt class="docutils literal"><span class="pre">proxy</span></tt><a class="headerlink" href="#proxy" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.proxy">
+<tt class="descclassname">Options.</tt><tt class="descname">proxy</tt><a class="headerlink" href="#django.db.models.Options.proxy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<p>If set to <tt class="xref docutils literal"><span class="pre">True</span></tt>, a model which subclasses another model will be treated as
+a <a class="reference internal" href="../../topics/db/models.html#proxy-models"><em>proxy model</em></a>.</p>
+</div>
+<div class="section" id="s-unique-together">
+<span id="unique-together"></span><h3><tt class="docutils literal"><span class="pre">unique_together</span></tt><a class="headerlink" href="#unique-together" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.unique_together">
+<tt class="descclassname">Options.</tt><tt class="descname">unique_together</tt><a class="headerlink" href="#django.db.models.Options.unique_together" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Seta os nomes de campos, que juntos, devem ser únicos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">unique_together</span> <span class="o">=</span> <span class="p">((</span><span class="s">&quot;driver&quot;</span><span class="p">,</span> <span class="s">&quot;restaurant&quot;</span><span class="p">),)</span>
+</pre></div>
+</div>
+<p>Isso é uma lista de listas de campos que devem ser únicos quando estão juntos.
+ela é usada no Django admin e é executada a nível de banco de dados (i.e., a
+regra <tt class="docutils literal"><span class="pre">UNIQUE</span></tt> apropriada é incluída na consulta <tt class="docutils literal"><span class="pre">CREATE</span> <span class="pre">TABLE</span></tt>).</p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Por conveniência, unique_together pode ser uma lista singular quando lida com
+camos sozinhos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">unique_together</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;driver&quot;</span><span class="p">,</span> <span class="s">&quot;restaurant&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-verbose-name">
+<span id="verbose-name"></span><h3><tt class="docutils literal"><span class="pre">verbose_name</span></tt><a class="headerlink" href="#verbose-name" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.verbose_name">
+<tt class="descclassname">Options.</tt><tt class="descname">verbose_name</tt><a class="headerlink" href="#django.db.models.Options.verbose_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um nome legível-por-humanos para o objeto, no singular:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">verbose_name</span> <span class="o">=</span> <span class="s">&quot;pizza&quot;</span>
+</pre></div>
+</div>
+<p>Se este não for fornecido, o Django usará uma versão do nome da classe:
+<tt class="docutils literal"><span class="pre">CamelCase</span></tt> se torna <tt class="docutils literal"><span class="pre">camel</span> <span class="pre">case</span></tt>.</p>
+</div>
+<div class="section" id="s-verbose-name-plural">
+<span id="verbose-name-plural"></span><h3><tt class="docutils literal"><span class="pre">verbose_name_plural</span></tt><a class="headerlink" href="#verbose-name-plural" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Options.verbose_name_plural">
+<tt class="descclassname">Options.</tt><tt class="descname">verbose_name_plural</tt><a class="headerlink" href="#django.db.models.Options.verbose_name_plural" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O nome no plural para o objeto:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s">&quot;stories&quot;</span>
+</pre></div>
+</div>
+<p>Se este não for fornecido, o Django usará <a class="reference internal" href="#django.db.models.Options.verbose_name" title="django.db.models.Options.verbose_name"><tt class="xref py py-attr docutils literal"><span class="pre">verbose_name</span></tt></a> +
+<tt class="docutils literal"><span class="pre">&quot;s&quot;</span></tt>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">Meta</span></tt> opções do model</a><ul>
+<li><a class="reference internal" href="#opcoes-disponiveis-do-meta">Opções disponíveis do <tt class="docutils literal"><span class="pre">Meta</span></tt></a><ul>
+<li><a class="reference internal" href="#abstract"><tt class="docutils literal"><span class="pre">abstract</span></tt></a></li>
+<li><a class="reference internal" href="#app-label"><tt class="docutils literal"><span class="pre">app_label</span></tt></a></li>
+<li><a class="reference internal" href="#db-table"><tt class="docutils literal"><span class="pre">db_table</span></tt></a><ul>
+<li><a class="reference internal" href="#nomes-de-tabelas">Nomes de tabelas</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#db-tablespace"><tt class="docutils literal"><span class="pre">db_tablespace</span></tt></a></li>
+<li><a class="reference internal" href="#get-latest-by"><tt class="docutils literal"><span class="pre">get_latest_by</span></tt></a></li>
+<li><a class="reference internal" href="#managed"><tt class="docutils literal"><span class="pre">managed</span></tt></a></li>
+<li><a class="reference internal" href="#order-with-respect-to"><tt class="docutils literal"><span class="pre">order_with_respect_to</span></tt></a></li>
+<li><a class="reference internal" href="#ordering"><tt class="docutils literal"><span class="pre">ordering</span></tt></a></li>
+<li><a class="reference internal" href="#permissions"><tt class="docutils literal"><span class="pre">permissions</span></tt></a></li>
+<li><a class="reference internal" href="#proxy"><tt class="docutils literal"><span class="pre">proxy</span></tt></a></li>
+<li><a class="reference internal" href="#unique-together"><tt class="docutils literal"><span class="pre">unique_together</span></tt></a></li>
+<li><a class="reference internal" href="#verbose-name"><tt class="docutils literal"><span class="pre">verbose_name</span></tt></a></li>
+<li><a class="reference internal" href="#verbose-name-plural"><tt class="docutils literal"><span class="pre">verbose_name_plural</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="relations.html">Referência de objetos relacionados</a></li>
+    
+    
+      <li>Next: <a href="instances.html">Referência das instâncias de Model</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Referência da API</a>
+        
+          <ul><li><a href="index.html">Modelos</a>
+        
+        <ul><li><tt class="docutils literal docutils literal"><span class="pre">Meta</span></tt> opções do model</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/models/options.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="relations.html" title="Referência de objetos relacionados">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="instances.html" title="Referência das instâncias de Model">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,368 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Referência dos middlewares embutidos &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Referência da API" href="index.html" />
+    <link rel="next" title="Modelos" href="models/index.html" />
+    <link rel="prev" title="Class-based generic views" href="class-based-views.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="class-based-views.html" title="Class-based generic views">previous</a> 
+     |
+    <a href="index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="models/index.html" title="Modelos">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-middleware">
+            
+  <div class="section" id="s-module-django.middleware">
+<span id="s-referencia-dos-middlewares-embutidos"></span><span id="s-ref-middleware"></span><span id="module-django.middleware"></span><span id="referencia-dos-middlewares-embutidos"></span><span id="ref-middleware"></span><h1>Referência dos middlewares embutidos<a class="headerlink" href="#module-django.middleware" title="Permalink to this headline">¶</a></h1>
+<p>Este documento detalha todos os componentes middleware que acompanham o Django.
+Para informações de como usá-los e de como escrever o seu próprio middleware,
+veja o <a class="reference internal" href="../topics/http/middleware.html"><em>guia de uso de middleware</em></a>.</p>
+<div class="section" id="s-middlewares-disponiveis">
+<span id="middlewares-disponiveis"></span><h2>Middlewares disponíveis<a class="headerlink" href="#middlewares-disponiveis" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-module-django.middleware.cache">
+<span id="s-middleware-de-cache"></span><span id="module-django.middleware.cache"></span><span id="middleware-de-cache"></span><h3>Middleware de cache<a class="headerlink" href="#module-django.middleware.cache" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.middleware.cache.django.middleware.cache.UpdateCacheMiddleware">
+<em class="property">class </em><tt class="descclassname">django.middleware.cache.</tt><tt class="descname">UpdateCacheMiddleware</tt><a class="headerlink" href="#django.middleware.cache.django.middleware.cache.UpdateCacheMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="django.middleware.cache.django.middleware.cache.FetchFromCacheMiddleware">
+<em class="property">class </em><tt class="descclassname">django.middleware.cache.</tt><tt class="descname">FetchFromCacheMiddleware</tt><a class="headerlink" href="#django.middleware.cache.django.middleware.cache.FetchFromCacheMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Habilita o cache em todo o site. Se este estiver habilitado, cada página
+construída pelo Django será cacheada durante o tempo definido em
+<a class="reference internal" href="settings.html#std:setting-CACHE_MIDDLEWARE_SECONDS"><tt class="xref std std-setting docutils literal"><span class="pre">CACHE_MIDDLEWARE_SECONDS</span></tt></a>. Veja a <a class="reference internal" href="../topics/cache.html"><em>documentação do cache</em></a>.</p>
+</div>
+<div class="section" id="s-module-django.middleware.common">
+<span id="s-middleware-common"></span><span id="module-django.middleware.common"></span><span id="middleware-common"></span><h3>Middleware &#8220;Common&#8221;<a class="headerlink" href="#module-django.middleware.common" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.middleware.common.django.middleware.common.CommonMiddleware">
+<em class="property">class </em><tt class="descclassname">django.middleware.common.</tt><tt class="descname">CommonMiddleware</tt><a class="headerlink" href="#django.middleware.common.django.middleware.common.CommonMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Adiciona algumas conveniências para perfeccionistas:</p>
+<ul>
+<li><p class="first">Proíbe o acesso de &#8220;user agents&#8221; especificados em
+<a class="reference internal" href="settings.html#std:setting-DISALLOWED_USER_AGENTS"><tt class="xref std std-setting docutils literal"><span class="pre">DISALLOWED_USER_AGENTS</span></tt></a>, o qual deve ser uma lista de strings.</p>
+</li>
+<li><p class="first">Executa uma reescrita de URL baseada nas configurações
+<a class="reference internal" href="settings.html#std:setting-APPEND_SLASH"><tt class="xref std std-setting docutils literal"><span class="pre">APPEND_SLASH</span></tt></a> e <a class="reference internal" href="settings.html#std:setting-PREPEND_WWW"><tt class="xref std std-setting docutils literal"><span class="pre">PREPEND_WWW</span></tt></a>.</p>
+<p>Se o <a class="reference internal" href="settings.html#std:setting-APPEND_SLASH"><tt class="xref std std-setting docutils literal"><span class="pre">APPEND_SLASH</span></tt></a> for <tt class="xref docutils literal"><span class="pre">True</span></tt> e a URL inicial não terminar
+com uma barra, e ela não for encontrada no URLconf, então uma nova URL é
+formada, adicionando uma barra no final. Se esta nova URL é encontrada no
+URLconf, o Django redireciona a requisição para esta nova URL. Por outro
+lado, a URL inicial é processada habitualmente.</p>
+<p>Por exemplo, <tt class="docutils literal"><span class="pre">foo.com/bar</span></tt> será redirecionado para <tt class="docutils literal"><span class="pre">foo.com/bar/</span></tt> se
+você não tiver um padrão de URL válido para <tt class="docutils literal"><span class="pre">foo.com/bar</span></tt> mas <em>tem</em> um
+padrão válido para <tt class="docutils literal"><span class="pre">foo.com/bar/</span></tt>.</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 1.0:</span> O comportamento do <a class="reference internal" href="settings.html#std:setting-APPEND_SLASH"><tt class="xref std std-setting docutils literal"><span class="pre">APPEND_SLASH</span></tt></a> mudou ligeiramente nesta
+versão. Ele não é utilizado para verificar se o padrão confere na
+URLconf.</div>
+<p>Se o <a class="reference internal" href="settings.html#std:setting-PREPEND_WWW"><tt class="xref std std-setting docutils literal"><span class="pre">PREPEND_WWW</span></tt></a> é <tt class="xref docutils literal"><span class="pre">True</span></tt>, as URLs que faltam um &#8220;www.&#8221; na
+frente serão redirecionadas para a mesma URL com o &#8220;www.&#8221; na frente.</p>
+<p>Estes dois tipos de opções são destinadas a normalizar URLs. A filosofia
+é que cada URL deve existir em um, e somente um, lugar. Tecnicamente uma
+URL <tt class="docutils literal"><span class="pre">foo.com/bar</span></tt> é diferente de <tt class="docutils literal"><span class="pre">foo.com/bar/</span></tt> &#8211; um indexador de
+motor de busca tratará elas como URLs separadas &#8211; então esta é a melhor
+prática para normalizar URLs.</p>
+</li>
+<li><p class="first">Manipula ETags baseado na configuração <a class="reference internal" href="settings.html#std:setting-USE_ETAGS"><tt class="xref std std-setting docutils literal"><span class="pre">USE_ETAGS</span></tt></a>. Se o
+<a class="reference internal" href="settings.html#std:setting-USE_ETAGS"><tt class="xref std std-setting docutils literal"><span class="pre">USE_ETAGS</span></tt></a> é definido como <tt class="xref docutils literal"><span class="pre">True</span></tt>, o Django calculará um ETag
+para cada requisição usando um hash MD5 do conteúdo da página, e irá se
+responsabilizar por enviar repostas <tt class="docutils literal"><span class="pre">Not</span> <span class="pre">Modified</span></tt> (não modificado), se
+apropriado.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="s-module-django.middleware.doc">
+<span id="s-middleware-view-metadata"></span><span id="module-django.middleware.doc"></span><span id="middleware-view-metadata"></span><h3>Middleware view metadata<a class="headerlink" href="#module-django.middleware.doc" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.middleware.doc.django.middleware.doc.XViewMiddleware">
+<em class="property">class </em><tt class="descclassname">django.middleware.doc.</tt><tt class="descname">XViewMiddleware</tt><a class="headerlink" href="#django.middleware.doc.django.middleware.doc.XViewMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Envia cabeçalhos HTTP <tt class="docutils literal"><span class="pre">X-View</span></tt> personalizados para requisições HEAD oriundas
+de endereços IP definidos na configuração <a class="reference internal" href="settings.html#std:setting-INTERNAL_IPS"><tt class="xref std std-setting docutils literal"><span class="pre">INTERNAL_IPS</span></tt></a>. Isso é
+utilizado pelo sistema de documentação automática do Django.</p>
+</div>
+<div class="section" id="s-module-django.middleware.gzip">
+<span id="s-middleware-gzip"></span><span id="module-django.middleware.gzip"></span><span id="middleware-gzip"></span><h3>Middleware GZIP<a class="headerlink" href="#module-django.middleware.gzip" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.middleware.gzip.django.middleware.gzip.GZipMiddleware">
+<em class="property">class </em><tt class="descclassname">django.middleware.gzip.</tt><tt class="descname">GZipMiddleware</tt><a class="headerlink" href="#django.middleware.gzip.django.middleware.gzip.GZipMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Comprime conteúdos para navegadores que entendem compressão gzip (todos os
+navegadores modernos).</p>
+<p>É sugerido colocá-lo em primeiro na lista de middlewares, desta forma a
+compressão do conteúdo de resposta será a última coisa a ser feita. Não serão
+comprimidos conteúdos menores que 200 bytes, quando o código de resposta for
+diferente de 200, quando arquivos JavaScript (para compatibilidade com IE), ou
+quando as respostas possuem o cabeçalho <tt class="docutils literal"><span class="pre">Content-Encoding</span></tt> já especificado.</p>
+</div>
+<div class="section" id="s-module-django.middleware.http">
+<span id="s-middleware-get-condicional"></span><span id="module-django.middleware.http"></span><span id="middleware-get-condicional"></span><h3>Middleware GET condicional<a class="headerlink" href="#module-django.middleware.http" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.middleware.http.django.middleware.http.ConditionalGetMiddleware">
+<em class="property">class </em><tt class="descclassname">django.middleware.http.</tt><tt class="descname">ConditionalGetMiddleware</tt><a class="headerlink" href="#django.middleware.http.django.middleware.http.ConditionalGetMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Manipula operações condicionais do GET. Se a resposta tem um cabeçalho <tt class="docutils literal"><span class="pre">ETag</span></tt>
+ou <tt class="docutils literal"><span class="pre">Last-Modified</span></tt>, e a requisição possui <tt class="docutils literal"><span class="pre">If-None-Match</span></tt> ou
+<tt class="docutils literal"><span class="pre">If-Modified-Since</span></tt>, a resposta é substituída por um
+<tt class="xref py py-class docutils literal"><span class="pre">HttpNotModified`</span></tt>.</p>
+<p>Também define os cabeçalhos de resposta <tt class="docutils literal"><span class="pre">Date</span></tt> e <tt class="docutils literal"><span class="pre">Content-Length</span></tt>.</p>
+</div>
+<div class="section" id="s-middleware-para-proxy-reverso">
+<span id="middleware-para-proxy-reverso"></span><h3>Middleware para proxy reverso<a class="headerlink" href="#middleware-para-proxy-reverso" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.middleware.http.django.middleware.http.SetRemoteAddrFromForwardedFor">
+<em class="property">class </em><tt class="descclassname">django.middleware.http.</tt><tt class="descname">SetRemoteAddrFromForwardedFor</tt><a class="headerlink" href="#django.middleware.http.django.middleware.http.SetRemoteAddrFromForwardedFor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Define o <tt class="docutils literal"><span class="pre">request.META['REMOTE_ADDR']</span></tt> baseado no
+<tt class="docutils literal"><span class="pre">request.META['HTTP_X_FORWARDED_FOR']</span></tt>, se o último estiver definido. Isso é
+útil se você estiver por trás de um proxy reverso que faz com que cada
+<tt class="docutils literal"><span class="pre">REMOTE_ADDR</span></tt> seja definido como <tt class="docutils literal"><span class="pre">127.0.0.1</span></tt>.</p>
+<p><strong>Nota importante:</strong> Isso NÃO valida o <tt class="docutils literal"><span class="pre">HTTP_X_FORWARDED_FOR</span></tt>. Se você não
+está atrás de um proxy reverso que define o <tt class="docutils literal"><span class="pre">HTTP_X_FORWARDED_FOR</span></tt>
+automaticamente, não utilize este middleware. Ninguém pode burlar o valor do
+<tt class="docutils literal"><span class="pre">HTTP_X_FORWARDED_FOR</span></tt>, e por causa disso defina <tt class="docutils literal"><span class="pre">REMOTE_ADDR</span></tt> baseado no
+<tt class="docutils literal"><span class="pre">HTTP_X_FORWARDED_FOR</span></tt>, o que significa que ninguém pode &#8220;falsificar&#8221; seus
+endereços de IP. Somente use isto quando você confia absolutamente no valor do
+<tt class="docutils literal"><span class="pre">HTTP_X_FORWARDED_FOR</span></tt>.</p>
+</div>
+<div class="section" id="s-module-django.middleware.locale">
+<span id="s-middleware-locale"></span><span id="module-django.middleware.locale"></span><span id="middleware-locale"></span><h3>Middleware Locale<a class="headerlink" href="#module-django.middleware.locale" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.middleware.locale.django.middleware.locale.LocaleMiddleware">
+<em class="property">class </em><tt class="descclassname">django.middleware.locale.</tt><tt class="descname">LocaleMiddleware</tt><a class="headerlink" href="#django.middleware.locale.django.middleware.locale.LocaleMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Habilita a seleção de idioma baseado em dados vindos da requisição. Ele
+personaliza o conteúdo para cada usuário. Veja a <a class="reference internal" href="../topics/i18n/index.html"><em>documentação de
+internacionalização</em></a>.</p>
+</div>
+<div class="section" id="s-module-django.contrib.sessions.middleware">
+<span id="s-middleware-session"></span><span id="module-django.contrib.sessions.middleware"></span><span id="middleware-session"></span><h3>Middleware Session<a class="headerlink" href="#module-django.contrib.sessions.middleware" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.contrib.sessions.middleware.django.contrib.sessions.middleware.SessionMiddleware">
+<em class="property">class </em><tt class="descclassname">django.contrib.sessions.middleware.</tt><tt class="descname">SessionMiddleware</tt><a class="headerlink" href="#django.contrib.sessions.middleware.django.contrib.sessions.middleware.SessionMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Habilita o suporte a sessões. Veja a <a class="reference internal" href="../topics/http/sessions.html"><em>documentação de sessões</em></a>.</p>
+</div>
+<div class="section" id="s-module-django.contrib.auth.middleware">
+<span id="s-middleware-authentication"></span><span id="module-django.contrib.auth.middleware"></span><span id="middleware-authentication"></span><h3>Middleware Authentication<a class="headerlink" href="#module-django.contrib.auth.middleware" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.contrib.auth.middleware.django.contrib.auth.middleware.AuthenticationMiddleware">
+<em class="property">class </em><tt class="descclassname">django.contrib.auth.middleware.</tt><tt class="descname">AuthenticationMiddleware</tt><a class="headerlink" href="#django.contrib.auth.middleware.django.contrib.auth.middleware.AuthenticationMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Adiciona o atributo <tt class="docutils literal"><span class="pre">user</span></tt>, representando o usuário atualmente logado, para
+todo objeto <tt class="docutils literal"><span class="pre">HttpRequest</span></tt> que chega. Veja <a class="reference internal" href="../topics/auth.html"><em>Autenticação em requisições
+Web</em></a>.</p>
+</div>
+<div class="section" id="s-module-django.contrib.csrf.middleware">
+<span id="s-middleware-de-protecao-csrf"></span><span id="module-django.contrib.csrf.middleware"></span><span id="middleware-de-protecao-csrf"></span><h3>Middleware de proteção CSRF<a class="headerlink" href="#module-django.contrib.csrf.middleware" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.contrib.csrf.middleware.django.contrib.csrf.middleware.CsrfMiddleware">
+<em class="property">class </em><tt class="descclassname">django.contrib.csrf.middleware.</tt><tt class="descname">CsrfMiddleware</tt><a class="headerlink" href="#django.contrib.csrf.middleware.django.contrib.csrf.middleware.CsrfMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Adiciona proteção contra Cross Site Request Forgeries adicionando campos
+invisíveis de formulários aos formulários POST e checando suas requisições
+pelos valores corretos. Veja a <a class="reference internal" href="contrib/csrf.html"><em>documentação da proteção de Cross Site
+Request Forgeries</em></a>.</p>
+</div>
+<div class="section" id="s-module-django.middleware.transaction">
+<span id="s-middleware-transaction"></span><span id="module-django.middleware.transaction"></span><span id="middleware-transaction"></span><h3>Middleware Transaction<a class="headerlink" href="#module-django.middleware.transaction" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.middleware.transaction.django.middleware.transaction.TransactionMiddleware">
+<em class="property">class </em><tt class="descclassname">django.middleware.transaction.</tt><tt class="descname">TransactionMiddleware</tt><a class="headerlink" href="#django.middleware.transaction.django.middleware.transaction.TransactionMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Vincula commit e rollback às fases request/response. Se uma função view é
+executada com sucesso, um commit é feito. Se ela falhar com uma exceção, um
+rollback é realizado.</p>
+<p>A ordem deste middleware na pilha é importante: módulos middleware rodando fora
+dele rodam com commit-on-save - o comportamento padrão do Django. Módulos
+middleware rodando dentro dele (vêm depois na pilha) estarão abaixo do mesmo
+controle de transações como nas funções view.</p>
+<p>Veja a <a class="reference internal" href="../topics/db/transactions.html"><em>documentação de gerenciamento de transações</em></a>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Referência dos middlewares embutidos</a><ul>
+<li><a class="reference internal" href="#middlewares-disponiveis">Middlewares disponíveis</a><ul>
+<li><a class="reference internal" href="#module-django.middleware.cache">Middleware de cache</a></li>
+<li><a class="reference internal" href="#module-django.middleware.common">Middleware &#8220;Common&#8221;</a></li>
+<li><a class="reference internal" href="#module-django.middleware.doc">Middleware view metadata</a></li>
+<li><a class="reference internal" href="#module-django.middleware.gzip">Middleware GZIP</a></li>
+<li><a class="reference internal" href="#module-django.middleware.http">Middleware GET condicional</a></li>
+<li><a class="reference internal" href="#middleware-para-proxy-reverso">Middleware para proxy reverso</a></li>
+<li><a class="reference internal" href="#module-django.middleware.locale">Middleware Locale</a></li>
+<li><a class="reference internal" href="#module-django.contrib.sessions.middleware">Middleware Session</a></li>
+<li><a class="reference internal" href="#module-django.contrib.auth.middleware">Middleware Authentication</a></li>
+<li><a class="reference internal" href="#module-django.contrib.csrf.middleware">Middleware de proteção CSRF</a></li>
+<li><a class="reference internal" href="#module-django.middleware.transaction">Middleware Transaction</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="class-based-views.html">Class-based generic views</a></li>
+    
+    
+      <li>Next: <a href="models/index.html">Modelos</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Referência da API</a>
+        
+        <ul><li>Referência dos middlewares embutidos</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/ref/middleware.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="class-based-views.html" title="Class-based generic views">previous</a> 
+     |
+    <a href="index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="models/index.html" title="Modelos">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

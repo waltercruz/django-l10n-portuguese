@@ -1,0 +1,424 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: In Progress $
+..   $OriginalRevision: 15028 $
+..   $TranslationAuthors: Walter Cruz $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+============================================
+Como usar o Django com o Apache e mod_python
+============================================
+
+.. warning::
+
+    Support for mod_python has been deprecated, and will be removed in
+    Django 1.5. If you are configuring a new deployment, you are
+    strongly encouraged to consider using :doc:`mod_wsgi
+    </howto/deployment/modwsgi>` or any of the other :doc:`supported
+    backends </howto/deployment/index>`.
+
+.. highlight:: apache
+
+O módulo `mod_python`_ para o Apache_ pode ser usado para fazer a implantação
+do Django em um servidor de produção, embora ele tenha sido praticamente superado pela opção
+mais simples :doc:`implantação com mod_wsgi </howto/deployment/modwsgi>`.
+
+O mod_python é semelhante (e inspirado) ao `mod_perl`_ : Ele embute o Python dentro
+do Apache e carrega o código Python na memória quando o servidor inicia. o Código fica na memória
+durante o tempo de vida do processo Apache, que leva a ganhos de performance
+significantes sobre outras opções de disposição de servidor.
+
+O Django requer o Apache 2.x e o mod_python 3.x, e você deve usar o
+`MPM prefork`_, ao invés do `MPM worker`_.
+
+.. seealso::
+
+    * O apache é um animal grande e complexo, e esse documento dá apenas um 
+      panorama do que o Apache é capaz de fazer. Se você precisa de informação
+      mais avançado sobre o Apache, não há fonte de informação melhor que
+      `a própria documentação oficial do Apache`_
+
+    * Você pode também estar interessado em :doc:`Como usar o Django com FastCGI, SCGI
+      ou AJP </howto/deployment/fastcgi>`.
+
+.. _Apache: http://httpd.apache.org/
+.. _mod_python: http://www.modpython.org/
+.. _mod_perl: http://perl.apache.org/
+.. _MPM prefork: http://httpd.apache.org/docs/2.2/mod/prefork.html
+.. _MPM worker: http://httpd.apache.org/docs/2.2/mod/worker.html
+.. _a própria documentação oficial do Apache: http://httpd.apache.org/docs/
+
+Configuração Básica
+===================
+
+Para configurar o Django com o mod_python, verifique primeiro se você tem o Apache instalado,
+Com o módulo mod_python ativado.
+
+Edite o arquivo ``httpd.conf`` e adicione o seguinte::
+
+    <Location "/mysite/">
+        SetHandler python-program
+        PythonHandler django.core.handlers.modpython
+        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+        PythonOption django.root /mysite        
+        PythonDebug On
+    </Location>
+
+...e substitua o ``mysite.settings`` com o caminho de importação do Python para o seu
+arquivo de configuração do projeto Django.
+
+Isso diz ao Apache: "Use o mod_python para qualquer URL em ou sobre '/mysite/', usando o 
+handler do mod_python do Django." Ele passa o valor do :ref:`DJANGO_SETTINGS_MODULE
+<django-settings-module>` para que o mod_python saiba quais configurações usar.
+
+Como o mod_python não sabe que estamos servido
+esse site a partir do prefixo ``/mysite/``, esse valor precisa ser passado
+para o Django através do manipulador do mod_python, pela linha ``PythonOption
+django.root ...``. O valor configurado nessa linha (o último item) deve ser igual
+ao texto informado na diretiva ``<Location ...>``. O efeito disso é que o
+Django irá automaticamente remover a string ``/mysite`` no início de quaisquer
+URLs antes de fazer a verificação deles com os seus padrões em ``URLConf``. Se você depois
+mudar o seu site para um endereço como ``/mysite2``, você não irá precisar alterar nada,
+exceto a opção ``django.root`` no arquivo de configuração.
+
+Ao usar o ``django.root`` você deve assegurar-se que o que resta, após a
+remoção do prefixo, inicie com uma barra. Seus padrões do URLConf que esperar
+uma barra inicial funcionaram corretamente. No exemplo acima,
+supondo que queiramos enviar uma URL como ``/mysite/admin/`` para o ``/admin/``, precisamos
+remover a  string ``/mysite`` do início, então esse deve ser o valor do
+``django.root``. Seria um error usar o ``/mysite/`` (com uma
+barra final) nesse caso.
+
+Repare que estamos usando a diretiva ``<Location>`` , não a diretiva ``<Directory>``. 
+Essa última é usada para apontar para lugares no sistema de arquivos,
+enquanto ``<Location>`` aponta para lugares específicos na estrutura de URL de um Web site.
+``<Directory>`` seria sem significado aqui.
+
+Além disso, se o seu projeto Django não está no ``PYTHONPATH`` padrão do seu 
+computador, você terá de dizer ao mod_python onde o seu projeto pode ser encontrado:
+
+.. parsed-literal::
+
+    <Location "/mysite/">
+        SetHandler python-program
+        PythonHandler django.core.handlers.modpython
+        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+        PythonOption django.root /mysite
+        PythonDebug On
+        **PythonPath "['/path/to/project'] + sys.path"**
+    </Location>
+
+O valor usado em ``PythonPath`` deve incluir o diretório pai de todos os módulos
+que você vai importar em sua aplicação. Deve também incluir o
+diretório pai da localização do :ref:`DJANGO_SETTINGS_MODULE
+<django-settings-module>`. Essa é exatamente a mesma situação
+do caminho do Python para uso iterativo. Sempre que você tenta importar algo,
+o Python irá percorrer todos os diretórios no ``sys.path`` em ordem,
+do primeiro ao último, e tentar importar de cada diretório até ter sucesso.
+
+Verique se as permissões dos seus arquivos de código Python estejam configuradas de forma que o usuário do
+Apache  (normalmente chamado de ``apache`` ou ``httpd`` na maioria dos sistemas) tenha acesso
+de leitura aos arquivos.
+
+Um exemplo que pode tornar isso mais claro: suponha que você tenha algumas aplicações em
+``/usr/local/django-apps/`` (por exemplo, ``/usr/local/django-apps/weblog/`` e assim
+por diante), seu arquivo de configurações está em ``/var/www/mysite/settings.py`` e você tem o
+:ref:`DJANGO_SETTINGS_MODULE <django-settings-module>` especificado como no exemplo
+acima. Nesse caso, você precisa escrever a sua diretiva ``PythonPath`` assim::
+
+    PythonPath "['/usr/local/django-apps/', '/var/www'] + sys.path"
+
+Com esse caminho, ``import weblog`` e ``import mysite.settings`` irão funcionar.
+Se você tem ``import blogroll`` em algum lugar do seu código e ``blogroll``
+está no diretório ``weblog/``, você *também* precisa adicionar
+``/usr/local/django-apps/weblog/`` ao seu ``PythonPath``. Lembre-se: os
+**diretórios pai** de tudo o que você for importar diretamente devem estar no caminho do
+Python.
+
+.. note::
+
+    Se você está usando o Windoes, ainda assim recomendamos que você use barras normais
+    nos nome dos caminhos, ainda que o Windows normalmente use as barras invertidas
+    como seu separador nativo. O Apache sabe como converter a barra para o formato
+    nativo, então esse jeito de lidar é mais portável e mais fácil de ler.
+    (E evida problemas esquisitos como ter de escapar as barras invertidas duas
+    vezes.)
+
+    Isso é válido mesmo em um sistema Windows::
+
+        PythonPath "['c:/path/to/project'] + sys.path"
+
+Você também pode adicionar diretivas como ``PythonAutoReload Off`` para performance.
+Veja a `documentação do mod_python`_ para uma lista completa de opções.
+
+Note que você deve configurar ``PythonDebug Off`` em um servidor de produção. Se você
+deixar o ``PythonDebug On``, seus usuários vão ver tracebacks Python feios (e reveladores)
+se algo der errado dentro do mod_python.
+
+Reinicie o Apache, e quaisquer requisições feitas para ``/mysite/`` ou abaixo dele serão servidas pelo
+Django. Note que as URLconfs do Django não não eliminar o "/mysite/" -- elas recebem a URL
+completa.
+
+Ao implantar sites Django no mod_python, você irá precisar reiniciar o Apache a cada
+vez que você fizer mudanças no seu código Python.
+
+Múltiplas instalações do Django no mesmo Apache
+===============================================
+
+É inteiramente possível executar múltiplas instalações do Django na mesma instância do Apache. 
+Apenas use ``VirtualHost`` para isso, assim so::
+
+    NameVirtualHost *
+
+    <VirtualHost *>
+        ServerName www.example.com
+        # ...
+        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+    </VirtualHost>
+
+    <VirtualHost *>
+        ServerName www2.example.com
+        # ...
+        SetEnv DJANGO_SETTINGS_MODULE mysite.other_settings
+    </VirtualHost>
+
+Se você precisa colocar duas instalações do Django dentro do mesmo ``VirtualHost``
+(ou em blocos ``VirtualHost`` diferentes que compartilham o mesmo nome de servidor),
+você precisará tomar um cuidade especial para que o cache do mod_python não
+bagunce as coisas. Use a diretiva ``PythonInterpreter`` para dar a cada diretiva
+``<Location>`` diferente interpretadores separados::
+
+    <VirtualHost *>
+        ServerName www.example.com
+        # ...
+        <Location "/something">
+            SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+            PythonInterpreter mysite
+        </Location>
+
+        <Location "/otherthing">
+            SetEnv DJANGO_SETTINGS_MODULE mysite.other_settings
+            PythonInterpreter othersite
+        </Location>
+    </VirtualHost>
+
+Os valores para ``PythonInterpreter`` não importam muito, desde que eles sejam diferentes
+entre os blocos ``Location``.
+
+Executando um servidor de desenvolvimento com o mod_python
+==========================================================
+
+Se você usar o mod_python como seu servidor de desenvolvimento, você pode evitar o fardo
+de ter de reiniciar o servidor cada vez que seu código muda. Apenas configure
+``MaxRequestsPerChild 1`` no seu arquivo ``httpd.conf`` para forçar o Apache a recarregar
+tudo de novo em cada requisição. Mas não faça isso no servidor de produção, ou revogaremos
+seus privilégios Django.
+
+Se você é o tipo de programador que debuga disperando declarações ``print``
+no meio do seu código, note que declarações ``print`` não aparecem no log do Apache 
+e podem até mesmo `causar erros de resposta`_.
+
+.. _causar erros de resposta: http://blog.dscpl.com.au/2009/04/wsgi-and-printing-to-standard-output.html
+
+Se você precisa imprimir informação de depuração em uma configuração com o mod_python, você
+tem algumas opções. You can print to ``stderr`` explicitly, like so::
+
+    print >> sys.stderr, 'debug text'
+    sys.stderr.flush()
+
+(note that ``stderr`` is buffered, so calling ``flush`` is necessary if you wish
+debugging information to be displayed promptly.)
+
+A more compact approach is to use an assertion::
+
+    assert False, 'debug text'
+
+Outra alternativa é adicionar a informação de debug no template da sua página.
+
+.. _documentação do mod_python: http://modpython.org/live/current/doc-html/directives.html
+
+Servindo arquivos de mídia
+==========================
+
+O Django não serve arquivos de mídia por si só; ele delega esse trabalho ao servidor Web
+de sua escolha.
+
+Nós recomendanos o uso de um servidor Web separado -- i.e., um que não esteja executando o 
+Django -- para servir mídia. Aqui estão algumas boas escolhas:
+
+    * lighttpd_
+    * Nginx_
+    * TUX_
+    * Uma versão reduzida do Apache_
+    * Cherokee_
+
+Se, porém, você não tem opção exceto servir arquivos de mídia no mesmo
+``VirtualHost`` do Apache do Django, aqui está como você pode desligar o mod_python para uma parte
+em particular do site::
+
+    <Location "/media">
+        SetHandler None
+    </Location>
+
+Apenas mude o ``Location`` para a URL raiz dos seus arquivos de mídia. Você pode usar também o
+``<LocationMatch>`` para casar com uma expressão regular.
+
+Esse exemplo configura o Django na raiz do site mas explicitamente desabilita o Django para
+o subdiretório ``media`` e qualquer URL quer termine em ``.jpg``, ``.gif`` ou
+``.png``::
+
+    <Location "/">
+        SetHandler python-program
+        PythonHandler django.core.handlers.modpython
+        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+    </Location>
+
+    <Location "/media">
+        SetHandler None
+    </Location>
+
+    <LocationMatch "\.(jpg|gif|png)$">
+        SetHandler None
+    </LocationMatch>
+
+
+.. _lighttpd: http://www.lighttpd.net/
+.. _Nginx: http://wiki.nginx.org/Main
+.. _TUX: http://en.wikipedia.org/wiki/TUX_web_server
+.. _Apache: http://httpd.apache.org/
+.. _Cherokee: http://www.cherokee-project.com/
+
+Servindo os arquivos da administração
+=====================================
+
+Note que o servidor de desenvolvimento do Django automaticamente serve os arquivos de mídia da administração,
+mas isso não é automático quando você usa outra disposição de servidor. Você é
+responsável por configurar o Apache, ou qualquer outro servidor de mídia que estiver usando, para
+servir os arquivos da administração.
+
+Os arquivos da administração ficam na pasta (:file:`django/contrib/admin/media`) da distribuição do
+Django.
+
+Aqui estão duas formas recomendadas:
+
+    1. Crie um link simbólico para os arquivos de mídia da administração dentro do seu
+       document root. Dessa forma, todos os seus arquivos relacionados ao Django -- código **e**
+       templates -- ficam em um único lugar, e você ainda irá ser capaz de fazer um ``svn
+       update`` no seu código para obter as últimas versões dos templates da administração, 
+       se eles mudarem.
+       
+    2. Ou, copie os arquivos de mídia da administração de forma que eles fiquem dentro do
+       document root do seu Apache.
+
+Usando "eggs" com o mod_python
+==============================
+
+Se você instalou o Django de um Python egg_ ou está usando eggs no seu projeto
+Django, algumas configurações extra são requeridas. Crie um arquivo extra no seu
+projeto (ou em algum outro lugar) que contenha algo assim:
+
+.. code-block:: python
+
+    import os
+    os.environ['PYTHON_EGG_CACHE'] = '/some/directory'
+
+Aqui, ``/some/directory`` é um diretório ao qual o servidor Apache tenha acesso de
+escrita. Ele será usado como o local de descompactação para qualquer código
+que os eggs precisem fazer.
+
+Então você irá precisar dizer ao mod_python para importar esse arquivo antes de fazer
+qualquer coisa. Isso é feito usando a diretiva PythonImport_ do seu mod_python. Você precisa
+garantir que você especificou a diretiva ``PythonInterpreter`` do mod_python 
+como descrito acima__ (nesse caso, você precisa fazer isso mesmo que você não esteja servindo
+múltiplas instalações). Então, adicione a linha ``PythonImport``
+na configuração principal do servidor (i.e., fora das seções ``Location`` ou
+``VirtualHost``). Por exemplo::
+
+    PythonInterpreter my_django
+    PythonImport /path/to/my/project/file.py my_django
+
+Note que você pode usar um caminho absoluto aqui (ou um caminho de importação com pontos normal),
+como descrito no `manual do mod_python`_. Nós usamos um caminho absoluto
+no exemplo acima porque se quaisquer modificações no Python path forem necessárias para acessar 
+seu projeto, elas não terão sido feitas no momento em que a linha ``PythonImport``
+é processada.
+
+.. _Egg: http://peak.telecommunity.com/DevCenter/PythonEggs
+.. _PythonImport: http://www.modpython.org/live/current/doc-html/dir-other-pimp.html
+.. _manual do mod_python: PythonImport_
+__ `Múltiplas instalações do Django no mesmo Apache`_
+
+Tratamento de erros
+===================
+
+QUando você usa o Apache/mod_python, os error serão capturados pelo Django -- em outras
+palavras, eles não irão propagar para o nível do Apache nem aparecerão no ``error_log`` do Apache.
+
+A exceção a isso é se algo estiver realmente quebrado na sua configuração do Django. Nesse
+caso, você verá uma página de "Erro Interno do Servidor" no seu navegador e o
+traceback completo do Python no seu arquivo ``error_log`` do Apache. O traceback no ``error_log``
+ocupa diversas linhas. (Sim, isso é feio e bem chato de ler,
+mas é como o mod_python faz as coisas.)
+
+Se você tiver uma falha de segmentação
+======================================
+
+Se o Apache causar uma falha de segmentação, existem duas razões prováveis, nenhuma
+das quais tem a ver com o Django em si.
+
+    1. Pode ser que o seu código Python está importando o módulo "pyexpat",
+       que pode causar conflito com a versão embutida no Apache. Para informação
+       completa, veja `Expat fazendo o Apache travar`_.
+       
+    2. Pode ser porque você está usando o mod_python e o mod_php na mesma instância
+       do Apache, com o MySQL como seu banco de dados. Em alguns casos,
+       isso causa um problema conhecido do mod_python devido a conflito de versões no PHP
+       e no backend do MySQL do Python. Existem informação completa na
+       `entrada da FAQ do mod_python`_.
+
+Se você continuar a ter problemas configurando o mod_python, algo interessante a se fazer
+e conseguir um site mod_python cru rodando, sem o framework Django. Isso é
+um modo fácil de isolar problemas específicos do mod_python. `Fazendo o mod_python funcionar`_
+detalha esse procedimento.
+
+O próximo passo deve ser editar seu código de teste e adicionar um import de qualquer
+código específico do Django que você esteja usando -- suas views, seus models, suas URLconf,
+sua configuração de RSS, etc. Coloque esses imports na sua função gerenciadora de teste
+e acesse sua URL de teste em um navegador. Se isso causa um crash, você confirmou
+que a importação de código Django que causa o problema. Gradualmente reduza o conjunto de
+imports até que pare de travar, para que você encontre o módulo específico que causa o 
+problema. Investigue cada módulo e veja seus imports, conforme necessário.
+
+.. _Expat fazendo o Apache travar: http://www.dscpl.com.au/wiki/ModPython/Articles/ExpatCausingApacheCrash
+.. _entrada da FAQ do mod_python: http://modpython.org/FAQ/faqw.py?req=show&file=faq02.013.htp
+.. _Fazendo o mod_python funcionar: http://www.dscpl.com.au/wiki/ModPython/Articles/GettingModPythonWorking
+
+
+If you get a UnicodeEncodeError
+===============================
+
+If you're taking advantage of the internationalization features of Django (see
+:doc:`/topics/i18n/index`) and you intend to allow users to upload files, you must
+ensure that the environment used to start Apache is configured to accept
+non-ASCII file names. If your environment is not correctly configured, you
+will trigger ``UnicodeEncodeError`` exceptions when calling functions like
+``os.path()`` on filenames that contain non-ASCII characters.
+
+To avoid these problems, the environment used to start Apache should contain
+settings analogous to the following::
+
+    export LANG='en_US.UTF-8'
+    export LC_ALL='en_US.UTF-8'
+
+Consult the documentation for your operating system for the appropriate syntax
+and location to put these configuration items; ``/etc/apache2/envvars`` is a
+common location on Unix platforms. Once you have added these statements
+to your environment, restart Apache.

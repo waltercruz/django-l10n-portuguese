@@ -1,0 +1,1019 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Os add-ons “local flavor” &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Os add-ons “django.contrib”" href="index.html" />
+    <link rel="next" title="django.contrib.markup" href="markup.html" />
+    <link rel="prev" title="django.contrib.humanize" href="humanize.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="humanize.html" title="django.contrib.humanize">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="markup.html" title="django.contrib.markup">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-localflavor">
+            
+  <div class="section" id="s-module-django.contrib.localflavor">
+<span id="s-os-add-ons-local-flavor"></span><span id="s-ref-contrib-localflavor"></span><span id="module-django.contrib.localflavor"></span><span id="os-add-ons-local-flavor"></span><span id="ref-contrib-localflavor"></span><h1>Os add-ons &#8220;local flavor&#8221;<a class="headerlink" href="#module-django.contrib.localflavor" title="Permalink to this headline">¶</a></h1>
+<p>Seguindo sua filosofia de &#8220;beterias inclusas&#8221;, o Django vem acompanhado de peças
+sortidas de código que são úteis para paises e culturas particulares. Estes são
+chamados de &#8220;local flavor&#8221; (sabores locais) e ficam no pacote
+<a class="reference internal" href="#module-django.contrib.localflavor" title="django.contrib.localflavor: Uma coleção de vários fragmentos que são úteis somente para um país ou cultura em particular."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.localflavor</span></tt></a>.</p>
+<p>Dentro desse pacote, ó código de um país ou uma cultura específica fica dentro
+de sub-pacotes, chamados usando <a class="reference external" href="http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm">códigos de país ISO 3166</a>.</p>
+<p>A maioria dos add-ons <tt class="docutils literal"><span class="pre">localflavor</span></tt> estão localizados na forma de componentes
+derivando do framework <a class="reference internal" href="../../topics/forms/index.html"><em>forms</em></a> &#8211; por exemplo, um
+<a class="reference internal" href="#django.contrib.localflavor.us.forms.USStateField" title="django.contrib.localflavor.us.forms.USStateField"><tt class="xref py py-class docutils literal"><span class="pre">USStateField</span></tt></a> que sabe como validar
+abreviações de estados do E.U.A., e um
+<a class="reference internal" href="#django.contrib.localflavor.fi.forms.FISocialSecurityNumber" title="django.contrib.localflavor.fi.forms.FISocialSecurityNumber"><tt class="xref py py-class docutils literal"><span class="pre">FISocialSecurityNumber</span></tt></a> que sabe
+como validar os números do seguro social Finlandês.</p>
+<p>Para usar um desses componentes localizados, basta importar o sub-pacote
+relevante. Por exemplo, aqui tem como você consegue criar um formulário com um
+campo representando um número de telefone Francês:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span> <span class="nn">django.contrib.localflavor.fr.forms</span> <span class="kn">import</span> <span class="n">FRPhoneNumberField</span>
+
+<span class="k">class</span> <span class="nc">MyForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">my_french_phone_no</span> <span class="o">=</span> <span class="n">FRPhoneNumberField</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="s-paises-suportados">
+<span id="paises-suportados"></span><h2>Paises suportados<a class="headerlink" href="#paises-suportados" title="Permalink to this headline">¶</a></h2>
+<p>Os paises atualmente suportados pelo <a class="reference internal" href="#module-django.contrib.localflavor" title="django.contrib.localflavor: Uma coleção de vários fragmentos que são úteis somente para um país ou cultura em particular."><tt class="xref py py-mod docutils literal"><span class="pre">localflavor</span></tt></a> são</p>
+<ul class="simple">
+<li><a class="reference internal" href="#argentina-ar">Argentina</a></li>
+<li><a class="reference internal" href="#australia-au">Australia</a></li>
+<li><a class="reference internal" href="#austria-at">Austria</a></li>
+<li><a class="reference internal" href="#brazil-br">Brazil</a></li>
+<li><a class="reference internal" href="#canada-ca">Canada</a></li>
+<li><a class="reference internal" href="#chile-cl">Chile</a></li>
+<li><a class="reference internal" href="#finland-fi">Finland</a></li>
+<li><a class="reference internal" href="#france-fr">France</a></li>
+<li><a class="reference internal" href="#germany-de">Germany</a></li>
+<li><a class="reference internal" href="#iceland-is">Iceland</a></li>
+<li><a class="reference internal" href="#india-in">India</a></li>
+<li><a class="reference internal" href="#italy-it">Italy</a></li>
+<li><a class="reference internal" href="#japan-jp">Japan</a></li>
+<li><a class="reference internal" href="#mexico-mx">Mexico</a></li>
+<li><a class="reference internal" href="#the-netherlands-nl">The Netherlands</a></li>
+<li><a class="reference internal" href="#norway-no">Norway</a></li>
+<li><a class="reference internal" href="#peru-pe">Peru</a></li>
+<li><a class="reference internal" href="#poland-pl">Poland</a></li>
+<li><a class="reference internal" href="#romania-ro">Romania</a></li>
+<li><a class="reference internal" href="#slovakia-sk">Slovakia</a></li>
+<li><a class="reference internal" href="#south-africa-za">South Africa</a></li>
+<li><a class="reference internal" href="#spain-es">Spain</a></li>
+<li><a class="reference internal" href="#switzerland-ch">Switzerland</a></li>
+<li><a class="reference internal" href="#united-kingdom-uk">United Kingdom</a></li>
+<li><a class="reference internal" href="#united-states-of-america-us">United States of America</a></li>
+</ul>
+<p>O pacote <tt class="docutils literal"><span class="pre">django.contrib.localflavor</span></tt> também inclui um sub-pacote genérico,
+contendo código útil que não são específicos para um único país ou cultura.
+Atualmente, é definido campos de entrada date e datetime baseados naqueles
+vindos de <a class="reference internal" href="../../topics/forms/index.html"><em>forms</em></a>, mas com formatos que não seguem o
+padrão dos E.U.A. Aqui temos um exemplo de como usá-los:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span> <span class="nn">django.contrib.localflavor</span> <span class="kn">import</span> <span class="n">generic</span>
+
+<span class="k">class</span> <span class="nc">MyForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">my_date_field</span> <span class="o">=</span> <span class="n">generic</span><span class="o">.</span><span class="n">forms</span><span class="o">.</span><span class="n">DateField</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-adicionando-sabores">
+<span id="adicionando-sabores"></span><h2>Adicionando sabores<a class="headerlink" href="#adicionando-sabores" title="Permalink to this headline">¶</a></h2>
+<p>Nós adoraríamos adicionar mais deles no Django, então por favor
+<a class="reference external" href="http://code.djangoproject.com/simpleticket">crie um ticket</a> com qualquer código que você gostaria de contribuir. Uma coisa
+que nós pedimos é que você, por favor, use objetos Unicode (<tt class="docutils literal"><span class="pre">u'mystring'</span></tt>)
+para strings, ao invês de configurar a codificação no arquivo. Veja qualquer um
+dos flavors como exemplos.</p>
+</div>
+<div class="section" id="s-argentina-ar">
+<span id="argentina-ar"></span><h2>Argentina (<tt class="docutils literal"><span class="pre">ar</span></tt>)<a class="headerlink" href="#argentina-ar" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.ar.forms.ARPostalCodeField">
+<em class="property">class </em><tt class="descclassname">ar.forms.</tt><tt class="descname">ARPostalCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.ar.forms.ARPostalCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número clássico de
+quatro dígitos do código postal ou um <a class="reference external" href="http://www.correoargentino.com.ar/consulta_cpa/home.php">CPA</a>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ar.forms.ARDNIField">
+<em class="property">class </em><tt class="descclassname">ar.forms.</tt><tt class="descname">ARDNIField</tt><a class="headerlink" href="#django.contrib.localflavor.ar.forms.ARDNIField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de  Documento
+Nacional de Identidade (DNI).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ar.forms.ARCUITField">
+<em class="property">class </em><tt class="descclassname">ar.forms.</tt><tt class="descname">ARCUITField</tt><a class="headerlink" href="#django.contrib.localflavor.ar.forms.ARCUITField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de Código Único
+de Identificação Tributária (CUIT).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ar.forms.ARProvinceSelect">
+<em class="property">class </em><tt class="descclassname">ar.forms.</tt><tt class="descname">ARProvinceSelect</tt><a class="headerlink" href="#django.contrib.localflavor.ar.forms.ARProvinceSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de províncias argentinas e cidades
+autônomas como suas opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-australia-au">
+<span id="australia-au"></span><h2>Australia (<tt class="docutils literal"><span class="pre">au</span></tt>)<a class="headerlink" href="#australia-au" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.au.forms.AUPostCodeField">
+<em class="property">class </em><tt class="descclassname">au.forms.</tt><tt class="descname">AUPostCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.au.forms.AUPostCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código postal
+austráliano.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.au.forms.AUPhoneNumberField">
+<em class="property">class </em><tt class="descclassname">au.forms.</tt><tt class="descname">AUPhoneNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.au.forms.AUPhoneNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de telefone
+australiano. Números válidos possuem dez dígitos.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.au.forms.AUStateSelect">
+<em class="property">class </em><tt class="descclassname">au.forms.</tt><tt class="descname">AUStateSelect</tt><a class="headerlink" href="#django.contrib.localflavor.au.forms.AUStateSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de estados/territórios australianos
+como suas opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-austria-at">
+<span id="austria-at"></span><h2>Austria (<tt class="docutils literal"><span class="pre">at</span></tt>)<a class="headerlink" href="#austria-at" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.at.forms.ATZipCodeField">
+<em class="property">class </em><tt class="descclassname">at.forms.</tt><tt class="descname">ATZipCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.at.forms.ATZipCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida sua entrada como um código zip austríaco.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.at.forms.ATStateSelect">
+<em class="property">class </em><tt class="descclassname">at.forms.</tt><tt class="descname">ATStateSelect</tt><a class="headerlink" href="#django.contrib.localflavor.at.forms.ATStateSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de estados austríacos como suas
+opções.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.at.forms.ATSocialSecurityNumberField">
+<em class="property">class </em><tt class="descclassname">at.forms.</tt><tt class="descname">ATSocialSecurityNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.at.forms.ATSocialSecurityNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida sua entrada como um número de seguro
+social austríaco.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-brazil-br">
+<span id="brazil-br"></span><h2>Brazil (<tt class="docutils literal"><span class="pre">br</span></tt>)<a class="headerlink" href="#brazil-br" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.br.forms.BRPhoneNumberField">
+<em class="property">class </em><tt class="descclassname">br.forms.</tt><tt class="descname">BRPhoneNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.br.forms.BRPhoneNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de telefone
+brasileiro, com o formato XX-XXXX-XXXX.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.br.forms.BRZipCodeField">
+<em class="property">class </em><tt class="descclassname">br.forms.</tt><tt class="descname">BRZipCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.br.forms.BRZipCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um C.E.P. brasileiro, com o
+formato XXXXX-XXX.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.br.forms.BRStateSelect">
+<em class="property">class </em><tt class="descclassname">br.forms.</tt><tt class="descname">BRStateSelect</tt><a class="headerlink" href="#django.contrib.localflavor.br.forms.BRStateSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de estados/territórios brasileiros
+como suas opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-canada-ca">
+<span id="canada-ca"></span><h2>Canada (<tt class="docutils literal"><span class="pre">ca</span></tt>)<a class="headerlink" href="#canada-ca" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.ca.forms.CAPhoneNumberField">
+<em class="property">class </em><tt class="descclassname">ca.forms.</tt><tt class="descname">CAPhoneNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.ca.forms.CAPhoneNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de telefone
+canadence, como o formato XXX-XXX-XXXX.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ca.forms.CAPostalCodeField">
+<em class="property">class </em><tt class="descclassname">ca.forms.</tt><tt class="descname">CAPostalCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.ca.forms.CAPostalCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código postal canadence,
+com o formato XXX XXX</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ca.forms.CAProvinceField">
+<em class="property">class </em><tt class="descclassname">ca.forms.</tt><tt class="descname">CAProvinceField</tt><a class="headerlink" href="#django.contrib.localflavor.ca.forms.CAProvinceField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um nome ou abreviação de
+província canadense.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ca.forms.CASocialInsuranceNumberField">
+<em class="property">class </em><tt class="descclassname">ca.forms.</tt><tt class="descname">CASocialInsuranceNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.ca.forms.CASocialInsuranceNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um Número de Seguro Social
+Canadense (SIN). Um número válido deve ter o formato XXX-XXX-XXX e passar um
+<a class="reference external" href="http://en.wikipedia.org/wiki/Luhn_algorithm">Luhn mod-10 checksum</a>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ca.forms.CAProvinceSelect">
+<em class="property">class </em><tt class="descclassname">ca.forms.</tt><tt class="descname">CAProvinceSelect</tt><a class="headerlink" href="#django.contrib.localflavor.ca.forms.CAProvinceSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de províncias e territórios
+canadenses como suas opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-chile-cl">
+<span id="chile-cl"></span><h2>Chile (<tt class="docutils literal"><span class="pre">cl</span></tt>)<a class="headerlink" href="#chile-cl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.cl.forms.CLRutField">
+<em class="property">class </em><tt class="descclassname">cl.forms.</tt><tt class="descname">CLRutField</tt><a class="headerlink" href="#django.contrib.localflavor.cl.forms.CLRutField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de identificação
+nacional chilena ('Rol Unico Tributario' or RUT). O formato válido é
+XX.XXX.XXX-X.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.cl.forms.CLRegionSelect">
+<em class="property">class </em><tt class="descclassname">cl.forms.</tt><tt class="descname">CLRegionSelect</tt><a class="headerlink" href="#django.contrib.localflavor.cl.forms.CLRegionSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de regiões chilenas (Regiões) como
+suas opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-finland-fi">
+<span id="finland-fi"></span><h2>Finland (<tt class="docutils literal"><span class="pre">fi</span></tt>)<a class="headerlink" href="#finland-fi" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.fi.forms.FISocialSecurityNumber">
+<em class="property">class </em><tt class="descclassname">fi.forms.</tt><tt class="descname">FISocialSecurityNumber</tt><a class="headerlink" href="#django.contrib.localflavor.fi.forms.FISocialSecurityNumber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de seguro social
+finlandês.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.fi.forms.FIZipCodeField">
+<em class="property">class </em><tt class="descclassname">fi.forms.</tt><tt class="descname">FIZipCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.fi.forms.FIZipCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como de um código zip finlandês.
+Códigos válidos consistem em cinco dígitos.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.fi.forms.FIMunicipalitySelect">
+<em class="property">class </em><tt class="descclassname">fi.forms.</tt><tt class="descname">FIMunicipalitySelect</tt><a class="headerlink" href="#django.contrib.localflavor.fi.forms.FIMunicipalitySelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de municípios finlandeses como suas
+opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-france-fr">
+<span id="france-fr"></span><h2>France (<tt class="docutils literal"><span class="pre">fr</span></tt>)<a class="headerlink" href="#france-fr" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.fr.forms.FRPhoneNumberField">
+<em class="property">class </em><tt class="descclassname">fr.forms.</tt><tt class="descname">FRPhoneNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.fr.forms.FRPhoneNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número local francês. O
+formato correto é 0X XX XX XX XX. 0X.XX.XX.XX.XX e 0XXXXXXXXX validam mas
+são corrigidos para 0X XX XX XX XX.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.fr.forms.FRZipCodeField">
+<em class="property">class </em><tt class="descclassname">fr.forms.</tt><tt class="descname">FRZipCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.fr.forms.FRZipCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código zip fancês.
+Códigos válidos consistem em cinco dígitos.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.fr.forms.FRDepartmentSelect">
+<em class="property">class </em><tt class="descclassname">fr.forms.</tt><tt class="descname">FRDepartmentSelect</tt><a class="headerlink" href="#django.contrib.localflavor.fr.forms.FRDepartmentSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de departamentos franceses como suas
+opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-germany-de">
+<span id="germany-de"></span><h2>Germany (<tt class="docutils literal"><span class="pre">de</span></tt>)<a class="headerlink" href="#germany-de" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.de.forms.DEIdentityCardNumberField">
+<em class="property">class </em><tt class="descclassname">de.forms.</tt><tt class="descname">DEIdentityCardNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.de.forms.DEIdentityCardNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de carteira de
+identidade alemã (<a class="reference external" href="http://de.wikipedia.org/wiki/Personalausweis">Personalausweis</a>). Números válidos têm o formato
+XXXXXXXXXXX-XXXXXXX-XXXXXXX-X, com nenhum grupo com somente zeros.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.de.forms.DEZipCodeField">
+<em class="property">class </em><tt class="descclassname">de.forms.</tt><tt class="descname">DEZipCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.de.forms.DEZipCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código zip alemão.
+Códigos válidos consistem em cinco dígitos.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.de.forms.DEStateSelect">
+<em class="property">class </em><tt class="descclassname">de.forms.</tt><tt class="descname">DEStateSelect</tt><a class="headerlink" href="#django.contrib.localflavor.de.forms.DEStateSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de estados alemãos como suas opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-the-netherlands-nl">
+<span id="the-netherlands-nl"></span><h2>The Netherlands (<tt class="docutils literal"><span class="pre">nl</span></tt>)<a class="headerlink" href="#the-netherlands-nl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.nl.forms.NLPhoneNumberField">
+<em class="property">class </em><tt class="descclassname">nl.forms.</tt><tt class="descname">NLPhoneNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.nl.forms.NLPhoneNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de telefone
+holandês.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.nl.forms.NLSofiNumberField">
+<em class="property">class </em><tt class="descclassname">nl.forms.</tt><tt class="descname">NLSofiNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.nl.forms.NLSofiNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de seguro social
+holandês (SoFI/BSN).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.nl.forms.NLZipCodeField">
+<em class="property">class </em><tt class="descclassname">nl.forms.</tt><tt class="descname">NLZipCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.nl.forms.NLZipCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código zip holandês.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.nl.forms.NLProvinceSelect">
+<em class="property">class </em><tt class="descclassname">nl.forms.</tt><tt class="descname">NLProvinceSelect</tt><a class="headerlink" href="#django.contrib.localflavor.nl.forms.NLProvinceSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de províncias holandesas como uma
+lista de opções..</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-iceland-is">
+<span id="iceland-is"></span><h2>Iceland (<tt class="docutils literal"><span class="pre">is_</span></tt>)<a class="headerlink" href="#iceland-is" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.is_.forms.ISIdNumberField">
+<em class="property">class </em><tt class="descclassname">is_.forms.</tt><tt class="descname">ISIdNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.is_.forms.ISIdNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de identificação
+islandês (kennitala). O formato é XXXXXX-XXXX.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.is_.forms.ISPhoneNumberField">
+<em class="property">class </em><tt class="descclassname">is_.forms.</tt><tt class="descname">ISPhoneNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.is_.forms.ISPhoneNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de telefone da
+Islândia (sete dígitos com um hífen opcional depois dos primeiros três
+dígitos).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.is_.forms.ISPostalCodeSelect">
+<em class="property">class </em><tt class="descclassname">is_.forms.</tt><tt class="descname">ISPostalCodeSelect</tt><a class="headerlink" href="#django.contrib.localflavor.is_.forms.ISPostalCodeSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de códigos postais da Islândia como
+suas opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-india-in">
+<span id="india-in"></span><h2>India (<tt class="docutils literal"><span class="pre">in_</span></tt>)<a class="headerlink" href="#india-in" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.in.forms.INStateField">
+<em class="property">class </em><tt class="descclassname">in.forms.</tt><tt class="descname">INStateField</tt><a class="headerlink" href="#django.contrib.localflavor.in.forms.INStateField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como o nome ou abreviação de um
+estado/território indiano. A entrada é normalizada para o padrão de duas
+letras do veículo de registro de abreviação para o dado estado ou
+território.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.in.forms.INZipCodeField">
+<em class="property">class </em><tt class="descclassname">in.forms.</tt><tt class="descname">INZipCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.in.forms.INZipCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código zip indiano, com
+o formato XXXXXXX.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.in.forms.INStateSelect">
+<em class="property">class </em><tt class="descclassname">in.forms.</tt><tt class="descname">INStateSelect</tt><a class="headerlink" href="#django.contrib.localflavor.in.forms.INStateSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de estados/territórios indianos como
+suas opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-italy-it">
+<span id="italy-it"></span><h2>Italy (<tt class="docutils literal"><span class="pre">it</span></tt>)<a class="headerlink" href="#italy-it" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.it.forms.ITSocialSecurityNumberField">
+<em class="property">class </em><tt class="descclassname">it.forms.</tt><tt class="descname">ITSocialSecurityNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.it.forms.ITSocialSecurityNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de seguro social
+italiano (<a class="reference external" href="http://www.agenziaentrate.it/ilwwcm/connect/Nsi/Servizi/Codice+fiscale+-+tessera+sanitaria/NSI+Informazioni+sulla+codificazione+delle+persone+fisiche">condição fiscal</a>).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.it.forms.ITVatNumberField">
+<em class="property">class </em><tt class="descclassname">it.forms.</tt><tt class="descname">ITVatNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.it.forms.ITVatNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida números italianos VAT (partida IVA).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.it.forms.ITZipCodeField">
+<em class="property">class </em><tt class="descclassname">it.forms.</tt><tt class="descname">ITZipCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.it.forms.ITZipCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código zip italiano.
+Códigos válidos devem conter cinco dígitos.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.it.forms.ITProvinceSelect">
+<em class="property">class </em><tt class="descclassname">it.forms.</tt><tt class="descname">ITProvinceSelect</tt><a class="headerlink" href="#django.contrib.localflavor.it.forms.ITProvinceSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de províncias italianas como suas
+opções.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.it.forms.ITRegionSelect">
+<em class="property">class </em><tt class="descclassname">it.forms.</tt><tt class="descname">ITRegionSelect</tt><a class="headerlink" href="#django.contrib.localflavor.it.forms.ITRegionSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de regiões italianas como suas
+opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-japan-jp">
+<span id="japan-jp"></span><h2>Japan (<tt class="docutils literal"><span class="pre">jp</span></tt>)<a class="headerlink" href="#japan-jp" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.jp.forms.JPPostalCodeField">
+<em class="property">class </em><tt class="descclassname">jp.forms.</tt><tt class="descname">JPPostalCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.jp.forms.JPPostalCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código postal japonês.
+Ele aceita sete dígitos, com ou sem hífen.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.jp.forms.JPPrefectureSelect">
+<em class="property">class </em><tt class="descclassname">jp.forms.</tt><tt class="descname">JPPrefectureSelect</tt><a class="headerlink" href="#django.contrib.localflavor.jp.forms.JPPrefectureSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de prefeituras japonesas como suas
+opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-mexico-mx">
+<span id="mexico-mx"></span><h2>Mexico (<tt class="docutils literal"><span class="pre">mx</span></tt>)<a class="headerlink" href="#mexico-mx" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.mx.forms.MXStateSelect">
+<em class="property">class </em><tt class="descclassname">mx.forms.</tt><tt class="descname">MXStateSelect</tt><a class="headerlink" href="#django.contrib.localflavor.mx.forms.MXStateSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de estados mexicanos como suas
+opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-norway-no">
+<span id="norway-no"></span><h2>Norway (<tt class="docutils literal"><span class="pre">no</span></tt>)<a class="headerlink" href="#norway-no" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.no.forms.NOSocialSecurityNumber">
+<em class="property">class </em><tt class="descclassname">no.forms.</tt><tt class="descname">NOSocialSecurityNumber</tt><a class="headerlink" href="#django.contrib.localflavor.no.forms.NOSocialSecurityNumber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de seguro social
+norueguesa (<a class="reference external" href="http://no.wikipedia.org/wiki/Personnummer">personnummer</a>).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.no.forms.NOZipCodeField">
+<em class="property">class </em><tt class="descclassname">no.forms.</tt><tt class="descname">NOZipCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.no.forms.NOZipCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código zip norueguês.
+Códigos válidos possuem quatro dígitos.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.no.forms.NOMunicipalitySelect">
+<em class="property">class </em><tt class="descclassname">no.forms.</tt><tt class="descname">NOMunicipalitySelect</tt><a class="headerlink" href="#django.contrib.localflavor.no.forms.NOMunicipalitySelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de minicípios noruegueses (fylker)
+como suas opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-peru-pe">
+<span id="peru-pe"></span><h2>Peru (<tt class="docutils literal"><span class="pre">pe</span></tt>)<a class="headerlink" href="#peru-pe" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.pt.forms.PEDNIField">
+<em class="property">class </em><tt class="descclassname">pt.forms.</tt><tt class="descname">PEDNIField</tt><a class="headerlink" href="#django.contrib.localflavor.pt.forms.PEDNIField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como uma DNI (Identidade
+nacional peruana).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.pt.forms.PERUCField">
+<em class="property">class </em><tt class="descclassname">pt.forms.</tt><tt class="descname">PERUCField</tt><a class="headerlink" href="#django.contrib.localflavor.pt.forms.PERUCField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número RUC (Registro
+Unico de Contribuintes). Números RUC válidos possuem 11 dígitos.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.pt.forms.PEDepartmentSelect">
+<em class="property">class </em><tt class="descclassname">pt.forms.</tt><tt class="descname">PEDepartmentSelect</tt><a class="headerlink" href="#django.contrib.localflavor.pt.forms.PEDepartmentSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de Departamentos Peruanos como suas
+opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-poland-pl">
+<span id="poland-pl"></span><h2>Poland (<tt class="docutils literal"><span class="pre">pl</span></tt>)<a class="headerlink" href="#poland-pl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.pl.forms.PLNationalIdentificationNumberField">
+<em class="property">class </em><tt class="descclassname">pl.forms.</tt><tt class="descname">PLNationalIdentificationNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.pl.forms.PLNationalIdentificationNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de identificação
+polonês (<a class="reference external" href="http://en.wikipedia.org/wiki/PESEL">PESEL</a>).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.pl.forms.PLNationalBusinessRegisterField">
+<em class="property">class </em><tt class="descclassname">pl.forms.</tt><tt class="descname">PLNationalBusinessRegisterField</tt><a class="headerlink" href="#django.contrib.localflavor.pl.forms.PLNationalBusinessRegisterField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um Número de Registro
+Nacional Oficial Polonês (<a class="reference external" href="http://www.stat.gov.pl/bip/regon_ENG_HTML.htm">REGON</a>), tendo tanto sete quando nove dígitos. O
+algorítmo checksum é usado para REGONs está documentado em
+<a class="reference external" href="http://wipos.p.lodz.pl/zylla/ut/nip-rego.html">http://wipos.p.lodz.pl/zylla/ut/nip-rego.html</a>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.pl.forms.PLPostalCodeField">
+<em class="property">class </em><tt class="descclassname">pl.forms.</tt><tt class="descname">PLPostalCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.pl.forms.PLPostalCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código postal polonês.
+O formato válido é XX-XXX, onde X é um dígito.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.pl.forms.PLTaxNumberField">
+<em class="property">class </em><tt class="descclassname">pl.forms.</tt><tt class="descname">PLTaxNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.pl.forms.PLTaxNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como a Número de Taxa Polonês
+(NIP). Formatos válidos são XXX-XXX-XX-XX ou XX-XX-XXX-XXX. O algorítmo
+checksum usado para NIPs está documentado em
+<a class="reference external" href="http://wipos.p.lodz.pl/zylla/ut/nip-rego.html">http://wipos.p.lodz.pl/zylla/ut/nip-rego.html</a>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.pl.forms.PLAdministrativeUnitSelect">
+<em class="property">class </em><tt class="descclassname">pl.forms.</tt><tt class="descname">PLAdministrativeUnitSelect</tt><a class="headerlink" href="#django.contrib.localflavor.pl.forms.PLAdministrativeUnitSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de unidades administrativas polonesas
+como suas opções.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.pl.forms.PLVoivodeshipSelect">
+<em class="property">class </em><tt class="descclassname">pl.forms.</tt><tt class="descname">PLVoivodeshipSelect</tt><a class="headerlink" href="#django.contrib.localflavor.pl.forms.PLVoivodeshipSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de voivodeships polonesas (províncias
+administrativas) como suas opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-romania-ro">
+<span id="romania-ro"></span><h2>Romania (<tt class="docutils literal"><span class="pre">ro</span></tt>)<a class="headerlink" href="#romania-ro" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.ro.forms.ROCIFField">
+<em class="property">class </em><tt class="descclassname">ro.forms.</tt><tt class="descname">ROCIFField</tt><a class="headerlink" href="#django.contrib.localflavor.ro.forms.ROCIFField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida códigos de identificação fiscal (CIF). O
+valor retornado mostra o RO na frente, se fornecido.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ro.forms.ROCNPField">
+<em class="property">class </em><tt class="descclassname">ro.forms.</tt><tt class="descname">ROCNPField</tt><a class="headerlink" href="#django.contrib.localflavor.ro.forms.ROCNPField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida códigos numéricos pessoais (CNP).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ro.forms.ROCountyField">
+<em class="property">class </em><tt class="descclassname">ro.forms.</tt><tt class="descname">ROCountyField</tt><a class="headerlink" href="#django.contrib.localflavor.ro.forms.ROCountyField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida sua entrada como um um nome ou abreviação
+de uma comarca (judete) romena. Ele normaliza a entrada como uma abreviatura
+padrão de registro de veículo para a comarca informada. Este campo só aceita
+nomes escritos com sinais diacríticos; considere usar ROCountySelect como
+uma alternativa.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ro.forms.ROCountySelect">
+<em class="property">class </em><tt class="descclassname">ro.forms.</tt><tt class="descname">ROCountySelect</tt><a class="headerlink" href="#django.contrib.localflavor.ro.forms.ROCountySelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de países romenos (judete) como suas
+opções.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ro.forms.ROIBANField">
+<em class="property">class </em><tt class="descclassname">ro.forms.</tt><tt class="descname">ROIBANField</tt><a class="headerlink" href="#django.contrib.localflavor.ro.forms.ROIBANField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida sua entrada como um Número de Conta de
+Banco Internacional Romeno (IBAN). O formato válido é
+ROXX-XXXX-XXXX-XXXX-XXXX-XXXX, com ou sem hífens.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ro.forms.ROPhoneNumberField">
+<em class="property">class </em><tt class="descclassname">ro.forms.</tt><tt class="descname">ROPhoneNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.ro.forms.ROPhoneNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida como números de telefone romenos, números
+curtos especiais excluídos.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ro.forms.ROPostalCodeField">
+<em class="property">class </em><tt class="descclassname">ro.forms.</tt><tt class="descname">ROPostalCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.ro.forms.ROPostalCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida como um código postal romeno.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-slovakia-sk">
+<span id="slovakia-sk"></span><h2>Slovakia (<tt class="docutils literal"><span class="pre">sk</span></tt>)<a class="headerlink" href="#slovakia-sk" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.sk.forms.SKPostalCodeField">
+<em class="property">class </em><tt class="descclassname">sk.forms.</tt><tt class="descname">SKPostalCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.sk.forms.SKPostalCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código postal eslovaco.
+Formatos válidos são XXXXX ou XXX XX, onde X é um dígito.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.sk.forms.SKDistrictSelect">
+<em class="property">class </em><tt class="descclassname">sk.forms.</tt><tt class="descname">SKDistrictSelect</tt><a class="headerlink" href="#django.contrib.localflavor.sk.forms.SKDistrictSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de distritos eslovacos como suas
+opções.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.sk.forms.SKRegionSelect">
+<em class="property">class </em><tt class="descclassname">sk.forms.</tt><tt class="descname">SKRegionSelect</tt><a class="headerlink" href="#django.contrib.localflavor.sk.forms.SKRegionSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de regiões eslovacas como suas
+opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-south-africa-za">
+<span id="south-africa-za"></span><h2>South Africa (<tt class="docutils literal"><span class="pre">za</span></tt>)<a class="headerlink" href="#south-africa-za" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.za.forms.ZAIDField">
+<em class="property">class </em><tt class="descclassname">za.forms.</tt><tt class="descname">ZAIDField</tt><a class="headerlink" href="#django.contrib.localflavor.za.forms.ZAIDField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número ID sulafricano.
+A validação usa o Luhn checksum e um verificador simplista (i.e., não é
+totalmente exato) para a data do nascimento.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.za.forms.ZAPostCodeField">
+<em class="property">class </em><tt class="descclassname">za.forms.</tt><tt class="descname">ZAPostCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.za.forms.ZAPostCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código postal da Africa
+do Sul. Códigos postais válidos devem ter quatro dígitos.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-spain-es">
+<span id="spain-es"></span><h2>Spain (<tt class="docutils literal"><span class="pre">es</span></tt>)<a class="headerlink" href="#spain-es" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.es.forms.ESIdentityCardNumberField">
+<em class="property">class </em><tt class="descclassname">es.forms.</tt><tt class="descname">ESIdentityCardNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.es.forms.ESIdentityCardNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código NIF/NIE/CIF
+espanhol (Número de identificação Fiscal).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.es.forms.ESCCCField">
+<em class="property">class </em><tt class="descclassname">es.forms.</tt><tt class="descname">ESCCCField</tt><a class="headerlink" href="#django.contrib.localflavor.es.forms.ESCCCField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de conta de banco
+espanhol (Código Conta Cliente ou CCC). Um número CCC válido tem o formato
+EEEE-OOOO-CC-AAAAAAAAAA, onde os dígitos E, O, C e A denotam a entidade,
+office (escritório), checksum e account (conta), repectivamente. O primeiro
+dígito checksum valida a entidade e o escritório. O segundo dígito checksum
+valida a conta. Ele também é valido usar um espaço como um delimitador, ou
+não usar delimitadores.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.es.forms.ESPhoneNumberField">
+<em class="property">class </em><tt class="descclassname">es.forms.</tt><tt class="descname">ESPhoneNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.es.forms.ESPhoneNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de telefone
+espanhol. Números válidos possuem nove dígitos, o primeiro dos quais é 6, 8
+ou 9.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.es.forms.ESPostalCodeField">
+<em class="property">class </em><tt class="descclassname">es.forms.</tt><tt class="descname">ESPostalCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.es.forms.ESPostalCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código postal espanhol.
+Códigos válidos possuem cinco dígitos, os dois primeiros estando entre 01 e
+52, representando a província.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.es.forms.ESProvinceSelect">
+<em class="property">class </em><tt class="descclassname">es.forms.</tt><tt class="descname">ESProvinceSelect</tt><a class="headerlink" href="#django.contrib.localflavor.es.forms.ESProvinceSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de províncias espanholas como suas
+opções.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.es.forms.ESRegionSelect">
+<em class="property">class </em><tt class="descclassname">es.forms.</tt><tt class="descname">ESRegionSelect</tt><a class="headerlink" href="#django.contrib.localflavor.es.forms.ESRegionSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de regiões espanholas como suas
+opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-switzerland-ch">
+<span id="switzerland-ch"></span><h2>Switzerland (<tt class="docutils literal"><span class="pre">ch</span></tt>)<a class="headerlink" href="#switzerland-ch" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.ch.forms.CHIdentityCardNumberField">
+<em class="property">class </em><tt class="descclassname">ch.forms.</tt><tt class="descname">CHIdentityCardNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.ch.forms.CHIdentityCardNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de cartão de
+identidade suíça. Um número válido deve estar no formato X1234567&lt;0 ou
+1234567890 e ter os checksums corretos -- veja
+<a class="reference external" href="http://adi.kousz.ch/artikel/IDCHE.htm">http://adi.kousz.ch/artikel/IDCHE.htm</a>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ch.forms.CHPhoneNumberField">
+<em class="property">class </em><tt class="descclassname">ch.forms.</tt><tt class="descname">CHPhoneNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.ch.forms.CHPhoneNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de telefone
+suíço. O formato correto é 0XX XXX XX XX. 0XX.XXX.XX.XX e 0XXXXXXXXX validam
+mas são convertidos para 0XX XXX XX XX.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ch.forms.CHZipCodeField">
+<em class="property">class </em><tt class="descclassname">ch.forms.</tt><tt class="descname">CHZipCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.ch.forms.CHZipCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código zip suíço.
+Códigos válidos consitem em quatro dígitos.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.ch.forms.CHStateSelect">
+<em class="property">class </em><tt class="descclassname">ch.forms.</tt><tt class="descname">CHStateSelect</tt><a class="headerlink" href="#django.contrib.localflavor.ch.forms.CHStateSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de estados suíços como suas opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-united-kingdom-uk">
+<span id="united-kingdom-uk"></span><h2>United Kingdom (<tt class="docutils literal"><span class="pre">uk</span></tt>)<a class="headerlink" href="#united-kingdom-uk" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.uk.forms.UKPostcodeField">
+<em class="property">class </em><tt class="descclassname">uk.forms.</tt><tt class="descname">UKPostcodeField</tt><a class="headerlink" href="#django.contrib.localflavor.uk.forms.UKPostcodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código postal do Reino
+Unido. A expressão regular usada é proveniente do esquema para os tipos de
+endereço no padrão britânico (British Standard) BS7666 em
+<a class="reference external" href="http://www.govtalk.gov.uk/gdsc/schemas/bs7666-v2-0.xsd">http://www.govtalk.gov.uk/gdsc/schemas/bs7666-v2-0.xsd</a>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.uk.forms.UKCountySelect">
+<em class="property">class </em><tt class="descclassname">uk.forms.</tt><tt class="descname">UKCountySelect</tt><a class="headerlink" href="#django.contrib.localflavor.uk.forms.UKCountySelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de paises/regiões do Reino Unido como
+suas opções.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.uk.forms.UKNationSelect">
+<em class="property">class </em><tt class="descclassname">uk.forms.</tt><tt class="descname">UKNationSelect</tt><a class="headerlink" href="#django.contrib.localflavor.uk.forms.UKNationSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de nações do Reino Unido como suas
+opções.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-united-states-of-america-us">
+<span id="united-states-of-america-us"></span><h2>United States of America (<tt class="docutils literal"><span class="pre">us</span></tt>)<a class="headerlink" href="#united-states-of-america-us" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.localflavor.us.forms.USPhoneNumberField">
+<em class="property">class </em><tt class="descclassname">us.forms.</tt><tt class="descname">USPhoneNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.us.forms.USPhoneNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um número de telefone dos
+E.U.A.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.us.forms.USSocialSecurityNumberField">
+<em class="property">class </em><tt class="descclassname">us.forms.</tt><tt class="descname">USSocialSecurityNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.us.forms.USSocialSecurityNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um Número de Seguro Social
+dos E.U.A. (SSN).</p>
+<p>Um SSN válido deve obedecer as seguintes regras:</p>
+<ul class="simple">
+<li>Formato de XXX-XX-XXXX</li>
+<li>Nenhum grupo de dígitos pode consistir inteiramente de zeros</li>
+<li>O início de um grupo de dígitos não pode ser 666</li>
+<li>Os números não podem estar em blocos promocionais 987-65-4320 até
+987-65-4329</li>
+<li>Um número não conhecido pode ser inválido devido o uso ou distribuição
+de promoção generalizada (e.g., o número do Woolworth ou o número
+promocional 1962)</li>
+</ul>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.us.forms.USStateField">
+<em class="property">class </em><tt class="descclassname">us.forms.</tt><tt class="descname">USStateField</tt><a class="headerlink" href="#django.contrib.localflavor.us.forms.USStateField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um nome ou abreviação de
+um estado dos E.U.A. A entrada é normalizada para o padrão de duas letras
+da abreviação do serviço postal para o estado informado.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.us.forms.USZipCodeField">
+<em class="property">class </em><tt class="descclassname">us.forms.</tt><tt class="descname">USZipCodeField</tt><a class="headerlink" href="#django.contrib.localflavor.us.forms.USZipCodeField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de formulário que valida a entrada como um código ZIP dos E.U.A.
+Os formatos válidos são XXXXX ou XXXXX-XXXX.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.us.forms.USStateSelect">
+<em class="property">class </em><tt class="descclassname">us.forms.</tt><tt class="descname">USStateSelect</tt><a class="headerlink" href="#django.contrib.localflavor.us.forms.USStateSelect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um widget <tt class="docutils literal"><span class="pre">Select</span></tt> que usa uma lista de estados/territórios dos E.U.A.
+como suas opções.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.us.models.PhoneNumberField">
+<em class="property">class </em><tt class="descclassname">us.models.</tt><tt class="descname">PhoneNumberField</tt><a class="headerlink" href="#django.contrib.localflavor.us.models.PhoneNumberField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um <tt class="xref py py-class docutils literal"><span class="pre">CharField</span></tt> que verifica se o valor é um número de telefone válido
+dos E.U.A. (no formato <tt class="docutils literal"><span class="pre">XXX-XXX-XXXX</span></tt>).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.localflavor.us.models.USStateField">
+<em class="property">class </em><tt class="descclassname">us.models.</tt><tt class="descname">USStateField</tt><a class="headerlink" href="#django.contrib.localflavor.us.models.USStateField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um campo de model que o formulário representa como um campo
+<tt class="docutils literal"><span class="pre">forms.USStateField</span></tt> e armazena a abreviação de duas letras dos E.U.A. no
+banco de dados.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Os add-ons &#8220;local flavor&#8221;</a><ul>
+<li><a class="reference internal" href="#paises-suportados">Paises suportados</a></li>
+<li><a class="reference internal" href="#adicionando-sabores">Adicionando sabores</a></li>
+<li><a class="reference internal" href="#argentina-ar">Argentina (<tt class="docutils literal"><span class="pre">ar</span></tt>)</a></li>
+<li><a class="reference internal" href="#australia-au">Australia (<tt class="docutils literal"><span class="pre">au</span></tt>)</a></li>
+<li><a class="reference internal" href="#austria-at">Austria (<tt class="docutils literal"><span class="pre">at</span></tt>)</a></li>
+<li><a class="reference internal" href="#brazil-br">Brazil (<tt class="docutils literal"><span class="pre">br</span></tt>)</a></li>
+<li><a class="reference internal" href="#canada-ca">Canada (<tt class="docutils literal"><span class="pre">ca</span></tt>)</a></li>
+<li><a class="reference internal" href="#chile-cl">Chile (<tt class="docutils literal"><span class="pre">cl</span></tt>)</a></li>
+<li><a class="reference internal" href="#finland-fi">Finland (<tt class="docutils literal"><span class="pre">fi</span></tt>)</a></li>
+<li><a class="reference internal" href="#france-fr">France (<tt class="docutils literal"><span class="pre">fr</span></tt>)</a></li>
+<li><a class="reference internal" href="#germany-de">Germany (<tt class="docutils literal"><span class="pre">de</span></tt>)</a></li>
+<li><a class="reference internal" href="#the-netherlands-nl">The Netherlands (<tt class="docutils literal"><span class="pre">nl</span></tt>)</a></li>
+<li><a class="reference internal" href="#iceland-is">Iceland (<tt class="docutils literal"><span class="pre">is_</span></tt>)</a></li>
+<li><a class="reference internal" href="#india-in">India (<tt class="docutils literal"><span class="pre">in_</span></tt>)</a></li>
+<li><a class="reference internal" href="#italy-it">Italy (<tt class="docutils literal"><span class="pre">it</span></tt>)</a></li>
+<li><a class="reference internal" href="#japan-jp">Japan (<tt class="docutils literal"><span class="pre">jp</span></tt>)</a></li>
+<li><a class="reference internal" href="#mexico-mx">Mexico (<tt class="docutils literal"><span class="pre">mx</span></tt>)</a></li>
+<li><a class="reference internal" href="#norway-no">Norway (<tt class="docutils literal"><span class="pre">no</span></tt>)</a></li>
+<li><a class="reference internal" href="#peru-pe">Peru (<tt class="docutils literal"><span class="pre">pe</span></tt>)</a></li>
+<li><a class="reference internal" href="#poland-pl">Poland (<tt class="docutils literal"><span class="pre">pl</span></tt>)</a></li>
+<li><a class="reference internal" href="#romania-ro">Romania (<tt class="docutils literal"><span class="pre">ro</span></tt>)</a></li>
+<li><a class="reference internal" href="#slovakia-sk">Slovakia (<tt class="docutils literal"><span class="pre">sk</span></tt>)</a></li>
+<li><a class="reference internal" href="#south-africa-za">South Africa (<tt class="docutils literal"><span class="pre">za</span></tt>)</a></li>
+<li><a class="reference internal" href="#spain-es">Spain (<tt class="docutils literal"><span class="pre">es</span></tt>)</a></li>
+<li><a class="reference internal" href="#switzerland-ch">Switzerland (<tt class="docutils literal"><span class="pre">ch</span></tt>)</a></li>
+<li><a class="reference internal" href="#united-kingdom-uk">United Kingdom (<tt class="docutils literal"><span class="pre">uk</span></tt>)</a></li>
+<li><a class="reference internal" href="#united-states-of-america-us">United States of America (<tt class="docutils literal"><span class="pre">us</span></tt>)</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="humanize.html">django.contrib.humanize</a></li>
+    
+    
+      <li>Next: <a href="markup.html">django.contrib.markup</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Referência da API</a>
+        
+          <ul><li><a href="index.html">Os add-ons &#8220;django.contrib&#8221;</a>
+        
+        <ul><li>Os add-ons &#8220;local flavor&#8221;</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/contrib/localflavor.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="humanize.html" title="django.contrib.humanize">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="markup.html" title="django.contrib.markup">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

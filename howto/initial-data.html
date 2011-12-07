@@ -1,0 +1,293 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Provendo dados inicias para models &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Guias “como fazer”" href="index.html" />
+    <link rel="next" title="Using internationalization in your own projects" href="i18n.html" />
+    <link rel="prev" title="Reporte de erros via e-mail" href="error-reporting.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="error-reporting.html" title="Reporte de erros via e-mail">previous</a> 
+     |
+    <a href="index.html" title="Guias &amp;#8220;como fazer&amp;#8221;" accesskey="U">up</a>
+   |
+    <a href="i18n.html" title="Using internationalization in your own projects">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-initial-data">
+            
+  <div class="section" id="s-provendo-dados-inicias-para-models">
+<span id="s-howto-initial-data"></span><span id="provendo-dados-inicias-para-models"></span><span id="howto-initial-data"></span><h1>Provendo dados inicias para models<a class="headerlink" href="#provendo-dados-inicias-para-models" title="Permalink to this headline">¶</a></h1>
+<p>As vezes é útil povoar seu banco de dados com dados no momento da instalação de
+uma aplicação. Aqui há algumas formas de se fazer o Django criar estes dados
+automaticamente: você pode prover <a class="reference internal" href="#provendo-dados-iniciais-com-fixtures">dados iniciais usando fixtures</a> ou você pode
+prover <a class="reference internal" href="#provendo-dados-iniciais-em-sql">dados iniciais em SQL</a>.</p>
+<p>Geralmente, usar um fixture é um método mais limpo desde que o banco de dados
+seja agnóstico, mas dados iniciais em SQL podem ser um pouco mais flexiveis.</p>
+<div class="section" id="s-provendo-dados-iniciais-com-fixtures">
+<span id="provendo-dados-iniciais-com-fixtures"></span><h2>Provendo dados iniciais com fixtures<a class="headerlink" href="#provendo-dados-iniciais-com-fixtures" title="Permalink to this headline">¶</a></h2>
+<p>Uma fixture é uma coleção de dados que o Django sabe com importar para dentro de
+um banco de dados. A forma mais simples de se criar uma fixture, se você já tem
+alguns dados, é usando o comando <tt class="xref std std-djadmin docutils literal"><span class="pre">manage.py</span> <span class="pre">dumpdata</span></tt>. Ou, você pode
+escrever a mão; as fixtures podem ser escritas em XML, YAML, ou JSON. A
+<a class="reference internal" href="../topics/serialization.html#topics-serialization"><em>documentação de serialização</em></a> tem mais detalhes
+sobre cada um destes <a class="reference internal" href="../topics/serialization.html#serialization-formats"><em>formatos de serialização</em></a>
+suportados.</p>
+<p>Como exemplo, aqui é mostrado uma fixture para um model simples <tt class="docutils literal"><span class="pre">Person</span></tt>, no
+formato JSON:</p>
+<div class="highlight-js"><div class="highlight"><pre><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;model&quot;</span><span class="o">:</span> <span class="s2">&quot;myapp.person&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pk&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;fields&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&quot;first_name&quot;</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;last_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Lennon&quot;</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;model&quot;</span><span class="o">:</span> <span class="s2">&quot;myapp.person&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pk&quot;</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;fields&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&quot;first_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Paul&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;last_name&quot;</span><span class="o">:</span> <span class="s2">&quot;McCartney&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>E aqui tem a mesma fixture como YAML:</p>
+<div class="highlight-none"><div class="highlight"><pre>- model: myapp.person
+  pk: 1
+  fields:
+    first_name: John
+    last_name: Lennon
+- model: myapp.person
+  pk: 2
+  fields:
+    first_name: Paul
+    last_name: McCartney
+</pre></div>
+</div>
+<p>Você armazenará estes dados em um diretório <tt class="docutils literal"><span class="pre">fixtures</span></tt> dentro de sua
+aplicação.</p>
+<p>Carregar os dados é fácil: é só chamar <a class="reference internal" href="../ref/django-admin.html#django-admin-loaddata"><tt class="xref std std-djadmin docutils literal"><span class="pre">manage.py</span> <span class="pre">loaddata</span>
+<span class="pre">fixturename</span></tt></a>, onde <em>fixturename</em> é o nome do arquivo fixture que você
+criou. Toda vez que você executar <a class="reference internal" href="../ref/django-admin.html#django-admin-loaddata"><tt class="xref std std-djadmin docutils literal"><span class="pre">loaddata</span></tt></a> os dados serão lidos da
+fixture e recarregados no banco de dados. Note que isto significa que se você
+mudar algum dado criado por uma fixture e rodar <a class="reference internal" href="../ref/django-admin.html#django-admin-loaddata"><tt class="xref std std-djadmin docutils literal"><span class="pre">loaddata</span></tt></a> novamente,
+ele irá sobrescrever a mudanças feitas.</p>
+<div class="section" id="s-carregando-automaticamente-os-dados-iniciais-de-fixtures">
+<span id="carregando-automaticamente-os-dados-iniciais-de-fixtures"></span><h3>Carregando automaticamente os dados iniciais de fixtures<a class="headerlink" href="#carregando-automaticamente-os-dados-iniciais-de-fixtures" title="Permalink to this headline">¶</a></h3>
+<p>Se você criar uma fixture chamada <tt class="docutils literal"><span class="pre">initial_data.[xml/yaml/json]</span></tt>, essas
+fixtures serão carregadas sempre que você rodar <a class="reference internal" href="../ref/django-admin.html#django-admin-syncdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">syncdb</span></tt></a>. Isto é
+extremamente conveniente, mas seja cuidadoso: lembre-se qeu os dados serão
+atualizado <em>toda vez</em> que voce executar <a class="reference internal" href="../ref/django-admin.html#django-admin-syncdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">syncdb</span></tt></a>. Então não use
+<tt class="docutils literal"><span class="pre">initial_data</span></tt> para dados que você deseja editar.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">As fixtures são usadas também pelo <a class="reference internal" href="../topics/testing.html#topics-testing-fixtures"><em>framework de testes</em></a> para ajudar a montar um ambiente consistente de
+testes.</p>
+</div>
+</div>
+</div>
+<div class="section" id="s-provendo-dados-iniciais-em-sql">
+<span id="s-initial-sql"></span><span id="provendo-dados-iniciais-em-sql"></span><span id="initial-sql"></span><h2>Provendo dados iniciais em SQL<a class="headerlink" href="#provendo-dados-iniciais-em-sql" title="Permalink to this headline">¶</a></h2>
+<p>O Django provê um hook para passar SQL arbitrário para o banco de dados, que
+é executado somente depois de uma consulta CREATE TABLE, no momento em que você
+roda um <a class="reference internal" href="../ref/django-admin.html#django-admin-syncdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">syncdb</span></tt></a>. Você pode usar este hook para popular com dados
+padrões, ou também criar funções SQL, view, triggers, etc.</p>
+<p>O hook é simples: o Django simplesmente procura por um arquivo chamado
+<tt class="docutils literal"><span class="pre">sql/&lt;modelname&gt;.sql</span></tt>, no diretório da aplicação, onde <tt class="docutils literal"><span class="pre">&lt;modelname&gt;</span></tt> é o
+nome do model em minúsculo.</p>
+<p>Então, se você tem um model <tt class="docutils literal"><span class="pre">Person</span></tt> em uma aplicação chamada <tt class="docutils literal"><span class="pre">myapp</span></tt>, você
+poderia adicionar SQL arbitrário num arquivo <tt class="docutils literal"><span class="pre">sql/person.sql</span></tt> dentro do
+diretório <tt class="docutils literal"><span class="pre">myapp</span></tt>.
+Aqui tem um exemplo do que o arquivo pode conter:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">myapp_person</span> <span class="p">(</span><span class="n">first_name</span><span class="p">,</span> <span class="n">last_name</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span><span class="s1">&#39;John&#39;</span><span class="p">,</span> <span class="s1">&#39;Lennon&#39;</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">myapp_person</span> <span class="p">(</span><span class="n">first_name</span><span class="p">,</span> <span class="n">last_name</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span><span class="s1">&#39;Paul&#39;</span><span class="p">,</span> <span class="s1">&#39;McCartney&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Para cada arquivo SQL, se fornecido, é esperado que contenha consultas SQL
+válidas que irão inserir os dados desejados (e.g., consultas <tt class="docutils literal"><span class="pre">INSERT</span></tt>
+apropriadamente formadas, separadas por ponto-e-vírgula);</p>
+<p>Os arquivos SQL são lidos pelos comandos <a class="reference internal" href="../ref/django-admin.html#django-admin-sqlcustom"><tt class="xref std std-djadmin docutils literal"><span class="pre">sqlcustom</span></tt></a>,
+<a class="reference internal" href="../ref/django-admin.html#django-admin-sqlreset"><tt class="xref std std-djadmin docutils literal"><span class="pre">sqlreset</span></tt></a>, <a class="reference internal" href="../ref/django-admin.html#django-admin-sqlall"><tt class="xref std std-djadmin docutils literal"><span class="pre">sqlall</span></tt></a> e <a class="reference internal" href="../ref/django-admin.html#django-admin-reset"><tt class="xref std std-djadmin docutils literal"><span class="pre">reset</span></tt></a> no <a class="reference internal" href="../ref/django-admin.html"><em>manage.py</em></a>. Consulte a <a class="reference internal" href="../ref/django-admin.html"><em>documentação do manage.py</em></a> para mais informações.</p>
+<p>Note que se você tem múltiplos arquivos de dados SQL, não há garantias da ordem
+em que eles serão executados. A única coisa que pode ser assumida, é que no
+momento em que todos forem executados, o banco de dados já estará com todas as
+suas tabelas criadas.</p>
+<div class="section" id="s-dados-sql-para-um-backend-especifico-de-banco-de-dados">
+<span id="dados-sql-para-um-backend-especifico-de-banco-de-dados"></span><h3>Dados SQL para um backend específico de banco de dados<a class="headerlink" href="#dados-sql-para-um-backend-especifico-de-banco-de-dados" title="Permalink to this headline">¶</a></h3>
+<p>Há também um kook para backend específico de dados SQL. Por exemplo, você pode
+ter separados arquivos com dados iniciais para PostgreSQL e MySQL. Para cada
+applicação, o Django procura por um arquivo chamado
+<tt class="docutils literal"><span class="pre">&lt;appname&gt;/sql/&lt;modelname&gt;.&lt;backend&gt;.sql</span></tt>, onde <tt class="docutils literal"><span class="pre">&lt;appname&gt;</span></tt> é o diretório de
+sua aplicação, <tt class="docutils literal"><span class="pre">&lt;modelname&gt;</span></tt> é o nome do model em minúsculo e <tt class="docutils literal"><span class="pre">&lt;backend&gt;</span></tt> é
+o valor de <a class="reference internal" href="../ref/settings.html#std:setting-DATABASE_ENGINE"><tt class="xref std std-setting docutils literal"><span class="pre">DATABASE_ENGINE</span></tt></a> no seu arquivo settings (e.g.,
+<tt class="docutils literal"><span class="pre">postgresql</span></tt>, <tt class="docutils literal"><span class="pre">mysql</span></tt>).</p>
+<p>O backend específico de dados SQL é executado antes do backend não-específico de
+dados SQL. Por exemplo, se sua aplicação contém os arquivos <tt class="docutils literal"><span class="pre">sql/person.sql</span></tt> e
+<tt class="docutils literal"><span class="pre">sql/person.postgresql.sql</span></tt> e você está instalando a aplicação sobre o
+PostgreSQL, o Django irá executar o conteúdo do <tt class="docutils literal"><span class="pre">sql/person.postgresql.sql</span></tt>
+primeiro, e então <tt class="docutils literal"><span class="pre">sql/person.sql</span></tt>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Provendo dados inicias para models</a><ul>
+<li><a class="reference internal" href="#provendo-dados-iniciais-com-fixtures">Provendo dados iniciais com fixtures</a><ul>
+<li><a class="reference internal" href="#carregando-automaticamente-os-dados-iniciais-de-fixtures">Carregando automaticamente os dados iniciais de fixtures</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#provendo-dados-iniciais-em-sql">Provendo dados iniciais em SQL</a><ul>
+<li><a class="reference internal" href="#dados-sql-para-um-backend-especifico-de-banco-de-dados">Dados SQL para um backend específico de banco de dados</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="error-reporting.html">Reporte de erros via e-mail</a></li>
+    
+    
+      <li>Next: <a href="i18n.html">Using internationalization in your own projects</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Guias &#8220;como fazer&#8221;</a>
+        
+        <ul><li>Provendo dados inicias para models</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/howto/initial-data.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="error-reporting.html" title="Reporte de erros via e-mail">previous</a> 
+     |
+    <a href="index.html" title="Guias &amp;#8220;como fazer&amp;#8221;" accesskey="U">up</a>
+   |
+    <a href="i18n.html" title="Using internationalization in your own projects">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

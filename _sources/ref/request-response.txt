@@ -1,0 +1,643 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11348 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-request-response:
+
+================================
+Objetos de requisição e resposta
+================================
+
+.. module:: django.http
+   :synopsis: Classes para trabalhar com requisições e respostas HTTP.
+
+Visão Geral
+===========
+
+O Django utiliza objetos de requisição e resposta para passar estado através
+do sistema.
+
+Quando uma página é requisitada, o Django cria um objeto :class:`HttpRequest`
+que contém metadados sobre a requisição. Então o Django carrega a view
+apropriada, passando o :class:`HttpRequest` como o primeiro argumento para a
+função de view. Cada view é responsável por devolver um objeto
+:class:`HttpResponse`.
+
+Este documento explica as APIs para os objetos :class:`HttpRequest` e
+:class:`HttpResponse`.
+
+
+Objetos HttpRequest
+===================
+
+.. class:: HttpRequest
+
+Atributos
+---------
+
+Todos os atributos, exceto ``session``, devem ser considerados
+somente para leitura.
+
+.. attribute:: HttpRequest.path
+
+    Uma string representando o caminho completo para a página requisitada,
+    não incluindo o domínio.
+
+    Exemplo: ``"/music/bands/the_beatles/"``
+
+.. attribute:: HttpRequest.method
+
+    Uma string representando o método HTTP usado na requisição. Este valor
+    está sempre em maiúsculo. Exemplo::
+
+        if request.method == 'GET':
+            do_something()
+        elif request.method == 'POST':
+            do_something_else()
+
+.. attribute:: HttpRequest.encoding
+
+    .. versionadded:: 1.0
+
+    Uma string representando o valor atual de codificação utilizado para
+    decodificar o envio de dados de formulário (ou ``None``, que quer dizer
+    que o parâmetro de configuração ``DEFAULT_CHARSET`` é utilizado). Você
+    pode alterar este atributo para modificar a codificação usada quando
+    acessar os dados do formulário. Quaisquer acessos subseqüentes a atributos
+    (como ler de ``GET`` ou ``POST``) utilizará no novo valor de encodig. Isto é
+    útil se você sabe que os dados do formulário não estão na codificação
+    ``DEFAULT_CHARSET``.
+
+.. attribute:: HttpRequest.GET
+
+    Um objeto, tipo dicionário, contendo todos os parâmetros HTTP GET. Veja a
+    documentação do ``QueryDict`` abaixo.
+
+.. attribute:: HttpRequest.POST
+
+
+    Um objeto dicionário contendo todos os parametros passados por HTTP POST.
+    Veja a documentação do ``QueryDict`` abaixo.
+
+    It's possible that a request can come in via POST with an empty ``POST``
+    dictionary -- if, say, a form is requested via the POST HTTP method but
+    does not include form data. Therefore, you shouldn't use ``if request.POST``
+    to check for use of the POST method; instead, use ``if request.method ==
+    "POST"`` (see above).
+    É possível que um requisição POST possa vir com um dicionário POST vazio --
+    se, digo, um formulário é requisitado via metodo HTTP POST mas não inclui
+    dados. Portanto, você não deve usar ``if request.POST`` para checar o uso
+    do método POST; ao invés, use ``if request.method == "POST"`` (veja acima).
+
+    Perceba: ``POST`` *não* inclui informações de upload de arquivos. Veja
+    ``FILES``.
+
+.. attribute:: HttpRequest.REQUEST
+
+    Por conveniência, um objeto dicionário que procura ``POST`` primeiro, somente
+    depois ``GET``. Inpirado no ``$_REQUEST`` do PHP.
+
+
+    Por exemplo, se ``GET = {"name": "john"}`` and ``POST = {"age": '34'}``,
+    ``REQUEST["name"]`` poderia ser ``"john"``, e ``REQUEST["age"]`` poderia ser
+    ``"34"``.
+
+    É fortemente sugerido que você use o ``GET`` e ``POST`` ao invés de
+    ``REQUEST``, porque são mais explicitos.
+
+.. attribute:: HttpRequest.COOKIES
+
+    Um dicionário padrão do Python contendo todos os cookies. Chaves e valores
+    são strings.
+
+.. attribute:: HttpRequest.FILES
+
+    Um objeto dicionário contendo todos os arquivos enviados. Cada chave em
+    ``FILES`` é o ``name`` do ``<input type="file" name="" />``. Cada valor em
+    ``FILES`` é um objeto ``UploadedFile`` contendo os seguintes atributos:
+
+
+        * ``read(num_bytes=None)`` -- Lê um número de bytes do arquivo.
+        * ``name`` -- O nome do arquivo enviado.
+        * ``size`` -- O tamanho, em bytes, do arquivo enviado.
+        * ``chunks(chunk_size=None)`` -- Um gerado que fornece pedaços
+          sequenciais de dados.
+
+
+    Veja :doc:`/topics/files` para mais informações.
+
+    Note que ``FILES`` conterá somente dados se o método de requisição for POST
+    e o ``<form>`` que postou a requisição tenha
+    ``enctype="multipart/form-data"``. De outra forma, ``FILES`` será um
+    dicionário em branco.
+
+    .. versionchanged:: 1.0
+
+    Nas versões anteriores do Django, ``request.FILES`` contendo um simples
+    ``dict`` representando os arquivos enviados. Isto já não é verdade -- os
+    arquivos são representados por objetos ``UploadedFile`` como decrito abaixo.
+
+    Estes objetos ``UploadedFile`` emulam a interface do velho ``dict``, mas
+    que é depreciada e será removida no próximo lançamento do Djando.
+
+.. attribute:: HttpRequest.META
+
+    Um dicionário padrão do Python contendo todos cabeçalhos disponíveis do
+    HTTP. Os cabeçalhos disponíveis dependem do cliente e do servidor, mas aqui
+    há alguns exemplos:
+
+        * ``CONTENT_LENGTH``
+        * ``CONTENT_TYPE``
+        * ``HTTP_ACCEPT_ENCODING``
+        * ``HTTP_ACCEPT_LANGUAGE``
+        * ``HTTP_HOST`` -- O cabeçalho HTTP Host enviado pelo cliente.
+        * ``HTTP_REFERER`` -- A página remetente, se ouver uma.
+        * ``HTTP_USER_AGENT`` -- A string do user-agent do cliente.
+        * ``QUERY_STRING`` -- A query string, como uma string única (não parseada).
+        * ``REMOTE_ADDR`` -- O endereço IP do cliente.
+        * ``REMOTE_HOST`` -- O hostname do cliente.
+        * ``REQUEST_METHOD`` -- Uma string como ``"GET"`` ou ``"POST"``.
+        * ``SERVER_NAME`` -- O hostname do servidor.
+        * ``SERVER_PORT`` -- A porta do servidor.
+
+    Com a exceção do ``CONTENT_LENGTH`` e ``CONTENT_TYPE``, mostrados acima,
+    qualquer cabeçalho HTTP na requisição é convertido para a chave ``META``,
+    tendo todos os seus caracteres passados para maiúsculo, substituindo os
+    hífens por underscores e adicionando um ``HTTP_`` como prefixo do nome.
+    Então, por exemplo, um cabeçalho chamado ``X-Bender`` seria mapeado para a
+    chave ``META`` como ``HTTP_X_BENDER``.
+
+.. attribute:: HttpRequest.user
+
+    A ``django.contrib.auth.models.User`` object representing the currently
+    logged-in user. If the user isn't currently logged in, ``user`` will be set
+    to an instance of ``django.contrib.auth.models.AnonymousUser``. You
+    can tell them apart with ``is_authenticated()``, like so::
+    Um objeto ``django.contrib.auth.models.User`` representando o usuário atual
+    logado. Se o usuário não estiver logado, o ``user`` conterá uma instância do
+    ``django.contrib.auth.models.AnonymousUser``. Você pode usar o método
+    ``is_authenticated()``, tipo::
+
+        if request.user.is_authenticated():
+            # Faça algo para usuários logados.
+        else:
+            # Faça algo para usuários anônimos.
+
+    O ``user`` é somente disponível se sua instalação do Django tem o middleware
+    ``AuthenticationMiddleware`` ativado. Para mais, veja :doc:`/topics/auth`.
+
+.. attribute:: HttpRequest.session
+
+    Um objeto dicionário, onde é possivel ler e escrever dados, que representa a
+    sessão corrente. Ele somente é disponível se sua instalação do Django tiver
+    o suporte a sessão ativado. Veja a :doc:`documentação do session
+    </topics/http/sessions>` para destalhes completos.
+
+.. attribute:: HttpRequest.raw_post_data
+
+    Os dados do HTTP POST puros. Este é usual somente para processamentos
+    avançados. Use ``POST`` no lugar dele.
+
+.. attribute:: HttpRequest.urlconf
+
+    Não definido pelo Django em si, mas será lido se outro código (e.g., uma
+    classe middleware) setá-lo. Quando presente, será usado como o URLconf raiz
+    para a requisição corrent, sobrescrever a configuração ``ROOT_URLCONF``.
+    Veja :ref:`how-django-processes-a-request` para detalhes.
+
+Métodos
+-------
+
+.. method:: HttpRequest.get_host()
+
+   .. versionadded:: 1.0
+
+   Retorna o servidor originador da requisição usando informações dos cabeçalhos
+   ``HTTP_X_FORWARDED_HOST`` e ``HTTP_HOST`` (nesta ordem). Se eles não fornecem
+   um valor, o método usa uma combinação de ``SERVER_NAME`` e ``SERVER_PORT``
+   como detalhado em `PEP 333`_.
+
+   .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
+
+   Exemplo: ``"127.0.0.1:8000"``
+
+.. method:: HttpRequest.get_full_path()
+
+   Retorna o ``path``, mais uma query string anexa, se aplicável.
+
+   Exemplo: ``"/music/bands/the_beatles/?print=true"``
+
+.. method:: HttpRequest.build_absolute_uri(location)
+
+   .. versionadded:: 1.0
+
+   Retorna a URI absoluta de ``location``. Se nenhum location é fornecido, o
+   location será setado para `request.get_full_path()``.
+
+   Se o location já é uma URI absoluta, ele não será alterado. De outra forma a
+   URI absoluta é construída usando as variáveis de servidor disponíveis nesta
+   requisição.
+
+   Exemplo: ``"http://example.com/music/bands/the_beatles/?print=true"``
+
+.. method:: HttpRequest.is_secure()
+
+   Retorna ``True`` se a requisição é segura; isto é, se ela foi feita com
+   HTTPS.
+
+.. method:: HttpRequest.is_ajax()
+
+   .. versionadded:: 1.0
+
+   Retorna ``True`` se a requisição foi feita via um ``XMLHttpRequest``,
+   checando o cabeçalho ``HTTP_X_REQUESTED_WITH`` por um string
+   ``'XMLHttpRequest'``. As seguintes bibliotecas JavaScript enviam seus
+   cabeçalhos:
+
+       * jQuery
+       * Dojo
+       * MochiKit
+       * MooTools
+       * Prototype
+       * YUI
+
+   Se você escrever sua própria chamada XMLHttpRequest (no lado do navergador),
+   terá de setar este cabeçalho manualmente se quiser que o ``is_ajax()``.
+
+Objetos QueryDict
+-----------------
+
+.. class:: QueryDict
+
+Num objeto :class:`HttpRequest`, os atributos ``GET`` e ``POST`` são instâncias
+do ``django.http.QueryDict``. O :class:`QueryDict` é uma classe tipo dicionário
+customizada para lidar com múltiplos valores para a mesma chave. Isto é
+necessário porquê alguns elementos de formulário HTML, notavelmente,
+``<select multiple="multiple">``, passam multiplos valores para a mesma chave.
+
+``QueryDict`` instances are immutable, unless you create a ``copy()`` of them.
+That means you can't change attributes of ``request.POST`` and ``request.GET``
+directly.
+A instância ``QueryDict`` é imutável, a menos que você crie uma ``copy()``
+deles. O que significa que você não poderá mudar atributos do ``request.POST`` e
+``request.GET`` diretamente.
+
+Métodos
+-------
+
+O :class:`QueryDict` implementa todo os métodos padrão de dicionários, porque
+ele é uma subclasse de dicionário. Execeções são esboçadas aqui:
+
+.. method:: QueryDict.__getitem__(key)
+
+    Retorna o valor para a chave dada. Se a chave tem mais de um valor,
+    ``__getitem__()`` retorna o último valor. Ele lança
+    ``django.utils.datastructure.MultiValueDictKeyError`` se a chave não existe.
+    (Esta é uma subclasse da classe ``KeyError`` padrão do Python, então você
+    pode cutucá-la para pegar o ``KeyError``.)
+
+.. method:: QueryDict.__setitem__(key, value)
+
+    Seta a chave data para ``[value]`  (uma lista do Python cujo o único
+    elemento é ``value``). Note que esta, como outras funções de dicionário que
+    têm efeitos segundários, ela somente pode ser chamada num ``QueryDict``
+    mutável (um que foi criado via ``copy()``).
+
+.. method:: QueryDict.__contains__(key)
+
+    Retorna ``True`` se a chave dada estiver setada. Este te permite fazer,
+    e.g., ``if "foo" in request.GET``.
+
+.. method:: QueryDict.get(key, default)
+
+    Use a mesma lógica em ``__getitem__()`` acima, com um hook para retornar um
+    valor padrão se a chave não existe.
+
+.. method:: QueryDict.setdefault(key, default)
+
+    É como um método ``setdefault()`` padrão de dicionário, exceto por ele usar
+    ``__setitem__`` internamente.
+
+.. method:: QueryDict.update(other_dict)
+
+    Recebe ambos ``QueryDict`` ou um dicionário padrão. É como o método
+    ``update()`` padrão de dicionário, exceto por *atachar* os ítems no
+    dicionário atual ao invés de substituí-los. Por exemplo::
+
+          >>> q = QueryDict('a=1')
+          >>> q = q.copy() # para torná-lo mutável
+          >>> q.update({'a': '2'})
+          >>> q.getlist('a')
+          ['1', '2']
+          >>> q['a'] # retorna o último
+          ['2']
+
+.. method:: QueryDict.items()
+
+    É como o método ``items()`` padrão de dicionários, exceto por usar o mesmo
+    último valor lógico como ``__getitem()__``. Por exemplo::
+
+           >>> q = QueryDict('a=1&a=2&a=3')
+           >>> q.items()
+           [('a', '3')]
+
+.. method:: QueryDict.iteritems()
+
+    É como o método ``iteritems()`` padrão de dicionários. Como o
+    :meth:`QueryDict.items()` este usa o mesmo último valor lógico como o
+    :meth:`QueryDict.__getitem()__`.
+
+.. method:: QueryDict.iterlists()
+
+    Como :meth:`QueryDict.iteritems()`` exceto por incluir todos os valores,
+    como uma lista, para cada membro do dicionário.
+
+.. method:: QueryDict.values()
+
+    Como o médodo ``values()`` padrão de dicionários, exceto por usar o mesmo
+    último valor lógico como ``__getitem()__``. Por exemplo::
+
+           >>> q = QueryDict('a=1&a=2&a=3')
+           >>> q.values()
+           ['3']
+
+.. method:: QueryDict.itervalues()
+
+    Como :meth:`QueryDict.values()`, exceto por ser um iterador.
+
+Além disso, o ``QueryDict`` tem os seguintes métodos:
+
+.. method:: QueryDict.copy()
+
+    Retorna uma cópia do objeto, usando ``copy.deepcopy()`` da biblioteca padrão
+    do Python. A cópia será mutável -- isto é, você poderá mudar seus valores.
+
+.. method:: QueryDict.getlist(key)
+
+    Retorna os dados da da chave requisitada, como uma lista Python. Retorna uma
+    lista vazia se a chave não existe. É garantido o retorno de uma lista de
+    algum tipo.
+
+.. method:: QueryDict.setlist(key, list_)
+
+    Seta a chave dada com ``list_`` (diferentemente de ``__setitem__()``).
+
+.. method:: QueryDict.appendlist(key, item)
+
+    Appends an item to the internal list associated with key.
+    Atache um item para a lista interna associada com a chave.
+
+.. method:: QueryDict.setlistdefault(key, default_list)
+
+    Como ``setdefault``, exceto por receber uma lista de valores ao invés de um
+    valor único.
+
+.. method:: QueryDict.lists()
+
+    Como :meth:`items()`, exceto por incluír todos os valores, como uma lista,
+    para cada membro do dicionário. Por exemplo::
+
+         >>> q = QueryDict('a=1&a=2&a=3')
+         >>> q.lists()
+         [('a', ['1', '2', '3'])]
+
+.. method:: QueryDict.urlencode()
+
+    Retorna uma string de dados no formato query string.
+    Exemplo: ``"a=2&b=3&b=5"``.
+
+Objetos HttpResponse
+====================
+
+.. class:: HttpResponse
+
+Em contrate com objetos :class:`HttpRequest`, que são criados automaticamente
+pelo Django, os objetos :class:`HttpResponse` são sua responsabilidade. Cada
+view que você escrever é responsável por instanciar, popular e retornar um
+:class:`HttpResponse`.
+
+The :class:`HttpResponse` class lives in the ``django.http`` module.
+A classe :class:`HttpResponse` reside o módulo ``django.http``.
+
+Uso
+---
+
+Passando strings
+~~~~~~~~~~~~~~~~
+
+Um uso típico é passar os conteúdos de uma página, como uma string, para o
+construtor :class:`HttpResponse`::
+
+    >>> response = HttpResponse("Aqui tem um texto para a página Web.")
+    >>> response = HttpResponse("Somente texto, por favor.", mimetype="text/plain")
+
+Mas se você quiser adicionar conteúdo incrementalmente, você pode usar o
+``response`` como um objeto::
+
+    >>> response = HttpResponse()
+    >>> response.write("<p>Aqui tem um texto para a página Web.</p>")
+    >>> response.write("<p>Aqui tem outro parágrafo.</p>")
+
+Você pode adicionar e deletar cabeçalhos usando sintaxe de dicionário::
+
+    >>> response = HttpResponse()
+    >>> response['X-DJANGO'] = "Ele é o melhor."
+    >>> del response['X-PHP']
+    >>> response['X-DJANGO']
+    "Ele é o melhor."
+
+Note que ``del`` não lança um ``KeyError`` se o cabeçalho não existe.
+
+Passando iteradores
+~~~~~~~~~~~~~~~~~~~
+
+Finalmente, você pode passar ao ``HttpResponse`` um iterador ao invés de passar
+strings na mão. Se você usar esta técnica, siga estas dicas:
+
+    * O iterador deve retornar strings.
+    * Se um :class:`HttpResponse`` foi inicializado com um iterador como seu
+      conteúdo, você não pode usar a instância :class:`HttpResponse` como um
+      objeto. Fazendo-o então lançar uma ``Exception``.
+
+Configurando cabeçalhos
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Para setar um cabeçalho em sua resposta, é só tratá-la como um dicionário::
+
+    >>> response = HttpResponse()
+    >>> response['Pragma'] = 'no-cache'
+
+Dizendo ao navegador para tratar a resposta como um arquivo atachado
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Para dizer ao navegador para tratar a resposta como um arquivo atachado, use o
+argumento ``mimetype`` e set o cabeçalho ``Content-Disposition``. Por exemplo,
+esta é a forma como você pode retornar uma planilha do Microsoft Excel::
+
+    >>> response = HttpResponse(my_data, mimetype='application/vnd.ms-excel')
+    >>> response['Content-Disposition'] = 'attachment; filename=foo.xls'
+
+Não há nada específico sobre o cabeçalho ``Content-Disposition`` do Django, mas
+é fácil esquecer a sintaxe, então nós incluimos ela aqui.
+
+Atributos
+---------
+
+.. attribute:: HttpResponse.content
+
+    Uma string normal do Python reprensentando o conteúdo, codificado como um
+    objeto Unicode se necessário.
+
+Métodos
+-------
+
+.. method:: HttpResponse.__init__(content='', mimetype=None, status=200, content_type=DEFAULT_CONTENT_TYPE)
+
+    Instancia um objeto ``HttpResponse`` com o conteúdo da página fornecida (uma
+    string) e o "MIME type". O ``DEFAULT_CONTENT_TYPE`` é ``'text/html'``.
+
+    O ``content`` pode ser um iterador ou string. Se for um iterador, ele deve
+    retornar strings, e suas strings serão unidas para formar o conteúdo da
+    resposta.
+
+    O ``status`` é o `Status code HTTP`_ para a resposta.
+
+    .. versionadded:: 1.0
+
+    O ``content_type`` é um alias para ``mimetype``. Historicamente, este
+    parâmetro foi chamado somente ``mimetype``, mas como na verdade ele é o
+    valor incluso no cabeçalho HTTP ``Content-Type``, também pode incluir o
+    conjunto de caracteres de codificação.
+
+.. method:: HttpResponse.__setitem__(header, value)
+
+    Seta o nome do cabeçalho dado com o valor fornecido. Ambos ``header`` e
+    ``value`` devem ser strings.
+
+.. method:: HttpResponse.__delitem__(header)
+
+    Deleta o cabeçalho com o nome dado. Falha silenciosamente se o cabeçalho
+    não existe. É case-sensitive.
+
+.. method:: HttpResponse.__getitem__(header)
+
+    Retorna o valor para o nome do cabeçalho dado. É case-sensitive.
+
+.. method:: HttpResponse.has_header(header)
+
+    Retorna ``True`` ou ``False`` baseado em uma checagem case-insensitive para
+    o cabeçalho com o nome fornecido.
+
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None)
+
+    Seta um cookie. Os parametros são os mesmo do objeto `cookie Morsel`_
+    da biblioteca padrão do Python.
+
+        * O ``max_age`` deve ser um número de segundo, ou ``None`` (padrão) se
+          o cookie deve durar somente enquanto a sessão do browser do cliente
+          estiver aberta.
+        * ``expires`` deve ser uma string no formato
+          ``"Wdy, DD-Mon-YY HH:MM:SS GMT"``.
+        * Usa o ``domain`` se você quiser setar um cross-domain cookie. Por
+          exemplo, ``domain=".lawrence.com"`` setará um cookie que é legível
+          pelo domínio www.lawrence.com, blogs.lawrence.com e
+          calendars.lawrence.com. Caso contrário, um cookie somente será
+          acessível pelo domínio que o setar.
+
+    .. _`cookie Morsel`: http://docs.python.org/library/cookie.html#Cookie.Morsel
+
+.. method:: HttpResponse.delete_cookie(key, path='/', domain=None)
+
+    Deleta o cookie com o a chave fornecida. Falha silenciosamente se a chave
+    não existe.
+
+    Devido a forma como os cookies funcionam, ``path`` e ``domain`` devem ser o
+    mesmo valor usado em ``set_cookie()`` -- caso contrário o cookie pode não
+    ser deletado.
+
+.. method:: HttpResponse.write(content)
+
+    Este método monta uma instância de um objeto :class:`HttpResponse` em um
+    arquivo.
+
+.. method:: HttpResponse.flush()
+
+    Este método monta uma instância do objeto :class:`HttpResponse` em um
+    arquivo.
+
+.. method:: HttpResponse.tell()
+
+    Este método monta uma instância de objeto :class:`HttpResponse` em um
+    arquivo.
+
+.. _Status code HTTP: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
+
+
+.. _ref-httpresponse-subclasses:
+
+Subclasses do HttpResponse
+--------------------------
+
+O Django incluí um número de subclasses ``HttpResponse`` que manipulam direntes
+tipos de respostas HTTP. Como ``HttpResponse``, estas subclasses residem o
+módulo :mod:`django.http`.
+
+.. class:: HttpResponseRedirect
+
+    O construtor recebe um único argumento -- o caminho para onde deve ser
+    redirecionado. Este pode ser uma URL completa
+    (e.g. ``'http://www.yahoo.com/search/'``) ou uma URL absoluta sem domínio
+    (e.g. ``'/search'``). Note que ele retorna o status code 302.
+
+.. class:: HttpResponsePermanentRedirect
+
+    Como um :class:`HttpResponseRedirect`, mas ele retorna um redirecionamento
+    permanente (HTTP status code 300) ao invés de um redirecionamento
+    "found" (status code 302).
+
+.. class:: HttpResponseNotModified
+
+    O construtor não recebe qualquer argumento. Use isto para designar que uma
+    página não foi modificada desde a última requisição do usuário (status code
+    304).
+
+.. class:: HttpResponseBadRequest
+
+    .. versionadded:: 1.0
+
+    Age como um :class:`HttpResponse` mas usa um "status code" 400.
+
+.. class:: HttpResponseNotFound
+
+    Age como um :class:`HttpResponse` mas usa um "status code" 404.
+
+.. class:: HttpResponseForbidden
+
+    Age como um :class:`HttpResponse` mas usa o "status code" 403.
+
+.. class:: HttpResponseNotAllowed
+
+    Como o :class:`HttpResponse`, mas usa um "status code" 405. Recebe um
+    argumento único, obrigatório: uma lista de métodos permitidos
+    (e.g. `['GET','POST']``).
+
+.. class:: HttpResponseGone
+
+    Age como um :class:`HttpResponse` mas usa um "status code" 410.
+
+.. class:: HttpResponseServerError
+
+    Age como um :class:`HttpResponse` mas usa um "status code" 500.
+

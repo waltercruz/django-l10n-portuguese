@@ -1,0 +1,400 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Framework de comentários do Django &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Os add-ons “django.contrib”" href="../index.html" />
+    <link rel="next" title="Os models embutidos do Comment" href="models.html" />
+    <link rel="prev" title="django.contrib.auth" href="../auth.html" />
+ 
+<script type="text/javascript" src="../../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="../auth.html" title="&lt;tt class=&#34;docutils literal docutils literal docutils literal&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django.contrib.auth&lt;/span&gt;&lt;/tt&gt;">previous</a> 
+     |
+    <a href="../../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="models.html" title="Os models embutidos do Comment">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-comments-index">
+            
+  <div class="section" id="s-module-django.contrib.comments">
+<span id="s-framework-de-comentarios-do-django"></span><span id="module-django.contrib.comments"></span><span id="framework-de-comentarios-do-django"></span><h1>Framework de comentários do Django<a class="headerlink" href="#module-django.contrib.comments" title="Permalink to this headline">¶</a></h1>
+<p>O Django inclui um simples, e ainda customizável framework de comentários. O
+framework embutido de comentários pode ser usado para atachar comentário a
+qualquer model, então você pode usá-lo para comentar entradas de blog, photos,
+capitulos de livros, ou algo mais.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Se você costumava usar o framework antigo (não documentado) de comentários
+do Django, precisará atualizá-lo. Veja o <a class="reference internal" href="upgrade.html#ref-contrib-comments-upgrade"><em>guia de atualização</em></a> para instruções.</p>
+</div>
+<div class="section" id="s-guia-rapido-de-inicio">
+<span id="guia-rapido-de-inicio"></span><h2>Guia rápido de início<a class="headerlink" href="#guia-rapido-de-inicio" title="Permalink to this headline">¶</a></h2>
+<p>Para começar a usar a aplicação <tt class="docutils literal"><span class="pre">comments</span></tt>, siga estes passos:</p>
+<ol class="arabic">
+<li><p class="first">Instale o framework de comentários adicionando
+<tt class="docutils literal"><span class="pre">'django.contrib.comments'</span></tt> ao <a class="reference internal" href="../../settings.html#std:setting-INSTALLED_APPS"><tt class="xref std std-setting docutils literal"><span class="pre">INSTALLED_APPS</span></tt></a>.</p>
+</li>
+<li><p class="first">Execute <tt class="docutils literal"><span class="pre">manage.py</span> <span class="pre">syncdb</span></tt>, e então o Django criará as tabelas do
+comments.</p>
+</li>
+<li><p class="first">Adicione as URLs da aplicação de comentário ao <tt class="docutils literal"><span class="pre">urls.py</span></tt> do seu
+projeto:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="o">...</span>
+    <span class="p">(</span><span class="s">r&#39;^comments/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;django.contrib.comments.urls&#39;</span><span class="p">)),</span>
+    <span class="o">...</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Use as <a class="reference internal" href="#tags-de-template-do-comments">tags de template do comments</a> abaixo para atachar
+comentários em seus templates.</p>
+</li>
+</ol>
+<p>Você pode também querer examinar o <a class="reference internal" href="settings.html#ref-contrib-comments-settings"><em>Configurações de Comentários</em></a>.</p>
+</div>
+<div class="section" id="s-tags-de-template-do-comments">
+<span id="tags-de-template-do-comments"></span><h2>Tags de template do comments<a class="headerlink" href="#tags-de-template-do-comments" title="Permalink to this headline">¶</a></h2>
+<p>Você irá primeiramente interagir com o sistema de comentários através de uma
+série de tags de templates que deixam você atachar comentários e gerar
+formulários para seus usuários para postá-los.</p>
+<p>Como toda biblioteca de tags de template customizada, você precisará
+<a class="reference internal" href="../../../topics/templates.html#loading-custom-template-libraries"><em>carregá-as</em></a> antes de você usá-las:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">load</span> <span class="nv">comments</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Uma vez carregadas você pode usar as tags de templates abaixo.</p>
+<div class="section" id="s-especificando-para-qual-objeto-o-comentario-sera-atachado">
+<span id="especificando-para-qual-objeto-o-comentario-sera-atachado"></span><h3>Especificando para qual objeto o comentário será atachado<a class="headerlink" href="#especificando-para-qual-objeto-o-comentario-sera-atachado" title="Permalink to this headline">¶</a></h3>
+<p>Os comentário do Django são todos &quot;atachados&quot; a algum objeto pai. Este pode ser
+qualquer instância de um model do Django. Cada uma das tags abaixo lhe dá
+diferentes formas de especificar a quais objetos serão atachados:</p>
+<ol class="arabic">
+<li><p class="first">Refere-se ao objeto diretamente -- o método mais comum. Na maioria das
+vezes, vocÊ terá algum objeto no contexto do template que você deseja
+atachar os comentários; você pode simplesmente usar este objeto.</p>
+<p>Por exemplo, numa página de entrada de blog que tenha uma variável
+chamada <tt class="docutils literal"><span class="pre">entry</span></tt>, você poderia usar o seguinte, para carregar o número
+de comentário:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">get_comment_count</span> <span class="nv">for</span> <span class="nv">entry</span> <span class="k">as</span> <span class="nv">comment_count</span> <span class="cp">%}</span>.
+</pre></div>
+</div>
+</li>
+<li><p class="first">Refere-se ao objeto por content-type e id do objeto. Você poderia usar
+este método se você, por alguma razão, na verdade não tem o acesso direto
+ao objeto.</p>
+<p>No exemplo seguinte, se você souber que ID do objeto é <tt class="docutils literal"><span class="pre">14</span></tt> mas não tem
+acesso ao objeto real, você poderia fazer algo tipo:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">get_comment_count</span> <span class="nv">for</span> <span class="nv">blog.entry</span> <span class="m">14</span> <span class="k">as</span> <span class="nv">comment_count</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Acima, <tt class="docutils literal"><span class="pre">blog.entry</span></tt> é um label de aplicação e nome de model (em
+mínusculo) da classe model.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="s-mostrando-comentarios">
+<span id="s-std:templatetag-get_comment_list"></span><span id="mostrando-comentarios"></span><span id="std:templatetag-get_comment_list"></span><h3>Mostrando comentários<a class="headerlink" href="#mostrando-comentarios" title="Permalink to this headline">¶</a></h3>
+<p>Para obter uma lista de comentários para algum objeto, use
+<a class="reference internal" href="#std:templatetag-get_comment_list"><tt class="xref std std-ttag docutils literal"><span class="pre">get_comment_list</span></tt></a>:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">get_comment_list</span> <span class="nv">for</span> <span class="o">[</span><span class="nv">object</span><span class="o">]</span> <span class="k">as</span> <span class="o">[</span><span class="nv">varname</span><span class="o">]</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Por exemplo:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">get_comment_list</span> <span class="nv">for</span> <span class="nv">event</span> <span class="k">as</span> <span class="nv">comment_list</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">comment</span> <span class="k">in</span> <span class="nv">comment_list</span> <span class="cp">%}</span>
+    ...
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Isto retorna uma lista de objetos
+<a class="reference internal" href="models.html#django.contrib.comments.models.Comment" title="django.contrib.comments.models.Comment"><tt class="xref py py-class docutils literal"><span class="pre">Comment</span></tt></a>; veja <a class="reference internal" href="models.html#ref-contrib-comments-models"><em>a documentação do
+model comment</em></a> para detalhes.</p>
+</div>
+<div class="section" id="s-contando-comentarios">
+<span id="s-std:templatetag-get_comment_count"></span><span id="contando-comentarios"></span><span id="std:templatetag-get_comment_count"></span><h3>Contando comentários<a class="headerlink" href="#contando-comentarios" title="Permalink to this headline">¶</a></h3>
+<p>Para contar comentário atachados em um objeto, use <a class="reference internal" href="#std:templatetag-get_comment_count"><tt class="xref std std-ttag docutils literal"><span class="pre">get_comment_count</span></tt></a>:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">get_comment_count</span> <span class="nv">for</span> <span class="o">[</span><span class="nv">object</span><span class="o">]</span> <span class="k">as</span> <span class="o">[</span><span class="nv">varname</span><span class="o">]</span>  <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Por exemplo:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">get_comment_count</span> <span class="nv">for</span> <span class="nv">event</span> <span class="k">as</span> <span class="nv">comment_count</span> <span class="cp">%}</span>
+
+<span class="nt">&lt;p&gt;</span>This event has <span class="cp">{{</span> <span class="nv">comment_count</span> <span class="cp">}}</span> comments.<span class="nt">&lt;/p&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-mostrando-o-formulario-de-comentarios">
+<span id="mostrando-o-formulario-de-comentarios"></span><h3>Mostrando o formulário de comentários<a class="headerlink" href="#mostrando-o-formulario-de-comentarios" title="Permalink to this headline">¶</a></h3>
+<p>Para mostrar o formulário que os usuários usarão para postar um comentário, você
+pode usar <a class="reference internal" href="#std:templatetag-render_comment_form"><tt class="xref std std-ttag docutils literal"><span class="pre">render_comment_form</span></tt></a> ou <a class="reference internal" href="#std:templatetag-get_comment_form"><tt class="xref std std-ttag docutils literal"><span class="pre">get_comment_form</span></tt></a>.</p>
+<div class="section" id="s-rapidamente-renderizando-o-formulario-de-comentario">
+<span id="s-std:templatetag-render_comment_form"></span><span id="rapidamente-renderizando-o-formulario-de-comentario"></span><span id="std:templatetag-render_comment_form"></span><h4>Rápidamente renderizando o formulário de comentário<a class="headerlink" href="#rapidamente-renderizando-o-formulario-de-comentario" title="Permalink to this headline">¶</a></h4>
+<p>A forma mais fácil de mostrar um formulário de comentário é usando o
+<a class="reference internal" href="#std:templatetag-render_comment_form"><tt class="xref std std-ttag docutils literal"><span class="pre">render_comment_form</span></tt></a>:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">render_comment_form</span> <span class="nv">for</span> <span class="o">[</span><span class="nv">object</span><span class="o">]</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Por exemplo:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">render_comment_form</span> <span class="nv">for</span> <span class="nv">event</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Isto irá renderizar comentários usando um template chamado
+<tt class="docutils literal"><span class="pre">comments/form.html</span></tt>, uma versão padrão que é incluída no Django.</p>
+</div>
+<div class="section" id="s-renderizando-um-formulario-customizado-de-comentario">
+<span id="s-std:templatetag-get_comment_form"></span><span id="renderizando-um-formulario-customizado-de-comentario"></span><span id="std:templatetag-get_comment_form"></span><h4>Renderizando um formulário customizado de comentário<a class="headerlink" href="#renderizando-um-formulario-customizado-de-comentario" title="Permalink to this headline">¶</a></h4>
+<p>Se você quiser mais controle sobre a aparência do formulário de comentário, você
+usa o <a class="reference internal" href="#std:templatetag-get_comment_form"><tt class="xref std std-ttag docutils literal"><span class="pre">get_comment_form</span></tt></a> para pegar um <a class="reference internal" href="../../../topics/forms/index.html"><em>objeto form</em></a> que você pode usar num template:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">get_comment_form</span> <span class="nv">for</span> <span class="o">[</span><span class="nv">object</span><span class="o">]</span> <span class="k">as</span> <span class="o">[</span><span class="nv">varname</span><span class="o">]</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Um formulário completo pode ficar tipo:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">get_comment_form</span> <span class="nv">for</span> <span class="nv">event</span> <span class="k">as</span> <span class="nv">form</span> <span class="cp">%}</span>
+<span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;</span><span class="cp">{%</span> <span class="k">comment_form_target</span> <span class="cp">%}</span><span class="s">&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="nt">&gt;</span>
+  <span class="cp">{{</span> <span class="nv">form</span> <span class="cp">}}</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;td&gt;&lt;/td&gt;</span>
+    <span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">name=</span><span class="s">&quot;preview&quot;</span> <span class="na">class=</span><span class="s">&quot;submit-post&quot;</span> <span class="na">value=</span><span class="s">&quot;Preview&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+</pre></div>
+</div>
+<p>Esteja certo de ler as <a class="reference internal" href="#notas-sobre-o-formulario-de-comentario">notas sobre o formulário de comentário</a>, abaixo, para
+alguma consideração especial que você poderá precisar fazer se estiver
+utilizando está abordagem.</p>
+</div>
+<div class="section" id="s-pegando-o-alvo-do-formulario-de-comentario">
+<span id="s-std:templatetag-comment_form_target"></span><span id="pegando-o-alvo-do-formulario-de-comentario"></span><span id="std:templatetag-comment_form_target"></span><h4>Pegando o alvo do formulário de comentário<a class="headerlink" href="#pegando-o-alvo-do-formulario-de-comentario" title="Permalink to this headline">¶</a></h4>
+<p>Você pode ter notado que o exemplo acima usa outra tag de template --
+<a class="reference internal" href="#std:templatetag-comment_form_target"><tt class="xref std std-ttag docutils literal"><span class="pre">comment_form_target</span></tt></a> -- para na verdade obter o atributo <tt class="docutils literal"><span class="pre">action</span></tt> do
+formulário. Este sermpre retornará a URL correta para onde o comentário deverá
+ser postado;</p>
+<blockquote>
+<div>&lt;form action=&quot;{% comment_form_target %}&quot; method=&quot;POST&quot;&gt;</div></blockquote>
+</div>
+<div class="section" id="s-redirecionando-depois-de-uma-postagem-de-comentario">
+<span id="redirecionando-depois-de-uma-postagem-de-comentario"></span><h4>Redirecionando depois de uma postagem de comentário<a class="headerlink" href="#redirecionando-depois-de-uma-postagem-de-comentario" title="Permalink to this headline">¶</a></h4>
+<p>Para especificar a URL que você quer redirecionar depois que um comentário foi
+postado, você pode incluir um campo invisível no formulário chamado <tt class="docutils literal"><span class="pre">next</span></tt>.
+Por exemplo:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;next&quot;</span> <span class="na">value=</span><span class="s">&quot;</span><span class="cp">{%</span> <span class="k">url</span> <span class="nv">my_comment_was_posted</span> <span class="cp">%}</span><span class="s">&quot;</span> <span class="nt">/&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="s-notas-sobre-o-formulario-de-comentario">
+<span id="s-notes-on-the-comment-form"></span><span id="notas-sobre-o-formulario-de-comentario"></span><span id="notes-on-the-comment-form"></span><h3>Notas sobre o formulário de comentário<a class="headerlink" href="#notas-sobre-o-formulario-de-comentario" title="Permalink to this headline">¶</a></h3>
+<p>O formulário usado pelo sistema de comentário tem uns poucos atributos anti-spam
+importantes, que você deve conhecer:</p>
+<ul>
+<li><p class="first">Ele contém um número de campos invisíveis que contém timestamps,
+informações sobre o objeto ao qual o comentário deve estar atachado, e um
+&quot;hash de segurança&quot;  usado para validar estas informações. Se alguém
+adultera estes dados -- alguns spammers de comentários tentarão -- a
+submissão falhará.</p>
+<p>Se você estiver renderizando um formulário de comentário customizado, você
+precisará garantir a passagem destes valores sem mudanças.</p>
+</li>
+<li><p class="first">O timestamp é usado para assegurar que &quot;ataques de resposta&quot; não durem
+muito tempo. Usuário que esperam muito entre a requisição do formulário e
+a postagem do comentário terão suas submissões recusadas.</p>
+</li>
+<li><p class="first">O formulário de comentário inclui um campo &quot;<a class="reference external" href="http://en.wikipedia.org/wiki/Honeypot_(computing)">honeypot</a>&quot; (pote de mel). Isto
+é uma armadilha: se algum dado é colocado nesse campo, o comentário será
+considerado spam (spammers frequêntemente preenchem todos os campos
+automaticamente, na tentativa de fazer submissões válidas).</p>
+<p>O formulário padrão esconde este campo utilizando um CSS e coloca nele um
+label adicional com um aviso de campo; Se você usar o formulário de
+comentário com um template customizado, deve assegurar-se de fazer o
+mesmo.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="s-mais-informacoes">
+<span id="mais-informacoes"></span><h2>Mais informações<a class="headerlink" href="#mais-informacoes" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Os models embutidos do Comment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">Configurações de Comentários</a></li>
+<li class="toctree-l1"><a class="reference internal" href="signals.html">Sinais enviados pela aplicação comments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrade.html">Atualizando o sistema de comentários de um Django anterior</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom.html">Customizing the comments framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forms.html">Comment form classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moderation.html">Generic comment moderation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example.html">Example of using the in-built comments app</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Framework de comentários do Django</a><ul>
+<li><a class="reference internal" href="#guia-rapido-de-inicio">Guia rápido de início</a></li>
+<li><a class="reference internal" href="#tags-de-template-do-comments">Tags de template do comments</a><ul>
+<li><a class="reference internal" href="#especificando-para-qual-objeto-o-comentario-sera-atachado">Especificando para qual objeto o comentário será atachado</a></li>
+<li><a class="reference internal" href="#mostrando-comentarios">Mostrando comentários</a></li>
+<li><a class="reference internal" href="#contando-comentarios">Contando comentários</a></li>
+<li><a class="reference internal" href="#mostrando-o-formulario-de-comentarios">Mostrando o formulário de comentários</a><ul>
+<li><a class="reference internal" href="#rapidamente-renderizando-o-formulario-de-comentario">Rápidamente renderizando o formulário de comentário</a></li>
+<li><a class="reference internal" href="#renderizando-um-formulario-customizado-de-comentario">Renderizando um formulário customizado de comentário</a></li>
+<li><a class="reference internal" href="#pegando-o-alvo-do-formulario-de-comentario">Pegando o alvo do formulário de comentário</a></li>
+<li><a class="reference internal" href="#redirecionando-depois-de-uma-postagem-de-comentario">Redirecionando depois de uma postagem de comentário</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#notas-sobre-o-formulario-de-comentario">Notas sobre o formulário de comentário</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mais-informacoes">Mais informações</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="../auth.html"><tt class="docutils literal docutils literal docutils literal"><span class="pre">django.contrib.auth</span></tt></a></li>
+    
+    
+      <li>Next: <a href="models.html">Os models embutidos do Comment</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../../index.html">Referência da API</a>
+        
+          <ul><li><a href="../index.html">Os add-ons &#8220;django.contrib&#8221;</a>
+        
+        <ul><li>Framework de comentários do Django</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/ref/contrib/comments/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../auth.html" title="&lt;tt class=&#34;docutils literal docutils literal docutils literal&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django.contrib.auth&lt;/span&gt;&lt;/tt&gt;">previous</a> 
+     |
+    <a href="../../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="models.html" title="Os models embutidos do Comment">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

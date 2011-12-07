@@ -1,0 +1,162 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11298 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+.. _howto-initial-data:
+
+==================================
+Provendo dados inicias para models
+==================================
+
+As vezes é útil povoar seu banco de dados com dados no momento da instalação de
+uma aplicação. Aqui há algumas formas de se fazer o Django criar estes dados
+automaticamente: você pode prover `dados iniciais usando fixtures`_ ou você pode
+prover `dados iniciais em SQL`_.
+
+Geralmente, usar um fixture é um método mais limpo desde que o banco de dados
+seja agnóstico, mas dados iniciais em SQL podem ser um pouco mais flexiveis.
+
+.. _dados iniciais em SQL: `provendo dados iniciais em SQL`_
+.. _dados iniciais usando fixtures: `provendo dados iniciais com fixtures`_
+
+Provendo dados iniciais com fixtures
+====================================
+
+Uma fixture é uma coleção de dados que o Django sabe com importar para dentro de
+um banco de dados. A forma mais simples de se criar uma fixture, se você já tem
+alguns dados, é usando o comando :djadmin:`manage.py dumpdata`. Ou, você pode
+escrever a mão; as fixtures podem ser escritas em XML, YAML, ou JSON. A
+:ref:`documentação de serialização <topics-serialization>` tem mais detalhes
+sobre cada um destes :ref:`formatos de serialização <serialization-formats>`
+suportados.
+
+Como exemplo, aqui é mostrado uma fixture para um model simples ``Person``, no
+formato JSON:
+
+.. code-block:: js
+
+    [
+      {
+        "model": "myapp.person",
+        "pk": 1,
+        "fields": {
+          "first_name": "John",
+          "last_name": "Lennon"
+        }
+      },
+      {
+        "model": "myapp.person",
+        "pk": 2,
+        "fields": {
+          "first_name": "Paul",
+          "last_name": "McCartney"
+        }
+      }
+    ]
+
+E aqui tem a mesma fixture como YAML:
+
+.. code-block:: none
+
+    - model: myapp.person
+      pk: 1
+      fields:
+        first_name: John
+        last_name: Lennon
+    - model: myapp.person
+      pk: 2
+      fields:
+        first_name: Paul
+        last_name: McCartney
+
+Você armazenará estes dados em um diretório ``fixtures`` dentro de sua
+aplicação.
+
+Carregar os dados é fácil: é só chamar :djadmin:`manage.py loaddata
+fixturename <loaddata>`, onde *fixturename* é o nome do arquivo fixture que você
+criou. Toda vez que você executar :djadmin:`loaddata` os dados serão lidos da
+fixture e recarregados no banco de dados. Note que isto significa que se você
+mudar algum dado criado por uma fixture e rodar :djadmin:`loaddata` novamente,
+ele irá sobrescrever a mudanças feitas.
+
+Carregando automaticamente os dados iniciais de fixtures
+--------------------------------------------------------
+
+Se você criar uma fixture chamada ``initial_data.[xml/yaml/json]``, essas
+fixtures serão carregadas sempre que você rodar :djadmin:`syncdb`. Isto é
+extremamente conveniente, mas seja cuidadoso: lembre-se qeu os dados serão
+atualizado *toda vez* que voce executar :djadmin:`syncdb`. Então não use
+``initial_data`` para dados que você deseja editar.
+
+.. seealso::
+
+    As fixtures são usadas também pelo :ref:`framework de testes
+    <topics-testing-fixtures>` para ajudar a montar um ambiente consistente de
+    testes.
+
+.. _initial-sql:
+
+Provendo dados iniciais em SQL
+==============================
+
+O Django provê um hook para passar SQL arbitrário para o banco de dados, que
+é executado somente depois de uma consulta CREATE TABLE, no momento em que você
+roda um :djadmin:`syncdb`. Você pode usar este hook para popular com dados
+padrões, ou também criar funções SQL, view, triggers, etc.
+
+O hook é simples: o Django simplesmente procura por um arquivo chamado
+``sql/<modelname>.sql``, no diretório da aplicação, onde ``<modelname>`` é o
+nome do model em minúsculo.
+
+Então, se você tem um model ``Person`` em uma aplicação chamada ``myapp``, você
+poderia adicionar SQL arbitrário num arquivo ``sql/person.sql`` dentro do
+diretório ``myapp``.
+Aqui tem um exemplo do que o arquivo pode conter:
+
+.. code-block:: sql
+
+    INSERT INTO myapp_person (first_name, last_name) VALUES ('John', 'Lennon');
+    INSERT INTO myapp_person (first_name, last_name) VALUES ('Paul', 'McCartney');
+
+Para cada arquivo SQL, se fornecido, é esperado que contenha consultas SQL
+válidas que irão inserir os dados desejados (e.g., consultas ``INSERT``
+apropriadamente formadas, separadas por ponto-e-vírgula);
+
+Os arquivos SQL são lidos pelos comandos :djadmin:`sqlcustom`,
+:djadmin:`sqlreset`, :djadmin:`sqlall` e :djadmin:`reset` no :doc:`manage.py
+</ref/django-admin>`. Consulte a :doc:`documentação do manage.py
+</ref/django-admin>` para mais informações.
+
+Note que se você tem múltiplos arquivos de dados SQL, não há garantias da ordem
+em que eles serão executados. A única coisa que pode ser assumida, é que no
+momento em que todos forem executados, o banco de dados já estará com todas as
+suas tabelas criadas.
+
+Dados SQL para um backend específico de banco de dados
+------------------------------------------------------
+
+Há também um kook para backend específico de dados SQL. Por exemplo, você pode
+ter separados arquivos com dados iniciais para PostgreSQL e MySQL. Para cada
+applicação, o Django procura por um arquivo chamado
+``<appname>/sql/<modelname>.<backend>.sql``, onde ``<appname>`` é o diretório de
+sua aplicação, ``<modelname>`` é o nome do model em minúsculo e ``<backend>`` é
+o valor de :setting:`DATABASE_ENGINE` no seu arquivo settings (e.g.,
+``postgresql``, ``mysql``).
+
+O backend específico de dados SQL é executado antes do backend não-específico de
+dados SQL. Por exemplo, se sua aplicação contém os arquivos ``sql/person.sql`` e
+``sql/person.postgresql.sql`` e você está instalando a aplicação sobre o
+PostgreSQL, o Django irá executar o conteúdo do ``sql/person.postgresql.sql``
+primeiro, e então ``sql/person.sql``.
+

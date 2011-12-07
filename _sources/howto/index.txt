@@ -1,0 +1,53 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _howto-index:
+
+Guias "como fazer"
+==================
+
+Aqui você irá encontrar respostas curtas para questões do tipo 
+"Como eu faço...?". Estes guias how-to cobrem tópicos em profundidade -- você
+terá de encontrar materiais em :doc:`/topics/index` e :doc:`/ref/index`. No 
+entanto, estes guias irão ajudá-lo a realizar rapidamente tarefas comuns.
+
+.. toctree::
+   :maxdepth: 1
+   
+   apache-auth
+   auth-remote-user
+   contribute
+   custom-management-commands
+   custom-model-fields
+   custom-template-tags
+   custom-file-storage
+   deployment/index
+   error-reporting
+   initial-data
+   i18n
+   jython
+   legacy-databases
+   outputting-csv
+   outputting-pdf
+   static-files
+
+.. seealso::
+
+    O `agregador da comunidade do Django`_ onde nós agregamos conteúdos da 
+    comunidade global do Django. Muitos escritores no agregador escrevem este 
+    tipo de material, how-to.
+
+.. _agregador da comunidade do Django: http://www.djangoproject.com/community/

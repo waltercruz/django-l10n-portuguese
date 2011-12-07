@@ -1,0 +1,176 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done $
+..   $OriginalRevision: 11348 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _releases-1.0-alpha-1:
+
+====================================
+Django 1.0 alpha notas de lançamento
+====================================
+
+Bem-vindo ao Django 1.0 alpha!
+
+Este é o primeiro de uma série de releases de previsão/desenvolvimento
+conducentes à eventual liberação do Django 1.0, atualmente agendado para o
+início de setembro de 2008. Este release a princípio atinge desenvolvedores que
+estão estão interessados no código do Django e a ajudar a identificar e
+resolver bugs prioritários para o release 1.0 final.
+
+Dessa forma, este release *não* é destinado para uso em produção, e qualquer
+uso neste sentido é desencorajado.
+
+O que há de novo no Django 1.0 alpha
+====================================
+
+O trunk do desenvolvimento do Django tem sido local de atividade quase
+constante durante o último ano, com a criação de várias novas funcionalidades
+desde o release 0.96. Alguns dos destaques incluem:
+
+Aplicação admin refatorada (newforms-admin)
+    A interface administrativa do Django (``django.contrib.admin``) foi
+    completamente refatorada; definições do admin agora são completamente
+    dissociadas das definições dos modelos (nada de declaração ``class Admin``
+    nos seus modelos!), reescrito para usar a nova biblioteca form-handling do
+    Django (introduzido no release 0.96 como ``django.newforms``, e agora
+    disponível simplesmente como ``django.forms``) e replanejado tendo em mente
+    extensibilidade e customização. A documentação completa para a aplicação
+    admin está disponível online na documentação oficial do Django:
+
+         :doc:`referência da administração </ref/contrib/admin/index>`
+
+Manipulação de Unicode melhorada
+    Internamente o Django foi completamente refatorado para usar Unicode; isso
+    simplifica drasticamente a tarefa de lidar com conteúdos e dados não-
+    Western-European no Django. Adicionalmente, funções utilitárias foram
+    providas para facilitar interoperabilidade de bibliotecas e sistemas de
+    terceiros que podem ou não manipular Unicode graciosamente. Detalhes estão
+    disponíveis na documentação Manipulando Unicode:
+
+         :doc:`unicode reference </ref/unicode>`
+
+Uma melhoria no ORM do Django
+    O mapeador objeto-relacional do Django -- o componente que provê o
+    mapeamento entre as classes de modelo do Django e seu banco de dados, e que
+    faz a mediação de suas consultas de banco de dados -- tem sido
+    dramaticamente melhorado por meio de uma massiva refatoração. Para a
+    maioria dos usuários do Django isso é compatível com versões anteriores; a
+    parte pública da API para consultas do banco de dados sofreu mudanças
+    menores, e a maior parte das atualizações foi feita nas partes internas do
+    ORM. Um guia das mudanças, incluindo as modificações incompatíveis com
+    versões anteriores e as menções às novas funcionalidades introduzidas por
+    tal refatoramento, está disponível no wiki do Django:
+
+         http://code.djangoproject.com/wiki/QuerysetRefactorBranch
+
+Escape automático de variáveis de template
+    Para prover melhorias de segurança contra vulnerabilidades de cross-site
+    scripting (XSS), o sistema de templates do Django agora escapa a saída de
+    variáveis automaticamente. Esse comportamento é configurável, e permite
+    ambos, variáveis e grandes construções de templates serem marcados como
+    seguros (não necessitando de escape) ou não-seguro (necessitando de
+    escape). Um guia completo para essa funcionalidade está na documentação do
+    sistema da tag :ttag:`autoescape`.
+
+Há muitas outras funcionalidades, muitas correções de bugs e muitos
+aprimoramentos para funcionalidades existentes em releases anteriores. A
+biblioteca ``newforms``, por exemplo, tem sofrido massivas melhorias incluíndo
+vários add-ons usuais no ``django.contrib`` que complementam e constróem novas
+capacidades de manipulação de formulários no Django, e os manipuladores de
+upload de arquivos do Django têm sido refatorados para permitir um controle
+refinado sobre o processo de transferência, bem como upload stream de arquivos
+grandes.
+
+Junto com essas melhorias e acréscimos, nós fizemos um número de mudanças
+incompatíveis com versões anteriores do framework, à medida que novas
+funcionalidades tomaram forma e APIs foram finalizadas para o release 1.0. Um
+guia completo para essas mudanças estará disponível como parte do release final
+Django 1.0, e uma lista completa das mudanças que trouxeram incompatibilidades
+com versões anteriores também está disponível no wiki do Django para aqueles
+que desejam começar a desenvolver e testar seu processo de atualização:
+
+    http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+
+
+Roadmap do Django 1.0
+=====================
+
+Um dos primeiros objetivos desta versão alpha é focar a atenção nos elementos
+a serem implementados para o Django 1.0, e sobre bugs que precisam ser
+resolvidos antes da versão final. Acompanhando esta versão, nós realizaremos
+uma série de sprints para concretizar uma série de versões beta e atingir um
+estágio release-candidate, logo em seguida virá o Django 1.0. A linha do tempo
+é projetada para ser:
+
+* 1 de agosto de 2008: Sprint (localizado em Washington, DC, e online).
+
+* 5 de agosto de 2008: Versão beta do Django 1.0. É quando acontecerá o
+  congelamento de novidades para o 1.0. Qualquer funcionalidade que almeje ser
+  incluída no 1.0 deve ser completada no trunk neste prazo.
+
+* 8 de agosto de 2008: Sprint (localizado em Lawrence, KS, e online).
+
+* 12 de agosto de 2008: Versão beta 2 do Django 1.0.
+
+* 15 de agosto de 2008: Sprint (localizado em Austin, TX, e online).
+
+* 19 de agosto de 2008: Release-candidate 1 do Django 1.0.
+
+* 22 de agosto de 2008: Sprint (localizado em Portland, OR e online).
+
+* 26 de agosto de 2008: Release-candidate 2 do Django 1.0
+
+* 2 de setembro de 2008: Versão final do Django 1.0. A festa da versão oficial
+  do Django 1.0 será durante a primeira DjangoCon, a ser realizada em Mountain
+  View, CA, nos dias 6 e 7 Setembro.
+
+É claro, como qualquer linha de tempo estimada, ela está sujeita a mudanças.
+A última informação sempre será disponibilizada no wiki do projeto Django:
+
+    http://code.djangoproject.com/wiki/VersionOneRoadmap
+
+
+O que você pode fazer para ajudar
+=================================
+
+A fim de proporcionar uma versão 1.0 de alta qualidade, nós precisamos de
+ajuda. Embora esta versão alpha seja, novamente, *não*-recomendada para uso em
+produção, você pode ajudar o time do Django testando o código alpha em um
+ambiente seguro de testes e reportando qualquer bug ou problema que encontrar.
+O ticket tracker do Django é o lugar central para procurar por problemas não
+resolvidos:
+
+    http://code.djangoproject.com/timeline
+
+Por favor, crie novos tickets se não existir um ticket correspondente ao seu
+problema.
+
+Adicionalmente, discussões do desenvolvimento do Django, incluindo progressos
+rumo à versão 1.0, ocorrem diariamente na lista de desenvolvedores::
+
+    http://groups.google.com/group/django-developers
+
+...e no canal do IRC ``#django-dev`` na rede ``irc.freenode.net``. Se você está
+interessado em ajudar com o desenvolvimento do Django, sinta-se livre para se
+juntar às discussões.
+
+A documentação online do Django também inclui pontos sobre como contribuir para
+o Django:
+
+    :doc:`contribuíndo para o Django </internals/contributing>`
+
+Contribuições de qualquer nível -- desenvolvendo código, escrevendo
+documentação ou simplesmente criando tickets e ajudando a testar corresções de
+bugs propostos -- são sempre bem-vindas e apreciadas.
+

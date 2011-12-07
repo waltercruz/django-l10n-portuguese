@@ -1,0 +1,488 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Form wizard &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../../index.html" />
+    <link rel="up" title="django.contrib.formtools" href="index.html" />
+    <link rel="next" title="GeoDjango" href="../gis/index.html" />
+    <link rel="prev" title="Pré-visualização de formulários" href="form-preview.html" />
+ 
+<script type="text/javascript" src="../../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="form-preview.html" title="Pré-visualização de formulários">previous</a> 
+     |
+    <a href="../../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="../gis/index.html" title="GeoDjango">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-formtools-form-wizard">
+            
+  <div class="section" id="s-module-django.contrib.formtools.wizard">
+<span id="s-form-wizard"></span><span id="s-ref-contrib-formtools-form-wizard"></span><span id="module-django.contrib.formtools.wizard"></span><span id="form-wizard"></span><span id="ref-contrib-formtools-form-wizard"></span><h1>Form wizard<a class="headerlink" href="#module-django.contrib.formtools.wizard" title="Permalink to this headline">¶</a></h1>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>O Django vem acompanhado uma aplicação opicional &#8220;form wizard&#8221; que divide
+<a class="reference internal" href="../../../topics/forms/index.html"><em>formulários</em></a> em várias páginas Web. Ele mantém o
+estado num hash HTML de campos <tt class="samp docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;hidden&quot;&gt;</span></tt>, e os dados não são
+processados no lado do servidor até que a última parte do formulário seja
+submetida.</p>
+<p>Você pode querer usar isto com formulários muito compridos que seriam
+desagradáveis de se mostrar numa única página. A primeira página pode pedir ao
+usuário informações centrais, a segunda coisas menos importantes, e assim por
+diante.</p>
+<p>o termo &#8220;wizard&#8221; (em português &#8220;assistente&#8221;) neste contexto, é <a class="reference external" href="http://en.wikipedia.org/wiki/Wizard_%28software%29">explicado na
+Wikipedia</a>.</p>
+<div class="section" id="s-como-ele-funciona">
+<span id="como-ele-funciona"></span><h2>Como ele funciona<a class="headerlink" href="#como-ele-funciona" title="Permalink to this headline">¶</a></h2>
+<p>Aqui temos o fluxo de funcionamento básico de como um usuário poderia usar um
+wizard:</p>
+<ol class="arabic simple">
+<li>O usuário visita a primeira página do wizard, preenche o formulário e o
+submete.</li>
+<li>O servidor valida os dados. Se eles forem inválidos, o formulário é
+mostrado novamente, com mensagens de erro. Se for válido, o servidor
+calcula um hash seguro dos dados e apresenta ao usuário o próximo
+formulário, poupando os dados validados e o hash em campos
+<tt class="samp docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;hidden&quot;&gt;</span></tt>.</li>
+<li>Repete o passo 1 e 2, para todos os formulários subsequentes do wizard.</li>
+<li>Um vez que o usuário tenha submetido todos os formulários e todos os
+dados estejam validados, o wizard processa os dados &#8211; salvando-os no
+banco de dados, enviando um e-mail, ou seja lá o que for que a aplicação
+precise fazer.</li>
+</ol>
+</div>
+<div class="section" id="s-uso">
+<span id="uso"></span><h2>Uso<a class="headerlink" href="#uso" title="Permalink to this headline">¶</a></h2>
+<p>Esta aplicação manipula tantos mecanismos para você quanto possível.
+Geralmente, você só tem que fazer estas coisas:</p>
+<ol class="arabic simple">
+<li>Definir um número de classes <tt class="xref py py-mod docutils literal"><span class="pre">django.forms</span></tt> e
+<tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt> &#8211; uma por página do wizard.</li>
+<li>Criar uma classe <a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard" title="django.contrib.formtools.wizard.FormWizard"><tt class="xref py py-class docutils literal"><span class="pre">FormWizard</span></tt></a> que
+especifica o que fazer uma vez que todos os seus formulários foram
+submetidos e validados. Isso também permite você sobrescrever alguns
+comportamentos do wizard.</li>
+<li>Criar alguns templates que renderizam formulários. Você pode definir um
+único template genérico para manipular todos os formulários, ou definir
+um template específico para cada formulário.</li>
+<li>Apontar seu URLconf para sua classe
+<a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard" title="django.contrib.formtools.wizard.FormWizard"><tt class="xref py py-class docutils literal"><span class="pre">FormWizard</span></tt></a>.</li>
+</ol>
+</div>
+<div class="section" id="s-definindo-classes-form">
+<span id="definindo-classes-form"></span><h2>Definindo classes <tt class="docutils literal"><span class="pre">Form</span></tt><a class="headerlink" href="#definindo-classes-form" title="Permalink to this headline">¶</a></h2>
+<p>o primeiro passo para criar um &#8220;form wizard&#8221; é criar as classes
+<tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt>. Estes deveriam ser padronizados com as
+classes <tt class="xref py py-mod docutils literal"><span class="pre">django.forms</span></tt> e <tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt>, explanados na
+<a class="reference internal" href="../../../topics/forms/index.html"><em>documentação do forms</em></a>.</p>
+<p>Estas classes podem estar em qualquer lugar de sua base de código, mas por
+convenção são postas num arquivo chamado <tt class="file docutils literal"><span class="pre">forms.py</span></tt> dentro da sua
+aplicação.</p>
+<p>Por exemplo, vamos escrever um wizard &#8220;contact form&#8221;, onde a primeira página
+coleta o endereço de email do remetente e o assunto, e a segunda página coleta
+a mensagem em si. Aqui tem um exemplo de como o <tt class="file docutils literal"><span class="pre">forms.py</span></tt> pode ficar:</p>
+<div class="highlight-python"><pre>from django import forms
+
+ class ContactForm1(forms.Form):
+     subject = forms.CharField(max_length=100)
+     sender = forms.EmailField()
+
+ class ContactForm2(forms.Form):
+     message = forms.CharField(widget=forms.Textarea)</pre>
+</div>
+<p><strong>Limitação importante:</strong> Pelo wizard usar campos HTML hidden para armazenar
+dados entre as páginas, você não pode incluir um
+<tt class="xref py py-class docutils literal"><span class="pre">FileField</span></tt> em qualquer outra página, a não ser na
+última.</p>
+</div>
+<div class="section" id="s-criando-uma-classe-formwizard">
+<span id="criando-uma-classe-formwizard"></span><h2>Criando uma classe <tt class="docutils literal"><span class="pre">FormWizard</span></tt><a class="headerlink" href="#criando-uma-classe-formwizard" title="Permalink to this headline">¶</a></h2>
+<p>O próximo passo é criar uma classe
+<a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard" title="django.contrib.formtools.wizard.FormWizard"><tt class="xref py py-class docutils literal"><span class="pre">FormWizard</span></tt></a>, que deveria ser uma
+subclasse do <tt class="docutils literal"><span class="pre">django.contrib.formtools.wizard.FormWizard</span></tt>.</p>
+<p>Assim como suas classes <tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt>, esta classe
+<a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard" title="django.contrib.formtools.wizard.FormWizard"><tt class="xref py py-class docutils literal"><span class="pre">FormWizard</span></tt></a> pode estar em qualquer
+lugar da sua base de código, mas por convenção é colocado no <tt class="file docutils literal"><span class="pre">forms.py</span></tt>.</p>
+<p>O único requerimento desta subclasse é que ela implementa um método
+<tt class="xref py py-meth docutils literal"><span class="pre">done()</span></tt>, que especifica o que
+deve acontecer quando <em>todos</em> os formulários foram submetidos e validados. A
+este método é passado dois argumentos:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">request</span></tt> -- um objeto <a class="reference internal" href="../../request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a></li>
+<li><tt class="docutils literal"><span class="pre">form_list</span></tt> -- uma lista de classes <tt class="xref py py-mod docutils literal"><span class="pre">django.forms</span></tt>
+<tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt></li>
+</ul>
+<p>Neste exemplo simplista, ao invés de executar qualquer operação de banco de
+dados, o método simplesmente renderiza um template com os dados validados:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render_to_response</span>
+<span class="kn">from</span> <span class="nn">django.contrib.formtools.wizard</span> <span class="kn">import</span> <span class="n">FormWizard</span>
+
+<span class="k">class</span> <span class="nc">ContactWizard</span><span class="p">(</span><span class="n">FormWizard</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">done</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">form_list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;done.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s">&#39;form_data&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span> <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">form_list</span><span class="p">],</span>
+        <span class="p">})</span>
+</pre></div>
+</div>
+<p>Note que este método será chamado via <tt class="docutils literal"><span class="pre">POST</span></tt>, então ele realmente deveria ser
+um bom cidadão Web e redirecionar depois de processar os dados. Aqui tem outro
+exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponseRedirect</span>
+<span class="kn">from</span> <span class="nn">django.contrib.formtools.wizard</span> <span class="kn">import</span> <span class="n">FormWizard</span>
+
+<span class="k">class</span> <span class="nc">ContactWizard</span><span class="p">(</span><span class="n">FormWizard</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">done</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">form_list</span><span class="p">):</span>
+        <span class="n">do_something_with_the_form_data</span><span class="p">(</span><span class="n">form_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="s">&#39;/page-to-redirect-to-when-done/&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Veja a seção <a class="reference internal" href="#metodos-avancados-do-formwizard">Métodos avançados do FormWizard</a> abaixo para aprender mais sobre
+os hooks do <a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard" title="django.contrib.formtools.wizard.FormWizard"><tt class="xref py py-class docutils literal"><span class="pre">FormWizard</span></tt></a>.</p>
+</div>
+<div class="section" id="s-criando-templates-para-formularios">
+<span id="criando-templates-para-formularios"></span><h2>Criando templates para formulários<a class="headerlink" href="#criando-templates-para-formularios" title="Permalink to this headline">¶</a></h2>
+<p>Agora, precisamos criar um template que renderize os forumlários do wizard. Por
+padrão, todo formulário usa um template chamado <tt class="file docutils literal"><span class="pre">forms/wizard.html</span></tt>. (Você
+pode mudar este nome sobrescrevendo o método
+<tt class="xref py py-meth docutils literal"><span class="pre">get_template()</span></tt>, que está documentado
+abaixo. Este hook também permite você usar um template diferente para cada
+formulário.)</p>
+<p>Este template aguarda o seguinte contexto:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">step_field</span></tt> -- O nome do campo hidden contento o passo.</li>
+<li><tt class="docutils literal"><span class="pre">step0</span></tt> -- O passo atual (partindo de zero).</li>
+<li><tt class="docutils literal"><span class="pre">step</span></tt> -- O passo atual (partindo de um).</li>
+<li><tt class="docutils literal"><span class="pre">step_count</span></tt> -- O total de passos.</li>
+<li><tt class="docutils literal"><span class="pre">form</span></tt> -- A instância do <tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt> para o passo
+atual (vazio ou com erros).</li>
+<li><tt class="docutils literal"><span class="pre">previous_fields</span></tt> -- Uma string representando todos os campos de dados
+anteriores, mais os hashes de formulários completados, todos em campos
+hidden de formulário. Note que você precisará executar isto através do
+template filter <tt class="xref py py-meth docutils literal"><span class="pre">safe()</span></tt>, para
+previnir o auto escape, por ele é um HTML puro.</li>
+</ul>
+<p>Ele também será transmitido a quaisquer objetos no <tt class="xref py py-data docutils literal"><span class="pre">extra_context</span></tt>, que é
+um  dicionário que você pode especificar contendo valores extra a serem
+adicionados ao contexto.
+Você pode especificá-lo de duas formas:</p>
+<ul class="simple">
+<li>Sete o atributo
+<tt class="xref py py-attr docutils literal"><span class="pre">extra_context</span></tt> na sua
+subclasse <a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard" title="django.contrib.formtools.wizard.FormWizard"><tt class="xref py py-class docutils literal"><span class="pre">FormWizard</span></tt></a> para um
+dicionário.</li>
+<li>Passe <tt class="xref py py-attr docutils literal"><span class="pre">extra_context</span></tt>
+como parâmetros extra no URLconf.</li>
+</ul>
+<p>Aqui tem um exemplo de template completo:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">extends</span> <span class="s2">&quot;base.html&quot;</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}</span>
+<span class="nt">&lt;p&gt;</span>Step <span class="cp">{{</span> <span class="nv">step</span> <span class="cp">}}</span> of <span class="cp">{{</span> <span class="nv">step_count</span> <span class="cp">}}</span><span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;.&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;table&gt;</span>
+<span class="cp">{{</span> <span class="nv">form</span> <span class="cp">}}</span>
+<span class="nt">&lt;/table&gt;</span>
+<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">step_field</span> <span class="cp">}}</span><span class="s">&quot;</span> <span class="na">value=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">step0</span> <span class="cp">}}</span><span class="s">&quot;</span> <span class="nt">/&gt;</span>
+<span class="cp">{{</span> <span class="nv">previous_fields</span><span class="o">|</span><span class="nf">safe</span> <span class="cp">}}</span>
+<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+<span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>Note que <tt class="docutils literal"><span class="pre">previous_fields</span></tt>, <tt class="docutils literal"><span class="pre">step_field</span></tt> e <tt class="docutils literal"><span class="pre">step0</span></tt> são todos obrigatórios
+para o wizard funcionar perfeitamente.</p>
+</div>
+<div class="section" id="s-ligando-o-wizard-num-urlconf">
+<span id="ligando-o-wizard-num-urlconf"></span><h2>Ligando o wizard num URLconf<a class="headerlink" href="#ligando-o-wizard-num-urlconf" title="Permalink to this headline">¶</a></h2>
+<p>Finalmente, dê ao seu novo objeto
+<a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard" title="django.contrib.formtools.wizard.FormWizard"><tt class="xref py py-class docutils literal"><span class="pre">FormWizard</span></tt></a> uma URL no <tt class="docutils literal"><span class="pre">urls.py</span></tt>. O
+wizard recebe uma lista de seus objetos form como argumentos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">mysite.testapp.forms</span> <span class="kn">import</span> <span class="n">ContactForm1</span><span class="p">,</span> <span class="n">ContactForm2</span><span class="p">,</span> <span class="n">ContactWizard</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^contact/$&#39;</span><span class="p">,</span> <span class="n">ContactWizard</span><span class="p">([</span><span class="n">ContactForm1</span><span class="p">,</span> <span class="n">ContactForm2</span><span class="p">])),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-metodos-avancados-do-formwizard">
+<span id="metodos-avancados-do-formwizard"></span><h2>Métodos avançados do FormWizard<a class="headerlink" href="#metodos-avancados-do-formwizard" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.contrib.formtools.wizard.FormWizard">
+<em class="property">class </em><tt class="descname">FormWizard</tt><a class="headerlink" href="#django.contrib.formtools.wizard.FormWizard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Além do método <tt class="xref py py-meth docutils literal"><span class="pre">done()</span></tt>,
+o <a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard" title="django.contrib.formtools.wizard.FormWizard"><tt class="xref py py-class docutils literal"><span class="pre">FormWizard</span></tt></a> oferece alguns
+métodos avançados que permitem você customizar o funcionamento do seu
+wizard.</p>
+<p>Alguns destes métodos recebem um argumento <tt class="docutils literal"><span class="pre">step</span></tt>, que é um contador,
+partindo de zero, representando o passo corrente do wizard. (E.g., o
+primeiro form é <tt class="docutils literal"><span class="pre">0</span></tt> e o segundo form é <tt class="docutils literal"><span class="pre">1</span></tt>.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.contrib.formtools.wizard.FormWizard.prefix_for_step">
+<tt class="descclassname">FormWizard.</tt><tt class="descname">prefix_for_step</tt>()<a class="headerlink" href="#django.contrib.formtools.wizard.FormWizard.prefix_for_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dado um passo, retorna um prefixo de <tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt> para
+uso. Por padrão, este simplesmente usa o passo em si. Para mais, veja a
+<a class="reference internal" href="../../forms/api.html#form-prefix"><em>documentação do prefixo de formulário</em></a>.
+Implementação padrão:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">prefix_for_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.contrib.formtools.wizard.FormWizard.render_hash_failure">
+<tt class="descclassname">FormWizard.</tt><tt class="descname">render_hash_failure</tt>()<a class="headerlink" href="#django.contrib.formtools.wizard.FormWizard.render_hash_failure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renderiza um template se a verificação do hash falhar. É raro você precisar
+sobrescrever este método.</p>
+<p>Implementação padrão:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">render_hash_failure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_form</span><span class="p">(</span><span class="n">step</span><span class="p">),</span> <span class="n">request</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;wizard_error&#39;</span><span class="p">:</span> <span class="s">&#39;Desculpe-nos, mas seu formulário expirou. Por favor continue preenchendo o formulário desta página.&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.contrib.formtools.wizard.FormWizard.security_hash">
+<tt class="descclassname">FormWizard.</tt><tt class="descname">security_hash</tt>()<a class="headerlink" href="#django.contrib.formtools.wizard.FormWizard.security_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calcula o hash de segurança para um dado objeto request e instância de
+<tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt>.</p>
+<p>Por padrão, ele usa um hash MD5 dos dados do formulário e sua configuração
+<a class="reference internal" href="../../settings.html#std:setting-SECRET_KEY"><tt class="xref std std-setting docutils literal"><span class="pre">SECRET_KEY</span></tt></a>. É raro alguém precisar sobrescrever isso.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">security_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">my_hash_function</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">form</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.contrib.formtools.wizard.FormWizard.parse_params">
+<tt class="descclassname">FormWizard.</tt><tt class="descname">parse_params</tt>()<a class="headerlink" href="#django.contrib.formtools.wizard.FormWizard.parse_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um hook para salvar o estado do objeto request e <tt class="docutils literal"><span class="pre">args</span></tt> / <tt class="docutils literal"><span class="pre">kwargs</span></tt> que
+foram capiturados da URL pelo seu URLconf.</p>
+<p>Por padrão, isso não faz nada.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">parse_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">my_state</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.contrib.formtools.wizard.FormWizard.get_template">
+<tt class="descclassname">FormWizard.</tt><tt class="descname">get_template</tt>()<a class="headerlink" href="#django.contrib.formtools.wizard.FormWizard.get_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna o nome do template que deveria ser usado para um certo passo.</p>
+<p>Por padrão, ele retorna <tt class="file docutils literal"><span class="pre">'forms/wizard.html'</span></tt>, indiferente do passo.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">get_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&#39;myapp/wizard_</span><span class="si">%s</span><span class="s">.html&#39;</span> <span class="o">%</span> <span class="n">step</span>
+</pre></div>
+</div>
+<p>Se o <a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard.get_template" title="django.contrib.formtools.wizard.FormWizard.get_template"><tt class="xref py py-meth docutils literal"><span class="pre">get_template()</span></tt></a> retorna uma lista de strings, então o
+wizard usará a função do sistema de template
+<a class="reference internal" href="../../templates/api.html#django.template.loader.select_template" title="django.template.loader.select_template"><tt class="xref py py-func docutils literal"><span class="pre">select_template()</span></tt></a>, <a class="reference internal" href="../../templates/api.html#ref-templates-api-the-python-api"><em>explanada na
+documentação de template</em></a>.
+Isto significa que o sistema usará o primeiro template que existir no
+sistema de arquivo. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">get_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s">&#39;myapp/wizard_</span><span class="si">%s</span><span class="s">.html&#39;</span> <span class="o">%</span> <span class="n">step</span><span class="p">,</span> <span class="s">&#39;myapp/wizard.html&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.contrib.formtools.wizard.FormWizard.render_template">
+<tt class="descclassname">FormWizard.</tt><tt class="descname">render_template</tt>()<a class="headerlink" href="#django.contrib.formtools.wizard.FormWizard.render_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renderiza o template para o dado passo, retornando um objeto
+<a class="reference internal" href="../../request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a>.</p>
+<p>Sobrescreva este método se você deseja adicionar um contexto customizado,
+retornar um tipo MIME diferente, etc. Se você somente precisa sobrescrever o
+nome do template, use o método <a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard.get_template" title="django.contrib.formtools.wizard.FormWizard.get_template"><tt class="xref py py-meth docutils literal"><span class="pre">get_template()</span></tt></a>.</p>
+<p>O template será renderizado com o contexto documentado na seção acima
+&quot;criando templates para formulários&quot;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.contrib.formtools.wizard.FormWizard.process_step">
+<tt class="descclassname">FormWizard.</tt><tt class="descname">process_step</tt>()<a class="headerlink" href="#django.contrib.formtools.wizard.FormWizard.process_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um hook para modificar o estado interno do wizard, dado uma totalidade de
+objetos <tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt> validados. O Form está garantido a
+ter dados limpos e válidos.</p>
+<p>Este método <em>não</em> deve modificar qualquer dado. Ao invés disso, ele pode
+querer setar um <tt class="docutils literal"><span class="pre">self.extra_context</span></tt> ou dinamicamente alterar o
+<tt class="docutils literal"><span class="pre">self.form_list</span></tt>, baseado nos formulários submetidos anteriormente.</p>
+<p>Note que este método é chamado toda vez que uma página é renderizada para
+<em>todos</em> os passos submetidos.</p>
+<p>A assinatura da função:</p>
+<div class="highlight-python"><pre>def process_step(self, request, form, step):
+    # ...</pre>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Form wizard</a><ul>
+<li><a class="reference internal" href="#como-ele-funciona">Como ele funciona</a></li>
+<li><a class="reference internal" href="#uso">Uso</a></li>
+<li><a class="reference internal" href="#definindo-classes-form">Definindo classes <tt class="docutils literal"><span class="pre">Form</span></tt></a></li>
+<li><a class="reference internal" href="#criando-uma-classe-formwizard">Criando uma classe <tt class="docutils literal"><span class="pre">FormWizard</span></tt></a></li>
+<li><a class="reference internal" href="#criando-templates-para-formularios">Criando templates para formulários</a></li>
+<li><a class="reference internal" href="#ligando-o-wizard-num-urlconf">Ligando o wizard num URLconf</a></li>
+<li><a class="reference internal" href="#metodos-avancados-do-formwizard">Métodos avançados do FormWizard</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="form-preview.html">Pré-visualização de formulários</a></li>
+    
+    
+      <li>Next: <a href="../gis/index.html">GeoDjango</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../../index.html">Referência da API</a>
+        
+          <ul><li><a href="../index.html">Os add-ons &#8220;django.contrib&#8221;</a>
+        
+          <ul><li><a href="index.html">django.contrib.formtools</a>
+        
+        <ul><li>Form wizard</li></ul>
+        </li></ul></li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/ref/contrib/formtools/form-wizard.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="form-preview.html" title="Pré-visualização de formulários">previous</a> 
+     |
+    <a href="../../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="../gis/index.html" title="GeoDjango">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,256 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Databrowse &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Os add-ons “django.contrib”" href="index.html" />
+    <link rel="next" title="A aplicação Flatpages" href="flatpages.html" />
+    <link rel="prev" title="Proteção Cross Site Request Forgery" href="csrf.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="csrf.html" title="Proteção Cross Site Request Forgery">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="flatpages.html" title="A aplicação Flatpages">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-databrowse">
+            
+  <div class="section" id="s-module-django.contrib.databrowse">
+<span id="s-databrowse"></span><span id="s-ref-contrib-databrowse"></span><span id="module-django.contrib.databrowse"></span><span id="databrowse"></span><span id="ref-contrib-databrowse"></span><h1>Databrowse<a class="headerlink" href="#module-django.contrib.databrowse" title="Permalink to this headline">¶</a></h1>
+<p>Databrowse é uma aplicação Django que permite você navegar em seus dados.</p>
+<p>Assim como a administração do Django cria dinamicamente uma interface
+espionando os seus modelos, o Databrowse cria dinamicamente um rico e navegável
+website espionando-os também.</p>
+<div class="admonition-note admonition ">
+<p class="first admonition-title">Note</p>
+<p>O Databrowse é <strong>muito</strong> novo e está em fase de desenvolvimento. Ele pode
+mudar substancialmente antes do próximo release do Django.</p>
+<p class="last">Como foi dito, ele é fácil de usar e não requer qualquer código novo.
+Então você pode brincar com ele hoje, com um pouco de investimento de
+tempo ou código.</p>
+</div>
+<div class="section" id="s-como-usar-o-databrowse">
+<span id="como-usar-o-databrowse"></span><h2>Como usar o Databrowse<a class="headerlink" href="#como-usar-o-databrowse" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Aponte o Django para os templates padrões do &#8220;Databrowse&#8221;. Existem duas
+maneiras de fazer isso:</p>
+<ul class="simple">
+<li>Adicione <tt class="docutils literal"><span class="pre">'django.contrib.databrowse'</span></tt> em seu
+<a class="reference internal" href="../settings.html#std:setting-INSTALLED_APPS"><tt class="xref std std-setting docutils literal"><span class="pre">INSTALLED_APPS</span></tt></a>. Isso funcionará se seu
+<a class="reference internal" href="../settings.html#std:setting-TEMPLATE_LOADERS"><tt class="xref std std-setting docutils literal"><span class="pre">TEMPLATE_LOADERS</span></tt></a> incluir o carregador de
+templates <tt class="docutils literal"><span class="pre">app_directories</span></tt> (que é o caso por padrão). Veja a
+documentação do <a class="reference internal" href="../templates/api.html#template-loaders"><em>carregor de templates</em></a> para
+saber mais.</li>
+<li>De outra forma, determine o caminho completo no sistema de arquivos
+para o diretório <tt class="file docutils literal"><span class="pre">django/contrib/databrowse/templates</span></tt>, e o
+adicione no <tt class="xref std std-setting docutils literal"><span class="pre">TEMPLATES_DIRS</span></tt> do arquivo settings.py.</li>
+</ul>
+</li>
+<li><p class="first">Registrar um número de modelos com o site Databrowse:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">databrowse</span>
+<span class="kn">from</span> <span class="nn">myapp.models</span> <span class="kn">import</span> <span class="n">SomeModel</span><span class="p">,</span> <span class="n">SomeOtherModel</span>
+
+<span class="n">databrowse</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">SomeModel</span><span class="p">)</span>
+<span class="n">databrowse</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">SomeOtherModel</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note que você pode registrar a <em>classe</em> do modelo, não instâncias.</p>
+<p>Não importa onde você coloque isto, desde que seja executado em algum
+ponto. Um bom lugar para isso é seu arquivo <a class="reference internal" href="../../topics/http/urls.html"><em>URLconf</em></a> (<tt class="docutils literal"><span class="pre">urls.py</span></tt>).</p>
+</li>
+<li><p class="first">Mude seu URLconf para importar o módulo <a class="reference internal" href="#module-django.contrib.databrowse" title="django.contrib.databrowse: Databrowse é uma aplicação Django que permite você navegar em seus dados."><tt class="xref py py-mod docutils literal"><span class="pre">databrowse</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">databrowse</span>
+</pre></div>
+</div>
+<p>...e adicione a seguinte linha em seu URLconf:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="s">r&#39;^databrowse/(.*)&#39;</span><span class="p">,</span> <span class="n">databrowse</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">root</span><span class="p">),</span>
+</pre></div>
+</div>
+<p>O prefixo não importa -- você pode usar <tt class="docutils literal"><span class="pre">databrowse/</span></tt> ou <tt class="docutils literal"><span class="pre">db/</span></tt> ou o
+que preferir.</p>
+</li>
+<li><p class="first">Rode o servidor do Django e visite <tt class="docutils literal"><span class="pre">/databrowse/</span></tt> em seu navegador.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="s-requerindo-login-de-usuario">
+<span id="requerindo-login-de-usuario"></span><h2>Requerindo login de usuário<a class="headerlink" href="#requerindo-login-de-usuario" title="Permalink to this headline">¶</a></h2>
+<p>Você pode restringir o acesso para usuário logados com poucas linhas de código
+extra. Simplesmente adicione o seguinte import em seu URLconf:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+</pre></div>
+</div>
+<p>Em seguida modifique o <a class="reference internal" href="../../topics/http/urls.html"><em>URLconf</em></a> a fim de que o view
+<tt class="xref py py-func docutils literal"><span class="pre">databrowse.site.root()</span></tt> seja afetado pelo decorador
+<a class="reference internal" href="../../topics/auth.html#django.contrib.auth.decorators.login_required" title="django.contrib.auth.decorators.login_required"><tt class="xref py py-func docutils literal"><span class="pre">django.contrib.auth.decorators.login_required()</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="s">r&#39;^databrowse/(.*)&#39;</span><span class="p">,</span> <span class="n">login_required</span><span class="p">(</span><span class="n">databrowse</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">root</span><span class="p">)),</span>
+</pre></div>
+</div>
+<p>Se você ainda não adicionou suporte para logins de usuários à sua <a class="reference internal" href="../../topics/http/urls.html"><em>URLconf</em></a>, como descrito na documentação de <a class="reference internal" href="auth.html"><em>autenticação de
+usuário</em></a>, então você precisará fazer isso agora com o
+seguinte mapeamento:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="s">r&#39;^accounts/login/$&#39;</span><span class="p">,</span> <span class="s">&#39;django.contrib.auth.views.login&#39;</span><span class="p">),</span>
+</pre></div>
+</div>
+<p>O passo final é criar o fomulário de login requerido pelo
+<a class="reference internal" href="../../topics/auth.html#django.contrib.auth.views.login" title="django.contrib.auth.views.login"><tt class="xref py py-func docutils literal"><span class="pre">django.contrib.auth.views.login()</span></tt></a>. A
+documentação de <a class="reference internal" href="auth.html"><em>autenticação de usuário</em></a> provê os
+detalhes completos e um template de exemplo que pode ser usado com este
+propósito.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Databrowse</a><ul>
+<li><a class="reference internal" href="#como-usar-o-databrowse">Como usar o Databrowse</a></li>
+<li><a class="reference internal" href="#requerindo-login-de-usuario">Requerindo login de usuário</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="csrf.html">Proteção Cross Site Request Forgery</a></li>
+    
+    
+      <li>Next: <a href="flatpages.html">A aplicação Flatpages</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Referência da API</a>
+        
+          <ul><li><a href="index.html">Os add-ons &#8220;django.contrib&#8221;</a>
+        
+        <ul><li>Databrowse</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/contrib/databrowse.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="csrf.html" title="Proteção Cross Site Request Forgery">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="flatpages.html" title="A aplicação Flatpages">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

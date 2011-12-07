@@ -1,0 +1,182 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, wainting for revision. $
+..   $OriginalRevision: 14077 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+============================
+Exportando PDFs com o Django
+============================
+
+Este documento explora como exportar arquivos PDF dinamicamente usando views do
+Django. Isso é possível graças a uma excelente, biblioteca PDF de código-aberto
+para Python, chamada ReportLab_.
+
+A vantagem de gerar dinamicamente arquivos PDF é que você pode criar PDFs 
+customizados para diferentes propósitos -- como para diferentes usuários ou
+diferentes partes de conteúdos.
+
+Por exemplo, o Django foi usado no kusports.com_ para gerar versões de 
+impressão curtomizadas dos torneios do NCAA, como arquivos PDF, para
+pessoas participantes no concurso March Madness.
+
+.. _ReportLab: http://www.reportlab.org/oss/rl-toolkit/
+.. _kusports.com: http://www.kusports.com/
+
+Instalando o ReportLab
+======================
+
+Baixe e instale a biblioteca ReportLab do site 
+http://www.reportlab.org/oss/rl-toolkit/download/. O `guia de usuário`_ (não 
+coincidentemente, um arquivo PDF) explica como instalá-lo.
+
+Teste sua instalação importando-o no interpretador interativo do Python::
+
+    >>> import reportlab
+
+Se o comando não mostrar nenhum erro, a instalação está funcionando.
+
+.. _guia de usuário: http://www.reportlab.com/docs/reportlab-userguide.pdf
+
+Escreva a sua view
+==================
+
+A chave para gerar PDFs dinamicamente com o Django é que a API do ReportLab
+trabalha sobre objetos que se comportam como arquivos, e objetos
+:class:`~django.http.HttpResponse` do Django são objetos assim.
+
+Aqui vai um exemplo "Hello World"::
+
+    from reportlab.pdfgen import canvas
+    from django.http import HttpResponse
+
+    def some_view(request):
+        # Crie o objeto HttpResponse com o cabeçalho de PDF apropriado.
+        response = HttpResponse(mimetype='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
+
+        # Crie o objeto PDF, usando o objeto response como seu "arquivo".
+        p = canvas.Canvas(response)
+
+        # Desenhe coisas no PDF. Aqui é onde a geração do PDF acontece.
+        # Veja a documentação do ReportLab para a lista completa de 
+        # funcionalidades.
+        p.drawString(100, 100, "Hello world.")
+
+        # Feche o objeto PDF, e está feito.
+        p.showPage()
+        p.save()
+        return response
+
+O código e comentários devem ser auto-explicativos, mas umas poucas coisas
+merecem ser mencionadas:
+
+    * O response recebe um mimetype especial, ``application/pdf``. Isso informa
+      ao navegador que o documento é um arquivo PDF, em vez de um arquivo HTML.
+      Se você não informar isto, o navegador irá provavelmente interpretar a
+      saída como um HTML, o que poderia resultar em um resultado feio e
+      assustador na janela do navegador.
+      
+    * O response recebe um cabeçalho adicional ``Content-Disposition``, que
+      contém o nome do arquivo PDF. Esse nome de arquivo é arbitrário: chame-o
+      como quiser. Ele será usado pelo navegador na caixa de diálogo
+      "Salvar como...", etc.
+      
+    * O cabeçalho ``Content-Disposition`` começa com  ``'attachment; '`` neste
+      exemplo. Isso força o navegador a mostrar uma caixa de diálogo 
+      avisando/confirmando como manipular o documento, mesmo se um padrão está
+      definido na máquina. Se você não informar o ``'attachment'``, o navegador
+      manipulará o PDF usando qualquer programa/plugin que ele tiver
+      configurado para usar com PDFs. Veja como esse código se pareceria::
+      
+          response['Content-Disposition'] = 'filename=algum_nomedearquivo.pdf'
+
+    * Usar hooks da API do ReportLab é fácil: somente passe ``response`` como
+      o primeiro argumento para o ``canvas.Canvas``. A classe ``Canvas`` recebe
+      um objeto como arquivo, e objetos :class:`~django.http.HttpResponse` 
+      atendem a esse requisito.
+      
+    * Note que todo método subseqüente de geração de PDF é chamado no objeto
+      PDF (neste caso, ``p``) -- não no ``response``.
+
+    * Finalmente, é importante chamar ``showPage()`` e ``save()`` sobre o
+      arquivo PDF.
+
+PDFs complexos
+==============
+
+Se você está criando um documento PDF complexo com o ReportLab, considere a
+utilização da biblioteca cStringIO_ como um manipulador temporário para o seu 
+arquivo PDF. A biblioteca cStringIO fornece uma interface para objeto como 
+arquivo que é particularmente eficiente. Aqui o exemplo acima "Hello World" é
+re-escrito para usar o ``cStringIO``::
+
+    # Fall back to StringIO in environments where cStringIO is not available
+    try:
+        from cStringIO import StringIO
+    except ImportError:
+        from StringIO import StringIO
+    from reportlab.pdfgen import canvas
+    from django.http import HttpResponse
+
+    def some_view(request):
+        # Crie o objeto HttpResponse com o cabeçalho PDF apropriado.
+        response = HttpResponse(mimetype='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
+
+        buffer = StringIO()
+
+        # Crie um objeto PDF, usando o objeto StringIO como seu "arquivo."
+        p = canvas.Canvas(buffer)
+
+        # Desenhe coisas no PDF. Aqui é onde a geração do PDF acontece.
+        # Veja a documentação do ReportLab para a lista completa de 
+        # funcionalidades.
+        p.drawString(100, 100, "Hello world.")
+
+        # Feche o objeto PDF.
+        p.showPage()
+        p.save()
+
+        # Pegue o valor do buffer StringIO e escreva-o para o response.
+        pdf = buffer.getvalue()
+        buffer.close()
+        response.write(pdf)
+        return response
+
+.. _cStringIO: http://docs.python.org/library/stringio.html#module-cStringIO
+
+Mais recursos
+=============
+
+    * PDFlib_ é outra biblioteca de geração de PDF que tem binding para o 
+      Python. Para usá-lo com o Django, somente use o mesmo conceito explicado
+      neste artigo.
+    * `Pisa XHTML2PDF`_ é mais uma biblioteca de geração de PDF. Pisa é entregue
+      com um exemplo de como integrá-la com o Django.
+    * HTMLdoc_ é um script de linha de comando que consegue converter HTML para
+      PDF. Ele não possui uma interface Python, mas você consegue escapar do
+      terminal usando ``system`` ou ``popen`` e recebendo a saída no Python.
+
+.. _PDFlib: http://www.pdflib.org/
+.. _`Pisa XHTML2PDF`: http://www.xhtml2pdf.com/
+.. _HTMLdoc: http://www.htmldoc.org/
+
+Outros formatos
+===============
+
+Repare que não há muitos destes exemplos específicos de PDF -- somente o que é 
+usado o ``reportlab``. Você pode usar uma técnica similar para gerar qualquer 
+formato que possa ser gerado por uma biblioteca Python. Também veja 
+:doc:`/howto/outputting-csv` para outro exemplo e algumas técnicas que você pode
+usar quando gera formatos baseados em texto.

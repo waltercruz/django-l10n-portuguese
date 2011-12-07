@@ -1,0 +1,456 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Filosofia de design &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Meta-documentação e miscelânea" href="index.html" />
+    <link rel="next" title="Estabilidade de API" href="api-stability.html" />
+    <link rel="prev" title="Meta-documentação e miscelânea" href="index.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="Meta-documentação e miscelânea">previous</a> 
+     |
+    <a href="index.html" title="Meta-documentação e miscelânea" accesskey="U">up</a>
+   |
+    <a href="api-stability.html" title="Estabilidade de API">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="misc-design-philosophies">
+            
+  <div class="section" id="s-filosofia-de-design">
+<span id="s-misc-design-philosophies"></span><span id="filosofia-de-design"></span><span id="misc-design-philosophies"></span><h1>Filosofia de design<a class="headerlink" href="#filosofia-de-design" title="Permalink to this headline">¶</a></h1>
+<p>Este documento explica algumas filosofias fundamentais dos desenvolvedores do
+Django, que as tem usado na criação do framework. O objetivo é explicar o
+passado e guiar o futuro.</p>
+<div class="section" id="s-em-toda-parte">
+<span id="em-toda-parte"></span><h2>Em toda parte<a class="headerlink" href="#em-toda-parte" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-baixo-acoplamento">
+<span id="s-loose-coupling"></span><span id="baixo-acoplamento"></span><span id="loose-coupling"></span><h3>Baixo acoplamento<a class="headerlink" href="#baixo-acoplamento" title="Permalink to this headline">¶</a></h3>
+<p id="index-0">Um objetivo fundamental da pilha do Django é o <a class="reference external" href="http://c2.com/cgi/wiki?CouplingAndCohesion">baixo acoplamento e alta
+coesão</a>.  As várias camadas do framework não devem se &#8220;conhecer&#8221; a menos que
+seja absolutamente necessário.</p>
+<p>Por exemplo, o sistema de template não sabe nada sobre requisições Web, a
+camada de banco de dados não sabe nada sobre a exibição dos dados e o sistema
+de view não se preocupa com que sistema de template o programador está
+utilizando.</p>
+<p>Apesar do Django vir com uma pilha completa por conveniência, as partes da
+pilha são independentes de quaisquer outras sempre que possível.</p>
+</div>
+<div class="section" id="s-menos-codigo">
+<span id="s-less-code"></span><span id="menos-codigo"></span><span id="less-code"></span><h3>Menos código<a class="headerlink" href="#menos-codigo" title="Permalink to this headline">¶</a></h3>
+<p>Aplicações Django devem utilizar o menor código possível; elas devem possuir
+pouco código &#8220;boilerplate&#8221; (códigos repetitivos). O Django deve tirar pleno
+proveito das capacidades dinâmicas do Python, tais como a introspecção.</p>
+</div>
+<div class="section" id="s-desenvolvimento-agil">
+<span id="s-quick-development"></span><span id="desenvolvimento-agil"></span><span id="quick-development"></span><h3>Desenvolvimento ágil<a class="headerlink" href="#desenvolvimento-agil" title="Permalink to this headline">¶</a></h3>
+<p>O ponto forte de um framework Web no século 21 é tornar rápido os aspectos
+tediosos do desenvolvimento Web. O Django deve permitir um desenvolvimento Web
+incrivelmente rápido.</p>
+</div>
+<div class="section" id="s-nao-se-repita-don-t-repeat-yourself-dry">
+<span id="s-dry"></span><span id="nao-se-repita-don-t-repeat-yourself-dry"></span><span id="dry"></span><h3>Não se repita (<cite>Don&#8217;t repeat yourself</cite>, DRY)<a class="headerlink" href="#nao-se-repita-don-t-repeat-yourself-dry" title="Permalink to this headline">¶</a></h3>
+<p id="index-1">Cada conceito distinto e/ou porção de dado deve existir em um, e somente em um,
+lugar. Redundância é ruim. Normalização é bom.</p>
+<p>O framework, dentro do possível, deve deduzir o máximo do menor número de
+informação possível.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">A <a class="reference external" href="http://c2.com/cgi/wiki?DontRepeatYourself">discussão sobre DRY no Portland Pattern Repository</a></p>
+</div>
+</div>
+<div class="section" id="s-explicito-e-melhor-que-implicito">
+<span id="s-explicit-is-better-than-implicit"></span><span id="explicito-e-melhor-que-implicito"></span><span id="explicit-is-better-than-implicit"></span><h3>Explícito é melhor que implícito<a class="headerlink" href="#explicito-e-melhor-que-implicito" title="Permalink to this headline">¶</a></h3>
+<p>Isto é um <a class="reference external" href="http://www.python.org/dev/peps/pep-0020/">princípio do núcleo do Python</a>, que significa que o Django não deve
+fazer muita &#8220;mágica&#8221;. Mágica não deveria acontecer a menos que haja realmente
+uma boa razão para ela. Vale a pena usar mágica apenas quando ela cria uma
+enorme conveniência inatingível de outras formas, e não é aplicada de uma forma
+que confunde desenvolvedores que estão tentando aprender a usar o recurso.</p>
+</div>
+<div class="section" id="s-consistencia">
+<span id="s-consistency"></span><span id="consistencia"></span><span id="consistency"></span><h3>Consistência<a class="headerlink" href="#consistencia" title="Permalink to this headline">¶</a></h3>
+<p>O framework deve ser consistente em todos os níveis. Consistência aplica-se em
+tudo, do baixo-nível (o estilo de código Python utilizado) ao alto-nível (a
+&#8220;experiência&#8221; de uso do Django).</p>
+</div>
+</div>
+<div class="section" id="s-models">
+<span id="models"></span><h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-id2">
+<span id="id2"></span><h3>Explícito é melhor que implícito<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Os campos não devem assumir certos comportamentos baseado unicamente no nome do
+campo. Isto exige muito conhecimento do sistema e é propenso a erros. Ao invés
+disso, os comportamentos devem ser baseados em argumentos com palavras-chave
+(keyword arguments) e, em alguns casos, sobre o tipo do campo.</p>
+</div>
+<div class="section" id="s-incluir-toda-logica-de-dominio-relevante">
+<span id="incluir-toda-logica-de-dominio-relevante"></span><h3>Incluir toda lógica de domínio relevante<a class="headerlink" href="#incluir-toda-logica-de-dominio-relevante" title="Permalink to this headline">¶</a></h3>
+<p>Modelos devem encapsular todo aspecto de um &#8220;objeto&#8221;, seguindo o padrão de
+projeto <a class="reference external" href="http://www.martinfowler.com/eaaCatalog/activeRecord.html">Active Record</a> do Martin Fowler.</p>
+<p>É por este motivo que tanto os dados representados por um modelo e a informação
+sobre o mesmo (seu nome legível por humanos, opções como ordenação padrão,
+etc.), são definidos em uma classe de modelo; todas as informações necessárias
+para compreender um determinado modelo deve ser armazenado <em>no</em> modelo.</p>
+</div>
+</div>
+<div class="section" id="s-api-do-banco-de-dados">
+<span id="api-do-banco-de-dados"></span><h2>API do banco de dados<a class="headerlink" href="#api-do-banco-de-dados" title="Permalink to this headline">¶</a></h2>
+<p>Os objetivos do núcleo da API do banco de dados são:</p>
+<div class="section" id="s-eficiencia-do-sql">
+<span id="eficiencia-do-sql"></span><h3>Eficiência do SQL<a class="headerlink" href="#eficiencia-do-sql" title="Permalink to this headline">¶</a></h3>
+<p>As declarações SQL devem ser executadas o mais rápido possível, e as consultas
+devem ser otimizadas internamente.</p>
+<p>Esta é a razão pela qual os desenvolvedores precisam executar <tt class="docutils literal"><span class="pre">save()</span></tt>
+explicitamente, ao invés do framework salvar as coisas silenciosamente de trás
+das cortinas.</p>
+<p>Esta também é a razão dos métodos <tt class="docutils literal"><span class="pre">select_related()</span></tt> e <tt class="docutils literal"><span class="pre">QuerySet</span></tt>
+existirem.  É como um reforço opcional de performance para o caso comum de
+selecionar &#8220;tudo que está relacionado a um objeto&#8221;.</p>
+</div>
+<div class="section" id="s-sintaxe-poderosa-e-concisa">
+<span id="sintaxe-poderosa-e-concisa"></span><h3>Sintaxe poderosa e concisa<a class="headerlink" href="#sintaxe-poderosa-e-concisa" title="Permalink to this headline">¶</a></h3>
+<p>A API do banco de dados deve permitir ricas e expressivas consultas em uma
+sintaxe mais simples possível. Ela não deve depender de outros módulos ou da
+importação de objetos auxiliares.</p>
+<p>&#8220;Joins&#8221; devem ser executados automaticamente quando necessário, por trás das
+cortinas.</p>
+<p>Todo objeto deve ser capaz de acessar todo conteúdo relacionado a ela. Este
+acesso deve funcionar nos dois sentidos.</p>
+</div>
+<div class="section" id="s-opcao-de-usar-sql-puro-facilmente-quando-necessario">
+<span id="opcao-de-usar-sql-puro-facilmente-quando-necessario"></span><h3>Opção de usar SQL puro facilmente, quando necessário<a class="headerlink" href="#opcao-de-usar-sql-puro-facilmente-quando-necessario" title="Permalink to this headline">¶</a></h3>
+<p>A API do banco de dados deve realizar isto através de um atalho, mas não
+necessariamente como um fim para tudo. O framework deve tornar fácil a escrita
+de SQL personalizado &#8211; consultas inteiras, ou simplesmente cláusulas <tt class="docutils literal"><span class="pre">WHERE</span></tt>
+com parâmetros personalizados para chamadas da API.</p>
+</div>
+</div>
+<div class="section" id="s-design-de-url">
+<span id="design-de-url"></span><h2>Design de URL<a class="headerlink" href="#design-de-url" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-id3">
+<span id="id3"></span><h3>Baixo acoplamento<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>URLs nas aplicações Django não devem ser acopladas a códigos Python subjacentes.
+Subordinando URLs a nomes de funções do Python é uma coisa ruim e feia de se
+fazer.</p>
+<p>Sendo assim, o sistema de URL do Django deve permitir que URLs para uma mesma
+aplicação sejam diferentes em diferentes contextos. Por exemplo, um site pode
+ter notícias em <tt class="docutils literal"><span class="pre">/stories/</span></tt>, enquanto em outros o caminho utilizado é
+<tt class="docutils literal"><span class="pre">/news/</span></tt>.</p>
+</div>
+<div class="section" id="s-flexibilidade-infinita">
+<span id="flexibilidade-infinita"></span><h3>Flexibilidade infinita<a class="headerlink" href="#flexibilidade-infinita" title="Permalink to this headline">¶</a></h3>
+<p>URLs devem ser tão flexiveis quanto possível. Qualquer URL concebível deve ser
+permitida.</p>
+</div>
+<div class="section" id="s-encorajar-as-melhores-praticas">
+<span id="encorajar-as-melhores-praticas"></span><h3>Encorajar as melhores práticas<a class="headerlink" href="#encorajar-as-melhores-praticas" title="Permalink to this headline">¶</a></h3>
+<p>O framework deve tornar fácil (ou mesmo mais fácil) o design de URLs bonitas do
+que feias.</p>
+<p>Extensões de arquivos nas URLs das páginas devem ser evitadas.</p>
+<p>O estilo Vignette de vírgulas em URLs merecem um castigo severo.</p>
+</div>
+<div class="section" id="s-urls-definitivas">
+<span id="s-definitive-urls"></span><span id="urls-definitivas"></span><span id="definitive-urls"></span><h3>URLs definitivas<a class="headerlink" href="#urls-definitivas" title="Permalink to this headline">¶</a></h3>
+<p id="index-2">Técnicamente, <tt class="docutils literal"><span class="pre">foo.com/bar</span></tt> e <tt class="docutils literal"><span class="pre">foo.com/bar/</span></tt> são URLs diferentes, e robôs
+de motores de busca (e alguns analisadores de tráfego na Web) irão tratá-las
+como páginas distintas. O Django deve fazer um esforço para &#8220;normalizar&#8221; as
+URLs, a fim de que os robôs de motores de busca não se confundam.</p>
+<p>Este é o raciocínio por trás da configuração <a class="reference internal" href="../ref/settings.html#std:setting-APPEND_SLASH"><tt class="xref std std-setting docutils literal"><span class="pre">APPEND_SLASH</span></tt></a>.</p>
+</div>
+</div>
+<div class="section" id="s-sistema-de-template">
+<span id="sistema-de-template"></span><h2>Sistema de template<a class="headerlink" href="#sistema-de-template" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-separar-a-logica-da-apresentacao">
+<span id="s-separation-of-logic-and-presentation"></span><span id="separar-a-logica-da-apresentacao"></span><span id="separation-of-logic-and-presentation"></span><h3>Separar a lógica da apresentação<a class="headerlink" href="#separar-a-logica-da-apresentacao" title="Permalink to this headline">¶</a></h3>
+<p>Nós vemos um sistema de template como uma ferramenta que controla a
+apresentação e a lógica relacionada à apresentação &#8211; e só. O sistema de
+template não deve suportar funcionalidades que vão além de seu objetivo básico.</p>
+<p>Se quiséssemos colocar tudo em templates, era para estarmos usando
+PHP. Já passamos por isso.</p>
+</div>
+<div class="section" id="s-desencorajar-redundancias">
+<span id="desencorajar-redundancias"></span><h3>Desencorajar redundâncias<a class="headerlink" href="#desencorajar-redundancias" title="Permalink to this headline">¶</a></h3>
+<p>A maioria dos Web sites dinâmicos utilizam algum tipo de design comum &#8211; um
+cabeçalho comum, rodapé, barra de navegação, etc. O sistema de template do
+Django deve ser fácil para armazenar estes elementos em um único lugar,
+eliminando código duplicado.</p>
+<p>Esta é a filosofia por trás da <a class="reference internal" href="../topics/templates.html#template-inheritance"><em>herança de templates</em></a>.</p>
+</div>
+<div class="section" id="s-ser-dissociado-do-html">
+<span id="ser-dissociado-do-html"></span><h3>Ser dissociado do HTML<a class="headerlink" href="#ser-dissociado-do-html" title="Permalink to this headline">¶</a></h3>
+<p>O sistema de template não deve ser projetado para gerar somente saída HTML. Ele
+deve ser igualmente bom para geração de outros formatos baseados em texto, ou
+só texto plano.</p>
+</div>
+<div class="section" id="s-xml-nao-deve-ser-utilizada-como-linguagem-de-template">
+<span id="xml-nao-deve-ser-utilizada-como-linguagem-de-template"></span><h3>XML não deve ser utilizada como linguagem de template<a class="headerlink" href="#xml-nao-deve-ser-utilizada-como-linguagem-de-template" title="Permalink to this headline">¶</a></h3>
+<p id="index-3">Usando um motor de XML para fazer análise dos templates, introduz todo um novo
+mundo de erro humano na edição de templates &#8211; e implica um nível inaceitável
+de overhead no processamento de template.</p>
+</div>
+<div class="section" id="s-presume-competencia-do-designer">
+<span id="presume-competencia-do-designer"></span><h3>Presume competência do designer<a class="headerlink" href="#presume-competencia-do-designer" title="Permalink to this headline">¶</a></h3>
+<p>O sistema de template não deve ser projetado de modo que templaes
+necessariamente sejam exibidos amigavelmente nos editores WYSIWYG, como o
+Dreamweaver. Isso é tão grave, que passa a ser uma limitação e não permitiria a
+sintaxe ser tão legal como ela é. O Django espera que os autores de templates
+estejam confortáveis editando HTML diretamente.</p>
+</div>
+<div class="section" id="s-trate-espacos-em-branco-de-maneira-obvia">
+<span id="trate-espacos-em-branco-de-maneira-obvia"></span><h3>Trate espaços em branco de maneira óbvia<a class="headerlink" href="#trate-espacos-em-branco-de-maneira-obvia" title="Permalink to this headline">¶</a></h3>
+<p>O sistema de template não deve fazer coisas mágicas com espaços em branco. Se
+um tempalte inclui espaços em branco, o sistema deve tratá-los como se trata um
+texto &#8211; simplesmente exibindo-o. Qualquer espaço em branco que não está em uma
+tag de template deverá ser exibido.</p>
+</div>
+<div class="section" id="s-nao-invente-uma-linguagem-de-programacao">
+<span id="nao-invente-uma-linguagem-de-programacao"></span><h3>Não invente uma linguagem de programação<a class="headerlink" href="#nao-invente-uma-linguagem-de-programacao" title="Permalink to this headline">¶</a></h3>
+<p>O sistema de template intencionalmente não permite o seguinte:</p>
+<ul class="simple">
+<li>Atribuição de variáveis</li>
+<li>Lógica avançada</li>
+</ul>
+<p>O objetivo não é inventar uma linguagem de programação. O objetivo é oferecer
+somente funcionalidades suficientes, como lógica condicional e laços (looping),
+que são essenciais para contruir representações relacionadas com decisões.</p>
+<p>O sistema de template do Django reconhece que templates são mais frequentemente
+escritos por <em>designers</em>, não por <em>programadores</em>, e por isso não deve presumir
+conhecimento em Python.</p>
+</div>
+<div class="section" id="s-protecao-e-seguranca">
+<span id="protecao-e-seguranca"></span><h3>Proteção e segurança<a class="headerlink" href="#protecao-e-seguranca" title="Permalink to this headline">¶</a></h3>
+<p>O sistema de template, <em>out of the box</em>, deve proibir a inclusão de códigos
+maliciosos &#8211; como comandos que apagam registros no banco de dados.</p>
+<p>Esta é outra razão para que o sistema de template não permita código Python
+arbitrário.</p>
+</div>
+<div class="section" id="s-extensibilidade">
+<span id="extensibilidade"></span><h3>Extensibilidade<a class="headerlink" href="#extensibilidade" title="Permalink to this headline">¶</a></h3>
+<p>O sistema de template deve reconhecer que autores avançados de templates podem
+querer extender sua tecnologia.</p>
+<p>Está é a filosofia por trás das tags e filtros de template personalizados.</p>
+</div>
+</div>
+<div class="section" id="s-views">
+<span id="views"></span><h2>Views<a class="headerlink" href="#views" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-simplicidade">
+<span id="simplicidade"></span><h3>Simplicidade<a class="headerlink" href="#simplicidade" title="Permalink to this headline">¶</a></h3>
+<p>Escrever uma view deve ser tão simples quanto escrever uma função Python. Os
+desenvolvedores não devem ter que instanciar uma classe quando uma função
+for suficiente.</p>
+</div>
+<div class="section" id="s-use-objetos-request">
+<span id="use-objetos-request"></span><h3>Use objetos request<a class="headerlink" href="#use-objetos-request" title="Permalink to this headline">¶</a></h3>
+<p>Views devem ter acesso ao objeto <cite>request</cite> &#8211; um objeto que armazena metadados
+sobre a requisição corrente. O objeto deve ser passado diretamente para a
+função view, ao invés da função view ter quer acessar o request de uma variável
+global.  Isto se faz leve, limpo e fácil de testar views passando-a objetos de
+requisição &#8220;falsos&#8221;.</p>
+</div>
+<div class="section" id="s-id4">
+<span id="id4"></span><h3>Baixo acoplamento<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>Uma view não deve se preocupar sobre qual sistema de template o desenvolvedor
+utiliza &#8211; ou mesmo se ele utiliza algum.</p>
+</div>
+<div class="section" id="s-diferenciamento-entre-get-e-post">
+<span id="diferenciamento-entre-get-e-post"></span><h3>Diferenciamento entre GET e POST<a class="headerlink" href="#diferenciamento-entre-get-e-post" title="Permalink to this headline">¶</a></h3>
+<p>GET é POST são distintos; os desenvolvedores devem explicitamente usar um ou
+outro. O framework deve tornar fácil a distinção entre os dados GET e POST.</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Filosofia de design</a><ul>
+<li><a class="reference internal" href="#em-toda-parte">Em toda parte</a><ul>
+<li><a class="reference internal" href="#baixo-acoplamento">Baixo acoplamento</a></li>
+<li><a class="reference internal" href="#menos-codigo">Menos código</a></li>
+<li><a class="reference internal" href="#desenvolvimento-agil">Desenvolvimento ágil</a></li>
+<li><a class="reference internal" href="#nao-se-repita-don-t-repeat-yourself-dry">Não se repita (<cite>Don&#8217;t repeat yourself</cite>, DRY)</a></li>
+<li><a class="reference internal" href="#explicito-e-melhor-que-implicito">Explícito é melhor que implícito</a></li>
+<li><a class="reference internal" href="#consistencia">Consistência</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#models">Models</a><ul>
+<li><a class="reference internal" href="#id2">Explícito é melhor que implícito</a></li>
+<li><a class="reference internal" href="#incluir-toda-logica-de-dominio-relevante">Incluir toda lógica de domínio relevante</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#api-do-banco-de-dados">API do banco de dados</a><ul>
+<li><a class="reference internal" href="#eficiencia-do-sql">Eficiência do SQL</a></li>
+<li><a class="reference internal" href="#sintaxe-poderosa-e-concisa">Sintaxe poderosa e concisa</a></li>
+<li><a class="reference internal" href="#opcao-de-usar-sql-puro-facilmente-quando-necessario">Opção de usar SQL puro facilmente, quando necessário</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#design-de-url">Design de URL</a><ul>
+<li><a class="reference internal" href="#id3">Baixo acoplamento</a></li>
+<li><a class="reference internal" href="#flexibilidade-infinita">Flexibilidade infinita</a></li>
+<li><a class="reference internal" href="#encorajar-as-melhores-praticas">Encorajar as melhores práticas</a></li>
+<li><a class="reference internal" href="#urls-definitivas">URLs definitivas</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sistema-de-template">Sistema de template</a><ul>
+<li><a class="reference internal" href="#separar-a-logica-da-apresentacao">Separar a lógica da apresentação</a></li>
+<li><a class="reference internal" href="#desencorajar-redundancias">Desencorajar redundâncias</a></li>
+<li><a class="reference internal" href="#ser-dissociado-do-html">Ser dissociado do HTML</a></li>
+<li><a class="reference internal" href="#xml-nao-deve-ser-utilizada-como-linguagem-de-template">XML não deve ser utilizada como linguagem de template</a></li>
+<li><a class="reference internal" href="#presume-competencia-do-designer">Presume competência do designer</a></li>
+<li><a class="reference internal" href="#trate-espacos-em-branco-de-maneira-obvia">Trate espaços em branco de maneira óbvia</a></li>
+<li><a class="reference internal" href="#nao-invente-uma-linguagem-de-programacao">Não invente uma linguagem de programação</a></li>
+<li><a class="reference internal" href="#protecao-e-seguranca">Proteção e segurança</a></li>
+<li><a class="reference internal" href="#extensibilidade">Extensibilidade</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#views">Views</a><ul>
+<li><a class="reference internal" href="#simplicidade">Simplicidade</a></li>
+<li><a class="reference internal" href="#use-objetos-request">Use objetos request</a></li>
+<li><a class="reference internal" href="#id4">Baixo acoplamento</a></li>
+<li><a class="reference internal" href="#diferenciamento-entre-get-e-post">Diferenciamento entre GET e POST</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="index.html">Meta-documentação e miscelânea</a></li>
+    
+    
+      <li>Next: <a href="api-stability.html">Estabilidade de API</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Meta-documentação e miscelânea</a>
+        
+        <ul><li>Filosofia de design</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/misc/design-philosophies.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="Meta-documentação e miscelânea">previous</a> 
+     |
+    <a href="index.html" title="Meta-documentação e miscelânea" accesskey="U">up</a>
+   |
+    <a href="api-stability.html" title="Estabilidade de API">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

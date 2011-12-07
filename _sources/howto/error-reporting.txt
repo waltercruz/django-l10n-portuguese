@@ -1,0 +1,89 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 11348 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _howto-error-reporting:
+
+Reporte de erros via e-mail
+===========================
+
+Quando você está rodando um site público deve sempre desligar a configuração
+:setting:`DEBUG`. Isso irá fazer seu servidor operar muito mais rápido, e também
+evitará que usuários maliciosos vejam detalhes de sua aplicação que não devem
+ser revelados pelas páginas de erro.
+
+Entretanto, rodar com o :setting:`DEBUG` como ``False`` significa que você nunca
+verá os erros gerados pelo seu site -- todo mundo sempre verá somente a sua
+página de erros pública.
+
+Erros de servidor
+-----------------
+
+Quando :setting:`DEBUG` é ``False``, o Django irá enviar um email para os
+usuários listados em :setting:`ADMIN` sempre que seu código lançar uma exceção
+não tratada e que resulta num "internal server error" (código de status HTTP
+500). Isto dá aos administradores a notificação imediata de quaisquer erros. O
+:setting:`ADMINS` irá pegar uma descrição do erro, um traceback completo do
+Python, e detalhes sobre a requisição HTTP que causou o erro.
+
+Por padrão, o Django irá mandar e-mails de root@localhost. Porém, alguns provedores
+de e-mail rejeitam todos os e-mails desse endereço. Para usar um endereço de remetente
+diferente, modifique a configuração :setting:`SERVER_EMAIL`.
+
+Para desabilitar este comportamento, basta remover todas as entradas da
+configuração :setting:`ADMINS`.
+
+Erros 404
+---------
+
+O Django também pode ser configurado para enviar e-mail com erros de links
+quebrados (erros 404 "page not found"). O Django envia um email sobre os erros
+quando:
+
+    * :setting:`DEBUG` é ``False``
+
+    * :setting:`SEND_BROKEN_LINK_EMAILS` é ``True``
+
+    * Seu :setting:`MIDDLEWARE_CLASSES` incluí ``CommonMiddleware``
+      (o que é feito por padrão).
+
+Se essas condições forem satisfeitas, o Django irá enviar um e-email para os
+usuários listados em :setting:`MANAGERS` toda vez que seu código gerar um erro
+404 e a requisição tiver um referente. (Ela não se preocupa em enviar e-mail de
+erros 404 que não têm um referente -- normalmente esses são tentativas dos
+usuários de escrever URLs ou algum bot web quebrado).
+
+Você pode dizer ao Django parar de reportar alguns erros 404 específicos
+apromirando as configurações :setting:`IGNORABLE_404_ENDS` e
+:setting:`IGNORABLE_404_STARTS`. Ambos devem ser uma tupla de strings. Por
+exemplo::
+
+    IGNORABLE_404_ENDS = ('.php', '.cgi')
+    IGNORABLE_404_STARTS = ('/phpmyadmin/',)
+
+Neste exemplo, um error 404 para qualquer final de URL com ``.php`` ou ``.cgi``
+não será reportado. Nem mesmo qualquer URL que comece com ``/phpmyadmin/``.
+
+O melhor caminho para desabilitar este comportamento é setar o
+:setting:`SEND_BROKEN_LINK_EMAILS` para ``False``.
+
+.. seealso::
+
+    Você pode também configurar um reporte de erro customizado, personalizando
+    uma parte do :ref:`exception middleware <exception-middleware>`. Se
+    você escrever um manipulador de erro personalizado, será uma boa idéia
+    emular o manipulador de erros nativo do Django e somente reportar/logar
+    erros se o :setting:`DEBUG` for ``False``.
+

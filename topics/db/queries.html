@@ -1,0 +1,1205 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Fazendo consultas &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Models e bancos de dados" href="index.html" />
+    <link rel="next" title="Aggregation" href="aggregation.html" />
+    <link rel="prev" title="Models" href="models.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="models.html" title="Models">previous</a> 
+     |
+    <a href="../index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="aggregation.html" title="Aggregation">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-db-queries">
+            
+  <div class="section" id="s-fazendo-consultas">
+<span id="fazendo-consultas"></span><h1>Fazendo consultas<a class="headerlink" href="#fazendo-consultas" title="Permalink to this headline">¶</a></h1>
+<p>Uma vez que você tenha criado seus <a class="reference internal" href="models.html"><em>data models</em></a>, o
+Django automaticamente lhe dá uma API de abstração de banco de dados que permite
+você criar, receber, atualizar e deletar objetos. Este documento explica como
+usar esta API. Visite a <a class="reference internal" href="../../ref/models/index.html"><em>referência do model</em></a> para
+detalhes completos de todas opções de model.</p>
+<p>Por todo esse guia (e na referência), nós iremos refereir aos seguintes models,
+que compreendem um aplicação de weblog:</p>
+<div class="highlight-python" id="queryset-model-example"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Blog</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">tagline</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<span class="k">class</span> <span class="nc">Author</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<span class="k">class</span> <span class="nc">Entry</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">blog</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Blog</span><span class="p">)</span>
+    <span class="n">headline</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">body_text</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">mod_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Author</span><span class="p">)</span>
+    <span class="n">n_comments</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">n_pingbacks</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">rating</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">headline</span>
+</pre></div>
+</div>
+<div class="section" id="s-criando-objetos">
+<span id="criando-objetos"></span><h2>Criando objetos<a class="headerlink" href="#criando-objetos" title="Permalink to this headline">¶</a></h2>
+<p>Para representar dados de uma tabela de banco de dados em objetos Python, o
+Django usa um sistema intuitivo: Uma classe model representa uma tabela de banco
+de dados, e uma instância dessa classe representa um dado em particular dentro
+da tabela.</p>
+<p>Para criar um objeto, instâncie-o usando argumentos nomeados para a classe
+model, e então chame <tt class="docutils literal"><span class="pre">save()</span></tt> para salvá-lo no banco de dados.</p>
+<p>You import the model class from wherever it lives on the Python path, as you
+may expect. (We point this out here because previous Django versions required
+funky model importing.)</p>
+<p>Assumimos que os models estão em <tt class="docutils literal"><span class="pre">mysite/blog/models.py</span></tt>, aqui tem um
+exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mysite.blog.models</span> <span class="kn">import</span> <span class="n">Blog</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Beatles Blog&#39;</span><span class="p">,</span> <span class="n">tagline</span><span class="o">=</span><span class="s">&#39;All the latest Beatles news.&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Isso executa uma consulta SQL <tt class="docutils literal"><span class="pre">INSERT</span></tt> por trás das cenas. O Django não
+executa nada no banco de dados até que você, explicitamente <tt class="docutils literal"><span class="pre">save()</span></tt>.</p>
+<p>O método <tt class="docutils literal"><span class="pre">save()</span></tt> não retorna valores.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>O <tt class="docutils literal"><span class="pre">save()</span></tt> recebe algumas opções avançadas não descritas aqui.
+Veja a documentação do <tt class="docutils literal"><span class="pre">save()</span></tt> para detalhes completos.</p>
+<p class="last">Para criar um objeto e salvá-lo em um passo veja o método <tt class="docutils literal"><span class="pre">`create()`</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="s-salvando-mudancas-de-objetos">
+<span id="salvando-mudancas-de-objetos"></span><h2>Salvando mudanças de objetos<a class="headerlink" href="#salvando-mudancas-de-objetos" title="Permalink to this headline">¶</a></h2>
+<p>Para salvar mudanças de um objeto que já existe no banco de dados, use
+<tt class="docutils literal"><span class="pre">save()</span></tt>.</p>
+<p>Dado uma instância <tt class="docutils literal"><span class="pre">b5</span></tt> do <tt class="docutils literal"><span class="pre">Blog</span></tt> que já está salvo no banco de dados, este
+exemplo muda seu nome e o atualiza no banco de dados:</p>
+<div class="highlight-python"><pre>&gt;&gt; b5.name = 'New name'
+&gt;&gt; b5.save()</pre>
+</div>
+<p>Isso executa uma consulta SQL <tt class="docutils literal"><span class="pre">UPDATE</span></tt> por trás das cenas. O Django não acessa
+o banco de dados até que você, explicitamente, chame <tt class="docutils literal"><span class="pre">save()</span></tt>.</p>
+<div class="section" id="s-salvando-campos-foreignkey-e-manytomanyfield">
+<span id="salvando-campos-foreignkey-e-manytomanyfield"></span><h3>Salvando campos <tt class="docutils literal"><span class="pre">ForeignKey</span></tt> e <tt class="docutils literal"><span class="pre">ManyToManyField</span></tt><a class="headerlink" href="#salvando-campos-foreignkey-e-manytomanyfield" title="Permalink to this headline">¶</a></h3>
+<p>Atualizar um campo <tt class="docutils literal"><span class="pre">ForeignKey</span></tt> funciona exatamente da mesma forma como salvar
+um campo normal; simplesmente atribuindo um objeto do tipo certo ao campo em
+questão:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cheese_blog</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;Cheddar Talk&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">entry</span><span class="o">.</span><span class="n">blog</span> <span class="o">=</span> <span class="n">cheese_blog</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">entry</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Atualizar um <tt class="docutils literal"><span class="pre">ManyToManyField</span></tt> funciona um pouco diferente; usa o método
+<tt class="docutils literal"><span class="pre">add()</span></tt> sobre o campo para adicionar um dado a relação:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">blog.models</span> <span class="kn">import</span> <span class="n">Author</span>
+<span class="go">&gt;&gt; joe = Author.objects.create(name=&quot;Joe&quot;)</span>
+<span class="go">&gt;&gt; entry.authors.add(joe)</span>
+</pre></div>
+</div>
+<p>O Django se queixará se você tentar atribuir ou adicionar um objeto do tipo
+errado.</p>
+</div>
+</div>
+<div class="section" id="s-recuperando-objetos">
+<span id="recuperando-objetos"></span><h2>Recuperando objetos<a class="headerlink" href="#recuperando-objetos" title="Permalink to this headline">¶</a></h2>
+<p>Para recuperar objetos de seu banco de dados, você constrói uma <tt class="docutils literal"><span class="pre">QuerySet</span></tt>
+através do <tt class="docutils literal"><span class="pre">Manager</span></tt> de sua classe model.</p>
+<p>Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> representa uma coleção de objetos do banco de dados. Ela poder
+nenhum, um ou muitos <em>filtros</em> -- critérios que apurem a coleção baseado nos
+parâmetros dados. Em termos SQL, um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> equipara-se a uma consulta
+<tt class="docutils literal"><span class="pre">SELECT</span></tt>, e um filtro é uma clausula limitadora como <tt class="docutils literal"><span class="pre">WHERE</span></tt> ou <tt class="docutils literal"><span class="pre">LIMIT</span></tt>.</p>
+<p>Você obtem um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> usando o <tt class="docutils literal"><span class="pre">Manager</span></tt> de seu model. Cada model tem
+pelo menos um <tt class="docutils literal"><span class="pre">Manager</span></tt>, e ele é chamado <tt class="docutils literal"><span class="pre">objects</span></tt> por padrão. Acesse-o
+diretamente via classe model, desta forma:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span>
+<span class="go">&lt;django.db.models.manager.Manager object at ...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Foo&#39;</span><span class="p">,</span> <span class="n">tagline</span><span class="o">=</span><span class="s">&#39;Bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">objects</span>
+<span class="go">Traceback:</span>
+<span class="go">    ...</span>
+<span class="go">AttributeError: &quot;Manager isn&#39;t accessible via Blog instances.&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">O <tt class="docutils literal"><span class="pre">Managers</span></tt> são acessível somente via classes, ao invés de instâncias,
+para reforçar a separação entre operações a nível de tabela e operações a
+nível de dado.</p>
+</div>
+<p>O <tt class="docutils literal"><span class="pre">Manager</span></tt> é a principal fonte de <tt class="docutils literal"><span class="pre">QuerySets</span></tt> para um model. Ele age como
+uma <tt class="docutils literal"><span class="pre">QuerySet</span></tt> &quot;raiz&quot; que descreve todos os objetos de uma tabela de banco de
+dados. Por exemplo, <tt class="docutils literal"><span class="pre">Blog.objects</span></tt> é o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> inicial que contém todos
+os objetos do <tt class="docutils literal"><span class="pre">Blog</span></tt> no banco de dados.</p>
+<div class="section" id="s-recebendo-todos-os-objetos">
+<span id="recebendo-todos-os-objetos"></span><h3>Recebendo todos os objetos<a class="headerlink" href="#recebendo-todos-os-objetos" title="Permalink to this headline">¶</a></h3>
+<p>A forma mais simples de receber objetos da tabela é obtendo todos eles.
+Para fazer isso, use o método <tt class="docutils literal"><span class="pre">all()</span></tt> de um <tt class="docutils literal"><span class="pre">Manager</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">all_entries</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>O método <tt class="docutils literal"><span class="pre">all()</span></tt> retorna um <cite>QuerySet`</cite> de todos os objetos do banco de dados.</p>
+<p>(Se <tt class="docutils literal"><span class="pre">Entry.objects</span></tt> é um <tt class="docutils literal"><span class="pre">QuerySet</span></tt>, porquê nós fizemos um
+<tt class="docutils literal"><span class="pre">Entry.objects</span></tt>? Isso é porque <tt class="docutils literal"><span class="pre">Entry.objects</span></tt>, o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> raiz, é um
+caso especial que não pode ser avaliado. O método <tt class="docutils literal"><span class="pre">all()</span></tt> retorna um
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> que <em>pode</em> ser avaliado.)</p>
+</div>
+<div class="section" id="s-recebendo-objetos-especificos-com-filtros">
+<span id="recebendo-objetos-especificos-com-filtros"></span><h3>Recebendo objetos específicos com filtros<a class="headerlink" href="#recebendo-objetos-especificos-com-filtros" title="Permalink to this headline">¶</a></h3>
+<p>O <tt class="docutils literal"><span class="pre">QuerySet</span></tt> raiz fornecido pelo <tt class="docutils literal"><span class="pre">Manager</span></tt> descreve todos os objetos na
+tabela de banco de dados. Geralmente, contudo, você precisará selecionar somente
+um conjunto de objetos.</p>
+<p>Para criar um subconjunto, você precisar refinar o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> inicial,
+adicionando confições ao filtro. As duas formas mais comuns de refinar um
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> são:</p>
+<div class="highlight-python"><pre>``filter(**kwargs)``
+    Retorna um novo ``QuerySet`` contendo objetos que combinam com os
+    parâmetros fornecidos.
+
+``exclude(**kwargs)``
+    Retorna um novo ``QuerySet`` contendo objetos que *não* combinam com os
+    parâmetros fornecidos.</pre>
+</div>
+<p>Os parâmetros (<tt class="docutils literal"><span class="pre">**kwargs</span></tt> na definição de função acima) devem estar no formato
+descrito em <a class="reference internal" href="#campos-de-pesquisa">Campos de pesquisa</a> abaixo.</p>
+<p>Por exemplo, para obter um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> de entradas de blog do ano 2006, use o
+<tt class="docutils literal"><span class="pre">filter()</span></tt> desta forma:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__year</span><span class="o">=</span><span class="mi">2006</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Nós não temos que adicionar um <tt class="docutils literal"><span class="pre">all()</span></tt> -- <tt class="docutils literal"><span class="pre">Entry.objects.all().filter(...)</span></tt>.
+Que continua funcionando, mas você somente precisa de <tt class="docutils literal"><span class="pre">all()</span></tt> quando deseja
+obter todos os objetos do <tt class="docutils literal"><span class="pre">QuerySet</span></tt> raiz.</p>
+<div class="section" id="s-filtros-encadeados">
+<span id="s-chaining-filters"></span><span id="filtros-encadeados"></span><span id="chaining-filters"></span><h4>Filtros encadeados<a class="headerlink" href="#filtros-encadeados" title="Permalink to this headline">¶</a></h4>
+<p>O resultado de refinar uma <tt class="docutils literal"><span class="pre">QuerySet</span></tt> é, em si, um <tt class="docutils literal"><span class="pre">QuerySet</span></tt>, então é
+possível encadear refinamentos juntos. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">headline__startswith</span><span class="o">=</span><span class="s">&#39;What&#39;</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">pub_date__gte</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">pub_date__gte</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Isso recebe o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> inicial de todas as entradas do banco de dados,
+adiciona um filtro, então uma exclusão, e então um outro filtro. O resultado
+final é um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> contendo todas as entradas com um cabeçalho que começa
+com &quot;What&quot;, que foi publicado entre Janeiro 1, 2005 e a data atual.</p>
+</div>
+<div class="section" id="s-querysets-filtrados-sao-unicos">
+<span id="s-filtered-querysets-are-unique"></span><span id="querysets-filtrados-sao-unicos"></span><span id="filtered-querysets-are-unique"></span><h4>QuerySets filtrados são únicos<a class="headerlink" href="#querysets-filtrados-sao-unicos" title="Permalink to this headline">¶</a></h4>
+<p>Cada vez que você refina um <tt class="docutils literal"><span class="pre">QuerySet</span></tt>, você tem um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> novo que não
+é vinculado ao <tt class="docutils literal"><span class="pre">QuerySet</span></tt> anterior. Cada refinamento cria um <tt class="docutils literal"><span class="pre">QuerySet</span></tt>
+separado e distinto que pode ser armazenado, usado e reusado.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><pre>&gt;&gt; q1 = Entry.objects.filter(headline__startswith="What")
+&gt;&gt; q2 = q1.exclude(pub_date__gte=datetime.now())
+&gt;&gt; q3 = q1.filter(pub_date__gte=datetime.now())</pre>
+</div>
+<p>Este três <tt class="docutils literal"><span class="pre">QuerySet</span></tt> são separadas. O primeiro é um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> base contendo
+todas as entradas que contenham um cabeçalho começando com &quot;What&quot;. O segundo é
+um subconjunto do primeir, com um critério adicional que exclui dados cujo o
+<tt class="docutils literal"><span class="pre">pub_date</span></tt> é maior que agora. O terceiro é um subconjunto do primeiro, com um
+critério adicional que seleciona somente os dados cujo <tt class="docutils literal"><span class="pre">pub_date</span></tt> é maior que
+agora. O <tt class="docutils literal"><span class="pre">QuerySet</span></tt> inicial (<tt class="docutils literal"><span class="pre">q1</span></tt>) não é afetado pelo processo de
+refinamento.</p>
+</div>
+<div class="section" id="s-querysets-sao-lazy">
+<span id="s-querysets-are-lazy"></span><span id="querysets-sao-lazy"></span><span id="querysets-are-lazy"></span><h4>QuerySets são lazy<a class="headerlink" href="#querysets-sao-lazy" title="Permalink to this headline">¶</a></h4>
+<p>Os <tt class="docutils literal"><span class="pre">QuerySets</span></tt> are lazy -- o ato de criar um  <tt class="docutils literal"><span class="pre">QuerySet</span></tt> não envolve
+qualquer atividade de banco de dados. Você pode empilhar filtros juntos ao longo
+do dia, e o Django não os executa no banco de dados até que o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> seja
+<em>avaliado</em>. Dê uma olhada nesse exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline__startswith</span><span class="o">=</span><span class="s">&quot;What&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__lte</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">body_text__icontains</span><span class="o">=</span><span class="s">&quot;food&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">q</span>
+</pre></div>
+</div>
+<p>Embora isso pareça como três hits no banco de dados, de fato o banco de dados
+foi consultado somente na última linha (<tt class="docutils literal"><span class="pre">print</span> <span class="pre">q</span></tt>). Geralmente, os resultados
+de um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> não são buscados do banco de dados até que você &quot;peça&quot; por
+eles. Quando você o faz, o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> é <em>avaliado</em> para acessar o banco de
+dados. Para mais detalhes sobre exatamente quando as avaliações tomam seu lugar,
+veja <a class="reference internal" href="../../ref/models/querysets.html#when-querysets-are-evaluated"><em>Quando QuerySets são avaliados</em></a>.</p>
+</div>
+</div>
+<div class="section" id="s-retrieving-a-single-object-with-get">
+<span id="s-retrieving-single-object-with-get"></span><span id="retrieving-a-single-object-with-get"></span><span id="retrieving-single-object-with-get"></span><h3>Retrieving a single object with get<a class="headerlink" href="#retrieving-a-single-object-with-get" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">.filter()</span></tt> will always give you a <tt class="docutils literal"><span class="pre">QuerySet</span></tt>, even if only a single
+object matches the query - in this case, it will be a <tt class="docutils literal"><span class="pre">QuerySet</span></tt> containing
+a single element.</p>
+<p>If you know there is only one object that matches your query, you can use
+the <tt class="docutils literal"><span class="pre">get()</span></tt> method on a <cite>Manager</cite> which returns the object directly:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">one_entry</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can use any query expression with <tt class="docutils literal"><span class="pre">get()</span></tt>, just like with <tt class="docutils literal"><span class="pre">filter()</span></tt> -
+again, see <a class="reference internal" href="#campos-de-pesquisa">Campos de pesquisa</a> abaixo.</p>
+<p>Note that there is a difference between using <tt class="docutils literal"><span class="pre">.get()</span></tt>, and using
+<tt class="docutils literal"><span class="pre">.filter()</span></tt> with a slice of <tt class="docutils literal"><span class="pre">[0]</span></tt>. If there are no results that match the
+query, <tt class="docutils literal"><span class="pre">.get()</span></tt> will raise a <tt class="docutils literal"><span class="pre">DoesNotExist</span></tt> exception. This exception is an
+attribute of the model class that the query is being performed on - so in the
+code above, if there is no <tt class="docutils literal"><span class="pre">Entry</span></tt> object with a primary key of 1, Django will
+raise <tt class="docutils literal"><span class="pre">Entry.DoesNotExist</span></tt>.</p>
+<p>Similarly, Django will complain if more than one item matches the <tt class="docutils literal"><span class="pre">get()</span></tt>
+query. In this case, it will raise <tt class="docutils literal"><span class="pre">MultipleObjectsReturned</span></tt>, which again is
+an attribute of the model class itself.</p>
+<div class="section" id="s-outros-metodos-do-queryset">
+<span id="outros-metodos-do-queryset"></span><h4>Outros métodos do QuerySet<a class="headerlink" href="#outros-metodos-do-queryset" title="Permalink to this headline">¶</a></h4>
+<p>Na maior parte do tempo você usará <tt class="docutils literal"><span class="pre">all()</span></tt>, <tt class="docutils literal"><span class="pre">filter()</span></tt> e <tt class="docutils literal"><span class="pre">exclude()</span></tt>
+quando você precisar pesquisar por objetos no banco de dados. Entretanto, isso
+não é tudo que há; veja a <a class="reference internal" href="../../ref/models/querysets.html#queryset-api"><em>Referência de API do QuerySet</em></a>
+para uma lista completa de todos os vários métodos do <tt class="docutils literal"><span class="pre">QuerySet</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="s-limitando-querysets">
+<span id="s-limiting-querysets"></span><span id="limitando-querysets"></span><span id="limiting-querysets"></span><h3>Limitando QuerySets<a class="headerlink" href="#limitando-querysets" title="Permalink to this headline">¶</a></h3>
+<p>Use a sintaxe de array-slicing do Python para limitar seu <tt class="docutils literal"><span class="pre">QuerySet</span></tt> com um
+certo número de resultados. Este é o equivalente as clausulas SQL <tt class="docutils literal"><span class="pre">LIMIT</span></tt> e
+<tt class="docutils literal"><span class="pre">OFFSET</span></tt>.</p>
+<p>Por exemplo, isso retorna os primeiros 5 objetos (<tt class="docutils literal"><span class="pre">LIMIT</span> <span class="pre">5</span></tt>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Isso retorna do sexto ao décimo objeto (<tt class="docutils literal"><span class="pre">OFFSET</span> <span class="pre">5</span> <span class="pre">LIMIT</span> <span class="pre">5</span></tt>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="mi">5</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Indexação negativa (i.e. <tt class="docutils literal"><span class="pre">Entry.objects.all()[-1]</span></tt>) não é suportada.</p>
+<p>Normalmente, dividir um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> resulta em um novo <tt class="docutils literal"><span class="pre">QuerySet</span></tt> -- e não
+executa um nova consulta. Uma exceção é se você usa o parâmetro &quot;step&quot; do
+Python na sintaxe do slice. Por exemplo, isso executaria na verdade a consulta
+para retornar uma lista dos 10 primeiros objetos a cada <em>segundo</em>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Para receber um <em>único</em> objeto ao invés de uma lista
+(e.g. <tt class="docutils literal"><span class="pre">SELECT</span> <span class="pre">foo</span>&nbsp; <span class="pre">FROM</span> <span class="pre">bar</span>&nbsp; <span class="pre">LIMIT</span> <span class="pre">1</span></tt>), use um index simples ao invés de um
+slice. Por exemplo, isso retorna a primeira <tt class="docutils literal"><span class="pre">Entry</span></tt> do banco de dados, depois
+de ordenar as entradas alfabéticamente pelos cabeçalhos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;headline&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Isso é o equivalente a:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;headline&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Note, no entanto, que o primeiro desses será lançado <tt class="docutils literal"><span class="pre">IndexError</span></tt> enquanto o
+segundo lançará <tt class="docutils literal"><span class="pre">DoesNotExists</span></tt> se nenhum objeto combinar com o critério dado.
+Veja <tt class="docutils literal"><span class="pre">get()</span></tt> para mais detalhes.</p>
+</div>
+<div class="section" id="s-campos-de-pesquisa">
+<span id="s-field-lookups-intro"></span><span id="campos-de-pesquisa"></span><span id="field-lookups-intro"></span><h3>Campos de pesquisa<a class="headerlink" href="#campos-de-pesquisa" title="Permalink to this headline">¶</a></h3>
+<p>Campos de pesquisa são como você especifica o cerne de uma clausula <tt class="docutils literal"><span class="pre">WHERE</span></tt>.
+Eles são especificado como argumento nomeados para o método <tt class="docutils literal"><span class="pre">filter()</span></tt> do
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt>.</p>
+<p>Os argumentos básicos de pesquisa tem a forma <tt class="docutils literal"><span class="pre">campo__tipodepesquisa=valor</span></tt>.
+(Isso é um underscore duplo). Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__lte</span><span class="o">=</span><span class="s">&#39;2006-01-01&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>é traduzido para o seguinte SQL:</p>
+<div class="highlight-python"><pre>SELECT * FROM blog_entry WHERE pub_date &lt;= '2006-01-01';</pre>
+</div>
+<div class="admonition-como-isso-e-possivel admonition ">
+<p class="first admonition-title">Como isso é possível</p>
+<p class="last">O Python tem a abilidade de definir funções que aceitam argumentos de
+nome-valor arbitrários cujo os nomes e valores são avaliados em tempo de
+execução. Para mais informações, veja <a class="reference external" href="http://docs.python.org/tut/node6.html#SECTION006720000000000000000">Keyword Arguments</a> no tutorial
+oficial do Python.</p>
+</div>
+<p>Se você passar um argumento inválido, uma função de pesquisa gerará o erro
+<tt class="docutils literal"><span class="pre">TypeError</span></tt>.</p>
+<p>A API de banco de dados suporta sobre dois dos tipos de pesquisa; uma referência
+completa poe ser encontrada em <a class="reference internal" href="../../ref/models/querysets.html#field-lookups"><em>referencia dos campos de pesquisa</em></a>. Para dar a você um gosto do que está disponível, aqui temos
+algumas das pesquisas mais comuns que você provavelmente usa:</p>
+<div class="highlight-python"><pre>:lookup:`exact`
+    Uma combinação "extata". Por exemplo::
+
+        &gt;&gt;&gt; Entry.objects.get(headline__exact="Man bites dog")
+
+    Podria gerar o SQL ao longo dessas linhas:
+
+    .. code-block:: sql
+
+        SELECT ... WHERE headline = 'Man bites dog';
+
+    Se você não fornecer um tipo de pesquisa -- isto é, se seu argumento não
+    contém um underscore duplo -- o tipo de pesquisa é assumido como
+    ``exact``
+
+    Por exemplo, as duas clausulas seguintes são equivalentes::
+
+        &gt;&gt;&gt; Blog.objects.get(id__exact=14)  # Forma explicita
+        &gt;&gt;&gt; Blog.objects.get(id=14)         # __exact é implícito
+
+    Isso é uma conveniência, pois pesquisas ``exact`` são um caso comum.
+
+:lookup:`iexact`
+    Uma combinação não sensível a maiúsculas. Então, a consulta::
+
+        &gt;&gt;&gt; Blog.objects.get(name__iexact="beatles blog")
+
+    Poderia combinar um ``Blog`` entitulado "Beatles Blog", "beatles blog",
+    ou mesmo "BeAtlEs blOG".
+
+:lookup:`contains`
+    Sensível a maiúsculas, testa se contém. Por exemplo::
+
+        Entry.objects.get(headline__contains='Lennon')
+
+    É traduzido para este SQL:
+
+    .. code-block:: sql
+
+        SELECT ... WHERE headline LIKE '%Lennon%';
+
+    Note que combinará com cabeçalhos ``'Today Lennon honored'`` mas não
+    ``'today lennon honored'``.
+
+    Há também uma versão não sensível a maiúsculas, :lookup:icontains`.
+
+:lookup:`startswith`, :lookup:`endswith`
+    Começa com e termina com, respecitivamente. Há também a versão não
+    sensível a maiúsculas chamada :lookup:`istartswith` e
+    :lookup:`iendswith`.</pre>
+</div>
+<p>De novo, estes são somente arranhões na superfície. Uma referência completa pode
+ser encontrada na <a class="reference internal" href="../../ref/models/querysets.html#field-lookups"><em>referência os campos de pesquisa</em></a>.</p>
+</div>
+<div class="section" id="s-pesquisas-que-abrangem-relacionamentos">
+<span id="pesquisas-que-abrangem-relacionamentos"></span><h3>Pesquisas que abrangem relacionamentos<a class="headerlink" href="#pesquisas-que-abrangem-relacionamentos" title="Permalink to this headline">¶</a></h3>
+<p>O Django oferece um poderoso e intuitovo meio de &quot;seguir&quot; relacionamentos numa
+pesquisa, preocupando-se com os <tt class="docutils literal"><span class="pre">JOIN</span></tt>s SQL por vocês automaticamente, por
+trás das cenas. Para abranger um relacionamento, é só usar o nome dos campos
+relacionados atráves dos models, separados por dois underscores, até que você
+obtenha os campos que você deseja.</p>
+<p>Este exemplo recebe todos os objetos <tt class="docutils literal"><span class="pre">Entry</span></tt> com um <tt class="docutils literal"><span class="pre">Blog</span></tt> cujo <tt class="docutils literal"><span class="pre">name</span></tt>
+seja <tt class="docutils literal"><span class="pre">'Beatles</span> <span class="pre">Blog'</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">blog__name__exact</span><span class="o">=</span><span class="s">&#39;Beatles Blog&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Esta abrangência pode ser tão funda quanto você quiser.</p>
+<p>Ela funciona com backwards, também. Para referenciar um relacionamento
+&quot;reverso&quot;, é só colocar em minúsculo o nome do model.</p>
+<p>Este exemplo recebe todos os objetos <tt class="docutils literal"><span class="pre">Blog</span></tt> que tenham pelo menos um <tt class="docutils literal"><span class="pre">Entry</span></tt>
+cujo <tt class="docutils literal"><span class="pre">headline</span></tt> contenha <tt class="docutils literal"><span class="pre">'Lennon'</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">entry__headline__contains</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Se você estiver fazendo filtragem através de vários relacionamentos e um dos
+models intermediários não tiver um valor que fechar com a condição do filtro, o
+Django tratará ela como se estivesse vazia (todos os valores são <tt class="docutils literal"><span class="pre">NULL</span></tt>), mas
+válidos. Tudo isso significa que nenhum erro será gerado. Por exemplo, neste
+filtro:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">entry__author__name</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(se houvesse um model relacionado <tt class="docutils literal"><span class="pre">Author</span></tt>), caso não houvesse nenhum
+<tt class="docutils literal"><span class="pre">author</span></tt> associado com uma entrada, ele poderia ser tratado como se também não
+tivesse nenhum <tt class="docutils literal"><span class="pre">name</span></tt> atachado, ao invés de lançar um erro por não ter o
+<tt class="docutils literal"><span class="pre">author</span></tt>. Normalmente este é exatamente isso que você espera que aconteça. O
+único caso onde ele pode ser confuso é se você estiver usando <tt class="docutils literal"><span class="pre">isnull</span></tt>. Deste
+modo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">entry__author__name__isnull</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>retornará objetos <tt class="docutils literal"><span class="pre">Blog</span></tt> que possuem um <tt class="docutils literal"><span class="pre">name</span></tt> vazio no <tt class="docutils literal"><span class="pre">author</span></tt> e também
+aqueles que têm um <tt class="docutils literal"><span class="pre">author</span></tt> vazio sobre os <tt class="docutils literal"><span class="pre">entry</span></tt>. Se você não quer esses
+últimos objetos, você poderia escrever:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">entry__author__isnull</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+        <span class="n">entry__author__name__isnull</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="s-abrangendo-relacionamentos-de-multiplos-valores">
+<span id="abrangendo-relacionamentos-de-multiplos-valores"></span><h4>Abrangendo relacionamentos de múltiplos valores<a class="headerlink" href="#abrangendo-relacionamentos-de-multiplos-valores" title="Permalink to this headline">¶</a></h4>
+<p>Quando você está filtrando um objeto baseado no <tt class="docutils literal"><span class="pre">ManyToManyField</span></tt> ou numa
+<tt class="docutils literal"><span class="pre">ForeignKeyField</span></tt> reverso, há dois diferentes tipos de filtro que podem ser
+interessantes. Considere o relacionamento <tt class="docutils literal"><span class="pre">Blog</span></tt>/<tt class="docutils literal"><span class="pre">Entry</span></tt> (<tt class="docutils literal"><span class="pre">Blog</span></tt> para
+<tt class="docutils literal"><span class="pre">Entry</span></tt> é um relacionamento one-to-many). Nós podemos estar interessados em
+encontrar blogs que tenham uma entrada que possui ambos, <em>&quot;Lennon&quot;</em> no título e
+que foi publicado em 2008. Ou nós podemos querer encontrar blogs que tenham uma
+entrada com <em>&quot;Lennon&quot;</em> no título bem como uma que fora publicada em 2008. Já que
+há várias entradas associadas com um único <tt class="docutils literal"><span class="pre">Blog</span></tt>, ambas consultas são
+possíveis e fazem sentido em algumas situações.</p>
+<p>O mesmo tipo de situação surge com um <tt class="docutils literal"><span class="pre">ManyToManyField</span></tt>. Por exemplo, se uma
+<tt class="docutils literal"><span class="pre">Entry</span></tt> tem um <tt class="docutils literal"><span class="pre">ManyToManyField</span></tt> chamado <tt class="docutils literal"><span class="pre">tags</span></tt>, nós podemos querer
+encontrar entradas likadas às tags chamadas <em>&quot;music&quot;</em> e <em>&quot;bands&quot;</em> ou nós podemos
+desejar uma entrada que contenha uma tag com o nome de <em>&quot;musci&quot;</em> e um status de
+<em>&quot;public&quot;</em>.</p>
+<p>Para lidar com ambas situações, o Django tem um forma consistente de
+processar chamadas <tt class="docutils literal"><span class="pre">filter()</span></tt> e <tt class="docutils literal"><span class="pre">exclude()</span></tt>. Tudo dentro de um única chamada
+<tt class="docutils literal"><span class="pre">filter()</span></tt> é aplicado simultaneamente para filtrar ítens que combinam com
+todos esses requisitos. Sucessivas chamadas <tt class="docutils literal"><span class="pre">filter()</span></tt> adicionais restringem o
+conjunto de objetos, mas para relações com múltiplos valores, se aplicam a
+qualquer objeto linkado a primeira chamada <tt class="docutils literal"><span class="pre">filter()</span></tt>.</p>
+<p>Eles podem soar um pouco confusa, então espero que um exemplo dê uma clareada.
+Para selecionar todos os blogs que contêm entradas tanto com <em>&quot;Lennon&quot;</em> no
+título e que foram publicados em 2008 (a mesma entrada satisfazendo ambas
+condições), nós escreveriámos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">entry__headline__contains</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">,</span>
+        <span class="n">entry__pub_date__year</span><span class="o">=</span><span class="mi">2008</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Para selecionar todos os blogs que contêm um entrada com <em>&quot;Lennon&quot;</em> no título
+<strong>bem como</strong> uma entrada que fora publicada em 2008, nós escrevíamos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">entry__headline__contains</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">entry__pub_date__year</span><span class="o">=</span><span class="mi">2008</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Neste segundo exemplo, o primeiro filtro restringe o queryset para todos os
+blogs linkados a esse tipo particular de entrada. O segundo filtro restringe o
+conjunto de blogs mais as que também foram linkadas ao segundo tipo de entrada.
+As entradas selecionadas no segundo filtro podem ou não, ser as mesmas entradas
+do primeiro filtro. Nós estamos filtrando os ítens <tt class="docutils literal"><span class="pre">Blog</span></tt> com cada declaração
+de filtro, não ítens <tt class="docutils literal"><span class="pre">Entry</span></tt>.</p>
+<p>Todo esse comportamento também é aplicado ao <tt class="docutils literal"><span class="pre">exclude()</span></tt>: todas as condições
+numa única declaração <tt class="docutils literal"><span class="pre">exclude()</span></tt> é aplicada a uma única instância (se estas
+condições estiverem falando dessa mesma relação de múltiplos valores). Condições
+em chamadas <tt class="docutils literal"><span class="pre">filer()</span></tt> ou <tt class="docutils literal"><span class="pre">exclude()</span></tt> subsequentes que referem-se ao mesmo
+relacionamento podem terminar filtrando diferentes objetos linkados.</p>
+</div>
+</div>
+<div class="section" id="s-filters-can-reference-fields-on-the-model">
+<span id="s-query-expressions"></span><span id="filters-can-reference-fields-on-the-model"></span><span id="query-expressions"></span><h3>Filters can reference fields on the model<a class="headerlink" href="#filters-can-reference-fields-on-the-model" title="Permalink to this headline">¶</a></h3>
+<p>In the examples given so far, we have constructed filters that compare
+the value of a model field with a constant. But what if you want to compare
+the value of a model field with another field on the same model?</p>
+<p>Django provides the <tt class="docutils literal"><span class="pre">F()</span></tt> object to allow such comparisons. Instances
+of <tt class="docutils literal"><span class="pre">F()</span></tt> act as a reference to a model field within a query. These
+references can then be used in query filters to compare the values of two
+different fields on the same model instance.</p>
+<p>For example, to find a list of all blog entries that have had more comments
+than pingbacks, we construct an <tt class="docutils literal"><span class="pre">F()</span></tt> object to reference the pingback count,
+and use that <tt class="docutils literal"><span class="pre">F()</span></tt> object in the query:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.db.models</span> <span class="kn">import</span> <span class="n">F</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">n_comments__gt</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s">&#39;n_pingbacks&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Django supports the use of addition, subtraction, multiplication,
+division and modulo arithmetic with <tt class="docutils literal"><span class="pre">F()</span></tt> objects, both with constants
+and with other <tt class="docutils literal"><span class="pre">F()</span></tt> objects. To find all the blog entries with more than
+<em>twice</em> as many comments as pingbacks, we modify the query:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">n_comments__gt</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s">&#39;n_pingbacks&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To find all the entries where the rating of the entry is less than the
+sum of the pingback count and comment count, we would issue the
+query:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">rating__lt</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s">&#39;n_comments&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">F</span><span class="p">(</span><span class="s">&#39;n_pingbacks&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>You can also use the double underscore notation to span relationships in
+an <tt class="docutils literal"><span class="pre">F()</span></tt> object. An <tt class="docutils literal"><span class="pre">F()</span></tt> object with a double underscore will introduce
+any joins needed to access the related object. For example, to retrieve all
+the entries where the author's name is the same as the blog name, we could
+issue the query:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">authors__name</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s">&#39;blog__name&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<span class="title">New in Django 1.3:</span> <a class="reference internal" href="../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
+<p>For date and date/time fields, you can add or subtract a <tt class="docutils literal"><span class="pre">datetime.timedelta</span></tt>
+object.  The following would return all entries that were modified more than 3 days
+after they were published:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">mod_date__gt</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s">&#39;pub_date&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-atalho-para-pk">
+<span id="atalho-para-pk"></span><h3>Atalho para pk<a class="headerlink" href="#atalho-para-pk" title="Permalink to this headline">¶</a></h3>
+<p>Por conveniência, o Django fornece um atalho para pesquisas com <tt class="docutils literal"><span class="pre">pk</span></tt>, que
+significa &quot;chave primária&quot;.</p>
+<p>No exemplo <tt class="docutils literal"><span class="pre">Blog</span></tt> model, a chave primária é o campo <tt class="docutils literal"><span class="pre">id</span></tt>, então estas três
+regras são equivalente:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id__exact</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span> <span class="c"># Forma explicita</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span> <span class="c"># __exact é implícito</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span> <span class="c"># pk implica em id__exact</span>
+</pre></div>
+</div>
+<p>O uso de <tt class="docutils literal"><span class="pre">pk</span></tt> não é limitado a consultas <tt class="docutils literal"><span class="pre">__exact</span></tt> -- qualquer termo de
+consulta pode ser combinado com <tt class="docutils literal"><span class="pre">pk</span></tt> para executar uma consulta sobre a chave
+primária de um model:</p>
+<div class="highlight-python"><pre># Pega as entradas dos blogs com id 1, 4 e 7
+&gt;&gt;&gt; Blog.objects.filter(pk__in=[1,4,7])
+
+# Pega todas as entradas do blog com id &gt; 14
+&gt;&gt;&gt; Blog.objects.filter(pk__gt=14)</pre>
+</div>
+<p>Pesquisas com <tt class="docutils literal"><span class="pre">pk</span></tt> também podem funcionar através de joins. Por exemplo, estas
+três regras são equivalentes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">blog__id__exact</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="c"># Froma explicita</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">blog__id</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>        <span class="c"># __exact é implícito</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">blog__pk</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>        <span class="c"># __pk implica em __id__exact</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-escapando-sinais-de-porcentagem-e-underscores-em-consultas-like">
+<span id="escapando-sinais-de-porcentagem-e-underscores-em-consultas-like"></span><h3>Escapando sinais de porcentagem e underscores em consultas LIKE<a class="headerlink" href="#escapando-sinais-de-porcentagem-e-underscores-em-consultas-like" title="Permalink to this headline">¶</a></h3>
+<p>Os campos de pesquisa que equacionam consultas SQL <tt class="docutils literal"><span class="pre">LIKE</span></tt> (<tt class="docutils literal"><span class="pre">iexact</span></tt>,
+<tt class="docutils literal"><span class="pre">contains</span></tt>, <tt class="docutils literal"><span class="pre">icontains</span></tt>, <tt class="docutils literal"><span class="pre">startswith</span></tt>, <tt class="docutils literal"><span class="pre">istartswith</span></tt>, <tt class="docutils literal"><span class="pre">endswith</span></tt>
+e <tt class="docutils literal"><span class="pre">iendswith</span></tt>) terão automaticamente escapados os dois caracteres especiais
+usados no <tt class="docutils literal"><span class="pre">LIKE</span></tt> -- o sinal de porcentagem e o underscore. (Numa regra
+<tt class="docutils literal"><span class="pre">LIKE</span></tt>, o sinal de porcentagem significa um coringa de multiplos caracteres e
+o underscore significa um coringa de um único caractere.)</p>
+<p>Isso signifca que coisas devem funcionar intuitivamente, então a abstração não
+vaza. Por exemplo, para receber todas as entradas que contenham um sinal de
+porcentagem, é só usar o sinal de porcentagem como qualquer outro caractere:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline__contains</span><span class="o">=</span><span class="s">&#39;%&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>O Django se encarrega de escapar para você; o SQL resultante parecerá com algo
+assim:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="p">...</span> <span class="k">WHERE</span> <span class="n">headline</span> <span class="k">LIKE</span> <span class="s1">&#39;%\%%&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>O mesmo serve para undescores. Ambos, sinais de porcentagem e undersocres, são
+tratados para você transparentemente.</p>
+</div>
+<div class="section" id="s-cacheamento-e-querysets">
+<span id="s-caching-and-querysets"></span><span id="cacheamento-e-querysets"></span><span id="caching-and-querysets"></span><h3>Cacheamento e QuerySets<a class="headerlink" href="#cacheamento-e-querysets" title="Permalink to this headline">¶</a></h3>
+<p>Cada <tt class="docutils literal"><span class="pre">QuerySet</span></tt> contém um cache, para minizar o acesso ao banco de dados. É
+importante entender como ele funciona, a fim de se escrever um código mais
+eficiente.</p>
+<p>Num <tt class="docutils literal"><span class="pre">QuerySet</span></tt> recem criado, o cache está vazio. Na primeira vez que um
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> for avaliado -- e, por isso, uma consulta ao banco de dados
+acontece -- o Django salva o resultado da consulta num cache de <tt class="docutils literal"><span class="pre">QuerySet</span></tt> e
+retorna os resultado que foram explicitamente requisitados (e.g., o próximo
+elemento, se o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> estiver sendo iterado). Avaliações subsequentes de
+um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> reusam os resultados cacheados.</p>
+<p>Mantenha esse comportamento de cache em mente, pois ele pode morder você se você
+não usar seus <tt class="docutils literal"><span class="pre">QuerySet</span></tt>s correntamente. Por exemplo, a seguir serão criados
+dois <tt class="docutils literal"><span class="pre">QuerySet</span></tt>s, eles serão avaliados, e mostrados na tela:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">headline</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">pub_date</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span>
+</pre></div>
+</div>
+<p>Isso significa que a mesma consulta ao banco de dados  será executada duas
+vezes, efetivamente dobrando sua carga sobre o banco de dados. Também, há a
+possibilidade de duas listas que podem não incluir os mesmos dados do banco,
+pois uma <tt class="docutils literal"><span class="pre">Entry</span></tt> pode ter sido adicionada ou deletada na fração de segundo que
+divide as duas requisições.</p>
+<p>Para evitar este problema, simplesmente salve o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> e reuse-o:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">queryset</span> <span class="o">=</span> <span class="n">Poll</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">headline</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">queryset</span><span class="p">]</span> <span class="c"># Avalia o query set.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">pub_date</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">queryset</span><span class="p">]</span> <span class="c"># Re-usa o que está em cache.</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="s-consultas-complexas-com-objetos-q">
+<span id="consultas-complexas-com-objetos-q"></span><h2>Consultas complexas com objetos Q<a class="headerlink" href="#consultas-complexas-com-objetos-q" title="Permalink to this headline">¶</a></h2>
+<p>Consultas com palavras chaves -- no <tt class="docutils literal"><span class="pre">filter()</span></tt>, etc. -- são mescladas com
+&quot;AND&quot;. Se você precisa executar consultas mais complexas (por exemplo, consultas
+com <tt class="docutils literal"><span class="pre">OR</span></tt>), você pode usar objetos <tt class="docutils literal"><span class="pre">Q</span></tt>.</p>
+<p>Um objeto <tt class="docutils literal"><span class="pre">Q</span></tt> (<tt class="docutils literal"><span class="pre">django.db.models.Q</span></tt>) é um objeto usado para encapsular uma
+coleção de argumentos nomeados. Estes argumentos são especificados assim como
+nos &quot;Campos de pesquisa&quot; acima.</p>
+<p>Por exemplo, este objeto <tt class="docutils literal"><span class="pre">Q</span></tt> encapsula uma única consulta <tt class="docutils literal"><span class="pre">LIKE</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Q</span><span class="p">(</span><span class="n">question__startswith</span><span class="o">=</span><span class="s">&#39;What&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Objetos <tt class="docutils literal"><span class="pre">Q</span></tt> podem ser combinados usando os operadores <tt class="docutils literal"><span class="pre">&amp;</span></tt> e <tt class="docutils literal"><span class="pre">|</span></tt>. Quando um
+operador é usado em dois objetos <tt class="docutils literal"><span class="pre">Q</span></tt>, ele produz um novo objeto <tt class="docutils literal"><span class="pre">Q</span></tt>.</p>
+<p>Por exemplo, esta regra produz um único objeto <tt class="docutils literal"><span class="pre">Q</span></tt> que representa o &quot;OR&quot; ou
+duas consultas <tt class="docutils literal"><span class="pre">&quot;question__startwith&quot;</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Q</span><span class="p">(</span><span class="n">question__startswith</span><span class="o">=</span><span class="s">&#39;Who&#39;</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">question__startswith</span><span class="o">=</span><span class="s">&#39;What&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Este é equivalente a seguinte clausula SQL <tt class="docutils literal"><span class="pre">WHERE</span></tt>:</p>
+<div class="highlight-python"><pre>WHERE question LIKE 'Who%' OR question LIKE 'What%'</pre>
+</div>
+<p>Você pode compor declarações de complexidade arbitrária combinando objetos <tt class="docutils literal"><span class="pre">Q</span></tt>
+com os operadores <tt class="docutils literal"><span class="pre">&amp;</span></tt> e <tt class="docutils literal"><span class="pre">|</span></tt> e usar o agrupamento paramétrico. Também,
+objetos <tt class="docutils literal"><span class="pre">Q</span></tt> podem ser negados usando o operador <tt class="docutils literal"><span class="pre">~</span></tt>, permitindo combinações
+entre consultas normais e negadas (<tt class="docutils literal"><span class="pre">NOT</span></tt>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Q</span><span class="p">(</span><span class="n">question__startswith</span><span class="o">=</span><span class="s">&#39;Who&#39;</span><span class="p">)</span> <span class="o">|</span> <span class="o">~</span><span class="n">Q</span><span class="p">(</span><span class="n">pub_date__year</span><span class="o">=</span><span class="mi">2005</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Cada função de pesquisa que recebe argumentos nomeados (e.g. <tt class="docutils literal"><span class="pre">filter()</span></tt>,
+<tt class="docutils literal"><span class="pre">exclude()</span></tt>, <tt class="docutils literal"><span class="pre">get()</span></tt>) podem também ser passados para um ou mais objetos
+<tt class="docutils literal"><span class="pre">Q</span></tt> como um argumento posicional. Se você fornece vários argumentos de objeto
+<tt class="docutils literal"><span class="pre">Q</span></tt> para uma função de pesquisa, os argumentos serão mesclados com &quot;AND&quot;. Por
+exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Poll</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="n">Q</span><span class="p">(</span><span class="n">question__startswith</span><span class="o">=</span><span class="s">&#39;Who&#39;</span><span class="p">),</span>
+    <span class="n">Q</span><span class="p">(</span><span class="n">pub_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">pub_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>... isso se traduz aproximadamente no SQL:</p>
+<div class="highlight-python"><pre>SELECT * from polls WHERE question LIKE 'Who%'
+    AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')</pre>
+</div>
+<p>Funções de pesquisa podem combinar o uso de objetos <tt class="docutils literal"><span class="pre">Q</span></tt> e argumentos nomeados.
+Todos os argumentos fornecidos para uma função de pesquisa (sejam eles agumentos
+ou objetos <tt class="docutils literal"><span class="pre">Q</span></tt>) são mesclados com &quot;AND&quot;. No entanto, se um objeto <tt class="docutils literal"><span class="pre">Q</span></tt> é
+fornecido, ele deve preceder a definição de qualquer argumento nomeado.
+Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Poll</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="n">Q</span><span class="p">(</span><span class="n">pub_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">pub_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)),</span>
+    <span class="n">question__startswith</span><span class="o">=</span><span class="s">&#39;Who&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>... poderia ser uma consulta válida, equivalente ao exemplo anterior; mas:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># CONSULTA INVÁLIDA</span>
+<span class="n">Poll</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="n">question__startswith</span><span class="o">=</span><span class="s">&#39;Who&#39;</span><span class="p">,</span>
+    <span class="n">Q</span><span class="p">(</span><span class="n">pub_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">pub_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>... não seria válida.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">O <a class="reference external" href="http://code.djangoproject.com/browser/django/trunk/tests/modeltests/or_lookups/models.py">exemplos do OR</a> nos unit tests do Django é mostrado alguns possíveis
+usos do <tt class="docutils literal"><span class="pre">Q</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="s-comparando-objetos">
+<span id="comparando-objetos"></span><h2>Comparando objetos<a class="headerlink" href="#comparando-objetos" title="Permalink to this headline">¶</a></h2>
+<p>Para comparar duas instâncias de model, é só usar o operador de comparação
+padrão do Python, dois sinais de igual: <tt class="docutils literal"><span class="pre">==</span></tt>. Por trás das cenas, o que é
+comparado é a chave primária dos dois models.</p>
+<p>Usando o exemplo <tt class="docutils literal"><span class="pre">Entry</span></tt> acima, as duas declarações a seguir são
+equivalentes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">some_entry</span> <span class="o">==</span> <span class="n">other_entry</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">some_entry</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other_entry</span><span class="o">.</span><span class="n">id</span>
+</pre></div>
+</div>
+<p>Se uma chave primária de um model não é chamada de <tt class="docutils literal"><span class="pre">id</span></tt>, não tem problema.
+As comparações sempre usaram a chave primária, seja lá como for chamada. Por
+exemplo, se uma chave primária de um model é chamada <tt class="docutils literal"><span class="pre">name</span></tt>, estas duas
+declarações são equivalentes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">some_obj</span> <span class="o">==</span> <span class="n">other_obj</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">some_obj</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other_obj</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-deletando-objetos">
+<span id="s-topics-db-queries-delete"></span><span id="deletando-objetos"></span><span id="topics-db-queries-delete"></span><h2>Deletando objetos<a class="headerlink" href="#deletando-objetos" title="Permalink to this headline">¶</a></h2>
+<p>O método delete, convenientemente é chamado <tt class="docutils literal"><span class="pre">delete()</span></tt>. Este método deleta
+imediatamente o objeto e não retorna valor. Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">e</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Você pode também deletar objetos em grupos. Todo <tt class="docutils literal"><span class="pre">QuerySet</span></tt> tem um método
+<tt class="docutils literal"><span class="pre">delete()</span></tt>, que deleat todos os seus membros.</p>
+<p>Por exemplo, isso deleta todos os objetos <tt class="docutils literal"><span class="pre">Entry</span></tt> com um <tt class="docutils literal"><span class="pre">pub_date</span></tt> do ano
+2005:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__year</span><span class="o">=</span><span class="mi">2005</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Tenha em mente que isso irá, sempre que possível, ser executado puramente em
+SQL, sendo assim o método <tt class="docutils literal"><span class="pre">delete()</span></tt> de instâncias de objeto individuais não
+precisaram ser chamadas durante o processo. Se você forneceu um método
+<tt class="docutils literal"><span class="pre">delete()</span></tt> a uma classe model e quer se assegurar de que ele será chamado,
+você precisa deletar as instâncias &quot;manualmente&quot; (e.g., iterando sobre o
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> e chamando o <tt class="docutils literal"><span class="pre">delete()</span></tt> de cada objeto individualmente) ao invés
+de usar um método <tt class="docutils literal"><span class="pre">delete()</span></tt> de grupo do <tt class="docutils literal"><span class="pre">QuerySet</span></tt>.</p>
+<p>Quando o Django deleta um objeto, ele emula o comportamento de restrições
+(CONSTRAINT) do SQL <tt class="docutils literal"><span class="pre">ON</span> <span class="pre">DELETE</span> <span class="pre">CASCADE</span></tt> -- em outras palavras, quaisquer
+objetos que possuam uma chave estrangeira apontando ao objeto que está para ser
+deletado, também será deletado com ele. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="c"># Isso irá deletar o Blog e todos os seus objetos Entry.</span>
+<span class="n">b</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<span class="title">New in Django 1.3:</span> This cascade behavior is customizable via the
+<tt class="xref py py-attr docutils literal"><span class="pre">on_delete</span></tt> argument to the
+<a class="reference internal" href="../../ref/models/fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><tt class="xref py py-class docutils literal"><span class="pre">ForeignKey</span></tt></a>.</div>
+<p>Note que <tt class="docutils literal"><span class="pre">delete()</span></tt> é o único método de <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que não é exposto num
+<tt class="docutils literal"><span class="pre">Manager</span></tt> em si. Este é um mecanismo de segurança para previnir que você
+acidentalmente requisite <tt class="docutils literal"><span class="pre">Entry.objects.delete()</span></tt>, e apague <em>todas</em> as
+entradas. Se você deseja <em>deletar</em> todos os objetos, então você deve
+explicitamente requisitas uma consulta completa:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-atualizando-varios-objetos-de-uma-vez">
+<span id="s-topics-db-queries-update"></span><span id="atualizando-varios-objetos-de-uma-vez"></span><span id="topics-db-queries-update"></span><h2>Atualizando vários objetos de uma vez<a class="headerlink" href="#atualizando-varios-objetos-de-uma-vez" title="Permalink to this headline">¶</a></h2>
+<p>As vezes você quer atribuir um valor em particular a um campo de todos os
+objetos de um  <tt class="docutils literal"><span class="pre">QuerySet</span></tt>. Você pode fazer isso com o método <tt class="docutils literal"><span class="pre">update()</span></tt>.
+Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Atualiza todos os headlines com o pub_date em 2007.</span>
+<span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pub_date__year</span><span class="o">=</span><span class="mi">2007</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">headline</span><span class="o">=</span><span class="s">&#39;Everything is the same&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Você somente pode setar compos não relacionados e campos <tt class="docutils literal"><span class="pre">ForeignKey</span></tt> usando
+este método, e o valor que você configurar o campo deve ser um valor nativo do
+Python (i.e., você não pode configurar um campo para ser igual a algum outro
+campo nesse momento).</p>
+<p>Para atualizar campos <tt class="docutils literal"><span class="pre">ForeignKey</span></tt>, configure o novo valor na nova instância
+de model que você deseja apontar. Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="go"># Muda todos os Entry que pretençam a este Blog.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">blog</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>O método <tt class="docutils literal"><span class="pre">update()</span></tt> é aplicado instantâneamente e não retorna valores (
+semelhante ao <tt class="docutils literal"><span class="pre">delte()</span></tt>). A única restrição do <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que foi atualizado
+é que ele só pode acessar uma tabela do banco de dados, a tabela principal do
+model.</p>
+<p>Tenha cuidado que o método <tt class="docutils literal"><span class="pre">update()</span></tt> é convertido diretamente numa declaração
+SQL. Ela é uma operação de massa para atualizações direta. Não executa qualquer
+método <tt class="docutils literal"><span class="pre">save()</span></tt> no seus models, ou emite os sinais <tt class="docutils literal"><span class="pre">pre_save</span></tt> ou
+<tt class="docutils literal"><span class="pre">post_save</span></tt> (que são consequencias da chamada do <tt class="docutils literal"><span class="pre">save()</span></tt>). Se você deseja
+salvar todos os ítens de um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> assegure-se de que o método <tt class="docutils literal"><span class="pre">save()</span></tt>
+seja chamada em cada instância, você não precisa de nenhuma função especial para
+lidar com isso. É só iterar sobre eles e chamar o <tt class="docutils literal"><span class="pre">save()</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">my_queryset</span><span class="p">:</span>
+    <span class="n">item</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-objetos-relacionados">
+<span id="objetos-relacionados"></span><h2>Objetos relacionados<a class="headerlink" href="#objetos-relacionados" title="Permalink to this headline">¶</a></h2>
+<p>Quando você define um relacionamento num model (i.e., um <tt class="docutils literal"><span class="pre">ForeignKey</span></tt>,
+<tt class="docutils literal"><span class="pre">OneToOneField</span></tt>, ou <tt class="docutils literal"><span class="pre">ManyToManyField</span></tt>), instâncias desse model terão uma API
+conveniente para acessar os objetos relacionados.</p>
+<p>Usando os models do topo dessa página, por exemplo, um objeto <tt class="docutils literal"><span class="pre">Entry</span></tt> <tt class="docutils literal"><span class="pre">e</span></tt>
+pode obter seus objetos <tt class="docutils literal"><span class="pre">Blog</span></tt> associados acessando um atributo <tt class="docutils literal"><span class="pre">blog`</span> <span class="pre">:</span>
+<span class="pre">``e.blog</span></tt>.</p>
+<p>(Por trás das cenas, esta funcionalidade é implementada por <a class="reference external" href="http://users.rcn.com/python/download/Descriptor.htm">descriptors</a> Python.
+Isso realmente não deve importar, mas nós o apontamos aqui só por curiosidade.)</p>
+<p>O Django também cria uma API de acessores para o <em>outro</em> lado do
+relacionamento -- o link de um model relacionado para outro que define o
+relacionamento. Por exemplo, um objeto <tt class="docutils literal"><span class="pre">Blog</span></tt> <tt class="docutils literal"><span class="pre">b</span></tt> tem acesso a lista de
+todos os objetos <tt class="docutils literal"><span class="pre">Entry</span></tt> relacionados via o atributo <tt class="docutils literal"><span class="pre">entry_set</span></tt>:
+<tt class="docutils literal"><span class="pre">b.entry_set.all()</span></tt>.</p>
+<p>Todos os exemplos nesta seção usam as amostras de model <tt class="docutils literal"><span class="pre">Blog</span></tt>, <tt class="docutils literal"><span class="pre">Author</span></tt> e
+<tt class="docutils literal"><span class="pre">Entry</span></tt> definidos no topo dessa página.</p>
+<div class="section" id="s-relacionamentos-um-para-muitos-one-to-many">
+<span id="relacionamentos-um-para-muitos-one-to-many"></span><h3>Relacionamentos Um-para-muitos (One-to-many)<a class="headerlink" href="#relacionamentos-um-para-muitos-one-to-many" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="s-forward">
+<span id="forward"></span><h4>Forward<a class="headerlink" href="#forward" title="Permalink to this headline">¶</a></h4>
+<p>Se um modem tem uma <tt class="docutils literal"><span class="pre">ForeignKey</span></tt>, instâncias desse model terão acesso ao
+objeto relacionado (foreign) via um simples atribuot do model.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">blog</span> <span class="c"># Retorna o objeto Blog relacionado.</span>
+</pre></div>
+</div>
+<p>Você pode obter um conjunto via um atributo foreing-key. Assim como você pode
+esperar, mudanças na chave estrangeira não são salvas no banco de dados até que
+você chame <tt class="docutils literal"><span class="pre">save()</span></tt>.
+Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">blog</span> <span class="o">=</span> <span class="n">some_blog</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Se um campo <tt class="docutils literal"><span class="pre">ForeignKey</span></tt> tem <tt class="docutils literal"><span class="pre">null=True</span></tt> (i.e., ele permite valores
+<tt class="docutils literal"><span class="pre">NULL</span></tt>), você pode atrituir <tt class="xref docutils literal"><span class="pre">None</span></tt> a ele. Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">blog</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">save</span><span class="p">()</span> <span class="c"># &quot;UPDATE blog_entry SET blog_id = NULL ...;&quot;</span>
+</pre></div>
+</div>
+<p>Remeter acesso a relacionamentos one-to-many é chacheado na primeira vez em que
+o objeto relacionado é acessado. Subsequentes acessos a chave estrangeira do
+mesmo objeto são cacheados. Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">e</span><span class="o">.</span><span class="n">blog</span>  <span class="c"># Consluta o banco de dados para receber o Blog associado.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">e</span><span class="o">.</span><span class="n">blog</span>  <span class="c"># Não consulta o banco de dados. usa a versão em cache.</span>
+</pre></div>
+</div>
+<p>Note que o método <tt class="docutils literal"><span class="pre">select_related()</span></tt> do <tt class="docutils literal"><span class="pre">QuerySet</span></tt> recursivamente prepopula
+o cache de todos os relacionamentos one-to-many de antemão. Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">e</span><span class="o">.</span><span class="n">blog</span>  <span class="c"># Não consulta o banco de dados; usa a versão em cache.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">e</span><span class="o">.</span><span class="n">blog</span>  <span class="c"># Não consulta o banco de dados; usa a versão em cache.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-seguindo-os-relacionamentos-backward">
+<span id="s-backwards-related-objects"></span><span id="seguindo-os-relacionamentos-backward"></span><span id="backwards-related-objects"></span><h4>Seguindo os relacionamentos &quot;backward&quot;<a class="headerlink" href="#seguindo-os-relacionamentos-backward" title="Permalink to this headline">¶</a></h4>
+<p>Se um model tem uma <tt class="docutils literal"><span class="pre">ForeignKey</span></tt>, instâncias da chave estrangeira do model
+terão acesso ao <tt class="docutils literal"><span class="pre">Manager</span></tt> que retorna todas as instâncias do primeiro model.
+Por padrão, esse <tt class="docutils literal"><span class="pre">Manager</span></tt> é chamado <tt class="docutils literal"><span class="pre">FOO_set</span></tt>, onde <tt class="docutils literal"><span class="pre">FOO</span></tt> é o nome do
+model fonte, em minusculo. Esse <tt class="docutils literal"><span class="pre">Manager</span></tt> retorna <tt class="docutils literal"><span class="pre">QuerySets</span></tt>, que podem ser
+filtrados e manipulados como descrito na seção &quot;Recebendo objetos&quot; acima.</p>
+<p>Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">entry_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="c"># Retorna todas os objetos Entry relacionados ao Blog.</span>
+
+<span class="go"># b.entry_set é um Manager que retorna QuerySets.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">entry_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline__contains</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">entry_set</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Você pode sobrescrever o nome <tt class="docutils literal"><span class="pre">FOO_set</span></tt> através do parâmetro <tt class="docutils literal"><span class="pre">related_name</span></tt>
+na definição do <tt class="docutils literal"><span class="pre">ForeignKey</span></tt>. Por exemplo, se o model <tt class="docutils literal"><span class="pre">Entry</span></tt> fosse alterado
+para <tt class="docutils literal"><span class="pre">blog</span> <span class="pre">=</span> <span class="pre">ForeignKey(Blog,</span> <span class="pre">related_name='entries')</span></tt>, o código do exemplo
+acima ficaria:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="c"># Retorna todos os objetos Entry relacionados ao Blog.</span>
+
+<span class="go"># b.entries é um Manager que retorna QuerySets.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">headline__contains</span><span class="o">=</span><span class="s">&#39;Lennon&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Você não pode acessar um <tt class="docutils literal"><span class="pre">Manager</span></tt> <tt class="docutils literal"><span class="pre">ForeignKey</span></tt> de uma classe no sentido
+contrário; ele deve ser acessado de uma instância:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Blog</span><span class="o">.</span><span class="n">entry_set</span>
+<span class="go">Traceback:</span>
+<span class="go">    ...</span>
+<span class="go">AttributeError: &quot;Manager must be accessed via instance&quot;.</span>
+</pre></div>
+</div>
+<p>Além dos métodos do <tt class="docutils literal"><span class="pre">QuerySet</span></tt> definidos em &quot;Recebendo objetos&quot; acima, o
+<tt class="docutils literal"><span class="pre">Manager</span></tt> <tt class="docutils literal"><span class="pre">ForeignKey</span></tt> possui métodos adicionais utilizados para lidar com
+conjuntos de objetos relacionados. Uma sinopse de cada um está abaixo, e
+detalhes completos podem ser encontrados na <a class="reference internal" href="../../ref/models/relations.html"><em>referência de objetos
+relacionados</em></a>.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">add(obj1,</span> <span class="pre">obj2,</span> <span class="pre">...)</span></tt></dt>
+<dd>Adiciona os objetos do model especificados ao conjunto do objeto
+relacionado.</dd>
+<dt><tt class="docutils literal"><span class="pre">create(**kwargs)</span></tt></dt>
+<dd>Cria um novo objeto, salva-o e coloca-o no conjunto do objeto relacionado.
+Retorna o novo objeto criado.</dd>
+<dt><tt class="docutils literal"><span class="pre">remove(obj1,</span> <span class="pre">obj2,</span> <span class="pre">...)</span></tt></dt>
+<dd>Remove o os objetos model especificados do conjunto do objeto relacinoado.</dd>
+<dt><tt class="docutils literal"><span class="pre">clear()</span></tt></dt>
+<dd>Remove todos os objetos do conjunto do objeto relacionado.</dd>
+</dl>
+<p>Para atribuir memtros de um conjunto relacionado de uma só vez, é só atribuí-lo
+de qualquer objeto iterável. O iterável pode conter instâncias de objetos, ou
+só uma lista de valores de chave primária. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">b</span><span class="o">.</span><span class="n">entry_set</span> <span class="o">=</span> <span class="p">[</span><span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Neste exemplo, <tt class="docutils literal"><span class="pre">e1</span></tt> e <tt class="docutils literal"><span class="pre">e2</span></tt> pode ser uma instância completa do Entry, ou
+valores inteiros de chave primária.</p>
+<p>Se o método <tt class="docutils literal"><span class="pre">clear()</span></tt> estiver disponível, quaisquer objetos pre-existentes
+serão removidos do <tt class="docutils literal"><span class="pre">entry_set</span></tt> antes de todos os objetos no iterável (neste
+caso, uma lista) são adicionados ao conjunto. Se o método <tt class="docutils literal"><span class="pre">clear()</span></tt> <em>não</em>
+estiver disponível, todos os objetos no iterável serão adicionados sem remover
+quaisquer elementos existentes.</p>
+<p>Cada operação &quot;reverse&quot; descrita nesta seção tem um efeito imediato sobre o
+banco de dados. Toda adição, criação e deleção é imediatamente e automaticamente
+salva no banco de dados.</p>
+</div>
+</div>
+<div class="section" id="s-relacionamentos-muitos-para-muitos-many-to-many">
+<span id="relacionamentos-muitos-para-muitos-many-to-many"></span><h3>Relacionamentos muitos-para-muitos (Many-to-many)<a class="headerlink" href="#relacionamentos-muitos-para-muitos-many-to-many" title="Permalink to this headline">¶</a></h3>
+<p>Amdas as extremidades de um relacionamento many-to-many obtêem uma API de acesso
+automática para o outro lado. A API funciona exatamente como o &quot;backward&quot; do
+relacionamento one-to-many, acima.</p>
+<p>A única diferença é na nomeação do atributo: O model que define o
+<tt class="docutils literal"><span class="pre">ManyToManyField</span></tt> usa o nome do atributo do próprio campo, considerando que o
+model &quot;reverso&quot; usa o nome do model original em minúscula, mais <tt class="docutils literal"><span class="pre">'_set'</span></tt>
+(assim como reverso de relacionamentos one-to-many).</p>
+<p>Com um exemplo fica mais fácil entender:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">e</span><span class="o">.</span><span class="n">authors</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="c"># Retorna todos os objetos Author desta Entry.</span>
+<span class="n">e</span><span class="o">.</span><span class="n">authors</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">e</span><span class="o">.</span><span class="n">authors</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name__contains</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">)</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">Author</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">a</span><span class="o">.</span><span class="n">entry_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="c"># Retorna todos os objetos Entry desse Author.</span>
+</pre></div>
+</div>
+<p>Como <tt class="docutils literal"><span class="pre">ForeignKey</span></tt>, o <tt class="docutils literal"><span class="pre">ManyToManyField</span></tt> pode especificar <tt class="docutils literal"><span class="pre">related_name</span></tt>.
+No exemplo acima, se o <tt class="docutils literal"><span class="pre">ManyToManyField</span></tt> em <tt class="docutils literal"><span class="pre">Entry</span></tt> tivesse especificado
+<tt class="docutils literal"><span class="pre">related_name='entries'</span></tt>, então cada instância de <tt class="docutils literal"><span class="pre">Author</span></tt> teria um atributo
+<tt class="docutils literal"><span class="pre">entries</span></tt> ao invés de <tt class="docutils literal"><span class="pre">entry_set</span></tt>.</p>
+</div>
+<div class="section" id="s-relacionamentos-um-pra-um-one-to-one">
+<span id="relacionamentos-um-pra-um-one-to-one"></span><h3>Relacionamentos Um-pra-um (One-to-one)<a class="headerlink" href="#relacionamentos-um-pra-um-one-to-one" title="Permalink to this headline">¶</a></h3>
+<p>Relacionamentos One-to-one são muito similares aos relacionamentos many-to-many.
+Se você define uma <a class="reference internal" href="../../ref/models/fields.html#django.db.models.OneToOneField" title="django.db.models.OneToOneField"><tt class="xref py py-class docutils literal"><span class="pre">OneToOneField</span></tt></a> no seu model, as
+instâncias desse model terão acesso ao objeto relacionado atráves de um simples
+atributo de um model.</p>
+<p>Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">EntryDetail</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">OneToOneField</span><span class="p">(</span><span class="n">Entry</span><span class="p">)</span>
+    <span class="n">details</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+
+<span class="n">ed</span> <span class="o">=</span> <span class="n">EntryDetail</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ed</span><span class="o">.</span><span class="n">entry</span> <span class="c"># Retorna o objeto Entry relacionado.</span>
+</pre></div>
+</div>
+<p>A diferença vem nas consultas &quot;reverse&quot;. O model relacionado num relacionamento
+one-to-one também tem acesso ao objeto <a class="reference internal" href="managers.html#django.db.models.Manager" title="django.db.models.Manager"><tt class="xref py py-class docutils literal"><span class="pre">Manager</span></tt></a>, mas
+esse <a class="reference internal" href="managers.html#django.db.models.Manager" title="django.db.models.Manager"><tt class="xref py py-class docutils literal"><span class="pre">Manager</span></tt></a> representa um único objeto, ao invés de
+uma coleção de objetos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">e</span><span class="o">.</span><span class="n">entrydetail</span> <span class="c"># retorna o objeto EntryDetail relacionado</span>
+</pre></div>
+</div>
+<p>Se nenhum objeto foi atribuído a este relacionamento, o Django lançará uma
+exceção <tt class="docutils literal"><span class="pre">DoesNotExist</span></tt>.</p>
+<p>Instâncias podem ser atribuídas ao relacionamento reverso da mesma forma como
+você poderia atribuir ao relacionamento forward:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">e</span><span class="o">.</span><span class="n">entrydetail</span> <span class="o">=</span> <span class="n">ed</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-como-e-possivel-relacionamentos-backward">
+<span id="como-e-possivel-relacionamentos-backward"></span><h3>Como é possível relacionamentos backward?<a class="headerlink" href="#como-e-possivel-relacionamentos-backward" title="Permalink to this headline">¶</a></h3>
+<p>Outro mapeador de objeto relacional requer que você defina relacionamentos em
+abos os lados. Os desenvolvedores do Django acreditam que isso é uma violação do
+princípio DRY (Don't Repeat yourself), então o Django somente requer que você
+defina o relacionamento de um lado.</p>
+<p>Mas como é possível, dado que uma classe model não sabe qual outros classes
+model estão relacionadas até que essas outras classes sejam carregadas?</p>
+<p>A resposta está na configuração <a class="reference internal" href="../../ref/settings.html#std:setting-INSTALLED_APPS"><tt class="xref std std-setting docutils literal"><span class="pre">INSTALLED_APPS</span></tt></a>. A primeira vez em que
+qualquer model é carregado, o Django itera sobre todos os models no
+<a class="reference internal" href="../../ref/settings.html#std:setting-INSTALLED_APPS"><tt class="xref std std-setting docutils literal"><span class="pre">INSTALLED_APPS</span></tt></a> e cria os relacionamentos backward na memória se
+necessário. Essencialmente, uma das funções do <a class="reference internal" href="../../ref/settings.html#std:setting-INSTALLED_APPS"><tt class="xref std std-setting docutils literal"><span class="pre">INSTALLED_APPS</span></tt></a> é dizer
+ao Django os domínios dos models.</p>
+</div>
+<div class="section" id="s-consultas-sobre-objetos-relacionados">
+<span id="consultas-sobre-objetos-relacionados"></span><h3>Consultas sobre objetos relacionados<a class="headerlink" href="#consultas-sobre-objetos-relacionados" title="Permalink to this headline">¶</a></h3>
+<p>Consultas envolvendo objetos relacionados seguem as mesmas regras de consultas
+envolvendo campos de valores normais. Quando especificar o valor para combinar
+numa consulta, você pode usar tanto uma instância de objeto em si, quando o
+valor da chave primária do objeto.</p>
+<p>Por exemplo, se você tem um objeto Blog <tt class="docutils literal"><span class="pre">b</span></tt> com <tt class="docutils literal"><span class="pre">id=5</span></tt>, as três consultas
+seguintes seriam idênticas:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">blog</span><span class="o">=</span><span class="n">b</span><span class="p">)</span> <span class="c"># Consulta usando intância de objeto</span>
+<span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">blog</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="c"># Consulta usando id da instância</span>
+<span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">blog</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="c"># Consulta usando id diretamente</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="s-voltando-ao-sql-puro">
+<span id="voltando-ao-sql-puro"></span><h2>Voltando ao SQL puro<a class="headerlink" href="#voltando-ao-sql-puro" title="Permalink to this headline">¶</a></h2>
+<p>Se você se encontrou precisando escrever uma consulta SQL que é mais complexa
+para o mapeador de banco de dados do Django, você pode voltar ao modo de
+consultas em SQL puro.</p>
+<p>A forma preferida para fazer isso é dando ao model, métodos personalizados ou
+métodos personalizados ao manager, que executam consultas. Embora não há nada
+no Django que <em>obrigue</em> consultas de banco de dados estarem na camada de model,
+esta abordagem mantem toda a lógica de acesso a dados num único lugar, o que é
+mais inteligente para organização de código. Para instruções, veja
+<a class="reference internal" href="sql.html"><em>Performing raw SQL queries</em></a>.</p>
+<p>Finalmente, é importante notar que a camada de banco de dados do Django é
+meramente uma interface para o seu banco de dados. Você pode acessar seu banco
+por outras ferramentas, linguagens de programação ou frameworkds de banco de
+dados; não há nada específico do Django sobre o seu banco de dados.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Fazendo consultas</a><ul>
+<li><a class="reference internal" href="#criando-objetos">Criando objetos</a></li>
+<li><a class="reference internal" href="#salvando-mudancas-de-objetos">Salvando mudanças de objetos</a><ul>
+<li><a class="reference internal" href="#salvando-campos-foreignkey-e-manytomanyfield">Salvando campos <tt class="docutils literal"><span class="pre">ForeignKey</span></tt> e <tt class="docutils literal"><span class="pre">ManyToManyField</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#recuperando-objetos">Recuperando objetos</a><ul>
+<li><a class="reference internal" href="#recebendo-todos-os-objetos">Recebendo todos os objetos</a></li>
+<li><a class="reference internal" href="#recebendo-objetos-especificos-com-filtros">Recebendo objetos específicos com filtros</a><ul>
+<li><a class="reference internal" href="#filtros-encadeados">Filtros encadeados</a></li>
+<li><a class="reference internal" href="#querysets-filtrados-sao-unicos">QuerySets filtrados são únicos</a></li>
+<li><a class="reference internal" href="#querysets-sao-lazy">QuerySets são lazy</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#retrieving-a-single-object-with-get">Retrieving a single object with get</a><ul>
+<li><a class="reference internal" href="#outros-metodos-do-queryset">Outros métodos do QuerySet</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#limitando-querysets">Limitando QuerySets</a></li>
+<li><a class="reference internal" href="#campos-de-pesquisa">Campos de pesquisa</a></li>
+<li><a class="reference internal" href="#pesquisas-que-abrangem-relacionamentos">Pesquisas que abrangem relacionamentos</a><ul>
+<li><a class="reference internal" href="#abrangendo-relacionamentos-de-multiplos-valores">Abrangendo relacionamentos de múltiplos valores</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#filters-can-reference-fields-on-the-model">Filters can reference fields on the model</a></li>
+<li><a class="reference internal" href="#atalho-para-pk">Atalho para pk</a></li>
+<li><a class="reference internal" href="#escapando-sinais-de-porcentagem-e-underscores-em-consultas-like">Escapando sinais de porcentagem e underscores em consultas LIKE</a></li>
+<li><a class="reference internal" href="#cacheamento-e-querysets">Cacheamento e QuerySets</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#consultas-complexas-com-objetos-q">Consultas complexas com objetos Q</a></li>
+<li><a class="reference internal" href="#comparando-objetos">Comparando objetos</a></li>
+<li><a class="reference internal" href="#deletando-objetos">Deletando objetos</a></li>
+<li><a class="reference internal" href="#atualizando-varios-objetos-de-uma-vez">Atualizando vários objetos de uma vez</a></li>
+<li><a class="reference internal" href="#objetos-relacionados">Objetos relacionados</a><ul>
+<li><a class="reference internal" href="#relacionamentos-um-para-muitos-one-to-many">Relacionamentos Um-para-muitos (One-to-many)</a><ul>
+<li><a class="reference internal" href="#forward">Forward</a></li>
+<li><a class="reference internal" href="#seguindo-os-relacionamentos-backward">Seguindo os relacionamentos &#8220;backward&#8221;</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#relacionamentos-muitos-para-muitos-many-to-many">Relacionamentos muitos-para-muitos (Many-to-many)</a></li>
+<li><a class="reference internal" href="#relacionamentos-um-pra-um-one-to-one">Relacionamentos Um-pra-um (One-to-one)</a></li>
+<li><a class="reference internal" href="#como-e-possivel-relacionamentos-backward">Como é possível relacionamentos backward?</a></li>
+<li><a class="reference internal" href="#consultas-sobre-objetos-relacionados">Consultas sobre objetos relacionados</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#voltando-ao-sql-puro">Voltando ao SQL puro</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="models.html">Models</a></li>
+    
+    
+      <li>Next: <a href="aggregation.html">Aggregation</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Usando o Django</a>
+        
+          <ul><li><a href="index.html">Models e bancos de dados</a>
+        
+        <ul><li>Fazendo consultas</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/topics/db/queries.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="models.html" title="Models">previous</a> 
+     |
+    <a href="../index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="aggregation.html" title="Aggregation">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

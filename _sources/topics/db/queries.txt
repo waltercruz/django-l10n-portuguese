@@ -1,0 +1,1135 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+=================
+Fazendo consultas
+=================
+
+.. currentmodule:: django.db.models
+
+Uma vez que você tenha criado seus :doc:`data models </topics/db/models>`, o
+Django automaticamente lhe dá uma API de abstração de banco de dados que permite
+você criar, receber, atualizar e deletar objetos. Este documento explica como
+usar esta API. Visite a :doc:`referência do model </ref/models/index>` para
+detalhes completos de todas opções de model.
+
+Por todo esse guia (e na referência), nós iremos refereir aos seguintes models,
+que compreendem um aplicação de weblog:
+
+.. _queryset-model-example:
+
+.. code-block:: python
+
+    class Blog(models.Model):
+        name = models.CharField(max_length=100)
+        tagline = models.TextField()
+
+        def __unicode__(self):
+            return self.name
+
+    class Author(models.Model):
+        name = models.CharField(max_length=50)
+        email = models.EmailField()
+
+        def __unicode__(self):
+            return self.name
+
+    class Entry(models.Model):
+        blog = models.ForeignKey(Blog)
+        headline = models.CharField(max_length=255)
+        body_text = models.TextField()
+        pub_date = models.DateTimeField()
+        mod_date = models.DateTimeField()
+        authors = models.ManyToManyField(Author)
+        n_comments = models.IntegerField()
+        n_pingbacks = models.IntegerField()
+        rating = models.IntegerField()
+
+        def __unicode__(self):
+            return self.headline
+
+Criando objetos
+===============
+
+Para representar dados de uma tabela de banco de dados em objetos Python, o
+Django usa um sistema intuitivo: Uma classe model representa uma tabela de banco
+de dados, e uma instância dessa classe representa um dado em particular dentro
+da tabela.
+
+Para criar um objeto, instâncie-o usando argumentos nomeados para a classe
+model, e então chame ``save()`` para salvá-lo no banco de dados.
+
+You import the model class from wherever it lives on the Python path, as you
+may expect. (We point this out here because previous Django versions required
+funky model importing.)
+
+Assumimos que os models estão em ``mysite/blog/models.py``, aqui tem um
+exemplo::
+
+    >>> from mysite.blog.models import Blog
+    >>> b = Blog(name='Beatles Blog', tagline='All the latest Beatles news.')
+    >>> b.save()
+
+Isso executa uma consulta SQL ``INSERT`` por trás das cenas. O Django não
+executa nada no banco de dados até que você, explicitamente ``save()``.
+
+O método ``save()`` não retorna valores.
+
+.. seealso::
+
+    O ``save()`` recebe algumas opções avançadas não descritas aqui.
+    Veja a documentação do ``save()`` para detalhes completos.
+
+    Para criar um objeto e salvá-lo em um passo veja o método ```create()```.
+
+Salvando mudanças de objetos
+============================
+
+Para salvar mudanças de um objeto que já existe no banco de dados, use
+``save()``.
+
+Dado uma instância ``b5`` do ``Blog`` que já está salvo no banco de dados, este
+exemplo muda seu nome e o atualiza no banco de dados::
+
+    >> b5.name = 'New name'
+    >> b5.save()
+
+Isso executa uma consulta SQL ``UPDATE`` por trás das cenas. O Django não acessa
+o banco de dados até que você, explicitamente, chame ``save()``.
+
+Salvando campos ``ForeignKey`` e ``ManyToManyField``
+----------------------------------------------------
+
+Atualizar um campo ``ForeignKey`` funciona exatamente da mesma forma como salvar
+um campo normal; simplesmente atribuindo um objeto do tipo certo ao campo em
+questão::
+
+    >>> cheese_blog = Blog.objects.get(name="Cheddar Talk")
+    >>> entry.blog = cheese_blog
+    >>> entry.save()
+
+Atualizar um ``ManyToManyField`` funciona um pouco diferente; usa o método
+``add()`` sobre o campo para adicionar um dado a relação::
+
+    >>> from blog.models import Author
+    >> joe = Author.objects.create(name="Joe")
+    >> entry.authors.add(joe)
+
+O Django se queixará se você tentar atribuir ou adicionar um objeto do tipo
+errado.
+
+Recuperando objetos
+===================
+
+Para recuperar objetos de seu banco de dados, você constrói uma ``QuerySet``
+através do ``Manager`` de sua classe model.
+
+Um ``QuerySet`` representa uma coleção de objetos do banco de dados. Ela poder
+nenhum, um ou muitos *filtros* -- critérios que apurem a coleção baseado nos
+parâmetros dados. Em termos SQL, um ``QuerySet`` equipara-se a uma consulta
+``SELECT``, e um filtro é uma clausula limitadora como ``WHERE`` ou ``LIMIT``.
+
+Você obtem um ``QuerySet`` usando o ``Manager`` de seu model. Cada model tem
+pelo menos um ``Manager``, e ele é chamado ``objects`` por padrão. Acesse-o
+diretamente via classe model, desta forma::
+
+    >>> Blog.objects
+    <django.db.models.manager.Manager object at ...>
+    >>> b = Blog(name='Foo', tagline='Bar')
+    >>> b.objects
+    Traceback:
+        ...
+    AttributeError: "Manager isn't accessible via Blog instances."
+
+.. note::
+
+    O ``Managers`` são acessível somente via classes, ao invés de instâncias,
+    para reforçar a separação entre operações a nível de tabela e operações a
+    nível de dado.
+
+O ``Manager`` é a principal fonte de ``QuerySets`` para um model. Ele age como
+uma ``QuerySet`` "raiz" que descreve todos os objetos de uma tabela de banco de
+dados. Por exemplo, ``Blog.objects`` é o ``QuerySet`` inicial que contém todos
+os objetos do ``Blog`` no banco de dados.
+
+Recebendo todos os objetos
+--------------------------
+
+A forma mais simples de receber objetos da tabela é obtendo todos eles.
+Para fazer isso, use o método ``all()`` de um ``Manager``::
+
+    >>> all_entries = Entry.objects.all()
+
+O método ``all()`` retorna um `QuerySet`` de todos os objetos do banco de dados.
+
+(Se ``Entry.objects`` é um ``QuerySet``, porquê nós fizemos um
+``Entry.objects``? Isso é porque ``Entry.objects``, o ``QuerySet`` raiz, é um
+caso especial que não pode ser avaliado. O método ``all()`` retorna um
+``QuerySet`` que *pode* ser avaliado.)
+
+Recebendo objetos específicos com filtros
+-----------------------------------------
+
+O ``QuerySet`` raiz fornecido pelo ``Manager`` descreve todos os objetos na
+tabela de banco de dados. Geralmente, contudo, você precisará selecionar somente
+um conjunto de objetos.
+
+Para criar um subconjunto, você precisar refinar o ``QuerySet`` inicial,
+adicionando confições ao filtro. As duas formas mais comuns de refinar um
+``QuerySet`` são::
+
+    ``filter(**kwargs)``
+        Retorna um novo ``QuerySet`` contendo objetos que combinam com os
+        parâmetros fornecidos.
+
+    ``exclude(**kwargs)``
+        Retorna um novo ``QuerySet`` contendo objetos que *não* combinam com os
+        parâmetros fornecidos.
+
+Os parâmetros (``**kwargs`` na definição de função acima) devem estar no formato
+descrito em `Campos de pesquisa`_ abaixo.
+
+Por exemplo, para obter um ``QuerySet`` de entradas de blog do ano 2006, use o
+``filter()`` desta forma::
+
+    Entry.objects.filter(pub_date__year=2006)
+
+Nós não temos que adicionar um ``all()`` -- ``Entry.objects.all().filter(...)``.
+Que continua funcionando, mas você somente precisa de ``all()`` quando deseja
+obter todos os objetos do ``QuerySet`` raiz.
+
+.. _chaining-filters:
+
+Filtros encadeados
+~~~~~~~~~~~~~~~~~~
+
+O resultado de refinar uma ``QuerySet`` é, em si, um ``QuerySet``, então é
+possível encadear refinamentos juntos. Por exemplo::
+
+    >>> Entry.objects.filter(
+    ...     headline__startswith='What'
+    ... ).exclude(
+    ...     pub_date__gte=datetime.now()
+    ... ).filter(
+    ...     pub_date__gte=datetime(2005, 1, 1)
+    ... )
+
+Isso recebe o ``QuerySet`` inicial de todas as entradas do banco de dados,
+adiciona um filtro, então uma exclusão, e então um outro filtro. O resultado
+final é um ``QuerySet`` contendo todas as entradas com um cabeçalho que começa
+com "What", que foi publicado entre Janeiro 1, 2005 e a data atual.
+
+.. _filtered-querysets-are-unique:
+
+QuerySets filtrados são únicos
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cada vez que você refina um ``QuerySet``, você tem um ``QuerySet`` novo que não
+é vinculado ao ``QuerySet`` anterior. Cada refinamento cria um ``QuerySet``
+separado e distinto que pode ser armazenado, usado e reusado.
+
+Exemplo::
+
+    >> q1 = Entry.objects.filter(headline__startswith="What")
+    >> q2 = q1.exclude(pub_date__gte=datetime.now())
+    >> q3 = q1.filter(pub_date__gte=datetime.now())
+
+Este três ``QuerySet`` são separadas. O primeiro é um ``QuerySet`` base contendo
+todas as entradas que contenham um cabeçalho começando com "What". O segundo é
+um subconjunto do primeir, com um critério adicional que exclui dados cujo o
+``pub_date`` é maior que agora. O terceiro é um subconjunto do primeiro, com um
+critério adicional que seleciona somente os dados cujo ``pub_date`` é maior que
+agora. O ``QuerySet`` inicial (``q1``) não é afetado pelo processo de
+refinamento.
+
+.. _querysets-are-lazy:
+
+QuerySets são lazy
+~~~~~~~~~~~~~~~~~~
+
+Os ``QuerySets`` are lazy -- o ato de criar um  ``QuerySet`` não envolve
+qualquer atividade de banco de dados. Você pode empilhar filtros juntos ao longo
+do dia, e o Django não os executa no banco de dados até que o ``QuerySet`` seja
+*avaliado*. Dê uma olhada nesse exemplo::
+
+    >>> q = Entry.objects.filter(headline__startswith="What")
+    >>> q = q.filter(pub_date__lte=datetime.now())
+    >>> q = q.exclude(body_text__icontains="food")
+    >>> print q
+
+Embora isso pareça como três hits no banco de dados, de fato o banco de dados
+foi consultado somente na última linha (``print q``). Geralmente, os resultados
+de um ``QuerySet`` não são buscados do banco de dados até que você "peça" por
+eles. Quando você o faz, o ``QuerySet`` é *avaliado* para acessar o banco de
+dados. Para mais detalhes sobre exatamente quando as avaliações tomam seu lugar,
+veja :ref:`when-querysets-are-evaluated`.
+
+.. _retrieving-single-object-with-get:
+
+Retrieving a single object with get
+-----------------------------------
+
+``.filter()`` will always give you a ``QuerySet``, even if only a single
+object matches the query - in this case, it will be a ``QuerySet`` containing
+a single element.
+
+If you know there is only one object that matches your query, you can use
+the ``get()`` method on a `Manager` which returns the object directly::
+
+    >>> one_entry = Entry.objects.get(pk=1)
+
+You can use any query expression with ``get()``, just like with ``filter()`` -
+again, see `Campos de pesquisa`_ abaixo.
+
+Note that there is a difference between using ``.get()``, and using
+``.filter()`` with a slice of ``[0]``. If there are no results that match the
+query, ``.get()`` will raise a ``DoesNotExist`` exception. This exception is an
+attribute of the model class that the query is being performed on - so in the
+code above, if there is no ``Entry`` object with a primary key of 1, Django will
+raise ``Entry.DoesNotExist``.
+
+Similarly, Django will complain if more than one item matches the ``get()``
+query. In this case, it will raise ``MultipleObjectsReturned``, which again is
+an attribute of the model class itself.
+
+
+Outros métodos do QuerySet
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Na maior parte do tempo você usará ``all()``, ``filter()`` e ``exclude()``
+quando você precisar pesquisar por objetos no banco de dados. Entretanto, isso
+não é tudo que há; veja a :ref:`Referência de API do QuerySet <queryset-api>`
+para uma lista completa de todos os vários métodos do ``QuerySet``.
+
+.. _limiting-querysets:
+
+Limitando QuerySets
+-------------------
+
+Use a sintaxe de array-slicing do Python para limitar seu ``QuerySet`` com um
+certo número de resultados. Este é o equivalente as clausulas SQL ``LIMIT`` e
+``OFFSET``.
+
+Por exemplo, isso retorna os primeiros 5 objetos (``LIMIT 5``)::
+
+    >>> Entry.objects.all()[:5]
+
+Isso retorna do sexto ao décimo objeto (``OFFSET 5 LIMIT 5``)::
+
+    >>> Entry.objects.all()[5:10]
+
+Indexação negativa (i.e. ``Entry.objects.all()[-1]``) não é suportada.
+
+Normalmente, dividir um ``QuerySet`` resulta em um novo ``QuerySet`` -- e não
+executa um nova consulta. Uma exceção é se você usa o parâmetro "step" do
+Python na sintaxe do slice. Por exemplo, isso executaria na verdade a consulta
+para retornar uma lista dos 10 primeiros objetos a cada *segundo*::
+
+    >>> Entry.objects.all()[:10:2]
+
+Para receber um *único* objeto ao invés de uma lista
+(e.g. ``SELECT foo  FROM bar  LIMIT 1``), use um index simples ao invés de um
+slice. Por exemplo, isso retorna a primeira ``Entry`` do banco de dados, depois
+de ordenar as entradas alfabéticamente pelos cabeçalhos::
+
+    >>> Entry.objects.order_by('headline')[0]
+
+Isso é o equivalente a::
+
+    >>> Entry.objects.order_by('headline')[0:1].get()
+
+Note, no entanto, que o primeiro desses será lançado ``IndexError`` enquanto o
+segundo lançará ``DoesNotExists`` se nenhum objeto combinar com o critério dado.
+Veja ``get()`` para mais detalhes.
+
+.. _field-lookups-intro:
+
+Campos de pesquisa
+------------------
+
+Campos de pesquisa são como você especifica o cerne de uma clausula ``WHERE``.
+Eles são especificado como argumento nomeados para o método ``filter()`` do
+``QuerySet``.
+
+Os argumentos básicos de pesquisa tem a forma ``campo__tipodepesquisa=valor``.
+(Isso é um underscore duplo). Por exemplo::
+
+    >>> Entry.objects.filter(pub_date__lte='2006-01-01')
+
+é traduzido para o seguinte SQL::
+
+    SELECT * FROM blog_entry WHERE pub_date <= '2006-01-01';
+
+.. admonition:: Como isso é possível
+
+   O Python tem a abilidade de definir funções que aceitam argumentos de
+   nome-valor arbitrários cujo os nomes e valores são avaliados em tempo de
+   execução. Para mais informações, veja `Keyword Arguments`_ no tutorial
+   oficial do Python.
+
+   .. _`Keyword Arguments`: http://docs.python.org/tut/node6.html#SECTION006720000000000000000
+
+Se você passar um argumento inválido, uma função de pesquisa gerará o erro
+``TypeError``.
+
+A API de banco de dados suporta sobre dois dos tipos de pesquisa; uma referência
+completa poe ser encontrada em :ref:`referencia dos campos de pesquisa
+<field-lookups>`. Para dar a você um gosto do que está disponível, aqui temos
+algumas das pesquisas mais comuns que você provavelmente usa::
+
+    :lookup:`exact`
+        Uma combinação "extata". Por exemplo::
+
+            >>> Entry.objects.get(headline__exact="Man bites dog")
+
+        Podria gerar o SQL ao longo dessas linhas:
+
+        .. code-block:: sql
+
+            SELECT ... WHERE headline = 'Man bites dog';
+
+        Se você não fornecer um tipo de pesquisa -- isto é, se seu argumento não
+        contém um underscore duplo -- o tipo de pesquisa é assumido como
+        ``exact``
+
+        Por exemplo, as duas clausulas seguintes são equivalentes::
+
+            >>> Blog.objects.get(id__exact=14)  # Forma explicita
+            >>> Blog.objects.get(id=14)         # __exact é implícito
+
+        Isso é uma conveniência, pois pesquisas ``exact`` são um caso comum.
+
+    :lookup:`iexact`
+        Uma combinação não sensível a maiúsculas. Então, a consulta::
+
+            >>> Blog.objects.get(name__iexact="beatles blog")
+
+        Poderia combinar um ``Blog`` entitulado "Beatles Blog", "beatles blog",
+        ou mesmo "BeAtlEs blOG".
+
+    :lookup:`contains`
+        Sensível a maiúsculas, testa se contém. Por exemplo::
+
+            Entry.objects.get(headline__contains='Lennon')
+
+        É traduzido para este SQL:
+
+        .. code-block:: sql
+
+            SELECT ... WHERE headline LIKE '%Lennon%';
+
+        Note que combinará com cabeçalhos ``'Today Lennon honored'`` mas não
+        ``'today lennon honored'``.
+
+        Há também uma versão não sensível a maiúsculas, :lookup:icontains`.
+
+    :lookup:`startswith`, :lookup:`endswith`
+        Começa com e termina com, respecitivamente. Há também a versão não
+        sensível a maiúsculas chamada :lookup:`istartswith` e
+        :lookup:`iendswith`.
+
+De novo, estes são somente arranhões na superfície. Uma referência completa pode
+ser encontrada na :ref:`referência os campos de pesquisa <field-lookups>`.
+
+Pesquisas que abrangem relacionamentos
+--------------------------------------
+
+O Django oferece um poderoso e intuitovo meio de "seguir" relacionamentos numa
+pesquisa, preocupando-se com os ``JOIN``\s SQL por vocês automaticamente, por
+trás das cenas. Para abranger um relacionamento, é só usar o nome dos campos
+relacionados atráves dos models, separados por dois underscores, até que você
+obtenha os campos que você deseja.
+
+Este exemplo recebe todos os objetos ``Entry`` com um ``Blog`` cujo ``name``
+seja ``'Beatles Blog'``::
+
+    >>> Entry.objects.filter(blog__name__exact='Beatles Blog')
+
+Esta abrangência pode ser tão funda quanto você quiser.
+
+Ela funciona com backwards, também. Para referenciar um relacionamento
+"reverso", é só colocar em minúsculo o nome do model.
+
+Este exemplo recebe todos os objetos ``Blog`` que tenham pelo menos um ``Entry``
+cujo ``headline`` contenha ``'Lennon'``::
+
+    >>> Blog.objects.filter(entry__headline__contains='Lennon')
+
+Se você estiver fazendo filtragem através de vários relacionamentos e um dos
+models intermediários não tiver um valor que fechar com a condição do filtro, o
+Django tratará ela como se estivesse vazia (todos os valores são ``NULL``), mas
+válidos. Tudo isso significa que nenhum erro será gerado. Por exemplo, neste
+filtro::
+
+    Blog.objects.filter(entry__author__name='Lennon')
+
+(se houvesse um model relacionado ``Author``), caso não houvesse nenhum
+``author`` associado com uma entrada, ele poderia ser tratado como se também não
+tivesse nenhum ``name`` atachado, ao invés de lançar um erro por não ter o
+``author``. Normalmente este é exatamente isso que você espera que aconteça. O
+único caso onde ele pode ser confuso é se você estiver usando ``isnull``. Deste
+modo::
+
+    Blog.objects.filter(entry__author__name__isnull=True)
+
+retornará objetos ``Blog`` que possuem um ``name`` vazio no ``author`` e também
+aqueles que têm um ``author`` vazio sobre os ``entry``. Se você não quer esses
+últimos objetos, você poderia escrever::
+
+    Blog.objects.filter(entry__author__isnull=False,
+            entry__author__name__isnull=True)
+
+Abrangendo relacionamentos de múltiplos valores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Quando você está filtrando um objeto baseado no ``ManyToManyField`` ou numa
+``ForeignKeyField`` reverso, há dois diferentes tipos de filtro que podem ser
+interessantes. Considere o relacionamento ``Blog``/``Entry`` (``Blog`` para
+``Entry`` é um relacionamento one-to-many). Nós podemos estar interessados em
+encontrar blogs que tenham uma entrada que possui ambos, *"Lennon"* no título e
+que foi publicado em 2008. Ou nós podemos querer encontrar blogs que tenham uma
+entrada com *"Lennon"* no título bem como uma que fora publicada em 2008. Já que
+há várias entradas associadas com um único ``Blog``, ambas consultas são
+possíveis e fazem sentido em algumas situações.
+
+O mesmo tipo de situação surge com um ``ManyToManyField``. Por exemplo, se uma
+``Entry`` tem um ``ManyToManyField`` chamado ``tags``, nós podemos querer
+encontrar entradas likadas às tags chamadas *"music"* e *"bands"* ou nós podemos
+desejar uma entrada que contenha uma tag com o nome de *"musci"* e um status de
+*"public"*.
+
+Para lidar com ambas situações, o Django tem um forma consistente de
+processar chamadas ``filter()`` e ``exclude()``. Tudo dentro de um única chamada
+``filter()`` é aplicado simultaneamente para filtrar ítens que combinam com
+todos esses requisitos. Sucessivas chamadas ``filter()`` adicionais restringem o
+conjunto de objetos, mas para relações com múltiplos valores, se aplicam a
+qualquer objeto linkado a primeira chamada ``filter()``.
+
+Eles podem soar um pouco confusa, então espero que um exemplo dê uma clareada.
+Para selecionar todos os blogs que contêm entradas tanto com *"Lennon"* no
+título e que foram publicados em 2008 (a mesma entrada satisfazendo ambas
+condições), nós escreveriámos::
+
+    Blog.objects.filter(entry__headline__contains='Lennon',
+            entry__pub_date__year=2008)
+
+Para selecionar todos os blogs que contêm um entrada com *"Lennon"* no título
+**bem como** uma entrada que fora publicada em 2008, nós escrevíamos::
+
+    Blog.objects.filter(entry__headline__contains='Lennon').filter(
+            entry__pub_date__year=2008)
+
+Neste segundo exemplo, o primeiro filtro restringe o queryset para todos os
+blogs linkados a esse tipo particular de entrada. O segundo filtro restringe o
+conjunto de blogs mais as que também foram linkadas ao segundo tipo de entrada.
+As entradas selecionadas no segundo filtro podem ou não, ser as mesmas entradas
+do primeiro filtro. Nós estamos filtrando os ítens ``Blog`` com cada declaração
+de filtro, não ítens ``Entry``.
+
+Todo esse comportamento também é aplicado ao ``exclude()``: todas as condições
+numa única declaração ``exclude()`` é aplicada a uma única instância (se estas
+condições estiverem falando dessa mesma relação de múltiplos valores). Condições
+em chamadas ``filer()`` ou ``exclude()`` subsequentes que referem-se ao mesmo
+relacionamento podem terminar filtrando diferentes objetos linkados.
+
+.. _query-expressions:
+
+Filters can reference fields on the model
+-----------------------------------------
+
+In the examples given so far, we have constructed filters that compare
+the value of a model field with a constant. But what if you want to compare
+the value of a model field with another field on the same model?
+
+Django provides the ``F()`` object to allow such comparisons. Instances
+of ``F()`` act as a reference to a model field within a query. These
+references can then be used in query filters to compare the values of two
+different fields on the same model instance.
+
+For example, to find a list of all blog entries that have had more comments
+than pingbacks, we construct an ``F()`` object to reference the pingback count,
+and use that ``F()`` object in the query::
+
+    >>> from django.db.models import F
+    >>> Entry.objects.filter(n_comments__gt=F('n_pingbacks'))
+
+Django supports the use of addition, subtraction, multiplication,
+division and modulo arithmetic with ``F()`` objects, both with constants
+and with other ``F()`` objects. To find all the blog entries with more than
+*twice* as many comments as pingbacks, we modify the query::
+
+    >>> Entry.objects.filter(n_comments__gt=F('n_pingbacks') * 2)
+
+To find all the entries where the rating of the entry is less than the
+sum of the pingback count and comment count, we would issue the
+query::
+
+    >>> Entry.objects.filter(rating__lt=F('n_comments') + F('n_pingbacks'))
+
+You can also use the double underscore notation to span relationships in
+an ``F()`` object. An ``F()`` object with a double underscore will introduce
+any joins needed to access the related object. For example, to retrieve all
+the entries where the author's name is the same as the blog name, we could
+issue the query::
+
+    >>> Entry.objects.filter(authors__name=F('blog__name'))
+
+.. versionadded:: 1.3
+
+For date and date/time fields, you can add or subtract a ``datetime.timedelta``
+object.  The following would return all entries that were modified more than 3 days
+after they were published::
+   
+    >>> from datetime import timedelta
+    >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
+
+Atalho para pk
+--------------
+
+Por conveniência, o Django fornece um atalho para pesquisas com ``pk``, que
+significa "chave primária".
+
+No exemplo ``Blog`` model, a chave primária é o campo ``id``, então estas três
+regras são equivalente::
+
+    >>> Blog.objects.get(id__exact=14) # Forma explicita
+    >>> Blog.objects.get(id=14) # __exact é implícito
+    >>> Blog.objects.get(pk=14) # pk implica em id__exact
+
+O uso de ``pk`` não é limitado a consultas ``__exact`` -- qualquer termo de
+consulta pode ser combinado com ``pk`` para executar uma consulta sobre a chave
+primária de um model::
+
+    # Pega as entradas dos blogs com id 1, 4 e 7
+    >>> Blog.objects.filter(pk__in=[1,4,7])
+
+    # Pega todas as entradas do blog com id > 14
+    >>> Blog.objects.filter(pk__gt=14)
+
+Pesquisas com ``pk`` também podem funcionar através de joins. Por exemplo, estas
+três regras são equivalentes::
+
+    >>> Entry.objects.filter(blog__id__exact=3) # Froma explicita
+    >>> Entry.objects.filter(blog__id=3)        # __exact é implícito
+    >>> Entry.objects.filter(blog__pk=3)        # __pk implica em __id__exact
+
+Escapando sinais de porcentagem e underscores em consultas LIKE
+---------------------------------------------------------------
+
+Os campos de pesquisa que equacionam consultas SQL ``LIKE`` (``iexact``,
+``contains``, ``icontains``, ``startswith``, ``istartswith``, ``endswith``
+e ``iendswith``) terão automaticamente escapados os dois caracteres especiais
+usados no ``LIKE`` -- o sinal de porcentagem e o underscore. (Numa regra
+``LIKE``, o sinal de porcentagem significa um coringa de multiplos caracteres e
+o underscore significa um coringa de um único caractere.)
+
+Isso signifca que coisas devem funcionar intuitivamente, então a abstração não
+vaza. Por exemplo, para receber todas as entradas que contenham um sinal de
+porcentagem, é só usar o sinal de porcentagem como qualquer outro caractere::
+
+    >>> Entry.objects.filter(headline__contains='%')
+
+O Django se encarrega de escapar para você; o SQL resultante parecerá com algo
+assim:
+
+.. code-block:: sql
+
+    SELECT ... WHERE headline LIKE '%\%%';
+
+O mesmo serve para undescores. Ambos, sinais de porcentagem e undersocres, são
+tratados para você transparentemente.
+
+.. _caching-and-querysets:
+
+Cacheamento e QuerySets
+-----------------------
+
+Cada ``QuerySet`` contém um cache, para minizar o acesso ao banco de dados. É
+importante entender como ele funciona, a fim de se escrever um código mais
+eficiente.
+
+Num ``QuerySet`` recem criado, o cache está vazio. Na primeira vez que um
+``QuerySet`` for avaliado -- e, por isso, uma consulta ao banco de dados
+acontece -- o Django salva o resultado da consulta num cache de ``QuerySet`` e
+retorna os resultado que foram explicitamente requisitados (e.g., o próximo
+elemento, se o ``QuerySet`` estiver sendo iterado). Avaliações subsequentes de
+um ``QuerySet`` reusam os resultados cacheados.
+
+Mantenha esse comportamento de cache em mente, pois ele pode morder você se você
+não usar seus ``QuerySet``\s correntamente. Por exemplo, a seguir serão criados
+dois ``QuerySet``\s, eles serão avaliados, e mostrados na tela::
+
+    >>> print [e.headline for e in Entry.objects.all()]
+    >>> print [e.pub_date for e in Entry.objects.all()]
+
+Isso significa que a mesma consulta ao banco de dados  será executada duas
+vezes, efetivamente dobrando sua carga sobre o banco de dados. Também, há a
+possibilidade de duas listas que podem não incluir os mesmos dados do banco,
+pois uma ``Entry`` pode ter sido adicionada ou deletada na fração de segundo que
+divide as duas requisições.
+
+Para evitar este problema, simplesmente salve o ``QuerySet`` e reuse-o::
+
+    >>> queryset = Poll.objects.all()
+    >>> print [p.headline for p in queryset] # Avalia o query set.
+    >>> print [p.pub_date for p in queryset] # Re-usa o que está em cache.
+
+Consultas complexas com objetos Q
+=================================
+
+Consultas com palavras chaves -- no ``filter()``, etc. -- são mescladas com
+"AND". Se você precisa executar consultas mais complexas (por exemplo, consultas
+com ``OR``), você pode usar objetos ``Q``.
+
+Um objeto ``Q`` (``django.db.models.Q``) é um objeto usado para encapsular uma
+coleção de argumentos nomeados. Estes argumentos são especificados assim como
+nos "Campos de pesquisa" acima.
+
+Por exemplo, este objeto ``Q`` encapsula uma única consulta ``LIKE``::
+
+    Q(question__startswith='What')
+
+Objetos ``Q`` podem ser combinados usando os operadores ``&`` e ``|``. Quando um
+operador é usado em dois objetos ``Q``, ele produz um novo objeto ``Q``.
+
+Por exemplo, esta regra produz um único objeto ``Q`` que representa o "OR" ou
+duas consultas ``"question__startwith"``::
+
+    Q(question__startswith='Who') | Q(question__startswith='What')
+
+Este é equivalente a seguinte clausula SQL ``WHERE``::
+
+    WHERE question LIKE 'Who%' OR question LIKE 'What%'
+
+Você pode compor declarações de complexidade arbitrária combinando objetos ``Q``
+com os operadores ``&`` e ``|`` e usar o agrupamento paramétrico. Também,
+objetos ``Q`` podem ser negados usando o operador ``~``, permitindo combinações
+entre consultas normais e negadas (``NOT``)::
+
+    Q(question__startswith='Who') | ~Q(pub_date__year=2005)
+
+Cada função de pesquisa que recebe argumentos nomeados (e.g. ``filter()``,
+``exclude()``, ``get()``) podem também ser passados para um ou mais objetos
+``Q`` como um argumento posicional. Se você fornece vários argumentos de objeto
+``Q`` para uma função de pesquisa, os argumentos serão mesclados com "AND". Por
+exemplo::
+
+    Poll.objects.get(
+        Q(question__startswith='Who'),
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+    )
+
+... isso se traduz aproximadamente no SQL::
+
+    SELECT * from polls WHERE question LIKE 'Who%'
+        AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')
+
+Funções de pesquisa podem combinar o uso de objetos ``Q`` e argumentos nomeados.
+Todos os argumentos fornecidos para uma função de pesquisa (sejam eles agumentos
+ou objetos ``Q``) são mesclados com "AND". No entanto, se um objeto ``Q`` é
+fornecido, ele deve preceder a definição de qualquer argumento nomeado.
+Por exemplo::
+
+    Poll.objects.get(
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
+        question__startswith='Who')
+
+... poderia ser uma consulta válida, equivalente ao exemplo anterior; mas::
+
+    # CONSULTA INVÁLIDA
+    Poll.objects.get(
+        question__startswith='Who',
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)))
+
+... não seria válida.
+
+.. seealso::
+
+    O `exemplos do OR`_ nos unit tests do Django é mostrado alguns possíveis
+    usos do ``Q``.
+
+    .. _exemplos do OR: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/or_lookups/models.py
+
+Comparando objetos
+==================
+
+Para comparar duas instâncias de model, é só usar o operador de comparação
+padrão do Python, dois sinais de igual: ``==``. Por trás das cenas, o que é
+comparado é a chave primária dos dois models.
+
+Usando o exemplo ``Entry`` acima, as duas declarações a seguir são
+equivalentes::
+
+    >>> some_entry == other_entry
+    >>> some_entry.id == other_entry.id
+
+Se uma chave primária de um model não é chamada de ``id``, não tem problema.
+As comparações sempre usaram a chave primária, seja lá como for chamada. Por
+exemplo, se uma chave primária de um model é chamada ``name``, estas duas
+declarações são equivalentes::
+
+    >>> some_obj == other_obj
+    >>> some_obj.name == other_obj.name
+
+.. _topics-db-queries-delete:
+
+Deletando objetos
+=================
+
+O método delete, convenientemente é chamado ``delete()``. Este método deleta
+imediatamente o objeto e não retorna valor. Exemplo::
+
+    e.delete()
+
+Você pode também deletar objetos em grupos. Todo ``QuerySet`` tem um método
+``delete()``, que deleat todos os seus membros.
+
+Por exemplo, isso deleta todos os objetos ``Entry`` com um ``pub_date`` do ano
+2005::
+
+    Entry.objects.filter(pub_date__year=2005).delete()
+
+Tenha em mente que isso irá, sempre que possível, ser executado puramente em
+SQL, sendo assim o método ``delete()`` de instâncias de objeto individuais não
+precisaram ser chamadas durante o processo. Se você forneceu um método
+``delete()`` a uma classe model e quer se assegurar de que ele será chamado,
+você precisa deletar as instâncias "manualmente" (e.g., iterando sobre o
+``QuerySet`` e chamando o ``delete()`` de cada objeto individualmente) ao invés
+de usar um método ``delete()`` de grupo do ``QuerySet``.
+
+Quando o Django deleta um objeto, ele emula o comportamento de restrições
+(CONSTRAINT) do SQL ``ON DELETE CASCADE`` -- em outras palavras, quaisquer
+objetos que possuam uma chave estrangeira apontando ao objeto que está para ser
+deletado, também será deletado com ele. Por exemplo::
+
+    b = Blog.objects.get(pk=1)
+    # Isso irá deletar o Blog e todos os seus objetos Entry.
+    b.delete()
+
+.. versionadded:: 1.3
+    This cascade behavior is customizable via the
+    :attr:`~django.db.models.ForeignKey.on_delete` argument to the
+    :class:`~django.db.models.ForeignKey`.
+
+Note que ``delete()`` é o único método de ``QuerySet`` que não é exposto num
+``Manager`` em si. Este é um mecanismo de segurança para previnir que você
+acidentalmente requisite ``Entry.objects.delete()``, e apague *todas* as
+entradas. Se você deseja *deletar* todos os objetos, então você deve
+explicitamente requisitas uma consulta completa::
+
+    Entry.objects.all().delete()
+
+.. _topics-db-queries-update:
+
+Atualizando vários objetos de uma vez
+=====================================
+
+As vezes você quer atribuir um valor em particular a um campo de todos os
+objetos de um  ``QuerySet``. Você pode fazer isso com o método ``update()``.
+Por exemplo::
+
+    # Atualiza todos os headlines com o pub_date em 2007.
+    Entry.objects.filter(pub_date__year=2007).update(headline='Everything is the same')
+
+Você somente pode setar compos não relacionados e campos ``ForeignKey`` usando
+este método, e o valor que você configurar o campo deve ser um valor nativo do
+Python (i.e., você não pode configurar um campo para ser igual a algum outro
+campo nesse momento).
+
+Para atualizar campos ``ForeignKey``, configure o novo valor na nova instância
+de model que você deseja apontar. Exemplo::
+
+    >>> b = Blog.objects.get(pk=1)
+
+    # Muda todos os Entry que pretençam a este Blog.
+    >>> Entry.objects.all().update(blog=b)
+
+O método ``update()`` é aplicado instantâneamente e não retorna valores (
+semelhante ao ``delte()``). A única restrição do ``QuerySet`` que foi atualizado
+é que ele só pode acessar uma tabela do banco de dados, a tabela principal do
+model.
+
+Tenha cuidado que o método ``update()`` é convertido diretamente numa declaração
+SQL. Ela é uma operação de massa para atualizações direta. Não executa qualquer
+método ``save()`` no seus models, ou emite os sinais ``pre_save`` ou
+``post_save`` (que são consequencias da chamada do ``save()``). Se você deseja
+salvar todos os ítens de um ``QuerySet`` assegure-se de que o método ``save()``
+seja chamada em cada instância, você não precisa de nenhuma função especial para
+lidar com isso. É só iterar sobre eles e chamar o ``save()``::
+
+    for item in my_queryset:
+        item.save()
+
+Objetos relacionados
+====================
+
+Quando você define um relacionamento num model (i.e., um ``ForeignKey``,
+``OneToOneField``, ou ``ManyToManyField``), instâncias desse model terão uma API
+conveniente para acessar os objetos relacionados.
+
+Usando os models do topo dessa página, por exemplo, um objeto ``Entry`` ``e``
+pode obter seus objetos ``Blog`` associados acessando um atributo ``blog` :
+``e.blog``.
+
+(Por trás das cenas, esta funcionalidade é implementada por descriptors_ Python.
+Isso realmente não deve importar, mas nós o apontamos aqui só por curiosidade.)
+
+O Django também cria uma API de acessores para o *outro* lado do
+relacionamento -- o link de um model relacionado para outro que define o
+relacionamento. Por exemplo, um objeto ``Blog`` ``b`` tem acesso a lista de
+todos os objetos ``Entry`` relacionados via o atributo ``entry_set``:
+``b.entry_set.all()``.
+
+Todos os exemplos nesta seção usam as amostras de model ``Blog``, ``Author`` e
+``Entry`` definidos no topo dessa página.
+
+.. _descriptors: http://users.rcn.com/python/download/Descriptor.htm
+
+Relacionamentos Um-para-muitos (One-to-many)
+--------------------------------------------
+
+Forward
+~~~~~~~
+
+Se um modem tem uma ``ForeignKey``, instâncias desse model terão acesso ao
+objeto relacionado (foreign) via um simples atribuot do model.
+
+Exemplo::
+
+    >>> e = Entry.objects.get(id=2)
+    >>> e.blog # Retorna o objeto Blog relacionado.
+
+Você pode obter um conjunto via um atributo foreing-key. Assim como você pode
+esperar, mudanças na chave estrangeira não são salvas no banco de dados até que
+você chame ``save()``.
+Exemplo::
+
+    >>> e = Entry.objects.get(id=2)
+    >>> e.blog = some_blog
+    >>> e.save()
+
+Se um campo ``ForeignKey`` tem ``null=True`` (i.e., ele permite valores
+``NULL``), você pode atrituir ``None`` a ele. Exemplo::
+
+    >>> e = Entry.objects.get(id=2)
+    >>> e.blog = None
+    >>> e.save() # "UPDATE blog_entry SET blog_id = NULL ...;"
+
+Remeter acesso a relacionamentos one-to-many é chacheado na primeira vez em que
+o objeto relacionado é acessado. Subsequentes acessos a chave estrangeira do
+mesmo objeto são cacheados. Exemplo::
+
+    >>> e = Entry.objects.get(id=2)
+    >>> print e.blog  # Consluta o banco de dados para receber o Blog associado.
+    >>> print e.blog  # Não consulta o banco de dados. usa a versão em cache.
+
+Note que o método ``select_related()`` do ``QuerySet`` recursivamente prepopula
+o cache de todos os relacionamentos one-to-many de antemão. Exemplo::
+
+    >>> e = Entry.objects.select_related().get(id=2)
+    >>> print e.blog  # Não consulta o banco de dados; usa a versão em cache.
+    >>> print e.blog  # Não consulta o banco de dados; usa a versão em cache.
+
+.. _backwards-related-objects:
+
+Seguindo os relacionamentos "backward"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Se um model tem uma ``ForeignKey``, instâncias da chave estrangeira do model
+terão acesso ao ``Manager`` que retorna todas as instâncias do primeiro model.
+Por padrão, esse ``Manager`` é chamado ``FOO_set``, onde ``FOO`` é o nome do
+model fonte, em minusculo. Esse ``Manager`` retorna ``QuerySets``, que podem ser
+filtrados e manipulados como descrito na seção "Recebendo objetos" acima.
+
+Exemplo::
+
+    >>> b = Blog.objects.get(id=1)
+    >>> b.entry_set.all() # Retorna todas os objetos Entry relacionados ao Blog.
+
+    # b.entry_set é um Manager que retorna QuerySets.
+    >>> b.entry_set.filter(headline__contains='Lennon')
+    >>> b.entry_set.count()
+
+Você pode sobrescrever o nome ``FOO_set`` através do parâmetro ``related_name``
+na definição do ``ForeignKey``. Por exemplo, se o model ``Entry`` fosse alterado
+para ``blog = ForeignKey(Blog, related_name='entries')``, o código do exemplo
+acima ficaria::
+
+    >>> b = Blog.objects.get(id=1)
+    >>> b.entries.all() # Retorna todos os objetos Entry relacionados ao Blog.
+
+    # b.entries é um Manager que retorna QuerySets.
+    >>> b.entries.filter(headline__contains='Lennon')
+    >>> b.entries.count()
+
+Você não pode acessar um ``Manager`` ``ForeignKey`` de uma classe no sentido
+contrário; ele deve ser acessado de uma instância::
+
+    >>> Blog.entry_set
+    Traceback:
+        ...
+    AttributeError: "Manager must be accessed via instance".
+
+Além dos métodos do ``QuerySet`` definidos em "Recebendo objetos" acima, o
+``Manager`` ``ForeignKey`` possui métodos adicionais utilizados para lidar com
+conjuntos de objetos relacionados. Uma sinopse de cada um está abaixo, e
+detalhes completos podem ser encontrados na :doc:`referência de objetos
+relacionados </ref/models/relations>`.
+
+``add(obj1, obj2, ...)``
+    Adiciona os objetos do model especificados ao conjunto do objeto
+    relacionado.
+
+``create(**kwargs)``
+    Cria um novo objeto, salva-o e coloca-o no conjunto do objeto relacionado.
+    Retorna o novo objeto criado.
+
+``remove(obj1, obj2, ...)``
+    Remove o os objetos model especificados do conjunto do objeto relacinoado.
+
+``clear()``
+    Remove todos os objetos do conjunto do objeto relacionado.
+
+Para atribuir memtros de um conjunto relacionado de uma só vez, é só atribuí-lo
+de qualquer objeto iterável. O iterável pode conter instâncias de objetos, ou
+só uma lista de valores de chave primária. Por exemplo::
+
+    b = Blog.objects.get(id=1)
+    b.entry_set = [e1, e2]
+
+Neste exemplo, ``e1`` e ``e2`` pode ser uma instância completa do Entry, ou
+valores inteiros de chave primária.
+
+Se o método ``clear()`` estiver disponível, quaisquer objetos pre-existentes
+serão removidos do ``entry_set`` antes de todos os objetos no iterável (neste
+caso, uma lista) são adicionados ao conjunto. Se o método ``clear()`` *não*
+estiver disponível, todos os objetos no iterável serão adicionados sem remover
+quaisquer elementos existentes.
+
+Cada operação "reverse" descrita nesta seção tem um efeito imediato sobre o
+banco de dados. Toda adição, criação e deleção é imediatamente e automaticamente
+salva no banco de dados.
+
+Relacionamentos muitos-para-muitos (Many-to-many)
+-------------------------------------------------
+
+Amdas as extremidades de um relacionamento many-to-many obtêem uma API de acesso
+automática para o outro lado. A API funciona exatamente como o "backward" do
+relacionamento one-to-many, acima.
+
+A única diferença é na nomeação do atributo: O model que define o
+``ManyToManyField`` usa o nome do atributo do próprio campo, considerando que o
+model "reverso" usa o nome do model original em minúscula, mais ``'_set'``
+(assim como reverso de relacionamentos one-to-many).
+
+Com um exemplo fica mais fácil entender::
+
+    e = Entry.objects.get(id=3)
+    e.authors.all() # Retorna todos os objetos Author desta Entry.
+    e.authors.count()
+    e.authors.filter(name__contains='John')
+
+    a = Author.objects.get(id=5)
+    a.entry_set.all() # Retorna todos os objetos Entry desse Author.
+
+Como ``ForeignKey``, o ``ManyToManyField`` pode especificar ``related_name``.
+No exemplo acima, se o ``ManyToManyField`` em ``Entry`` tivesse especificado
+``related_name='entries'``, então cada instância de ``Author`` teria um atributo
+``entries`` ao invés de ``entry_set``.
+
+Relacionamentos Um-pra-um (One-to-one)
+--------------------------------------
+
+Relacionamentos One-to-one são muito similares aos relacionamentos many-to-many.
+Se você define uma :class:`~django.db.models.OneToOneField` no seu model, as
+instâncias desse model terão acesso ao objeto relacionado atráves de um simples
+atributo de um model.
+
+Por exemplo::
+
+    class EntryDetail(models.Model):
+        entry = models.OneToOneField(Entry)
+        details = models.TextField()
+
+    ed = EntryDetail.objects.get(id=2)
+    ed.entry # Retorna o objeto Entry relacionado.
+
+A diferença vem nas consultas "reverse". O model relacionado num relacionamento
+one-to-one também tem acesso ao objeto :class:`~django.db.models.Manager`, mas
+esse :class:`~django.db.models.Manager` representa um único objeto, ao invés de
+uma coleção de objetos::
+
+    e = Entry.objects.get(id=2)
+    e.entrydetail # retorna o objeto EntryDetail relacionado
+
+Se nenhum objeto foi atribuído a este relacionamento, o Django lançará uma
+exceção ``DoesNotExist``.
+
+Instâncias podem ser atribuídas ao relacionamento reverso da mesma forma como
+você poderia atribuir ao relacionamento forward::
+
+    e.entrydetail = ed
+
+Como é possível relacionamentos backward?
+-----------------------------------------
+
+Outro mapeador de objeto relacional requer que você defina relacionamentos em
+abos os lados. Os desenvolvedores do Django acreditam que isso é uma violação do
+princípio DRY (Don't Repeat yourself), então o Django somente requer que você
+defina o relacionamento de um lado.
+
+Mas como é possível, dado que uma classe model não sabe qual outros classes
+model estão relacionadas até que essas outras classes sejam carregadas?
+
+A resposta está na configuração :setting:`INSTALLED_APPS`. A primeira vez em que
+qualquer model é carregado, o Django itera sobre todos os models no
+:setting:`INSTALLED_APPS` e cria os relacionamentos backward na memória se
+necessário. Essencialmente, uma das funções do :setting:`INSTALLED_APPS` é dizer
+ao Django os domínios dos models.
+
+Consultas sobre objetos relacionados
+------------------------------------
+
+Consultas envolvendo objetos relacionados seguem as mesmas regras de consultas
+envolvendo campos de valores normais. Quando especificar o valor para combinar
+numa consulta, você pode usar tanto uma instância de objeto em si, quando o
+valor da chave primária do objeto.
+
+Por exemplo, se você tem um objeto Blog ``b`` com ``id=5``, as três consultas
+seguintes seriam idênticas::
+
+    Entry.objects.filter(blog=b) # Consulta usando intância de objeto
+    Entry.objects.filter(blog=b.id) # Consulta usando id da instância
+    Entry.objects.filter(blog=5) # Consulta usando id diretamente
+
+Voltando ao SQL puro
+====================
+
+Se você se encontrou precisando escrever uma consulta SQL que é mais complexa
+para o mapeador de banco de dados do Django, você pode voltar ao modo de
+consultas em SQL puro.
+
+A forma preferida para fazer isso é dando ao model, métodos personalizados ou
+métodos personalizados ao manager, que executam consultas. Embora não há nada
+no Django que *obrigue* consultas de banco de dados estarem na camada de model,
+esta abordagem mantem toda a lógica de acesso a dados num único lugar, o que é
+mais inteligente para organização de código. Para instruções, veja
+:doc:`/topics/db/sql`.
+
+Finalmente, é importante notar que a camada de banco de dados do Django é
+meramente uma interface para o seu banco de dados. Você pode acessar seu banco
+por outras ferramentas, linguagens de programação ou frameworkds de banco de
+dados; não há nada específico do Django sobre o seu banco de dados.
+

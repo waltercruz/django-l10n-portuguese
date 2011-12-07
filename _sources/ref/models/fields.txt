@@ -1,0 +1,1010 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 14924 $
+..   $TranslationAuthors: Walter Cruz, Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-models-fields:
+
+=============================
+Referência de campos do Model
+=============================
+
+.. module:: django.db.models.fields
+   :synopsis: Tipos de campos embutidos.
+
+.. currentmodule:: django.db.models
+
+Este documento contém todos os detalhes sobre todas as `opções dos campos`_ e
+`tipos de campos`_ que o Django oferece.
+
+.. seealso::
+
+    Se os campos embutidos não atendem a sua necessidade, você pode facilmente
+    :ref:`escrever seus próprios campos de model <howto-custom-model-fields>`.
+
+.. note::
+
+    Tecnicamente, estes models são definidos em :mod:`django.db.models.fields`,
+    mas por conveniência eles são importados dentro do :mod:`django.db.models`;
+    a convenção padrão é usar ``from django.db import models`` e referir-se aos
+    campos como ``models.<Foo>Field``.
+
+.. _common-model-field-options:
+
+Opções dos campos
+=================
+
+O seguintes argumentos estão disponíveis para todos os tipos de campos. Todos
+são opcionais.
+
+``null``
+--------
+
+.. attribute:: Field.null
+
+Se ``True``, o Django irá gravar  valores vazios como ``NULL`` no banco de dados.
+O padrão é ``False``.
+
+Repare que strings vazias sempre serão gravadas como strings vazias, não
+como ``NULL``. Use o ``null=True`` apenas para campos que não sejam texto, como
+inteiros, booleanos e datas. Para ambos os tipos de campos, você irá precisar
+configurar o ``blank=True`` se você quer permitir valores vazios nos formulários,
+como o parâmetro :attr:`~Field.null` afeta somente o banco de dados (veja
+:attr:`~Field.blank`, abaixo).
+
+Evite o uso de :attr:`~Field.null` em campos de texto, como :class:`CharField` e
+:class:`TextField` a menos que você tenha uma ótima razão. Se um campo baseado
+em texto tem ``null=True``, isso significa que ele tem dois valores possíveis
+para "sem dados": ``NULL``, e a string vazia. Na maioria dos casos, é redundante
+ter dois valores possíveis para "sem dados;" a convenção do Django é usar a
+string vazia, não ``NULL``.
+
+.. note::
+
+    Ao usar o Oracle como backend, a opção ``null=True`` será convertida
+    para campos de texto que podem ser vazios, e o valor ``NULL`` será gravado
+    para indicar a string vazia.
+
+``blank``
+---------
+
+.. attribute:: Field.blank
+
+Se ``True``, o campo pode ser vazio. o padrão é ``False``.
+
+Note que isso é diferente de :attr:`~Field.null`. :attr:`~Field.null` é
+puramente relacionado ao banco de dados, e :attr:`~Field.blank` é relacionado
+com validação. Se um campo tem ``blank=True``, a validação na administração do
+Django irá permitir a entrada de um valor vazio. Se um campo tem
+``blank=False``, o campo será obrigatório.
+
+``choices``
+-----------
+
+.. attribute:: Field.choices
+
+Um iterável(e.g., uma lista ou tupla) de tupla duplas para usar como escolhas
+para esse campo.
+
+Se fornecido, a administração do Django irá usar uma caixa de seleção no lugar
+de um campo de texto padrão e irá limitar as escolhas as opções dadas.
+
+Uma lista de opções parece com isto::
+
+    YEAR_IN_SCHOOL_CHOICES = (
+        ('FR', 'Freshman'),
+        ('SO', 'Sophomore'),
+        ('JR', 'Junior'),
+        ('SR', 'Senior'),
+        ('GR', 'Graduate'),
+    )
+
+O primeiro elemeno de cada tupla é o verdadeiro valor a ser gravado. O segundo
+elemento é o nome legível por humanos para essa opção.
+
+A lista de escolhas pode ser definida como uma parte de sua classe de modelo::
+
+    class Foo(models.Model):
+        GENDER_CHOICES = (
+            ('M', 'Male'),
+            ('F', 'Female'),
+        )
+        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+
+ou fora da sua classe de modelo::
+
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+    class Foo(models.Model):
+        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+
+Você pode também coletar suas escolhas disponíveis em grupos nomeados que podem
+ser usados com o proposito de organização::
+
+    MEDIA_CHOICES = (
+        ('Audio', (
+                ('vinyl', 'Vinyl'),
+                ('cd', 'CD'),
+            )
+        ),
+        ('Video', (
+                ('vhs', 'VHS Tape'),
+                ('dvd', 'DVD'),
+            )
+        ),
+        ('unknown', 'Unknown'),
+    )
+
+O primeiro elemento em cada tupla é o nome a ser aplicado no grupo. O segundo
+elemento é um iterável de tuplas duplas, com cada tupla dupla contendo um valor
+e um nome, legível para humanos, para uma opção. Opções agrupadas podem ser
+combinadas com opções não agrupadas em uma única lista (como a opção `unknown`
+deste exemplo).
+
+Para cada campo de modelo que tem o :attr:`~Field.choices` configurado, o Django
+adicionará um método para obter o valor legível para o valor atual do campo.
+Veja :meth:`~django.db.models.Model.get_FOO_display` na documentação da API de
+banco de dados.
+
+Finalmente, veja que as opções podem ser qualquer objeto iterável -- não
+necessariamente uma lista ou tupla. Isso permite qu evocê construa suas opções
+dinamicamente. Mas se você se pegar hackeando o :attr:`~Field.choices` para ser
+dinâmico, você provavelmente deveria estar usando uma tabela do banco de dados
+com uma :class:`ForeignKey`. :attr:`~Field.choices` deve ser usados para dados
+que não mudem muito, ou que não mudem nunca.
+
+``db_column``
+-------------
+
+.. attribute:: Field.db_column
+
+O nome da coluna do banco de dados a ser usada com esse campo. Se não for
+informada, o Django irá usar o nome do campo.
+
+Se o nome da sua coluna no banco de dados é uma palavra chave SQL reservada, ou
+contém caracteres que não são permitidos em nomes de variáveis no Python --
+notadamente, o hífen tudo bem. O Django escapa os nomes de colunas e tabelas por
+trás dos panos.
+
+``db_index``
+------------
+
+.. attribute:: Field.db_index
+
+Se``True``, djadmin:`django-admin.py sqlindexes <sqlindexes>` irá gerar uma
+declaração ``CREATE INDEX`` para esse campo.
+
+``db_tablespace``
+-----------------
+
+.. attribute:: Field.db_tablespace
+
+.. versionadded:: 1.0
+
+O nome do tablespace no banco de dados a ser usado para esse o índice desse
+campo, se esse campo é indexado. O padrão é a configuração
+:setting:`DEFAULT_INDEX_TABLESPACE`  do projeto, se configurado, ou o
+:attr:`~Field.db_tablespace` do modelo, se houver. Se o backend não suporta
+tablespaces, essa opção é ignorada.
+
+``default``
+-----------
+
+.. attribute:: Field.default
+
+O valor padrão para o campo. Pode ser também um objeto chamável. Se
+for um chamável, será chamado a cada vez que um novo objeto for criado.
+
+``editable``
+------------
+
+.. attribute:: Field.editable
+
+Se ``False``, o campo não será editável na administração ou por formulários
+gerados automaticamente a partir de models. O padrão é ``True``.
+
+``help_text``
+-------------
+
+.. attribute:: Field.help_text
+
+"Ajuda" extra a ser exibida subre o campo na administração de formulários
+do objeto. É útil para documentação, mesmo que seu objeto não tenha um
+formulário administrativo.
+
+Note que esse valor *não* é escapado pelo processamento de HTML ao ser exibido
+na interface administrativa. Isso permite que você inclua HTML  no
+:attr:`~Field.help_text` se você desejar. Por exemplo::
+
+	help_text="Por favor use o seguinte formato: <em>DD/MM/YYYY</em>."
+
+Como alternativa você pode utilizar texto plano e
+``django.utils.html.escape()`` para escapar quaisquer caracter especial do HTML.
+
+``primary_key``
+---------------
+
+.. attribute:: Field.primary_key
+
+Se ``True``, esse campo será a chave primária para o modelo.
+
+Se você não especificar ``primary_key=True`` para nenhum campo no seu modelo, o
+Django irá adicionar automaticamente um :class:`IntegerField` para ser a chave
+primária, então você não precisa setar ``primary_key=True`` sobre algum de seus
+campos, a menos que você queira sobrescrever o comportamento de chave primária
+padrão. Para mais, veja :ref:`automatic-primary-key-fields`.
+
+``primary_key=True`` implica em :attr:`blank=False <Field.blank>`,
+:attr:`null=False <Field.null>`` e :attr:`unique=True <Field.unique>`. Somente
+uma chave primária é permitida por objeto.
+
+``unique``
+----------
+
+.. attribute:: Field.unique
+
+Se ``True``, esse campo deve ser único na tabela.
+
+Isso é garantido no banco de dedos e no formulário de administração do Django. Se
+você tentar salvar um modelo com um valor duplicado em um campo
+:attr:`~Field.unique`, uma exceção :exc:`django.db.IntegrityError` será lançada
+pelo método :meth:`~django.db.models.Model.save` do modelo.
+
+Esta opção é válida para todos os tipos de campos exceto :class:ManyToManyField`
+e :class:`FileField`.
+
+``unique_for_date``
+-------------------
+
+.. attribute:: Field.unique_for_date
+
+Configure isso para o nome de um campo :class:`DateField` ou
+:class:`DateTimeField` para exigir que esse campo seja único para o valor da data.
+
+Por exemplo, se você tem um campo ``title`` que tem
+``unique_for_date="pub_date"``, o Django não irá permitir a criação
+de dois registros com o mesmo ``title`` e ``pub_date``.
+
+Isso é reforçado no nível do formulário de administração do Django, mas não no
+banco de dados.
+
+``unique_for_month``
+--------------------
+
+.. attribute:: Field.unique_for_month
+
+Semelhante ao :attr:`~Field.unique_for_date`, mas requer que o campo seja único
+com respeito ao mês.
+
+``unique_for_year``
+-------------------
+
+.. attribute:: Field.unique_for_year
+
+Semelhante a :attr:`~Field.unique_for_date` e :attr:`~Field.unique_for_month`.
+
+``verbose_name``
+-------------------
+
+.. attribute:: Field.verbose_name
+
+Um nome, legível para humanos, para o campo. Se o nome prolíxo não for dado, o
+Django criará um automaticamente, usando o nome do campo, convertendo os
+underscores em espaços. Veja
+:ref:`Nomes de campos  por extenso <verbose-field-names>`.
+
+.. _model-field-types:
+
+Tipos de campos
+===============
+
+.. currentmodule:: django.db.models
+
+``AutoField``
+-------------
+
+.. class:: AutoField(**options)
+
+Um :class:`IntegerField` que incrementa seu valor automaticamente de acordo com os
+IDs disponíveis. Você normalmente não precisa usá-lo diretamente; um campo de
+chave primária será automaticamente adicionado ao seu modelo se você não
+especificar um. Veja :ref:`automatic-primary-key-fields`.
+
+``BooleanField``
+----------------
+
+.. class:: BooleanField(**options)
+
+Um campo Verdadeiro/Falso.
+
+O site administrativo representa-o como uma checkbox.
+
+.. versionchanged:: 1.2
+
+    In previous versions of Django when running under MySQL ``BooleanFields``
+    would return their data as ``ints``, instead of true ``bools``.  See the
+    release notes for a complete description of the change.
+
+``CharField``
+-------------
+
+.. class:: CharField(max_length=None, [**options])
+
+Um campo string, para campos texto de tamanhos pequeno e médio.
+
+Para grandes quantidades de texto, use :class:`django.db.models.TextField`.
+
+A administração representa-o como um ``<input type="text">`` (um input de uma
+única linha).
+
+:class:`CharField` tem um argumento extra obrigatório:
+
+.. attribute:: CharField.max_length
+
+    O tamanho máximo (em caracteres) do campo. O ``max_length`` é verificado a
+    nível de banco de dados e na validação do Django.
+
+.. note::
+
+    Se você estiver escrevendo uma aplicação que deve ser portável para vários
+    backends de banco de dados, você deve estar alerta, pois há restrições para
+    o ``max_length`` em alguns backends. Leia as :doc:`notas sobre backend de
+    bancos de dados </ref/databases>`.
+
+.. admonition:: MySQL users
+
+    Se você estiver usando este campo com MySQLdb 1.2.2 e a colação ``utf8_bin``
+    (que *não* é a padrão), há alguns problemas que deve ter em mente. Leia as
+    :ref:`notas do banco de dados MySQL <mysql-collation>` para detalhes.
+
+``CommaSeparatedIntegerField``
+------------------------------
+
+.. class:: CommaSeparatedIntegerField(max_length=None, [**options])
+
+Um campo de inteiros separados por vírgulas. Como no :class`CharField`, o
+argumento :attr:`~CharField.max_length` é obrigatório e atente para as
+portabilidades mencionadas.
+
+``DateField``
+-------------
+
+.. class:: DateField([auto_now=False, auto_now_add=False, **options])
+
+Uma data, representada por uma instância ``datetime.date`` do Python. Tem alguns
+poucos argumentos extra, opcionais:
+
+.. attribute:: DateField.auto_now
+
+    Configura o campo automaticamente para a hora em que o objeto é salvo. Útil
+    para campos de hora da "última modificação". Note que *sempre* é usada a
+    data atual, não é apenas um valor padrão que você pode sobrescrever.
+
+.. attribute:: DateField.auto_now_add
+
+    Configura automaticamente o campo para a data em que ele foi primeiramente
+    criado. Útil para a criação de carimbos de data. Note que *sempre* é usada a
+    data atual, não é apenas um valir padrão que você pode sobrescrever.
+
+A administração representa isso como um ``<input type="text">`` com um
+calendário JavaScript, e um atalho para "Hoje."  O calendário JavaScript sempre
+irá iniciar a semana no Domingo.
+
+``DateTimeField``
+-----------------
+
+.. class:: DateTimeField([auto_now=False, auto_now_add=False, **options])
+
+A date and time, represented in Python by a ``datetime.datetime`` instance.
+Um campo de data e hora. Tem as mesmas opções extras de :class:`DateField`.
+
+A administração representa esse campo como dois campos ``<input type="text">``,
+com atalhos JavaScript.
+
+``DecimalField``
+----------------
+
+.. versionadded:: 1.0
+
+.. class:: DecimalField(max_digits=None, decimal_places=None, [**options])
+
+Um número decimal de precisão fixa, representado no Python por uma instância de
+:class:`~decimal.Decimal`. Possui dois argumentos **obrigatórios**:
+
+.. attribute:: DecimalField.max_digits
+
+    O número máximo de dígitos permitidos no número.
+
+.. attribute:: DecimalField.decimal_places
+
+    O número de casas decimais para salvar com o número.
+
+Por exemplo, para gravar números até 999 com uma precisão de 2 casas decimais,
+você deve usar::
+
+    models.DecimalField(..., max_digits=5, decimal_places=2)
+
+E para guardar números de até aproximadamente um bilhão, com uma precisão de 10
+casas decimais::
+
+    models.DecimalField(..., max_digits=19, decimal_places=10)
+
+A administração representa isso como um ``<input type="text">`` (um input de uma
+única linha).
+
+``EmailField``
+--------------
+
+.. class:: EmailField([max_length=75, **options])
+
+Um :class:`CharField` que verifica se o valor é um e-mail válido.
+
+``FileField``
+-------------
+
+.. class:: FileField(upload_to=None, [max_length=100, **options])
+
+Um campo para upload de arquivo. Possui um argumento **obrigatório**
+
+.. note::
+    O argumentos ``primary_key`` e ``unique`` não são suportados, e lançarão um
+    ``TypeError`` se usados.
+
+Has one **required** argument:
+
+.. attribute:: FileField.upload_to
+
+    Um caminho no seu sistema de arquivos local que será adicionado a sua
+    configuração :setting:`MEDIA_ROOT` para determinar o valor do atributo
+    :attr:`~django.core.files.File.url`.
+
+    Esse caminho pode conter `formatação strftime`_, que será substituído pela
+    data/hora do upload do arquivo (para que os arquivos enviados não encham
+    o diretório fornecido).
+
+    .. versionchanged:: 1.0
+
+    Este pode também ser um chamável, como uma função, que será chamada para
+    obter o caminho do upload, incluíndo o nome do arquivo. Este chamável deve
+    ser preparado para receber dois argumentos, e retornar um caminho no estilo
+    Unix (com barras) para serem passados ao longo do sistema de armazenamento.
+    Os dois argumentos que serão passados são:
+
+        ======================  ================================================
+        Argumento               Descrição
+        ======================  ================================================
+        ``instance``            Uma instância do model onde o ``FileField`` é
+                                definido. Mais especificamente, esta é a
+                                instância particular onde o arquivo atual está
+                                atachado.
+
+                                Na maioria dos casos, este objeto não terá sido
+                                salvo no banco de dados ainda, então se ele usa
+                                o padrão ``AutoField``, *ele pode não ter ainda
+                                um valor para seu campo de chave primária*.
+
+        ``filename``            O nome que foi originalmente dado para o
+                                arquivo. Este pode ou não pode ser levado em
+                                conta durante a definição do caminho de destino
+                                final.
+        ======================  ================================================
+
+Também há um argumento opcional:
+
+.. attribute:: FileField.storage
+
+    .. versionadded:: 1.0
+
+    Opcional. Um objeto storage, que manipula o armazenamento e recebimento de
+    seus arquivos. Veja :doc:`/topics/files` para mais detalhes de como prover
+    este objeto.
+
+A administração representa esse campo como um ``<input type="file">`` (um widget de
+upload de arquivo).
+
+O uso de um :class:`FileField` ou um :class:`ImageField` (veja abaixo) em um
+modelo requer alguns passos adicionais:
+
+    1. No seu arquivo de configurações, você precisa definir
+       :setting:`MEDIA_ROOT` como o caminho completo para o diretório onde você
+       gostaria que o Django guardasse os arquivos enviados. (Por questões de
+       performance, esses arquivos não são guardados no banco de dados). Defina
+       o  :setting:`MEDIA_URL` como a URL pública desse diretório. Assegure-se
+       de que esse diretório tenha permissão de escrita pela conta do usuário
+       que executa o servidor web.
+
+    2. Adiciona o :class:`FileField` ou :class:`ImageField` ao seu modelo,
+       definindo a opção :attr:`~FileField.upload_to` para dizer ao Django para
+       qual subdiretório do :setting:`MEDIA_ROOT` ele deve enviar os arquivos.
+
+    3. Tudo o que será gravado no seu banco de dados é o caminho para o arquivo
+       (relativo ao :setting:`MEDIA_ROOT`). Você muito provavalmente usará a
+       função :attr:`~django.core.files.File.url` fornecida pelo Django. Por
+       exemplo, se seu :class:`ImageField` é chamado de ``mug_shot``, você pode
+       obter a URL absoluta para sua imagem em um template com
+       ``{{ object.get_mug_shot.url }}``.
+
+Por exemplo, digamos que o seu :setting:`MEDIA_ROOT` esteja configurado para
+``'/home/media'``, e o :attr:`~FileField.upload_to` está configurado para
+``'photos/%Y/%m/%d'``. A parte ``'%Y/%m/%d'`` do :attr:`~FileField.upload_to` é
+a `formatação strftime`_; ``'%Y'`` é o ano com quatro digítos,
+``'%m'`` é o mês com dois dígitos e ``'%d'`` é o dia com dois dígitos. Se você
+enviar um arquivo em 15 de janeiro de 2007, ele será salvo no diretório
+``/home/media/photos/2007/01/15``.
+
+Se você quer obter o nome do arquivo no disco, ou a URL que se refere àquele
+arquivo, ou o tamanho do arquivo, você pode usar os métodos
+:attr:`~django.core.files.File.name`, :attr:`~django.core.files.File.url` e :attr:`~django.core.files.File.size`. Veja :doc:`/topics/files`.
+
+Observe que independente da forma que você lida com arquivos enviados, você deve
+prestar muita atennção para onde você os está enviado e para quais tipos eles
+são, para evitar furos de segurança. *Valide todos os arquivos enviados* para
+assegurar-se que eles são o que você pensa que eles são. Por exemplo, se você
+permite que alguém envie arquivos sem validação, para um diretório que esteja
+dentro do document root do seu servidor web, então alguém poderia enviar um
+script CGI ou PHP e executar esse script visitando essa URL em seu site URL. Não
+permita isso.
+
+.. versionadded:: 1.0
+   O argumento ``max_length`` foi adicionado nesta versão.
+
+Por padrão, instâncias de :class:`FileField` são criadas como colunas
+``varchar(100)`` no seu banco de dados. Assim como nos outros campos, você
+pode mudar o tamanho máximo usando o argumento :attr:`~CharField.max_length`.
+
+.. _`formatação strftime`: http://docs.python.org/lib/module-time.html#l2h-1941
+
+``FilePathField``
+-----------------
+
+.. class:: FilePathField(path=None, [match=None, recursive=False, max_length=100, **options])
+
+Um campo :class:`CharField` cujas escolhas são limitadas a nomes de arquivos em
+um certo diretório no sistema de arquivos. Tem três argumentos especiais, sendo
+o primeiro **obrigatório**:
+
+.. attribute:: FilePathField.path
+
+    Obrigatório. O caminho absoluto para um diretório no sistema de arquivos a
+    partir de onde o :class:`FilePathField` deve obter suas opções. Exemplo:
+    ``"/home/images"``.
+
+.. attribute:: FilePathField.match
+
+    Opcional. Uma expressão regular, como uma string, que o
+    :class:`FilePathField` usará para filtrar os nomes dos arquivos. Perceba que
+    a regex será aplicada apenas ao nome do aruqivo, não ao caminho completo.
+    Exemplo: ``"foo.*\.txt$"``, que irá casar um arquivo chamado ``foo23.txt``
+    mas não ``bar.txt`` ou ``foo23.gif``.
+
+.. attribute:: FilePathField.recursive
+
+    Opcional. ``True`` ou``False``. O padrão é ``False``. Especifica se todos os
+    subdiretórios do :attr:`~FilePathField.path` devem ser incluídos.
+
+E é claro que todos esses argumentos podem ser usados juntos.
+
+A única pegadinha em potencial é que o :attr:`~FilePathField.match` aplica-se ao
+nome básico do arquivo, não ao caminho completo. Assim, esse exemplo::
+
+    FilePathField(path="/home/images", match="foo.*", recursive=True)
+
+...irá casar ``/home/images/foo.gif`` mas não ``/home/images/foo/bar.gif``
+porque o argumento :attr:`~FilePathField.match` aplicase aos nomes básicos dos
+arquivos (``foo.gif`` e ``bar.gif``).
+
+
+.. versionadded:: 1.0
+    O argumento ``max_length`` foi adicionado nesta versão.
+
+Por padrão, instâncias de :class:`FilePathField` são criadas como colunas
+``varchar(100)`` no seu banco de dados. Assim como nos outros campos, você pode
+mudar o tamanho máximo usando o argumento :attr:`~CharField.max_length`.
+
+``FloatField``
+--------------
+
+.. class:: FloatField([**options])
+
+.. versionchanged:: 1.0
+
+Um número de ponto flutuante, representado no Python como uma instância de um
+``float``.
+
+A administração representa-o como um ``<input type="text">`` (um input de uma
+única linha).
+
+``ImageField``
+--------------
+
+.. class:: ImageField(upload_to=None, [height_field=None, width_field=None, max_length=100, **options])
+
+Semelhante ao :class:`FileField`, mas verifica se o objeto enviado é uma imagem
+válida. Tem dois argumentos extras opcionais:
+
+.. attribute:: ImageField.height_field
+
+    Nome de um campo de model que será auto-populado com a altura da imagem toda
+    vez que a instância do model for salva.
+
+.. attribute:: ImageField.width_field
+
+    Nome de um campo de model que será auto-populado com a largura da imagem
+    toda vez que a instância do model for salva.
+
+Além dos métodos especiais que estão disponíveis para :class:`FileField`, um
+class:`ImageField` também tem os atributos ``File.height`` e ``File.width``.
+Veja :doc:`/topics/files`.
+
+Requer a `Python Imaging Library`_.
+
+.. _Python Imaging Library: http://www.pythonware.com/products/pil/
+
+.. versionadded:: 1.0
+   O argumento attr:`~CharField.max_length` foi adicionado nesta versão.
+
+Por padrão, instâncias de :class:`ImageField` são criadas como colunas
+``varchar(100)`` no seu banco de dados. Assim como nos outros campos, você pode
+mudar o tamanho máximo usando o argumento :attr:`~CharField.max_length`.
+
+``IntegerField``
+----------------
+
+.. class:: IntegerField([**options])
+
+Um inteiro. A administração representa-o como um ``<input type="text">`` (um
+input de uma única linha).
+
+``IPAddressField``
+------------------
+
+.. class:: IPAddressField([**options])
+
+Um endereço IP, em formato texto (ex: "192.0.2.30"). A administração
+representa-o como um ``<input type="text">`` (um input de uma única linha).
+
+``NullBooleanField``
+--------------------
+
+.. class:: NullBooleanField([**options])
+
+Como um :class:`BooleanField`, mas permite ``NULL`` como uma das opções. Use-o
+no lugar de um :class:`BooleanField` com ``null=True``. A administração
+representa-o como uma caixa ``<select>`` com as escolhas "Unknown", "Yes" e "No".
+
+``PositiveIntegerField``
+------------------------
+
+.. class:: PositiveIntegerField([**options])
+
+Como um :class:`IntegerField`, mas deve ser positivo.
+
+``PositiveSmallIntegerField``
+-----------------------------
+
+.. class:: PositiveSmallIntegerField([**options])
+
+Como um :class:`PositiveIntegerField`, mas somente permite valores até um certo
+ponto (de acordo com o tipo de banco de dados utilizado).
+
+``SlugField``
+-------------
+
+.. class:: SlugField([max_length=50, **options])
+
+:term:`Slug` é um termo jornalístico. Um slug é um apelido curto para algo,
+contendo somente letras, números, underscores ou hífens. Eles normalmente são
+usados em URLs.
+
+Semelhantemente ao CharField, você pode especificar o
+:attr:`~CharField.max_length` (leia a nota sobre portabilidade de banco de
+dados e :attr:`~CharField.max_length` nesta seção também). Se o
+:attr:`~CharField.max_length` não for especificado, o Django irá usar um tamanho
+padrão de 50.
+
+Implica em :attr:`Field.db_index`.
+
+É muitas vezes mais útil para pre-popular automaticamente um campo baseado no
+no seu valor. Você pode fazer isso automaticamente no admin usando
+:attr:`~django.contrib.admin.ModelAdmin.prepopulated_fields`.
+
+``SmallIntegerField``
+---------------------
+
+.. class:: SmallIntegerField([**options])
+
+Como um :class:`IntegerField`, mas somente permite valores até um certo
+ponto (dependendo do banco de dados).
+
+``TextField``
+-------------
+
+.. class:: TextField([**options])
+
+Um campo de texto longo. A administração o representa como uma ``<textarea>``
+(um input de múltiplas linhas).
+
+.. admonition:: MySQL users
+
+    Se você estiver usando este campo com MySQLdb 1.2.1p2 e a colação
+    ``utf8_bin`` (que *não* é a padrão), há alguns problemas que deve ter em
+    mente. Leia as :ref:`notas do banco de dados MySQL <mysql-collation>` para
+    detalhes.
+
+
+``TimeField``
+-------------
+
+.. class:: TimeField([auto_now=False, auto_now_add=False, **options])
+
+Uma hora. Representado em Python por uma instância ``datetime.time``. Aceita as
+mesmas opções de auto preenchimento dos campos :class:`DateField`.
+
+A administração o representa como uma ``<input type="text">`` com alguns
+atalhos JavaScript.
+
+``URLField``
+------------
+
+.. class:: URLField([verify_exists=True, max_length=200, **options])
+
+Um :class:`CharField` para uma URL. Possui um argumento extra opicional:
+
+.. attribute:: URLField.verify_exists
+
+    Se a opção for ``True`` (padrão), a existência da URL será verificada
+    (i.e., será verificado se a URL carrega e não retorna uma reposta 404). It
+    should be noted that when using the single-threaded development server,
+    validating a url being serverd by the same server will hang.
+    This should not be a problem for multithreaded servers.
+
+A administração representa-o como um ``<input type="text">`` (um input de uma
+única linha).
+
+Como toda subclasse de :class:`CharField`, :class:`URLField` recebe um argumento
+opcional, :attr:`~CharField.max_length`. Se você não especificar o
+:attr:`~CharField.max_length`, o padrão de 200 é usado.
+
+``XMLField``
+------------
+
+.. class:: XMLField(schema_path=None, [**options])
+
+Um :class:`TextField` que verifica se o valor é um XML válido de acordo com um
+esquema fornecido. Possui um argumento obrigatório:
+
+.. attribute:: schema_path
+
+    O caminho no sistema de arquivos para um esquema RelaxNG_ que será usado
+    para a validação do campo.
+
+.. _RelaxNG: http://www.relaxng.org/
+
+Campos de relacionamento
+========================
+
+.. module:: django.db.models.fields.related
+   :synopsis: Related field types
+
+.. currentmodule:: django.db.models
+
+O Django também define um conjunto de campos que representam relacionamentos.
+
+.. _ref-foreignkey:
+
+``ForeignKey``
+--------------
+
+.. class:: ForeignKey(othermodel, [**options])
+
+Uma reção muitos-para-um. Requer um argumento posicional: a classe com a qual o
+model está relacionada.
+
+.. _recursive-relationships:
+
+Para criar um relacionamento recursivo -- um objeto que tem um relacionamento
+muitos-para-um consigo mesmo -- use ``models.ForeignKey('self')``.
+
+.. _lazy-relationships:
+
+Se você precisa criar um relacionamento em um model que não não foi definido
+ainda, você pode usar o nome do model, ao invés do objeto em si::
+
+    class Car(models.Model):
+        manufacturer = models.ForeignKey('Manufacturer')
+        # ...
+
+    class Manufacturer(models.Model):
+        # ...
+
+.. versionadded:: 1.0
+
+Para referir-se a models definidos em outra aplicação, você pode explicitamente
+especificar um model com a label completa da aplicação. Por exemplo, se o model
+``Manufacturer`` acima é definido em outra aplicação chamada ``production``,
+você precisará usar::
+
+    class Car(models.Model):
+        manufacturer = models.ForeignKey('production.Manufacturer')
+
+Este tipo de referência pode ser útil para resolver dependências de import
+circular entre duas aplicações.
+
+Representação no banco de dados
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Por trás das cenas, o Django adiciona ``"_id"`` ao nome do campo para criar suas
+nomes de colunas. No exemplo acima, a tabela para o model ``Car`` terá uma
+coluna ``manufacturer_id``. (Você pode mudar isto sendo explicito, especificando
+:attr:`~Field.db_column`) No entando, seu código nunca deve lidar com o nome da
+coluna do banco de dados, a menos que você esteja escrevendo SQL customizado.
+Você sempre trabalhará com os nomes de campos de seu objeto model.
+
+.. _foreign-key-arguments:
+
+Argumentos
+~~~~~~~~~~
+
+A :class:`ForeignKey` aceita um conjunto extra de argumentos -- todos opcionais
+-- que definem detalhes de como a relação funciona.
+
+.. attribute:: ForeignKey.limit_choices_to
+
+    Um dicionário de argumentos e valores aparente (veja
+    :doc:`/topics/db/queries`) que limita as escolhas disponíveis para o admin
+    sobre este objeto. Use isto com funções do módulo do Python ``datetime``
+    para limitar as escolhas dos objetos por data. Por exemplo::
+
+        limit_choices_to = {'pub_date__lte': datetime.now}
+
+    permite somente a escolha de objetos relatados com uma ``pub_date`` anterior
+    a data/hora atual.
+
+    Ao invés de um dicionário este pode ser também um objeto
+    :class:`~django.db.models.Q` (um objeto com um método :meth:`get_sql`) para
+    consultas mais complexas.
+
+    O ``limit_choices_to`` não tem efeito sobre os FormSets inline que são
+    criados para mostra objetos relacionados no admin.
+
+.. attribute:: ForeignKey.related_name
+
+    O nome para ser usado pelo relacionamento do objeto relacionado para este.
+    Veja a :ref:`documentação de objetos relacionados
+    <backwards-related-objects>` para uma explicação completa e exemplos. Note
+    que você deve setar este valor quando estiver definindo relacionamentos em
+    :ref:`models abstratos <abstract-base-classes>`; e quando você utilizar
+    :ref:`alguma sintaxe especial <abstract-related-name>` disponível.
+
+.. attribute:: ForeignKey.to_field
+
+    O campo para qual o objeto relacionado aponta. Por padrão, o Django usa a
+    chave primária dos objetos relacionados.
+
+.. _ref-manytomany:
+
+``ManyToManyField``
+-------------------
+
+.. class:: ManyToManyField(othermodel, [**options])
+
+Um relacionamento muitos-para-muitos. Requer um argumento posicional: a classe
+com a qual o model se relaciona. Isso funciona exatamente da mesma forma como um
+:class:`ForeignKey`, incluíndo todas as opções em relação a relacionamentos
+:ref:`recursivos <recursive-relationships>` e :ref:`lazy <lazy-relationships>`.
+
+Representação no banco de dados.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Por trás das cenas, o Django cria uma tabela de ligação intermediária para
+representar o relacionamento muitos-para-muitos. Por padrão, o nome desta tabela
+é gerado usando os nomes das duas tabelas juntos. Desde que alguns bancos de
+dados não suportam nomes de tabelas acima de um certo comprimento, estes nomes
+serão automaticamente truncados para 64 caracteres e um hash de unicidade será
+utilizado. Isto significa que pode ver nomes de tabelas como
+``author_books_9cdf4``; isto é perfeitamente normal.
+Você pode manualmente provê o nome da tabela de ligação usando a opção
+:attr:`~ManyToManyField.db_table`.
+
+.. _manytomany-arguments:
+
+Argumentos
+~~~~~~~~~~
+
+O :class:`ManyToManyField` aceita um conjunto extra de argumentos -- todos
+opicionais -- que controlam como o relacionamento funciona.
+
+.. attribute:: ManyToManyField.related_name
+
+    O mesmo que :attr:`ForeignKey.related_name`.
+
+.. attribute:: ManyToManyField.limit_choices_to
+
+    O mesmo que :attr:`ForeignKey.limit_choices_to`.
+
+    O ``limit_choices_to`` não surte efeito quando usado em um
+    ``ManyToManyField`` com uma tabela intermediária personalizada usando o
+    parâmetro :attr:`~ManyToManyField.through`.
+
+.. attribute:: ManyToManyField.symmetrical
+
+    Somente usado na definição de ManyToManyFields no self. Considere o seguinte
+    model::
+
+        class Person(models.Model):
+            friends = models.ManyToManyField("self")
+
+    Quando o Django processa este model, ele identifica que ele tem um
+    :class:`ManyToManyField` para si mesmo, e como um resultado, ele não
+    adiciona um atributo ``person_set`` a classe ``Person``. Em vez disso, o
+    :class:`ManyToManyField` é assumido como simétrico -- que quer dizer, se eu
+    sou seu amigo, então você é meu amigo.
+
+    Se você não quer simetria em relacionamentos muitos-para-muitos com
+    ``self``, mude :attr:`~ManyToManyField.symmetrical` para ``False``. Isto
+    forçará o Django a adicionar um descrito para o reverso do relacionamento,
+    permitindo relacionamentos :class:`ManyToManyField` serem não-simétricos.
+
+.. attribute:: ManyToManyField.through
+
+    O Django gerará automaticamente uma tabela para gerenciar o relacionamento
+    muitos-para-muitos. Entretanto, se você quer especificar manualmente a
+    tabela intermediária, você pode usar a opção
+    :attr:`~ManyToManyField.through` para especificar o model do Django que
+    representa a tabela intermediária que você deseja usar.
+
+    O uso mais comum para esta opção é quando você quer associar
+    :ref:`dados extra com um relacionamento muitos-para-muitos
+    <intermediary-manytomany>`.
+
+.. attribute:: ManyToManyField.db_table
+
+    O nome da tabela a ser criada para o armazenamento dos dados
+    muitos-para-muitos. Se este não for fornecido, o Django assumirá um nome
+    padrão baseado nos nomes das duas tabelas que serão juntadas.
+
+.. _ref-onetoone:
+
+``OneToOneField``
+-----------------
+
+.. class:: OneToOneField(othermodel, [parent_link=False, **options])
+
+Um relacionamento um-para-um. Conceitualmente, este é similar a um
+:class:`ForeignKey` com :attr:`unique=True <Field.unique>`, mas o lado "reverso"
+da relação retornará diretamente um único objeto.
+
+Este é mais útil como  a chave primária de um model que "extende" outro model de
+alguma forma; a :ref:`multi-table-inheritance` é implementada adicionando uma
+relação implícita um-para-um do model filho para o model pai, por exemplo.
+
+Um argumento posicional é obrigatório: a classe para a qual o model será
+relacionado. Isso funciona exatamente da mesma forma como se fosse um
+:class:`ForeignKey`, incluíndo todas as opções em relação a relacionamentos
+:ref:`recursivos <recursive-relationships>` e :ref:`lazy <lazy-relationships>`.
+
+.. _onetoone-arguments:
+
+Adicionalmente, ``OneToOneField`` aceita todos os argumentos extra aceitos pelo
+:class:`ForeignKey`, mais um argumento extra:
+
+.. attribute:: OneToOneField.parent_link
+
+    Quando ``True`` e usado em um model que herda de outro model (contreto),
+    indica que este campo deve ser usado como o link para a classe pai, ao invés
+    de um ``OneToOneField`` extra que normalmente seria implicitamente criado
+    pela subclasse.
+

@@ -1,0 +1,1531 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11268 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+=================================
+Autenticação de Usuário no Django
+=================================
+
+.. module:: django.contrib.auth
+   :synopsis: Framework de autenticação do Django.
+
+O Django vem com um sistema de autenticação de usuário. Ele manipula contas de
+usuário, grupos, permissões e sessões de usuário baseados em cookie. Este
+documento explica como as coisas funcionam.
+
+Visão geral
+===========
+
+O sistema de autenticação consiste em:
+
+    * Usuários
+
+    * Permissões: Flags binário (yes/no) designando quando um usuário pode
+      executar uma certa tarefa.
+    * Grupos: Uma forma genérica de aplicar labels e permissões para mais de um
+      usuário.
+    * Mensagens: Uma forma simples de enfilerar mensagens para um dado usuário.
+
+Instalação
+==========
+
+O suporte de autenticação é empacotado como uma aplicação Django em
+``django.contrib.auth``. Para instalá-lo, faça o seguinte:
+
+    1. Coloque ``'django.contrib.auth'`` na sua configuração :setting:`INSTALLED_APPS`.
+    2. Execute o comando ``manage.py syncdb``.
+
+Note que o arquivo padrão :file:`settings.py` criado pelo
+:djadmin:`django-admin.py startproject` inclui ``'django.contrib.auth'`` no
+:setting:`INSTALLED_APPS` por conveniência. Se seu :setting:`INSTALLED_APPS` já
+contém ``'django.contrib.auth'``, sinta-se livre para executar o
+:djadmin:`manage.py syncdb` novamente; você pode rodar este comando quantas
+vezes você quiser, e cada vez ele somente intalará o que for necessário.
+
+O comando :djadmin:`syncdb` cria as tabelas necessárias no banco de dados, cria
+objetos de permissão para todas as aplicações instaladas que precisem deles, e
+abre um prompt para você criar uma conta de super usuário na primeira vez em que
+rodá-lo.
+
+Uma vez que você tenha feito estes passos, é isso.
+
+Usuários
+========
+
+.. class:: models.User
+
+Referência de API
+-----------------
+
+Campos
+~~~~~~
+
+.. class:: models.User
+
+    O objetos :class:`~django.contrib.auth.models.User` possuem os seguintes
+    campos:
+
+    .. attribute:: models.User.username
+
+        Obrigatório. 30 caracteres ou menos. Somente caracteres alfanuméricos
+        (letras, dígitos e underscores).
+
+    .. attribute:: models.User.first_name
+
+        Opcional. 30 caracteres ou menos.
+
+    .. attribute:: models.User.last_name
+
+        Opcional. 30 caracteres ou menos.
+
+    .. attribute:: models.User.email
+
+        Opcional. Endereço de e-mail.
+
+    .. attribute:: models.User.password
+
+        Obrigatório. Um hash da senha, e metadados sobre a senha. (O Django não
+        armazena a senha pura.) Senhas puras podem ser arbitrariamente longas e
+        podem conter qualquer caracter. Veja a seção "Senhas" abaixo.
+
+    .. attribute:: models.User.is_staff
+
+        Booleano. Determina se este usuário pode acessar o site admin.
+
+    .. attribute:: models.User.is_active
+
+        Booleano. Determina se esta conta de usuário deve ser considerada ativa.
+        Seta este flag para ``False`` ao invés de deletar as contas.
+
+        Isto não controla se o usuário pode ou não logar-se. Nada no caminho da
+        autenticação verifica o flag ``is_active``, então se você deseja
+        rejeitar um login baseado no ``is_active`` estando ``False``, cabe a
+        você verificar isto no seu próprio view de login. Entretanto,
+        verificação de permissões usando métodos como
+        :meth:`~models.User.has_perm` averiguam este flag e sempre retornarão
+        ``False`` para usuários inativos.
+
+    .. attribute:: models.User.is_superuser
+
+        Booleano. Determina que este usuário tem todas as pemissões sem
+        explicitamente atribuí-las.
+
+    .. attribute:: models.User.last_login
+
+        Um datetime do último login do usuário. É setado para a data/hora atual
+        por padrão.
+
+    .. attribute:: models.User.date_joined
+
+        Um datetime determinando quando a conta foi criada. É setada com a
+        data/hora atual por padrão quando a conta é criada.
+
+Métodos
+~~~~~~~
+
+.. class:: models.User
+
+    Os objetos :class:`~django.contrib.auth.models.User` tem dois campos
+    muitos-para-muitos: models.User. ``groups`` e ``user_permissions``.
+    O objetos :class:`~django.contrib.auth.models.User` podem acessar seus
+    objetos relacionados da mesma forma como qualquer outro
+    :doc:`models do Django </topics/db/models>`:
+
+    .. code-block:: python
+
+        myuser.groups = [group_list]
+        myuser.groups.add(group, group, ...)
+        myuser.groups.remove(group, group, ...)
+        myuser.groups.clear()
+        myuser.user_permissions = [permission_list]
+        myuser.user_permissions.add(permission, permission, ...)
+        myuser.user_permissions.remove(permission, permission, ...)
+        myuser.user_permissions.clear()
+
+    Além destes métodos automáticos da API, os objetos
+    :class:`~django.contrib.auth.models.User` tem os seguintes métodos
+    customizados:
+
+    .. method:: models.User.is_anonymous()
+
+        Sempre retorna ``False``. Esta é a forma de diferenciar os objetos
+        :class:`~django.contrib.auth.models.User` e
+        :class:`~django.contrib.auth.models.AnonymousUser`.
+        Geralmente, você deve preferir usar o método
+        :meth:`~django.contrib.auth.models.User.is_authenticated()` para isto.
+
+    .. method:: models.User.is_authenticated()
+
+        Sempre retorna ``True``. Esta é a forma de dizer se o usuário foi
+        autenticado. Isto não implica em quaisquer permissões, e não verifica se
+        o usuário está ativo - ele somente indica que o usuário forneceu um nome
+        e senha válidos.
+
+    .. method:: models.User.get_full_name()
+
+        Retorna o :attr:`~django.contrib.auth.models.User.first_name` mais o
+        :attr:`~django.contrib.auth.models.User.last_name`, com um espaço entre
+        eles.
+
+    .. method:: models.User.set_password(raw_password)
+
+        Seta a senha do usuário a partir de uma dada string, preocupe-se com em
+        gerar um hash da senha. Não salva objeto
+        :class:`~django.contrib.auth.models.User`.
+
+    .. method:: models.User.check_password(raw_password)
+
+        Retorna ``True`` se a string é a senha correta para o usuário. (Este se
+        encarrega de tirar o hash da senha e fazer a comparação.)
+
+    .. method:: models.User.set_unusable_password()
+
+        .. versionadded:: 1.0
+
+        Marca o usuário como não tendo senha definida. Isto não é o mesmo que
+        ter uma senha em branco. O
+        :meth:`~django.contrib.auth.models.User.check_password()` para este
+        usuário nunca retornará ``True``. Não salva o objeto
+        :class:`~django.contrib.auth.models.User`.
+
+        Você pode precisar disto se a autenticação para sua aplicação ocorre
+        contra uma fonte externa como um diretório LDAP.
+
+    .. method:: models.User.has_usable_password()
+
+        .. versionadded:: 1.0
+
+        Retorna ``False`` se
+        :meth:`~django.contrib.auth.models.User.set_unusable_password()` foi
+        chamado para este usuário.
+
+    .. method:: models.User.get_group_permissions()
+
+        Retorna uma lista de strings de permissão que o usuário tem, através
+        de seus grupos.
+
+    .. method:: models.User.get_all_permissions()
+
+        Retorna uma lista de strings de permissão que o usuário possui, ambos
+        através de permissões de grupo e usuário.
+
+    .. method:: models.User.has_perm(perm)
+
+        Retorna ``True`` se o usuário tem uma permissão específica, onde perm é
+        no formato ``"<nome da aplicação>.<nome do model em minúsculo>"``. Se o
+        usuário é inativo, este método sempre retornará ``False``.
+
+    .. method:: models.User.has_perms(perm_list)
+
+        Retorna ``True`` se o usuário tem cada uma das permissões especificadas,
+        onde cada permissão está no formato ``"package.codename"``. Se o usuário
+        estiver inativo, este método sempre retornará ``False``.
+
+    .. method:: models.User.has_module_perms(package_name)
+
+        Retorna ``True`` se o usuário tem alguma permissão no dado pacote (a
+        label da aplicação Django). Se o usuário está inativo, este método
+        sempre retornará ``False``.
+
+    .. method:: models.User.get_and_delete_messages()
+
+        Retorna uma lista de objetos
+        :class:`~django.contrib.auth.models.Message` da fila do usuário e deleta
+        as mensagens da fila.
+
+    .. method:: models.User.email_user(subject, message, from_email=None)
+
+        Envia um e-mail para o usuário. Se
+        :attr:`~django.contrib.auth.models.User.from_email` é ``None``, o Django
+        usa o :setting:`DEFAULT_FROM_EMAIL`.
+
+    .. method:: models.User.get_profile()
+
+        Retorna um profile específico de site para este usuário. Lança
+        :exc:`django.contrib.auth.models.SiteProfileNotAvailable` se o site
+        atual não permitir profiles. Para informações de como definir um profile
+        de usuário para um site específico, veja a seção sobre `armazenando
+        informações adicionais de usuário`_ abaixo.
+
+.. _armazenando informações adicionais de usuário: #storing-additional-information-about-users
+
+Gerente de funções
+~~~~~~~~~~~~~~~~~~
+
+.. class:: models.UserManager
+
+    O model :class:`~django.contrib.auth.models.User` tem um gerenciador
+    customizado que possu os segunintes helpers:
+
+    .. method:: models.UserManager.create_user(username, email, password=None)
+
+        Cria, salva e retorna um :class:`~django.contrib.auth.models.User`.
+        Os atributos :attr:`~django.contrib.auth.models.User.username`,
+        :attr:`~django.contrib.auth.models.User.email` e
+        :attr:`~django.contrib.auth.models.User.password` são setados com os
+        dados fornecidos, e o :class:`~django.contrib.auth.models.User.User`
+        recebe ``is_active=True``.
+
+        Se nenhuma senha é fornecida,
+        :meth:`~django.contrib.auth.models.User.set_unusable_password()` será
+        chamado.
+
+        Veja `Criando usuários`_ para mais exemplos de uso.
+
+    .. method:: models.UserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+
+        Retorna uma senha randômica com o comprimento e string, de caracteres
+        permitidos, fornecida. (Note que o valor padrão de ``allowed_chars``
+        não contém letras que causem confusão, incluindo:
+
+            * ``i``, ``l``, ``I``, e ``1`` (letra minúscula i, letra minúscula
+              L, letra maiúscula i, e o número um)
+            * ``o``, ``O``, e ``0`` (letra maiúscula o, letra minúscula o,
+              e zero)
+
+Uso básico
+----------
+
+.. _topics-auth-creating-users:
+
+Criando usuários
+~~~~~~~~~~~~~~~~
+
+A forma mais básica de criar usuário é usar o helper
+:meth:`~django.contrib.auth.models.UserManager.create_user` que vem com o
+Django::
+
+    >>> from django.contrib.auth.models import User
+    >>> user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+
+    # Neste ponto, user é um objeto User que já foi salvo no banco de dados.
+    # Você pode continuar a mudar seus atributos se você quiser mudar outros
+    # campos.
+    >>> user.is_staff = True
+    >>> user.save()
+
+Você pode também criar usuários usando o site admin do Django. Assumindo que
+você o tenha habilitado e adicionado-o a URL ``/admin/``, a página "Add user"
+está em ``/admin/auth/user/add``. Você deve também ver um link para "Users" na
+seção "Auth" da página principal do admin. A página "Add user" do admin é
+diferente de uma página normal do admin, pois exige que você escolha um nome de
+usuário e senha antes de permitir você editar o resto dos do usuário.
+
+Também perceba: se você quiser que sua própria conta esteja habilitada a criar
+usuários usando o site admin do Django, você precisará dar a você mesmo
+permissão para adicionar e mudar usuários (i.e., as permissões "Add user" e
+"Change user"). Se sua conta tem permissão para adicionar usuários mas não para
+mudá-las, você não será hábil a adicionar usuários. Porque? Por que se você tem
+permissão para adicionar usuários, você tem o poder de criar super usuários, que
+podem então, por sua vez, mudar outros usuários. Então o Django requer permissão
+para adicionar *e* mudar como uma ligeira medida de segurança.
+
+
+Mudando senhas
+~~~~~~~~~~~~~~
+
+Mude uma senha com o :meth:`~django.contrib.auth.models.User.set_password()`:
+
+.. code-block:: python
+
+    >>> from django.contrib.auth.models import User
+    >>> u = User.objects.get(username__exact='john')
+    >>> u.set_password('new password')
+    >>> u.save()
+
+Não sete o atributo :attr:`~django.contrib.auth.models.User.password`
+diretamente a menos que vocÊ saiba o que está fazendo. Isto é explicado na
+próxima seção.
+
+Senhas
+------
+
+O atributo :attr:`~django.contrib.auth.models.User.password` de um objeto
+:class:`~django.contrib.auth.models.User` é uma string neste formato::
+
+    hashtype$salt$hash
+
+Que é o hastype, salt e hash, separados por um caracter dolar ('$').
+
+Hashtype é cada ``sha1`` (padrão), ``md5`` ou ``crypt`` -- o algorítimo usado
+para construir o hash sem volta da senha. O salt é uma string randômica que
+salga a senha pura criando o hash. Note que o método ``crypt`` é somente
+suportado em plataformas que possuem o módulo padrão do Python ``crypt``
+disponível.
+
+.. versionadded:: 1.0
+    Suporte para o módulo ``crypt`` é novo no Django 1.0.
+
+Por exemplo::
+
+    sha1$a1976$a36cc8cbf81742a8fb52e221aaeab48ed7f58ab4
+
+As funções :meth:`~django.contrib.auth.models.User.set_password` e
+:meth:`~django.contrib.auth.models.User.check_password` manipulam a configuração
+e verificam estes valores por trás das cenas.
+
+Nas versões anteriores do Django, como a 0.90, usavá-se simples hashes MD5 sem
+salt nas senhas. Por compatibilidade descendentes, estes ainda são suportados;
+eles seão convertidos automaticamente para o novo estilo na primeira vez que o
+:meth:`~django.contrib.auth.models.User.check_password()` funcionar corretamente
+para um certo usuário.
+
+Usuários Anonymous
+------------------
+
+.. class:: models.AnonymousUser
+
+    O :class:`~django.contrib.auth.models.AnonymousUser` é uma classe que
+    implementa a interface :class:`~django.contrib.auth.models.User`, com estas
+    diferenças:
+
+    * :attr:`~django.contrib.auth.models.User.id` é sempre ``None``.
+    * :attr:`~django.contrib.auth.models.User.is_staff` e
+      :attr:`~django.contrib.auth.models.User.is_superuser` são sempre
+      ``False``.
+    * :attr:`~django.contrib.auth.models.User.is_active` é sempre ``False``.
+    * :attr:`~django.contrib.auth.models.User.groups` e
+      :attr:`~django.contrib.auth.models.User.user_permissions` são sempre
+      vazios.
+    * :meth:`~django.contrib.auth.models.User.is_anonymous()` retorna ``True``
+      ao invés de ``False``.
+    * :meth:`~django.contrib.auth.models.User.is_authenticated()` retorna
+      ``False`` ao invés de ``True``.
+    * :meth:`~django.contrib.auth.models.User.has_perm()` sempre retorna
+      ``False``.
+    * :meth:`~django.contrib.auth.models.User.set_password()`,
+      :meth:`~django.contrib.auth.models.User.check_password()`,
+      :meth:`~django.contrib.auth.models.User.save()`,
+      :meth:`~django.contrib.auth.models.User.delete()`,
+      :meth:`~django.contrib.auth.models.User.set_groups()` e
+      :meth:`~django.contrib.auth.models.User.set_permissions()` lançam um
+      :exc:`NotImplementedError`.
+
+Ná prática, você provavelmente não precisará usar objetos
+:class:`~django.contrib.auth.models.AnonymousUser` você mesmo, mas eles serão
+utilizados por requisições Web, como explicado na próxima seção.
+
+.. _topics-auth-creating-superusers:
+
+Criando superusers
+------------------
+
+.. versionadded:: 1.0
+   O comando ``manage.py createsuperuser`` é novo.
+
+O :djadmin:`manage.py syncdb <syncdb>` conduz você a criar um superuser na
+primeira vez que você rodá-lo depois de adicionar ``'django.contri.auth'`` ao
+seu :setting:`INSTALLED_APPS`. Se você precisa criar um superuser um tempo
+depois, você pode usar o utilitário de linha de comando::
+
+    manage.py createsuperuser --username=joe --email=joe@example.com
+
+Você será perguntado por uma senha. Depois que você entra com uma,  o usuário
+será criado imediatamente. Se você deixar desligado as opções
+:djadminopt:`--username` ou :djadminopt:`--email`, ele pedirá a você estes
+valores.
+
+Se você estiver usando uma versão antiga do Django, a forma antiga de criar um
+superuser na linha de comando ainda funciona::
+
+    python /path/to/django/contrib/auth/create_superuser.py
+
+...onde :file:`/path/to` é o caminho para a base de código do Django dentro do
+seu sistema de arquivos. O comando ``manage.py`` é preferido porquê ele adivinha
+o caminho correto do ambiente por você.
+
+.. _auth-profiles:
+
+Armazenando informações adicionais sobre usuários
+-------------------------------------------------
+
+Se você quiser armazenar informações adicionais relacionadas aos seus usuários,
+o Django fornece um método para especificar um model relacionado específico do
+site -- denominado um "user profile" -- para este propósito.
+
+Para fazer uso deste recurso, devina um model com campos para as informações
+adicionais que você desejaria armazenas, ou métodos adicionais que você gostaria
+de ter disponível, e também adicione uma
+:class:`~django.db.models.Field.ForeignKey` de seu model para o model
+:class:`~django.contrib.auth.models.User`, especificado com ``unique=True`` para
+assegurar que somente uma instância seja criada para cada
+:class:`~django.contrib.auth.models.User`.
+
+Para indicar que este model é um model de "user profile" para um dado site,
+preencha no :file:`settings.py` o :setting:`AUTH_PROFILE_MODULE` com a string
+contendo os seguintes ítens, separados por um ponto:
+
+1. O nome da aplicação (case sensitive) em que o model do "user profile" é
+   definido (em outras palavras, o nome que foi passado para o
+   :djadmin:`manage.py startapp <startapp>` para criar a aplicação).
+
+2. O nome da classe do model (não case sensitive).
+
+Por exemplo, se o model do profile era uma classe chamada ``UserProfile`` e foi
+definida dentro de uma aplicação chamada ``accounts``, a configuração apropriada
+seria::
+
+    AUTH_PROFILE_MODULE = 'accounts.UserProfile'
+
+Quando um model de "user profile" foi definido e especificado desta maneira,
+cada objeto :class:`~django.contrib.auth.models.User` terá um método --
+:class:`~django.contrib.auth.models.User.get_profile()` -- que retorna a
+instância do model "user profile" associado com o
+:class:`~django.contrib.auth.models.User`.
+
+O método :class:`~django.contrib.auth.models.User.get_profile()`
+não cria o profile, se ele não existe. Você precisa registrar um manipulador
+para o sinal :attr:`django.db.models.signals.post_save` sobre o model User, e,
+no manipulador, se created=True, criar o profile associado.
+
+Para mais informações, veja o `Capítulo 12 do livro do Django`_.
+
+.. _Capítulo 12 do livro do Django: http://www.djangobook.com/en/1.0/chapter12/#cn222
+
+Autenticação em requisições Web
+===============================
+
+Até agora, este documento ocupou-se com as APIs de baixo nível para manipular
+objetos relacionados com autenticação. Num nível mais alto, o Django pode ligar
+este framework de autenticação dentro de seu sistema de :class:`objetos de
+requisição <django.http.HttpRequest>`.
+
+Primeiro, instale os middlewares
+:class:`~django.contrib.sessions.middleware.SessionMiddleware` e
+:class:`~django.contrib.auth.middleware.AuthenticationMiddleware` adicionando-os
+ao seu :setting:`MIDDLEWARE_CLASSES`. Veja a :doc:`documentação de sessões
+</topics/http/sessions>` para mais informações.
+
+Uma vez que tenha estes middlewares instalados, você estará apto a acessar
+:attr:`request.user <django.http.HttpRequest.user>` nos views.
+O :attr:`request.user <django.http.HttpRequest.user>` dará a você um objeto
+:class:`~django.contrib.auth.models.User` representando o usuário atualmente
+logado. Se um usuário não estiver logado, o
+:attr:`request.user <django.http.HttpRequest.user>` conterá uma instância do
+:class:`~django.contrib.auth.models.AnonymousUser` (veja a seção anterior).
+Você pode utilizar :meth:`~django.contrib.auth.models.User.is_authenticated()`,
+tipo:
+
+    if request.user.is_authenticated():
+        # Faça algo para usuários autenticados.
+    else:
+        # Faça algo para usuários anônimos.
+
+.. _howtologauserin:
+
+Como logar um usuário
+---------------------
+
+O Django fornece duas funções no :mod:`django.contrib.auth`:
+:func:`~django.contrib.auth.authenticate()` e
+:func:`~django.contrib.auth.login()`.
+
+.. function:: authenticate()
+
+    Para autenticar um dado username e senha, use
+    :func:`~django.contrib.auth.authenticate()`. Ele recebe dois argumentos
+    nomeados, ``username`` e ``password``, e retorna um objeto
+    :class:`~django.contrib.auth.models.User` se a senha for válida para este
+    username. Se a senha for inválida
+    :func:`~django.contrib.auth.authenticate()` retorna ``None``. Exemplo::
+
+        from django.contrib.auth import authenticate
+        user = authenticate(username='john', password='secret')
+        if user is not None:
+            if user.is_active:
+                print "Você forneceu um username e senha corretos!"
+            else:
+                print "Sua conta foi desabilitada!"
+        else:
+            print "Seu username e senha estavam incorretos."
+
+.. function:: login()
+
+    Para logar um usuário, em uma view, use
+    :func:`~django.contrib.auth.login()`. ele recebe um objeto
+    :class:`~django.http.HttpRequest` e objeto
+    :class:`~django.contrib.auth.models.User`. A função
+    :func:`~django.contrib.auth.login()` salva o ID do usuário na sessão, usando
+    o framework de sessão do Django, então, como mencionado acima, você
+    precisará assegurar-se de ter o middleware de sessão intalado.
+
+    Este exemplo mostra como você pode usar ambos
+    :func:`~django.contrib.auth.authenticate()` e
+    :func:`~django.contrib.auth.login()`::
+
+        from django.contrib.auth import authenticate, login
+
+        def my_view(request):
+            username = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    # Redirecione para uma página de sucesso.
+                else:
+                    # Retorna uma mensagem de erro de 'conta desabilitada' .
+            else:
+                # Retorna uma mensagem de erro 'login inválido'.
+
+.. admonition:: Calling ``authenticate()`` first
+
+    Quando você está manualmente logando um usuário, você *deve* chamar
+    :func:`~django.contrib.auth.authenticate()` antes de chamar
+    :func:`~django.contrib.auth.login()`.
+    A função :func:`~django.contrib.auth.authenticate()` seta um atributo sobre
+    o :class:`~django.contrib.auth.models.User` observando que o backend de
+    autenticação, autenticou o usuário com sucesso (veja a `documentação de
+    backends`_ para detalhes), e esta informação é necessária mais tarde,
+    durante o processo de login.
+
+.. _documentação de backends: #other-authentication-sources
+
+Verificando uma senha de usuário manualmente
+--------------------------------------------
+
+.. function:: check_password()
+
+    Se você gostaria de autenticar manualmente um usuário comparando uma senha,
+    em texto plano, com a senha em hash no banco de dados, use a função
+    conveniente :func:`django.contrib.auth.models.check_password`. Ela recebe
+    dois argumentos: a senha em texto plano, e o valor completo do campo
+    ``password`` no banco de dados, eles serão conferidos, e retornará ``True``
+    se combinarem, ou ``False`` caso contrário.
+
+Como deslogar um usuário
+------------------------
+
+.. function:: logout()
+
+    Para deslogar um usuário que esteja logado via
+    :func:`django.contrib.auth.login()`, use
+    :func:`django.contrib.auth.logout()` dentro de seu view. Ele recebe um
+    objeto :class:`~django.http.HttpRequest` e não retorna nada.
+    Exemplo::
+
+        from django.contrib.auth import logout
+
+        def logout_view(request):
+            logout(request)
+            # Redirecione para uma página de sucesso.
+
+    Note que :func:`~django.contrib.auth.logout()` não gera qualquer erro se o
+    usuário não estiver logado.
+
+    .. versionchanged:: 1.0
+       Chamar ``logout()`` agora limpa os dados da sessão.
+
+    Quando você chama :func:`~django.contrib.auth.logout()`, os dados da sessão
+    para a requisição atual são completamente apagados. Todo dado existente é
+    removido. Isto é para previnir que outra pessoa, que use o mesmo navegador,
+    após logar-se acesse dados da sessão do usuário anterior. Se você deseja
+    colocar algo na sessão que estará disponível para o usuário imediatamente
+    após deslogar, faça isto *depois* de chamar
+    :func:`django.contrib.auth.logout()`.
+
+Limitando acesso para usuários logados
+--------------------------------------
+
+O caminho bruto
+~~~~~~~~~~~~~~~
+
+O simples, caminho bruto para limitar o acesso a páginas é usar o método
+:meth:`request.user.is_authenticated()
+<django.contrib.auth.models.User.is_authenticated>` e redicionar o usuário para
+página de login::
+
+    from django.http import HttpResponseRedirect
+
+    def my_view(request):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect('/login/?next=%s' % request.path)
+        # ...
+
+...ou mostrar uma mensagem de erro::
+
+    def my_view(request):
+        if not request.user.is_authenticated():
+            return render_to_response('myapp/login_error.html')
+        # ...
+
+O decorador login_required
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: decorators.login_required()
+
+    Como um atalho, você pode usar o conveniente decorador
+    :func:`~django.contrib.auth.decorators.login_required`::
+
+        from django.contrib.auth.decorators import login_required
+
+        def my_view(request):
+            # ...
+        my_view = login_required(my_view)
+
+    Aqui um exemplo equivalente, usando a sintaxe mais compacta de decorador
+    introduzido no Python 2.4::
+
+        from django.contrib.auth.decorators import login_required
+
+        @login_required
+        def my_view(request):
+            # ...
+
+    O :func:`~django.contrib.auth.decorators.login_required` também recebe um
+    paramêtro opcional ``redirect_field_name``. Exemplo::
+
+        from django.contrib.auth.decorators import login_required
+
+        def my_view(request):
+            # ...
+        my_view = login_required(redirect_field_name='redirect_to')(my_view)
+
+    Novamente, um exemplo equivalente da sintaxe mais compacta do decorador
+    introduzido no Python 2.4::
+
+        from django.contrib.auth.decorators import login_required
+
+        @login_required(redirect_field_name='redirect_to')
+        def my_view(request):
+            # ...
+
+    O :func:`~django.contrib.auth.decorators.login_required` faz o seguinte:
+
+        * Se o usuário não estiver logado, redireciona-o para
+          :setting:`settings.LOGIN_URL <LOGIN_URL>` (``/accounts/login/`` por
+          padrão), passando a URL absoluta atual na query string como ``next``
+          ou o valor do ``redirect_field_name``. Por exemplo:
+          ``/accounts/login/?next=/pools/3/``.
+
+        * Se o usuário estiver logado, executa o view normalmente. O códido do
+          view é livre para assumir que o usuário está logado.
+
+Note que você precisará mapear o view apropriado do Django para
+:setting:`settings.LOGIN_URL <LOGIN_URL>`. Por exemplo, usando o padrão,
+adicione a seguinte linha no seu URLconf::
+
+    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+
+.. function:: views.login(request, [template_name, redirect_field_name])
+
+    O que o ``django.contrib.auth.views.login`` faz:
+
+        * Se chamado via ``GET``, ele mostra um formulário de login que posta
+          para mesma URL. Mais sobre isso daqui a pouco.
+
+        * Se chamado via ``POST``, ele tenta logar o usuário. Se o login é
+          feito, o view redireciona para a URL especificada em ``next``. Se
+          ``next`` não é fornecido, ele redireciona para
+          :setting:`settings.LOGIN_REDIRECT_URL <LOGIN_REDIRECT_URL>` (que é por
+          padrão ``/accounts/profile/``). Se o login não é feito, ele mostra
+          novamente o formulário de login.
+
+    É de sua responsabilidade fornecer ao formulário de login um template
+    chamado ``registration/login.html`` por padrão. A este template é passado
+    quatro variáveis de contexto:
+
+        * ``form``: Um objeto :class:`~django.forms.Form` representando o
+          formulário de login. Veja a :doc:`documentação do forms
+          </topics/forms/index>` para saber mais sobre objetos ``Form``.
+
+        * ``next``: A URL para redirecionar depois que o login for realizado com
+          sucesso. Ele pode conter uma query string, também.
+
+        * ``site``: O :class:`~django.contrib.sites.models.Site` atual,
+          de acordo com a configuração :setting:`SITE_ID`. Se você não tiver o
+          framework site instalado, isto setará uma instância de
+          :class:`~django.contrib.sites.models.RequestSite`, que deriva do
+          nome do site e domínio vindos do :class:`~django.http.HttpRequest`
+          atual.
+
+        * ``site_name``: Um alias para ``site.name``. Se você não tiver o
+          framework site instalado, isto setará o valor de
+          :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+          Para saber mais sobre sites, veja :ref:`ref-contrib-sites`.
+
+    Se você preferir não chamar o template :file:`registration/login.html`,
+    você pode passar o parâmetro ``template_name`` via argumentos extras para
+    o view, no seu URLconf. Por exemplo, esta linha do URLconf  poderia usar
+    :file:`myapp/login.html` em seu lugar::
+
+        (r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'myapp/login.html'}),
+
+    Você pode também especificar o nome do campo ``GET`` que contém a URL
+    para redirecioná-lo depois que login passar ``redirect_field_name`` para o
+    view. Por padrão, o campo é chamado de ``next``.
+
+    Aqui temos uma amostra de template :file:`registration/login.html` que você
+    pode usar como um ponto de início. Ele assume que você tem um template
+    :file:`base.html` que define um bloco ``content``:
+
+    .. code-block:: html
+
+        {% extends "base.html" %}
+
+        {% block content %}
+
+        {% if form.errors %}
+        <p>Your username and password didn't match. Please try again.</p>
+        {% endif %}
+
+        <form method="post" action="{% url django.contrib.auth.views.login %}">
+        <table>
+        <tr>
+            <td>{{ form.username.label_tag }}</td>
+            <td>{{ form.username }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.password.label_tag }}</td>
+            <td>{{ form.password }}</td>
+        </tr>
+        </table>
+
+        <input type="submit" value="login" />
+        <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+
+        {% endblock %}
+
+    .. _forms documentation: ../forms/
+    .. _site framework docs: ../sites/
+
+Outros view embutidos
+---------------------
+
+Além do view :func:`~views.login`, o sistema de autenticação inclui uns outros
+views embutidos, localizados em :mod:`django.contrib.auth.views`:
+
+.. function:: views.logout(request, [next_page, template_name])
+
+    Desloga um usuário.
+
+    **Argumentos opcionais:**
+
+        * ``next_page``: A URL para redirecionar o usuário depois de deslogá-lo.
+
+        * ``template_name``: O nome completo do template que será mostrado
+          depois de deslogar o usuário. Será utilizado o padrão
+          :file:`registration/logged_out.html` se nenhum argumento for
+          fornecido.
+
+    **Contexto do template:**
+
+        * ``title``: A string "Logged out", localizada.
+
+.. function:: views.logout_then_login(request[, login_url])
+
+    Desloga um usuário, e então redireciona-o para a página de login.
+
+    **Argumentos opcionais:**
+
+        * ``login_url``: a URL da página de login para redirecioná-lo. Será o
+          padrão :setting:`settings.LOGIN_URL <LOGIN_URL>` se não for fornecido.
+
+.. function:: views.password_change(request[, template_name, post_change_redirect])
+
+    Permite um usuário mudar sua senha.
+
+    **Argumentos opcionais:**
+
+        * ``template_name``: o nome completo do template que mostrará o
+          formulário que muda a senha. Será o padrão
+          :file:`registration/password_change_form.html` se não for fornecido.
+
+        * ``post_change_redirect``: a URL para redirecioná-lo depois da mudança
+          da senha.
+
+    **Contexto do template:**
+
+        * ``form``: O formulário de mudança de senha.
+
+.. function:: views.password_change_done(request[, template_name])
+
+    a página mostrada depois que um usuário muda sua senha.
+
+    **Argumentos opcionais:**
+
+        * ``template_name``: o nome completo do template a se usar. Este será
+          o padrão :file:`registration/password_change_done.html` se não for
+          fornecido.
+
+.. function:: views.password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect])
+
+    Permite um usuário resetar sua senha, e enviá-lo uma nova senha por e-mail.
+
+    **Argumentos opcionais:**
+
+        * ``template_name``: O nome completo do template a se usar para mostrar
+          o formulário de reset. Este será o padrão
+          :file:`registration/password_reset_form.html` se não for fornecido.
+
+        * ``email_template_name``: O nome completo do template a se usar para
+          gerar o e-mail com a nova senha. Este será o padrão
+          :file:`registration/password_reset_email.html` se não for fornecido.
+
+        * ``password_reset_form``: Form que será usado para setar a senha.
+          O padrão é ``SetPasswordForm``.
+
+        * ``token_generator``: Instância de classe para verificar a senha. Este
+          será o padrão ``default_token_generator``, é uma instância do
+          ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+
+        * ``post_reset_redirect``: A URL para redirecionar depois de uma mudança
+          de senha com sucesso.
+
+    **Contexto do template:**
+
+        * ``form``: O formulário para resetar a senha do usuário.
+
+.. function:: views.password_reset_done(request[, template_name])
+
+    A páina mostrada depois que um usuário reseta sua senha.
+
+    **Argumentos opcionais:**
+
+        * ``template_name``: O nome completo do template a se usar. Este será
+          o padrão :file:`registration/password_reset_done.html` se não for
+          fornecido.
+
+.. function:: views.redirect_to_login(next[, login_url, redirect_field_name])
+
+    Redireciona para a página de login, e então volta para outra URL depois de
+    um login bem sucedido.
+
+    **Argumentos obrigatórios:**
+
+        * ``next``: A URL para redirecioná-lo depois de um login bem sucedido.
+
+    **Argumentos opcionais:**
+
+        * ``login_url``: A URL da página de login para redirecioná-lo. Este será
+          o padrão :setting:`settings.LOGIN_URL <LOGIN_URL>` se não for
+          fornecido.
+
+        * ``redirect_field_name``: O nome do campo ``GET`` contendo a URL para
+          ser redirecionada depois de deslogar. Sobrescreve ``next`` se o dado
+          parâmetro ``GET`` for passado.
+
+
+.. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
+
+    Apresenta um formulário para introduzir uma nova senha.
+
+    **Argumentos opcionais:**
+
+        * ``uidb36``: O id o usuário codificado na base 36. Por padrão é
+          ``None``.
+        * ``token``: O token para verificar que a senha é válida. O padrão será
+          ``None``.
+        * ``template_name``: O nome completo do template que mostrara o view de
+          confirmação de senha. O valor padrão é
+          :file:`registration/password_reset_confirm.html`.
+        * ``token_generator``: Instância da classe que verificar a senha. Este
+          será por padrão ``default_token_generator``, ele é uma instância do
+          ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+        * ``set_password_form``: Form que será usado para setar a senha.
+          Este será por padrão ``SetPasswordForm``.
+        * ``post_reset_redirect``: A URL para redirecioná-lo depois da resetar
+          a senha. Este será por padrão ``None``.
+
+.. function:: password_reset_complete(request[,template_name])
+
+   Apresenta um view que informa ao usuário que a senha foi mudada com sucesso.
+
+   **Argumentos opcionais:**
+
+       * ``template_name``: O nome completo do template para mostrar no view.
+         Este será por padrão :file:`registration/password_reset_complete.html`.
+
+Fomulários embutidos
+--------------------
+
+.. module:: django.contrib.auth.forms
+
+Se você não quiser usar os views embutidos, mas quiser o conforto de não ter que
+escrever formulários para esta funcionalidade, o sistema de autenticação fornece
+vários formulários embutidos localizados em :mod:`django.contrib.auth.forms`:
+
+.. class:: AdminPasswordChangeForm
+
+    Um formulário usado na interface de administração para mudar a senha do
+    usuário.
+
+.. class:: AuthenticationForm
+
+    Um formulário para logar um usuário.
+
+.. class:: PasswordChangeForm
+
+    Um formulário para permitir a um usuário mudar sua senha.
+
+.. class:: PasswordResetForm
+
+    Um formulário para resetar uma senha de usuário e enviar um email com a nova
+    senha para ele.
+
+.. class:: SetPasswordForm
+
+    Um formulário que deixa um usuário mudar sua senha sem introduzir a senha
+    antiga.
+
+.. class:: UserChangeForm
+
+    Um formulário usado no admin para mudar informações de um usuário e suas
+    permissões.
+
+.. class:: UserCreationForm
+
+    Um formulário para criar um novo usuário.
+
+Limitando o acesso para usuário logados que passam um teste
+-----------------------------------------------------------
+
+.. currentmodule:: django.contrib.auth
+
+Para limitar o acesso baseado em certas permissões ou algum outro teste, você
+faria essencialmente a mesma coisa como descrito na seção anterior.
+
+A forma simples é executar seu teste sobre :attr:`request.user
+<django.http.HttpRequest.user>` no view diretamente. Por exemplo, este view
+verifica para estar certo de que o usuário está logado e tem a permissão
+``polls.can_vote``::
+
+    def my_view(request):
+        if not (request.user.is_authenticated() and request.user.has_perm('polls.can_vote')):
+            return HttpResponse("You can't vote in this poll.")
+        # ...
+
+.. function:: decorators.user_passes_test()
+
+    Como um atalho, você pode usar o prático decorador ``user_passes_test``::
+
+        from django.contrib.auth.decorators import user_passes_test
+
+        def my_view(request):
+            # ...
+        my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'))(my_view)
+
+    Nós estamos usando este teste particular como um exemplo relativamente
+    simples. No entanto, se você só quer testar se uma permissão é disponível
+    para o usuário, você pode usar o decorador
+    :func:`~django.contrib.auth.decorators.permission_required()`, descrito
+    mais tarde neste documento.
+
+    Aqui tem a mesma coisa, usando a sintaxe de decorador do Python 2.4::
+
+        from django.contrib.auth.decorators import user_passes_test
+
+        @user_passes_test(lambda u: u.has_perm('polls.can_vote'))
+        def my_view(request):
+            # ...
+
+    O :func:`~django.contrib.auth.decorators.user_passes_test` recebe um
+    argumento obrigatório: uma função que recebe um objeto
+    :class:`~django.contrib.auth.models.User` e retorna ``True`` se o usuário
+    tem permissão para ver a página. Notee que o
+    :func:`~django.contrib.auth.decorators.user_passes_test` não verifica
+    automaticamente se o :class:`~django.contrib.auth.models.User` não é
+    anônimo.
+
+    O :func:`~django.contrib.auth.decorators.user_passes_test()` recebe um
+    argumento opcional ``login_url``, que permite você especificar a URL para
+    sua página de login (:setting:`settings.LOGIN_URL <LOGIN_URL>` por padrão).
+    Example in Python 2.3 syntax::
+
+        from django.contrib.auth.decorators import user_passes_test
+
+        def my_view(request):
+            # ...
+        my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')(my_view)
+
+    Exemplo na sintaxe do Python 2.4::
+
+        from django.contrib.auth.decorators import user_passes_test
+
+        @user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')
+        def my_view(request):
+            # ...
+
+O decorador permission_required
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: decorators.permission_required()
+
+    Esta é uma tarefa relativamente comum, checar se um usuário tem uma
+    permissão em particular. Por esta razão, o Django provê um atalho para este
+    caso: o decorador
+    :func:`~django.contrib.auth.decorators.permission_required()`.
+    Usando este decorador, o exemplo anterior pode ser escrito assim::
+
+        from django.contrib.auth.decorators import permission_required
+
+        def my_view(request):
+            # ...
+        my_view = permission_required('polls.can_vote')(my_view)
+
+    Como no método :meth:`User.has_perm`, nomes de permissões tem a forma
+    ``"<nome da aplicação>.<nome do model em minúsculo>"`` (i.e.
+    ``polls.choice`` para um model ``Choice`` na aplicação ``polls``).
+
+    Perceba que :func:`~django.contrib.auth.decorators.permission_required()`
+    também recebe um parametro opcional ``login_url``. Exemplo::
+
+        from django.contrib.auth.decorators import permission_required
+
+        def my_view(request):
+            # ...
+        my_view = permission_required('polls.can_vote', login_url='/loginpage/')(my_view)
+
+    Como no decorador :func:`~decorators.login_required`, o padrão para
+    ``login_url`` é :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+
+
+Limitando o acesso à visões genéricas
+-------------------------------------
+
+Para limitar o acesso a uma :ref:`visão genérica <ref-generic-views>`, escreva
+um fino wrapper a volta do view, e aponte seu URLconf para seu wrapper ao invés
+da visão genérica. Por exemplo::
+
+    from django.views.generic.date_based import object_detail
+
+    @login_required
+    def limited_object_detail(*args, **kwargs):
+        return object_detail(*args, **kwargs)
+
+Permissões
+==========
+
+O Django vem com um sistema simples de permissões. Ele fornece uma forma de
+atribuir permissões para usuários e grupos de usuários específicos.
+
+Ele é usado pelo admin do Django, mas você também é bem-vindo a usá-lo no seu
+próprio código.
+
+O admin do Django usa as seguintes permissões:
+
+    * Access to view the "add" form and add an object is limited to users with
+      the "add" permission for that type of object.
+    * Access to view the change list, view the "change" form and change an
+      object is limited to users with the "change" permission for that type of
+      object.
+    * Access to delete an object is limited to users with the "delete"
+      permission for that type of object.
+
+Permissões são setadas globalmente para um tipo de objeto, ão para uma instância
+de objeto específica. Por exemplo, é possível dizer "Maria pode mudar notícias",
+mas não é atualmente possível dizer "Maria pode mudar notícias, mas somente as
+que ela mesma criou" ou "Maria pode somente mudar noticias que tenham um certo
+status, data de publicação ou ID." Esta última funcionalidade é algo que os
+desenvolvedores do Django estão discutindo atualmente.
+
+Permissões padrão
+-----------------
+
+Quando ``django.contrib.auth`` é listado no seu :setting:`INSTALLED_APPS`, ele
+garantirá três permissões padrão -- adicionar, ediar, deletar -- são criadas
+para cada model do Django definidos em suas aplicações instaladas.
+
+Estas permissões serão criadas quando você rodar :djadmin:`manage.py syncdb
+<syncdb>`; na primeira vez que você rodar ``syncdb`` depois de adicionar o
+``django.contrib.auth`` ao :setting:``INSTALLED_APPS``, as permissões padrão
+serão criadas para todos os models instalados anteriormente, assim como para
+qualquer novo model que seja criado. Logo, ele cria permissões padrão para novos
+models toda vez que você executa :djadmin:`manage.py syncdb <syncdb>`.
+
+.. _custom-permissions:
+
+Permissões customizadas
+-----------------------
+
+Para criar permissões customizadas para um dado objeto de model, use o
+:ref:`atributo Meta do model <meta-options>`, ``permissions``.
+
+Este model de exemplo cria três permissões customizadas::
+
+    class USCitizen(models.Model):
+        # ...
+        class Meta:
+            permissions = (
+                ("can_drive", "Can drive"),
+                ("can_vote", "Can vote in elections"),
+                ("can_drink", "Can drink alcohol"),
+            )
+
+A única coisa que isto faz é criar estas permissões extra quando você executa o
+:djadmin:`manage.py syncdb <syncdb>`.
+
+Referência de API
+-----------------
+
+.. class:: models.Permission
+
+    Assim como usuários, as permissões são implementadas num model do Django que
+    fica em `django/contrib/auth/models.py`_.
+
+.. _django/contrib/auth/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/models.py
+
+Campos
+~~~~~~
+
+:class:`~django.contrib.auth.models.Permission` objects have the following
+fields:
+
+.. attribute:: models.Permission.name
+
+    Obrigatório. 50 caracteres ou menos. Exemplo: ``'Can vote'``.
+
+.. attribute:: models.Permission.content_type
+
+    Obrigatório. Uma referência da tabela de banco de dados
+    ``django_content_type``, que contém um dado para cada model do Django
+    instalado.
+
+.. attribute:: models.Permission.codename
+
+    Obrigatório. 100 caracteres ou menos. Exemplo: ``'can_vote'``.
+
+Métodos
+~~~~~~~
+
+O objetos :class:`~django.contrib.auth.models.Permission` tem um métod de acesso
+a dadospadrão como qualquer outro :ref:`model do Django <ref-models-instances>`.
+
+Dados de autenticação em templates
+==================================
+
+O usuário atualmente logado e suas permissões estão disponíveis no
+:doc:`contexto do template </ref/templates/api>` quando você usa o
+:class:`~django.template.context.RequestContext`.
+
+.. admonition:: Technicality
+
+   Tecnicamente, estas variáveis são somente disponibilizadas no contexto do
+   template se você usar :class:`~django.template.context.RequestContext` *e*
+   se sua configuração :setting:`TEMPLATE_CONTEXT_PROCESSORS` contiver
+   ``"django.core.context_processors.auth"``, que é o padrão. Para mais, veja
+   a :ref:`documentação do RequestContext <subclassing-context-requestcontext>`.
+
+Usuários
+--------
+
+Quando se renderiza um template
+:class:`~django.template.context.RequestContext`, o usuário atualmente logado,
+qualquer instância de :class:`~django.contrib.auth.models.User`, é armazenada na
+variável de template ``{{ user }}``:
+
+.. code-block:: html
+
+    {% if user.is_authenticated %}
+        <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
+    {% else %}
+        <p>Welcome, new user. Please log in.</p>
+    {% endif %}
+
+Esta variável de contexto de template não fica disponível se um
+``RequestContext`` não estiver sendo utilizado.
+
+Permissões
+----------
+
+As permissões do usuário atualmente logado são armazenadas na variável de
+template ``{{ perms }}``. Isto é uma instância de
+:class:`django.core.context_processors.PermWrapper`, que é um proxy de
+permissões amigável para templates.
+
+
+No objeto ``{{ perms }}``, na forma de atributo singular, é um proxy para o
+:meth:`User.has_module_perms
+<django-contrib.auth.models.User.has_module_perms>`. Este exemplo mostraria
+``True`` se o usuário logado tivesse qualquer permissão na aplicação ``foo``::
+
+    {{ perms.foo }}
+
+Na forma de atributo com segundo nível é um proxy para
+:meth:`User.has_perm <django.contrib.auth.models.User.has_perm>`. Este exemplo
+poderia mostrar ``True`` se o usuário logado tivesse a permissão
+``foo.can_vote``::
+
+    {{ perms.foo.can_vote }}
+
+Deste modo, você pode checar permissões no template usando declarações
+``{% if %}``:
+
+.. code-block:: html
+
+    {% if perms.foo %}
+        <p>Você tem permissão para fazer algo na aplicação foo.</p>
+        {% if perms.foo.can_vote %}
+            <p>Você pode votar!</p>
+        {% endif %}
+        {% if perms.foo.can_drive %}
+            <p>Você pode dirigir!</p>
+        {% endif %}
+    {% else %}
+        <p>Você não tem permissão para fazer nada na aplicação foo.</p>
+    {% endif %}
+
+Grupos
+======
+
+Grupos são uma forma genérica de categorizar usuários e então aplicar
+permissões, ou algum outro rótulo, para estes usuários. Um usuário pode
+pertencer a qualquer quantidade de grupos.
+
+Um usuário em um grupo automaticamente possui as permissões garantidas para esse
+grupo. Por exemplo, se o grupo ``Editores do site`` tem permissão
+``can_edit_home_page``, qualquer usuário neste grupo terá esta permissão.
+
+Além das permissões, grupos são uma forma conveniente de categorizar usuários e
+dar-lhes algum rótulo, ou funcionalidade amplicada. Por exemplo, você poderia
+criar um grupo ``'Usuários especiais'``, e você poderia escreer seu código que
+poderia, dizer, dar-lhes acessó a uma porção de usuários que são membros do
+seu site, ou enviar-lhes mensagens de e-mail privadas.
+
+Mensagens
+=========
+
+O sistema de mensagens é uma forma leve de enfileirar mensages para certos
+usuários.
+
+Uma mensagem é associada com um :class:`~django.contrib.auth.models.User`. Não
+há conceito de expiração ou timestamps.
+
+As mensagens são usadas pelo admin do Django depois de ações bem sucedidas. Por
+exemplo, ``"A enquete Foo foi criada com sucesso."`` é uma mensagem.
+
+A API é simples:
+
+.. method:: models.User.message_set.create(message)
+
+    Para criar uma nova mensagem, use
+    ``user_obj.message_set.create(message='message_text')``.
+
+    To retrieve/delete messages, use
+    Para receber/deletar mensagens, use
+    :meth:`user_obj.get_and_delete_messages() <django.contrib.auth.models.User.get_and_delete_messages>`,
+    que retorna uma lista de objetos ``Message`` da fila do usuário (se tiver
+    alguma) e deleta a mensagem da fila.
+
+Neste exemplo de view, o sistema salva uma mensagem para o usuário depois de
+criar uma playlist::
+
+    def create_playlist(request, songs):
+        # Cria a playlist com as músicas fornecidas.
+        # ...
+        request.user.message_set.create(message="Sua playlist foi adicionada com sucesso.")
+        return render_to_response("playlists/create.html",
+            context_instance=RequestContext(request))
+
+Quando você usa o :class:`~django.template.context.RequestContext`, o usuário
+atualmente logado e suas mensagens são disponibilizadas no :doc:`contexto do
+template </ref/templates/api>` como uma variável de template ``{{ messages }}``.
+Aqui tem um exemplo de código de template que mostra mensagens:
+
+.. code-block:: html
+
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+Note que :class:`~django.template.context.RequestContext` chama
+:meth:`~django.contrib.auth.models.User.get_and_delete_messages` no plano de
+fundo, então qualquer mensagem será deletada mesmo que você não a tenha
+mostrado.
+
+Finalmente, repare que este framework de mensagen somente funciona com usuário
+no banco de dados. Para enviar mensagens para usuários anônimos, use o
+:doc:`framework de sessão </topics/http/sessions>`.
+
+.. _authentication-backends:
+
+Other authentication sources
+============================
+
+The authentication that comes with Django is good enough for most common cases,
+but you may have the need to hook into another authentication source -- that
+is, another source of usernames and passwords or authentication methods.
+
+For example, your company may already have an LDAP setup that stores a username
+and password for every employee. It'd be a hassle for both the network
+administrator and the users themselves if users had separate accounts in LDAP
+and the Django-based applications.
+
+So, to handle situations like this, the Django authentication system lets you
+plug in another authentication sources. You can override Django's default
+database-based scheme, or you can use the default system in tandem with other
+systems.
+
+Especificando backends de autenticação
+--------------------------------------
+
+Por trás das cenas, o Django mantem uma lista de "backends de autenticação" que
+ele verifica para autenticação. Quando alguem chama
+:func:`django.contrib.auth.authenticate()` -- como descrito no
+:ref:`como logar um usuário <howtologauserin>` acima -- o Django tenta
+autenticar através de todos estes backends de autenticação. Se o primeiro método
+de autenticação falha, o Django tenta o segundo, e segue assim até que tenha
+tentado todos.
+
+A lista de backends de autenticação para usar é especificada no
+:setting:`AUTHENTICATION_BACKENDS`. Este deve ser uma tupla com caminhos Python
+que apontam para as classes que sabem como autenticar. Essas classes podem estar
+em qualquer lugar no caminho do Python.
+
+Por padrão, :setting:`AUTHENTICATION_BACKENDS` é setado para::
+
+    ('django.contrib.auth.backends.ModelBackend',)
+
+Que é o esquema básido de autenticação que verifica o banco de dados de usuários
+do Django.
+
+A ordem no :setting:`AUTHENTICATION_BACKENDS` importa, então se o mesmo nome de
+usuário e senha são válidos para vários backends, o Django irá parar o
+processamento no primeiro resultado positivo.
+
+.. note::
+
+    Uma vez que um usuário fora autenticado, o Django armazena qual backend foi
+    utilizado para autenticar o usuário na sessão do mesmo, e re-usa o mesmo
+    backend para tentativas subsequentes de autenticação deste usuário. Isto
+    efetivamente significa que a fonte de autenticação são chacheadas, então se
+    você mudar o :setting:`AUTHENTICATION_BACKENDS`, precisará limpar os dados
+    da sessão caso necessite forçar a re-autenticação do usuário usando
+    diferentes métodos. Uma forma simples para fazer isto é simplesmente
+    executar ``Sessin.objects.all().delete()``.
+
+Escrevendo um backend de autenticação
+-------------------------------------
+
+Um backend de autenticação é uma classe que implementa dois métodos:
+``get_user(user_id)`` e ``authenticate(**credentials)``.
+
+O método ``get_user` recebe um ``user_id`` -- que poderia ser um nome de
+usuário, ID do banco de dados ou o que seja -- e retorna um objeto ``User``.
+
+O método ``authenticate`` recebe credênciais como argumentos nomeados. Na
+maioria das vezes, ele parecerá com isto::
+
+    class MyBackend:
+        def authenticate(self, username=None, password=None):
+            # Verifica o nome/senha e retorna um User.
+
+Mas ele poderia também autenticar um token, tipo:
+
+    class MyBackend:
+        def authenticate(self, token=None):
+            # Verifica o token e retorna um User.
+
+Either way, ``authenticate`` should check the credentials it gets, and it
+should return a ``User`` object that matches those credentials, if the
+credentials are valid. If they're not valid, it should return ``None``.
+
+De ambas as formas, o ``authenticate`` deve verificar as referências que
+receber, e deve retornar um objeto ``User`` que combina com essas referências,
+se as referências forem válidas. Se elas não forem válidas, ele deve retornar
+``None``.
+
+O sistema de administração do Django é hermeticamente aclopado ao objeto
+``User`` do Django descrito no início deste documento. Por agora, a melhor forma
+de tratar isto é criar um objeto ``User`` do Django para cada usuário existente
+para seu backend (e.g, no seu diretório LDAP, seu banco de dados SQL
+externo, etc.) Você pode também escrever um script para fazer isto com
+antecedência, ou seu método ``authenticate`` pode fazê-lo na primeira vez que o
+usuário se logar.
+
+Aqui tem um exemplo de backend que autentica usando as variáveis username e
+password definidas no seu arquivo ``settings.py`` e cria um objeto ``User`` na
+primeira vez que autentica::
+
+    from django.conf import settings
+    from django.contrib.auth.models import User, check_password
+
+    class SettingsBackend:
+        """
+        Autentica usando as configurações ADMIN_LOGIN e ADMIN_PASSWORD.
+
+        Use o nome de login, e um hash da senha. Por exemplo:
+
+        ADMIN_LOGIN = 'admin'
+        ADMIN_PASSWORD = 'sha1$4e987$afbcf42e21bd417fb71db8c66b321e9fc33051de'
+        """
+        def authenticate(self, username=None, password=None):
+            login_valid = (settings.ADMIN_LOGIN == username)
+            pwd_valid = check_password(password, settings.ADMIN_PASSWORD)
+            if login_valid and pwd_valid:
+                try:
+                    user = User.objects.get(username=username)
+                except User.DoesNotExist:
+                    # Cria um usuário. Note que nós podemos setar uma senha
+                    # para tudo, porque ela não será verificad; o password
+                    # vindo do settings.py será.
+                    user = User(username=username, password='get from settings.py')
+                    user.is_staff = True
+                    user.is_superuser = True
+                    user.save()
+                return user
+            return None
+
+        def get_user(self, user_id):
+            try:
+                return User.objects.get(pk=user_id)
+            except User.DoesNotExist:
+                return None
+
+Manipulando autorização em backends customizados
+------------------------------------------------
+
+Backends customizados de autenticação pode fornecer suas próprias permissões.
+
+O model do usuário delegará funções de permissão
+(:meth:`~django.contrib.auth.models.User.get_group_permissions()`,
+:meth:`~django.contrib.auth.models.User.get_all_permissions()`,
+:meth:`~django.contrib.auth.models.User.has_perm()`, e
+:meth:`~django.contrib.auth.models.User.has_module_perms()`)  para qualquer
+backend de autenticação que implemente estas funções.
+
+As permissões dadas para o usuário serão o super conjunto de todas as permissões
+retornadas por todos os backends. Isto é, o Django concede uma permissão para um
+usuário que qualquer backend concederia.
+
+O simples backend acima poderia aplicar permissões para o mágico admin de
+forma muito simples::
+
+    class SettingsBackend:
+
+        # ...
+
+        def has_perm(self, user_obj, perm):
+            if user_obj.username == settings.ADMIN_LOGIN:
+                return True
+            else:
+                return False
+
+Isto dá permissões completas ao usuário acessado no exemplo acima.
+Advertindo que as todas as funções de autenticação do backend recebem o objeto
+do usuário como um argumento, e eles também aceitam os mesmos argumentos
+fornecidos para as funções associadas do
+:class:`django.contrib.auth.models.User`.
+
+Uma implementação completa de autorização pode ser encontrada em
+`django/contrib/auth/backends.py`_, que é o backend padrão e consulta a tabela
+``auth_permission`` a maior parte do tempo.
+
+.. _django/contrib/auth/backends.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
+

@@ -1,0 +1,347 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done $
+..   $OriginalRevision: 11298 $
+..   $TranslationAuthors: Marcelo Minholi $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+.. _intro-overview:
+
+==================
+Django num relance
+==================
+
+Como o Django foi desenvolvido no ambiente movimentado de uma redação, ele foi
+desenhado para tornar as tarefas comuns do desenvolvimento Web rápidas e fáceis.
+Aqui está uma visão informal sobre como escrever uma aplicação Web dirigida a
+banco de dados com Django.
+
+O objetivo deste documento é dar a você as especificações técnicas necessárias
+para entender como o Django funciona, mas este texto não pretende ser um
+tutorial ou uma referência -- mas possuímos os dois! Quando você estiver pronto
+para iniciar um projeto, você pode :doc:`iniciar com o tutorial
+</intro/tutorial01>` ou :doc:`mergulhar direto em uma documentação mais detalhada
+</topics/index>`.
+
+Projete seu model
+=================
+
+Embora você possa usar o Django sem um banco de dados, ele vem com um mapeador
+objeto-relacional no qual você descreve o layout da sua base de dados em código
+Python.
+
+A :doc:`sintaxe do modelo de dados </topics/db/models>` oferece muitas formas
+ricas de representar seus models -- portanto, ela está resolvendo cerca de dois
+anos de problemas de esquemas de base de dados. Aqui está um exemplo rápido::
+
+    class Reporter(models.Model):
+        full_name = models.CharField(max_length=70)
+
+        def __unicode__(self):
+            return self.full_name
+
+    class Article(models.Model):
+        pub_date = models.DateTimeField()
+        headline = models.CharField(max_length=200)
+        content = models.TextField()
+        reporter = models.ForeignKey(Reporter)
+
+        def __unicode__(self):
+            return self.headline
+
+Instale-o
+=========
+
+Em seguida, rode o utilitário de linha de comando do Django para criar as tabelas
+da base de dados automaticamente:
+
+.. code-block:: bash
+
+    manage.py syncdb
+
+O comando :djadmin:`syncdb` procura por todos os seus modelos disponíveis e
+cria as tabelas na sua base de dados caso as tabelas ainda não existam.
+
+Aproveite a API livre
+=====================
+
+Com ela você irá ter uma :doc:`API Python </topics/db/queries>` livre e rica para
+acessar seus dados. A API é criada em tempo de execução, nenhuma geração de
+código é necessária::
+
+    >>> from mysite.models import Reporter, Article
+
+    # Nenhum jornalista no sistema ainda.
+    >>> Reporter.objects.all()
+    []
+
+    # Crie um novo jornalista.
+    >>> r = Reporter(full_name='John Smith')
+
+    # Salve o objeto na base de dados. Você terá que chamar o save()
+    # explicitamente.
+    >>> r.save()
+
+    # Agora ele tem um ID.
+    >>> r.id
+    1
+
+    # Agora o novo jornalista está na base de dados.
+    >>> Reporter.objects.all()
+    [<Reporter: John Smith>]
+
+    # Campos são representados como atributos de objetos Python.
+    >>> r.full_name
+    'John Smith'
+
+    # O Django fornece uma rica API de pesquisa à base de dados.
+    >>> Reporter.objects.get(id=1)
+    <Reporter: John Smith>
+    >>> Reporter.objects.get(full_name__startswith='John')
+    <Reporter: John Smith>
+    >>> Reporter.objects.get(full_name__contains='mith')
+    <Reporter: John Smith>
+    >>> Reporter.objects.get(id=2)
+    Traceback (most recent call last):
+        ...
+    DoesNotExist: Reporter matching query does not exist.
+
+    # Crie um artigo.
+    >>> from datetime import datetime
+    >>> a = Article(pub_date=datetime.now(), headline='Django is cool',
+    ...     content='Yeah.', reporter=r)
+    >>> a.save()
+
+    # Agora o artigo está na base de dados.
+    >>> Article.objects.all()
+    [<Article: Django is cool>]
+
+    # Objetos Article tem acesso via API a objetos Reporter relacionados.
+    >>> r = a.reporter
+    >>> r.full_name
+    'John Smith'
+
+    # E vice-versa: Objetos Reporter tem acesso via API a objetos Article.
+    >>> r.article_set.all()
+    [<Article: Django is cool>]
+
+    # A API segue relacionamentos da forma que você precisar, realizando JOINs
+    # eficientes para você por baixo dos panos.
+    # Isto encontra todos os artigos de um jornalista cujo nome começa com "John".
+    >>> Article.objects.filter(reporter__full_name__startswith="John")
+    [<Article: Django is cool>]
+
+    # Modifique um objeto alterando seus atributos e chamando save().
+    >>> r.full_name = 'Billy Goat'
+    >>> r.save()
+
+    # Delete um objeto com delete().
+    >>> r.delete()
+
+Uma interface de administração dinâmica: não é apenas o andaime -- é a casa inteira
+===================================================================================
+
+Uma vez definido seus models, o Django poderá criar automaticamente uma
+:doc:`interface administrativa </ref/contrib/admin/index>` profissional pronta para
+produção -- um Web site que permite aos usuários autenticados adicionar, alterar
+e deletar objetos. E isso é tão fácil como registrar seu modelo no site de
+administracao::
+
+    # In models.py...
+
+    from django.db import models
+
+    class Article(models.Model):
+        pub_date = models.DateTimeField()
+        headline = models.CharField(max_length=200)
+        content = models.TextField()
+        reporter = models.ForeignKey(Reporter)
+        
+
+    # In admin.py in the same directory...
+    
+    import models
+    from django.contrib import admin
+
+    admin.site.register(models.Article)
+
+A filosofia aqui é que seu site é editado por uma equipe, ou um cliente, ou
+talvez apenas por você -- e você não quer ter que lidar com criação de
+interfaces backend apenas para gerenciar conteúdo.
+
+Um workflow típico na criação de aplicações Django é criar os models e ter os
+sites administrativos rodando o mais rápido possível, assim sua equipe (ou
+cliente) poderá começar a inserir os dados. Em seguida, desenvolve-se a forma
+com que os dados serão apresentados ao público.
+
+Projete suas URLs
+=================
+
+Um esquema limpo e elegante de URLs é um detalhe importante em uma aplicação Web
+de alta qualidade. O Django encoraja o desenho de belíssimas URLs e não coloca
+nenhuma sujeira nelas, como ``.php`` ou ``.asp``.
+
+Para desenhar URLs para uma aplicação, você cria um módulo Python chamado
+:doc:`URLconf </topics/http/urls>`. Uma tabela de conteúdos para sua aplicação,
+contendo um mapeamento simples entre padrões de URL e funções Python de retorno
+(funções de callback). URLconfs também servem para desacoplar as URLs do código
+Python.
+
+Aqui está como um URLconf se aparentaria para o exemplo ``Reporter``/``Article``
+acima::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('',
+        (r'^articles/(\d{4})/$', 'mysite.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'mysite.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.views.article_detail'),
+    )
+
+O código acima mapeia URLs, como simples expressões regulares, para a localização
+das funções Python de retorno ("views"). As expressões regulares usam parênteses
+para "capturar" valores das URLs. Quando um usuário requisita uma página, o Django
+percorre cada padrão, em ordem, e para no primeiro que combina com a URL
+requisitada. (Se nenhum deles combinar o Django chama uma view de exceção 404.)
+Isso é incrivelmente rápido, porque as expressões regulares são compiladas em
+tempo de execução.
+
+Uma vez que uma das expressões regulares case, o Django importa e chama a view
+indicada, que é uma simples função Python. Cada view recebe um objeto request --
+que contém os metadados da requisição -- e os valores capturados na expressão
+regular.
+
+Por exemplo, se um usuário requisitou a URL "/articles/2005/05/39323/", o Django
+deverá chamar a função ``mysite.views.article_detail(request,
+'2005', '05', '39323')``.
+
+Escreva suas views
+==================
+
+Cada view é responsável por fazer uma entre duas coisas: Retornar um objeto
+:class:`~django.http.HttpResponse` contendo o conteúdo para a página requisitada,
+ou levantar uma exceção como :class:`~django.http.Http404`. O resto é com você.
+
+Geralmente, uma view recupera dados de acordo com os parâmetros, carrega um
+template e renderiza o template com os dados recuperados. Aqui está uma view
+para o ``year_archive`` do exemplo acima::
+
+    def year_archive(request, year):
+        a_list = Article.objects.filter(pub_date__year=year)
+        return render_to_response('news/year_archive.html', {'year': year, 'article_list': a_list})
+
+Esse exemplo usa o :doc:`sistema de template </topics/templates>` do Django, o 
+qual possui diversos recursos poderosos mas prima por permanecer simples o 
+suficiente para que não-programadores possam usá-lo.
+
+Desenhe seus templates
+======================
+
+O código acima carrega o template ``news/year_archive.html``.
+
+O Django tem um caminho de pesquisa para templates, o qual permite a você
+minimizar a redundância entre templates. Nas configurações do Django, você
+especifica uma lista de diretórios para procurar por templates. Se um template
+não existir no primeiro diretório, ele verifica o segundo e assim por diante.
+
+Vamos dizer que o template ``news/article_detail.html`` foi encontrado. Aqui está
+como ele deve se parecer:
+
+.. code-block:: html+django
+
+    {% extends "base.html" %}
+
+    {% block title %}Artigos de {{ year }}{% endblock %}
+
+    {% block content %}
+    <h1>Artigos de {{ year }}</h1>
+
+    {% for article in article_list %}
+        <p>{{ article.headline }}</p>
+        <p>Por {{ article.reporter.full_name }}</p>
+        <p>Publicado em {{ article.pub_date|date:"F j, Y" }}</p>
+    {% endfor %}
+    {% endblock %}
+
+Variáveis são cercadas por chaves duplas. ``{{ article.headline }}`` que
+significa "retorne o valor do atributo headline do artigo", mas pontos não são
+usados apenas para acessar atributos: eles também podem acessar chaves de
+dicionários, acesar índices e chamar funções.
+
+Note que ``{{ article.pub_date|date:"F j, Y" }}`` usa um "pipe" no estilo Unix
+(o caractere "|"). Isso é chamado de filtro de template, e é uma forma de
+filtrar o valor de uma variável. Nesse caso, o filtro "date" formata um objeto
+Python datetime para um formato dado (como o encontrado na função date do PHP;
+sim, aqui está uma boa idéia do PHP).
+
+Você pode atrelar tantos filtros quanto você quiser. Você pode escrever filtros
+personalizados. Você pode escrever tags de template personalizadas, que irão
+rodar código Python personalizado por baixo dos panos.
+
+Finalmente, o Django usa o conceito de "herança de templates": É isso que o ``{%
+extends "base.html" %}`` faz. Isso significa "primeiro carregue o template
+chamado 'base', o qual define uma série de blocos, e preencha os blocos com os
+seguintes blocos". Resumindo, isso permite a você reduzir drasticamente a
+redundância em seus templates: cada template tem que definir apenas aquilo que é
+único para aquele template.
+
+Aqui está como o template "base.html" deve se parecer:
+
+.. code-block:: html+django
+
+    <html>
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+    </head>
+    <body>
+        <img src="sitelogo.gif" alt="Logo" />
+        {% block content %}{% endblock %}
+    </body>
+    </html>
+
+Simplesmente, ele define a aparencia do site (com o logotipo do site),
+e fornece "buracos" para templates filhos preencherem. Isso torna o redesign do
+site tão fácil quanto modificar um único arquivo -- o template base.
+
+Isso também permite a você criar múltiplas versões de um site, com templates
+base diferentes, enquanto reutiliza templates filhos. Os criadores do Django
+utilizaram essa técnica para criar versões de sites para celulares totalmente
+diferentes -- simplesmente criando um novo template base.
+
+Note que você não tem que usar o sistema de templates do Django se você preferir
+outro. Enquanto o sistema de templates do Django é particularmente bem integrado
+com a camada de modelos do Django, nada força você a usá-lo. Da mesma maneira
+que, você não tem que usar a API de banco de dados do Django, também. Você pode
+usar outras camadas de abstração de banco de dados, você pode ler arquivos XML,
+você pode ler arquivos do disco, ou qualquer coisa que desejar. Cada parte do
+Django -- models, views e templates -- é desacoplada da próxima.
+
+Isto é apenas a superfície
+==========================
+
+Essa foi apenas uma visão rápida das funcionalidades do Django. Alguns outros
+recursos úteis:
+
+    * Um :doc:`framework para caching </topics/cache>` que se integra com o
+      memcached e outros backends.
+
+    * Um :doc:`syndication framework </ref/contrib/syndication>` que torna a 
+      criação de RSS e Atom uma tarefa tão fácil quanto escrever uma classe Python.
+
+    * Mais recursos sexy da administração gerada automaticamente -- essa
+      introdução mal arranhou a superfície.
+
+Os próximos passos óbvios para você fazer é `baixar o Django`_, ler :ref:`o
+tutorial <intro-tutorial01>` e juntar-se `a comunidade`_.  Obrigado pelo seu
+interesse!
+
+.. _baixar o Django: http://www.djangobrasil.org/download/
+.. _a comunidade: http://www.djangobrasil.org/comunidade/

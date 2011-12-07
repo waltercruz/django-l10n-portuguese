@@ -1,0 +1,496 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Referência de sinais embutidos &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Referência da API" href="index.html" />
+    <link rel="next" title="Referência do Template" href="templates/index.html" />
+    <link rel="prev" title="Configurações disponíveis" href="settings.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="settings.html" title="Configurações disponíveis">previous</a> 
+     |
+    <a href="index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="templates/index.html" title="Referência do Template">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-signals">
+            
+  <div class="section" id="s-referencia-de-sinais-embutidos">
+<span id="s-ref-signals"></span><span id="referencia-de-sinais-embutidos"></span><span id="ref-signals"></span><h1>Referência de sinais embutidos<a class="headerlink" href="#referencia-de-sinais-embutidos" title="Permalink to this headline">¶</a></h1>
+<p>Uma lista de todos os sinais que o Django envia.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">O <a class="reference internal" href="contrib/comments/index.html"><em>framework de comentários</em></a> envia um
+<a class="reference internal" href="contrib/comments/signals.html"><em>conjuntos de sinais relacionados a
+ele</em></a>.</p>
+</div>
+<div class="section" id="s-module-django.db.models.signals">
+<span id="s-sinais-de-model"></span><span id="module-django.db.models.signals"></span><span id="sinais-de-model"></span><h2>Sinais de model<a class="headerlink" href="#module-django.db.models.signals" title="Permalink to this headline">¶</a></h2>
+<p>O módulo <a class="reference internal" href="#module-django.db.models.signals" title="django.db.models.signals: Sinais enviados pelo sistema de models."><tt class="xref py py-mod docutils literal"><span class="pre">django.db.models.signals</span></tt></a> define um conjunto de sinais enviados
+pelo sistema de módels.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Muitos destes sinais são enviado por vário métodos de model como
+<tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt> ou
+<a class="reference internal" href="models/instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><tt class="xref py py-meth docutils literal"><span class="pre">save()</span></tt></a> que você pode sobrescrever no seu
+próprio código.</p>
+<p>Se você sobrescreve estes métodos no seu próprio model, você deve chamar os
+método da classe pai para que este sinal seja enviado.</p>
+<blockquote class="last">
+<div>Note também que o Django armazena manipuladores de sinais como referências
+fracas por padrão, então se seu manipulador for uma função local, ela
+poderia ser &#8220;garbage collected&#8221;. Para previnir isso, passe <tt class="docutils literal"><span class="pre">weak=False</span></tt>
+quando você chamar o método <a class="reference internal" href="../topics/signals.html#django.dispatch.Signal.connect" title="django.dispatch.Signal.connect"><tt class="xref py py-meth docutils literal"><span class="pre">connect()</span></tt></a>.</div></blockquote>
+</div>
+<div class="section" id="s-pre-init">
+<span id="pre-init"></span><h3>pre_init<a class="headerlink" href="#pre-init" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.signals.pre_init">
+<tt class="descclassname">django.db.models.signals.</tt><tt class="descname">pre_init</tt><a class="headerlink" href="#django.db.models.signals.pre_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Sempre que você instanciar um model do Django, este sinal é enviado no início
+do método <tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt> do model.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>A classe de model que acabou de ter uma instância criada.</dd>
+<dt><tt class="docutils literal"><span class="pre">args</span></tt></dt>
+<dd>Uma lista de argumentos posicionais passados para
+<tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt>:</dd>
+<dt><tt class="docutils literal"><span class="pre">kwargs</span></tt></dt>
+<dd>Um dicionário de argumentos nomeados passados para
+<tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt>:.</dd>
+</dl>
+<p>Por exemplo, o <a class="reference internal" href="../intro/tutorial01.html#intro-tutorial01"><em>tutorial</em></a> tem esta linha:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">p</span> <span class="o">=</span> <span class="n">Poll</span><span class="p">(</span><span class="n">question</span><span class="o">=</span><span class="s">&quot;What&#39;s up?&quot;</span><span class="p">,</span> <span class="n">pub_date</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Os argumentos enviados para um manipulador <a class="reference internal" href="#django.db.models.signals.pre_init" title="django.db.models.signals.pre_init"><tt class="xref py py-data docutils literal"><span class="pre">pre_init</span></tt></a> seriam:</p>
+<table class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="86%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Argumento</th>
+<th class="head">Valor</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">sender</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">Poll</span></tt> (a classe em si)</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">args</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">[]</span></tt> (uma lista vazia, porque não houve argumentos
+posicionais passados para <tt class="docutils literal"><span class="pre">__init__</span></tt>.)</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">kwargs</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">{'question':</span> <span class="pre">&quot;What's</span> <span class="pre">up?&quot;,</span> <span class="pre">'pub_date':</span> <span class="pre">datetime.now()}</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="s-post-init">
+<span id="post-init"></span><h3>post_init<a class="headerlink" href="#post-init" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.db.models.signals.post_init">
+<tt class="descclassname">django.db.models.signals.</tt><tt class="descname">post_init</tt><a class="headerlink" href="#django.db.models.signals.post_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Como o pre_init, mas este é enviado quando o método
+<tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt>: finaliza.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>Como acima: a classe que acabou de ter uma instância criada.</dd>
+<dt><tt class="docutils literal"><span class="pre">instance</span></tt></dt>
+<dd>A instância atual do model que acabou de ser criado.</dd>
+</dl>
+</div>
+<div class="section" id="s-pre-save">
+<span id="pre-save"></span><h3>pre_save<a class="headerlink" href="#pre-save" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.db.models.signals.pre_save">
+<tt class="descclassname">django.db.models.signals.</tt><tt class="descname">pre_save</tt><a class="headerlink" href="#django.db.models.signals.pre_save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Este é enviado no início do método <a class="reference internal" href="models/instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><tt class="xref py py-meth docutils literal"><span class="pre">save()</span></tt></a>.</p>
+<p>Argumentos enviardos com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>A classe model.</dd>
+<dt><tt class="docutils literal"><span class="pre">instance</span></tt></dt>
+<dd>A instância atual sendo salva.</dd>
+</dl>
+</div>
+<div class="section" id="s-post-save">
+<span id="post-save"></span><h3>post_save<a class="headerlink" href="#post-save" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.db.models.signals.post_save">
+<tt class="descclassname">django.db.models.signals.</tt><tt class="descname">post_save</tt><a class="headerlink" href="#django.db.models.signals.post_save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Como <a class="reference internal" href="../howto/custom-model-fields.html#pre_save" title="pre_save"><tt class="xref py py-data docutils literal"><span class="pre">pre_save</span></tt></a>, mas enviado ao final do método
+<a class="reference internal" href="models/instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><tt class="xref py py-meth docutils literal"><span class="pre">save()</span></tt></a>.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>A classe model.</dd>
+<dt><tt class="docutils literal"><span class="pre">instance</span></tt></dt>
+<dd>A instância atual sendo salva.</dd>
+<dt><tt class="docutils literal"><span class="pre">created</span></tt></dt>
+<dd>Um booleano; <tt class="xref docutils literal"><span class="pre">True</span></tt> se o novo dado foi criado.</dd>
+</dl>
+</div>
+<div class="section" id="s-pre-delete">
+<span id="pre-delete"></span><h3>pre_delete<a class="headerlink" href="#pre-delete" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.db.models.signals.pre_delete">
+<tt class="descclassname">django.db.models.signals.</tt><tt class="descname">pre_delete</tt><a class="headerlink" href="#django.db.models.signals.pre_delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Enviado no início do método de model <a class="reference internal" href="models/instances.html#django.db.models.Model.delete" title="django.db.models.Model.delete"><tt class="xref py py-meth docutils literal"><span class="pre">delete()</span></tt></a>.
+Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>A classe model.</dd>
+<dt><tt class="docutils literal"><span class="pre">instance</span></tt></dt>
+<dd>A instância atual sendo criada.</dd>
+</dl>
+</div>
+<div class="section" id="s-post-delete">
+<span id="post-delete"></span><h3>post_delete<a class="headerlink" href="#post-delete" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.db.models.signals.post_delete">
+<tt class="descclassname">django.db.models.signals.</tt><tt class="descname">post_delete</tt><a class="headerlink" href="#django.db.models.signals.post_delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Como <a class="reference internal" href="#django.db.models.signals.pre_delete" title="django.db.models.signals.pre_delete"><tt class="xref py py-data docutils literal"><span class="pre">pre_delete</span></tt></a>, mas enviado ao final do método
+<a class="reference internal" href="models/instances.html#django.db.models.Model.delete" title="django.db.models.Model.delete"><tt class="xref py py-meth docutils literal"><span class="pre">delete()</span></tt></a>.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>A classe model.</dd>
+<dt><tt class="docutils literal"><span class="pre">instance</span></tt></dt>
+<dd><p class="first">A instância atual sendo criada.</p>
+<p class="last">Note que o objeto não estará mais no banco de dados, portanto seja muito
+cuidadoso com o que faz com esta instância.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="s-class-prepared">
+<span id="class-prepared"></span><h3>class_prepared<a class="headerlink" href="#class-prepared" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.db.models.signals.class_prepared">
+<tt class="descclassname">django.db.models.signals.</tt><tt class="descname">class_prepared</tt><a class="headerlink" href="#django.db.models.signals.class_prepared" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Enviado sempre que uma classe de model estiver sendo &quot;preparada&quot; -- isto é, uma
+vez que o model tenha sido definido e registrado no sistema de model do Django.
+O Django usa este sinal internamente; ele geralmente não é usado em
+aplicações de terceiros.</p>
+<p>Argumentos que são enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>A classe model que acabou de ser preparada.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="s-gerenciamento-de-sinais">
+<span id="gerenciamento-de-sinais"></span><h2>Gerenciamento de sinais<a class="headerlink" href="#gerenciamento-de-sinais" title="Permalink to this headline">¶</a></h2>
+<p>Sinais enviados pelo <a class="reference internal" href="django-admin.html"><em>django-admin</em></a>.</p>
+<div class="section" id="s-post-syncdb">
+<span id="post-syncdb"></span><h3>post_syncdb<a class="headerlink" href="#post-syncdb" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.db.models.signals.post_syncdb">
+<tt class="descclassname">django.db.models.signals.</tt><tt class="descname">post_syncdb</tt><a class="headerlink" href="#django.db.models.signals.post_syncdb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Enviado pelo <a class="reference internal" href="django-admin.html#django-admin-syncdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">syncdb</span></tt></a> depois de instalar uma aplicação.</p>
+<p>Qualquer manipulador que ouve este sinal, precisa ser escrito num lugar
+específico: num módulo <tt class="docutils literal"><span class="pre">management</span></tt> numa de suas <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><tt class="xref std std-setting docutils literal"><span class="pre">INSTALLED_APPS</span></tt></a>. Se
+o manipulador estiver registrado em algum outro lugar eles podem não ser
+carregados pelo <a class="reference internal" href="django-admin.html#django-admin-syncdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">syncdb</span></tt></a>.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>O módulo <tt class="docutils literal"><span class="pre">models</span></tt> que acabou de ser instalado. Isto é, se o
+<a class="reference internal" href="django-admin.html#django-admin-syncdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">syncdb</span></tt></a> acabou de instalar uma aplicação chamada
+<tt class="docutils literal"><span class="pre">&quot;foo.bar.myapp&quot;</span></tt>, o <tt class="docutils literal"><span class="pre">sender</span></tt> será o módulo
+<tt class="docutils literal"><span class="pre">foo.bar.myapp.models</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">app</span></tt></dt>
+<dd>O mesmo que o <tt class="docutils literal"><span class="pre">sender</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">created_models</span></tt></dt>
+<dd>Uma lista de classes model de qualquer applicação que o
+<a class="reference internal" href="django-admin.html#django-admin-syncdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">syncdb</span></tt></a> tenha criado até agora.</dd>
+<dt><tt class="docutils literal"><span class="pre">verbosity</span></tt></dt>
+<dd><p class="first">Indica a quantidade de informações que o manage.py imprime na tela.
+Veja o flag <tt class="xref std std-djadminopt docutils literal"><span class="pre">--verbosity`</span></tt> para detalhes.</p>
+<p class="last">Funções que ouvem o <a class="reference internal" href="#django.db.models.signals.post_syncdb" title="django.db.models.signals.post_syncdb"><tt class="xref py py-data docutils literal"><span class="pre">post_syncdb</span></tt></a> deve ser ajustar o que vão
+mostrar na tela baseado no valor deste argumento.</p>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">interactive</span></tt></dt>
+<dd><p class="first">Se <tt class="docutils literal"><span class="pre">interactive</span></tt> for <tt class="xref docutils literal"><span class="pre">True</span></tt>, ele assegura-se de abrir um prompt para
+usuário digitar coisas na linha de comando. Se o <tt class="docutils literal"><span class="pre">interactive</span></tt> for
+<tt class="xref docutils literal"><span class="pre">False</span></tt>, as funções que ouvem este sinal não devem tentar abrir um
+prompt para nada.</p>
+<p class="last">Por exemplo, a aplicação <a class="reference internal" href="../topics/auth.html#module-django.contrib.auth" title="django.contrib.auth: Framework de autenticação do Django."><tt class="xref py py-mod docutils literal"><span class="pre">django.contrib.auth</span></tt></a> somente abre um
+prompt para criar um superusuário quando o <tt class="docutils literal"><span class="pre">interactive</span></tt> é <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="s-module-django.core.signals">
+<span id="s-sinais-request-response"></span><span id="module-django.core.signals"></span><span id="sinais-request-response"></span><h2>Sinais Request/response<a class="headerlink" href="#module-django.core.signals" title="Permalink to this headline">¶</a></h2>
+<p>Sinais enviados pelo core do framework quando processa uma requisição.</p>
+<div class="section" id="s-request-started">
+<span id="request-started"></span><h3>request_started<a class="headerlink" href="#request-started" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.core.signals.request_started">
+<tt class="descclassname">django.core.signals.</tt><tt class="descname">request_started</tt><a class="headerlink" href="#django.core.signals.request_started" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Enviado quando o Django começar a processar uma requisição HTTP.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>A classe manipuladora -- i.e.
+<tt class="xref py py-class docutils literal"><span class="pre">django.core.handlers.modpython.ModPythonHandler</span></tt> ou
+<tt class="xref py py-class docutils literal"><span class="pre">django.core.handlers.wsgi.WsgiHandler</span></tt> -- que manipula a
+requisição.</dd>
+</dl>
+</div>
+<div class="section" id="s-request-finished">
+<span id="request-finished"></span><h3>request_finished<a class="headerlink" href="#request-finished" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.core.signals.request_finished">
+<tt class="descclassname">django.core.signals.</tt><tt class="descname">request_finished</tt><a class="headerlink" href="#django.core.signals.request_finished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Enviado quando o Django finaliza o processamento da requisição HTTP.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>A classe manipuladora, como acima.</dd>
+</dl>
+</div>
+<div class="section" id="s-got-request-exception">
+<span id="got-request-exception"></span><h3>got_request_exception<a class="headerlink" href="#got-request-exception" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.core.signals.got_request_exception">
+<tt class="descclassname">django.core.signals.</tt><tt class="descname">got_request_exception</tt><a class="headerlink" href="#django.core.signals.got_request_exception" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Este sinal é enviado sempre que o Django encontra uma exceção enquanto processa
+uma chegada de requisição HTTP.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">sender</span></tt></dt>
+<dd>A classe manipuladora, como acima.</dd>
+<dt><tt class="docutils literal"><span class="pre">request</span></tt></dt>
+<dd>O objeto <a class="reference internal" href="request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a>.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="s-module-django.test.signals">
+<span id="s-sinais-de-test"></span><span id="module-django.test.signals"></span><span id="sinais-de-test"></span><h2>Sinais de Test<a class="headerlink" href="#module-django.test.signals" title="Permalink to this headline">¶</a></h2>
+<p>Sinais que somente são enviados quando estão <a class="reference internal" href="../topics/testing.html"><em>rodando
+testes</em></a>.</p>
+<div class="section" id="s-template-rendered">
+<span id="template-rendered"></span><h3>template_rendered<a class="headerlink" href="#template-rendered" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.test.signals.template_rendered">
+<tt class="descclassname">django.test.signals.</tt><tt class="descname">template_rendered</tt><a class="headerlink" href="#django.test.signals.template_rendered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Enviados quando o sistema de teste renderiza um template. Este sinal não é
+emitido durante uma operação normal do servidor do Django -- ele somente está
+disponível durante o teste.</p>
+<p>Argumentos enviados com este sinal:</p>
+<dl class="docutils">
+<dt>sender</dt>
+<dd>O objeto <a class="reference internal" href="templates/api.html#django.template.Template" title="django.template.Template"><tt class="xref py py-class docutils literal"><span class="pre">Template</span></tt></a> que foi renderizado.</dd>
+<dt>template</dt>
+<dd>O mesmo que o sender</dd>
+<dt>context</dt>
+<dd>O <tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt> com que o template foi renderizado.</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Referência de sinais embutidos</a><ul>
+<li><a class="reference internal" href="#module-django.db.models.signals">Sinais de model</a><ul>
+<li><a class="reference internal" href="#pre-init">pre_init</a></li>
+<li><a class="reference internal" href="#post-init">post_init</a></li>
+<li><a class="reference internal" href="#pre-save">pre_save</a></li>
+<li><a class="reference internal" href="#post-save">post_save</a></li>
+<li><a class="reference internal" href="#pre-delete">pre_delete</a></li>
+<li><a class="reference internal" href="#post-delete">post_delete</a></li>
+<li><a class="reference internal" href="#class-prepared">class_prepared</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gerenciamento-de-sinais">Gerenciamento de sinais</a><ul>
+<li><a class="reference internal" href="#post-syncdb">post_syncdb</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-django.core.signals">Sinais Request/response</a><ul>
+<li><a class="reference internal" href="#request-started">request_started</a></li>
+<li><a class="reference internal" href="#request-finished">request_finished</a></li>
+<li><a class="reference internal" href="#got-request-exception">got_request_exception</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-django.test.signals">Sinais de Test</a><ul>
+<li><a class="reference internal" href="#template-rendered">template_rendered</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="settings.html">Configurações disponíveis</a></li>
+    
+    
+      <li>Next: <a href="templates/index.html">Referência do Template</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Referência da API</a>
+        
+        <ul><li>Referência de sinais embutidos</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/ref/signals.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="settings.html" title="Configurações disponíveis">previous</a> 
+     |
+    <a href="index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="templates/index.html" title="Referência do Template">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

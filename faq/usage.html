@@ -1,0 +1,245 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>FAQ: Usando o Django &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="FAQ do Django" href="index.html" />
+    <link rel="next" title="FAQ: Obtendo ajuda" href="help.html" />
+    <link rel="prev" title="FAQ: Instalação" href="install.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="install.html" title="FAQ: Instalação">previous</a> 
+     |
+    <a href="index.html" title="FAQ do Django" accesskey="U">up</a>
+   |
+    <a href="help.html" title="FAQ: Obtendo ajuda">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="faq-usage">
+            
+  <div class="section" id="s-faq-usando-o-django">
+<span id="faq-usando-o-django"></span><h1>FAQ: Usando o Django<a class="headerlink" href="#faq-usando-o-django" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="s-por-que-acontece-um-erro-ao-importar-o-django-settings-module">
+<span id="por-que-acontece-um-erro-ao-importar-o-django-settings-module"></span><h2>Por que acontece um erro ao importar o DJANGO_SETTINGS_MODULE?<a class="headerlink" href="#por-que-acontece-um-erro-ao-importar-o-django-settings-module" title="Permalink to this headline">¶</a></h2>
+<p>Certifique-se de que:</p>
+<ul>
+<li><p class="first">A variável de ambiente DJANGO_SETTINGS_MODULE está configurada para
+um módulo Python totalmente qualificado (ex:. &#8220;mysite.settings&#8221;).</p>
+</li>
+<li><p class="first">O módulo está em <tt class="docutils literal"><span class="pre">sys.path</span></tt> (<tt class="docutils literal"><span class="pre">import</span> <span class="pre">mysite.settings</span></tt> deve funcionar).</p>
+</li>
+<li><p class="first">O módulo não contém erros de sintaxe (é claro).</p>
+</li>
+<li><p class="first">Se você está usando o mod_python, mas <em>não</em> está usando o manipulador de requisições do Django,
+você precisa corrigir um bug do mod_python relacionado ao uso de <tt class="docutils literal"><span class="pre">SetEnv</span></tt>; antes de você
+importar qualquer coisa do Django você precisa fazer o seguinte:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">subprocess_env</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(onde <tt class="docutils literal"><span class="pre">req</span></tt> é o objeto de requisição do mod_python).</p>
+</li>
+</ul>
+</div>
+<div class="section" id="s-eu-nao-gosto-da-sua-linguagem-de-template-eu-tenho-de-usa-la">
+<span id="eu-nao-gosto-da-sua-linguagem-de-template-eu-tenho-de-usa-la"></span><h2>Eu não gosto da sua linguagem de template. Eu tenho de usá-la?<a class="headerlink" href="#eu-nao-gosto-da-sua-linguagem-de-template-eu-tenho-de-usa-la" title="Permalink to this headline">¶</a></h2>
+<p>Pensamos que nossa linguagem de templates é a melhor coisa inventada desde os
+pedaços de bacon mas reconhecemos que a escolha da linguagem de templates é uma
+discussão quase religiosa. Não há nada no Django que requer que você use a
+linguagem de template, então, se você prefere o ZPT, Cheetah, ou o que quer que
+seja, sinta-se livre para usá-los.</p>
+</div>
+<div class="section" id="s-eu-tenho-de-usar-sua-camada-de-modelo-banco-de-dados">
+<span id="eu-tenho-de-usar-sua-camada-de-modelo-banco-de-dados"></span><h2>Eu tenho de usar sua camada de modelo/banco de dados?<a class="headerlink" href="#eu-tenho-de-usar-sua-camada-de-modelo-banco-de-dados" title="Permalink to this headline">¶</a></h2>
+<p>Não. Assim como o sistema de templates, a camada de modelo/banco de dados está desacoplada
+do resto do framework.</p>
+<p>A única exceção é: se você usar uma biblioteca diferente de banco de dados, você irá perder
+o sistema de administração gerado automaticamente pelo Django. Esse aplicativo é acoplado
+à camada de banco de dados do Django.</p>
+</div>
+<div class="section" id="s-como-eu-uso-os-campos-de-imagem-e-arquivos">
+<span id="como-eu-uso-os-campos-de-imagem-e-arquivos"></span><h2>Como eu uso os campos de imagem e arquivos?<a class="headerlink" href="#como-eu-uso-os-campos-de-imagem-e-arquivos" title="Permalink to this headline">¶</a></h2>
+<p>O uso de um <a class="reference internal" href="../ref/models/fields.html#django.db.models.FileField" title="django.db.models.FileField"><tt class="xref py py-class docutils literal"><span class="pre">FileField</span></tt></a> ou um
+<a class="reference internal" href="../ref/models/fields.html#django.db.models.ImageField" title="django.db.models.ImageField"><tt class="xref py py-class docutils literal"><span class="pre">ImageField</span></tt></a> nos models requer alguns passos:</p>
+<ol class="arabic simple">
+<li>No seu arquivo de configurações, defina o <a class="reference internal" href="../ref/settings.html#std:setting-MEDIA_ROOT"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_ROOT</span></tt></a> como o
+caminho completo para o diretório onde você gostaria que o Django
+salvasse os arquivos enviados. (Para melhor performance, esses arquivos
+não são guardados em um banco de dados.)  Defina o <a class="reference internal" href="../ref/settings.html#std:setting-MEDIA_URL"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_URL</span></tt></a>
+como a URL pública para esse diretório.  Assegure-se de que esse
+diretório tenha permissão de escrita para o usuário do servidor Web.</li>
+<li>Adicione o <a class="reference internal" href="../ref/models/fields.html#django.db.models.FileField" title="django.db.models.FileField"><tt class="xref py py-class docutils literal"><span class="pre">FileField</span></tt></a> ou
+<a class="reference internal" href="../ref/models/fields.html#django.db.models.ImageField" title="django.db.models.ImageField"><tt class="xref py py-class docutils literal"><span class="pre">ImageField</span></tt></a> ao seu model, definindo a opção
+<a class="reference internal" href="../ref/models/fields.html#django.db.models.FileField.upload_to" title="django.db.models.FileField.upload_to"><tt class="xref py py-attr docutils literal"><span class="pre">upload_to</span></tt></a> para instruir o Django
+para qual subdiretório do <a class="reference internal" href="../ref/settings.html#std:setting-MEDIA_ROOT"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_ROOT</span></tt></a> ele deve enviar os
+arquivos.</li>
+<li>Tudo que será gravado no seu banco de dados é o caminho para o arquivo
+(relativo ao <a class="reference internal" href="../ref/settings.html#std:setting-MEDIA_ROOT"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_ROOT</span></tt></a>). Você pode também querer usar o
+atributo de conveniência <a class="reference internal" href="../ref/files/file.html#django.core.files.File.url" title="django.core.files.File.url"><tt class="xref py py-attr docutils literal"><span class="pre">url</span></tt></a> fornecido
+pelo Django. Por exemplo, se o seu <a class="reference internal" href="../ref/models/fields.html#django.db.models.ImageField" title="django.db.models.ImageField"><tt class="xref py py-class docutils literal"><span class="pre">ImageField</span></tt></a>
+é chamado <tt class="docutils literal"><span class="pre">mug_shot</span></tt>, você pode obter a URL absoluta para a sua imagem
+em um template com <tt class="docutils literal"><span class="pre">{{</span> <span class="pre">object.mug_shot.url</span> <span class="pre">}}</span></tt>.</li>
+</ol>
+</div>
+<div class="section" id="s-como-eu-torno-uma-variavel-disponivel-em-todos-os-meus-templates">
+<span id="como-eu-torno-uma-variavel-disponivel-em-todos-os-meus-templates"></span><h2>Como eu torno uma variável disponível em todos os meus templates?<a class="headerlink" href="#como-eu-torno-uma-variavel-disponivel-em-todos-os-meus-templates" title="Permalink to this headline">¶</a></h2>
+<p>Algumas vezes seus templates precisam todos da mesma coisa. Um exemplo comum
+seria menus gerados dinamicamente. À primeira vista, parece lógico simplesmente
+adicionar um dicionário comum ao contexto do template.</p>
+<p>A solução correta é usar um <tt class="docutils literal"><span class="pre">RequestContext</span></tt>. Detalhes em como fazer isso
+estão aqui: <a class="reference internal" href="../ref/templates/api.html#subclassing-context-requestcontext"><em>Estendendo Context: RequestContext</em></a>.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">FAQ: Usando o Django</a><ul>
+<li><a class="reference internal" href="#por-que-acontece-um-erro-ao-importar-o-django-settings-module">Por que acontece um erro ao importar o DJANGO_SETTINGS_MODULE?</a></li>
+<li><a class="reference internal" href="#eu-nao-gosto-da-sua-linguagem-de-template-eu-tenho-de-usa-la">Eu não gosto da sua linguagem de template. Eu tenho de usá-la?</a></li>
+<li><a class="reference internal" href="#eu-tenho-de-usar-sua-camada-de-modelo-banco-de-dados">Eu tenho de usar sua camada de modelo/banco de dados?</a></li>
+<li><a class="reference internal" href="#como-eu-uso-os-campos-de-imagem-e-arquivos">Como eu uso os campos de imagem e arquivos?</a></li>
+<li><a class="reference internal" href="#como-eu-torno-uma-variavel-disponivel-em-todos-os-meus-templates">Como eu torno uma variável disponível em todos os meus templates?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="install.html">FAQ: Instalação</a></li>
+    
+    
+      <li>Next: <a href="help.html">FAQ: Obtendo ajuda</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">FAQ do Django</a>
+        
+        <ul><li>FAQ: Usando o Django</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/faq/usage.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="install.html" title="FAQ: Instalação">previous</a> 
+     |
+    <a href="index.html" title="FAQ do Django" accesskey="U">up</a>
+   |
+    <a href="help.html" title="FAQ: Obtendo ajuda">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

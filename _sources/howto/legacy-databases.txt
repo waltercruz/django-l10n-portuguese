@@ -1,0 +1,86 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting to revision. $
+..   $OriginalRevision: 11348 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _howto-legacy-databases:
+
+================================================
+Integrando o Django com um banco de dados legado
+================================================
+
+Embora o Django seja mais adequado para o desenvolvimento de novas 
+aplicações, é bem possível integrá-lo com bases de dados legadas. O Django 
+inclui alguns utilitários para automatizar, tanto quanto possível, este 
+processo.
+
+Este documento assume que você sabe o básico sobre Django, pelo menos o que já
+foi discutido no :ref:`tutorial <intro-tutorial01>`.
+
+Uma vez que você tenha o Django configurado, siga esse processo geral para integrar
+com um banco de dados pré-existente.
+
+Dê ao Django seus parâmetros do banco de dados
+==============================================
+
+Você necessitará informar ao Django os seus parâmetros de conexão com o banco de
+dados, e qual tipo de banco de dados será usado. Faça isso editando estas
+configurações no seu :doc:`arquivo settings </topics/settings>`:
+
+    * :setting:`DATABASE_NAME`
+    * :setting:`DATABASE_ENGINE`
+    * :setting:`DATABASE_USER`
+    * :setting:`DATABASE_PASSWORD`
+    * :setting:`DATABASE_HOST`
+    * :setting:`DATABASE_PORT`
+
+Geramento automático de modelos
+===============================
+
+.. highlight:: bash
+
+O Django vem acompanhado de um utilitário, chamado :djadmin:`inspectdb`, que 
+pode criar modelos a partir de um banco de dados existente. Você pode ver o que
+ele gera usando este comando::
+
+    python manage.py inspectdb
+
+Salve a saída como um arquivo usando o redirecionamento de saída padrão do 
+Unix::
+
+    python manage.py inspectdb > models.py
+
+Esta funcionalidade é entendida como um shortcut (atalho), e não como um
+gerador definitivo de modelos. Veja a :djadmin:`documentação do inspectdb <inspectdb>`
+para mais informações.
+
+Uma vez que você tenha limpado seus modelos, nomeie o arquivo como 
+``models.py`` e coloque-o no pacote Python correspondente à sua aplicação. 
+Então adicione sua aplicação nas configurações de  :setting:`INSTALLED_APPS`.
+
+Instale as tabelas do core do Django
+====================================
+
+Agora, execute o comando :djadmin:`syncdb` para instalar qualquer dado extra
+no banco de dados, como permissões de administração ou tipos de conteúdo::
+
+    python manage.py syncdb
+
+Veja se funciona
+================
+
+Estes são os passos básicos -- a partir daqui você terá de modificar os modelos
+gerados pelo Django até que eles funcionem da maneira que lhe é conveniente. 
+Tente acessar seus dados por meio da API de banco de dados do Django, e tente 
+editar objetos por meio do site de administração do Django.

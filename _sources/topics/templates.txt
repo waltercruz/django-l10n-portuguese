@@ -1,0 +1,649 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+=================================
+A linguagem de template do Django
+=================================
+
+.. admonition:: Sobre este documento
+
+    Este documento explana a sintaxe da linguagem do sistema de template do 
+    Django. Se você estiver procurando por uma perspectiva mais técnica sobre
+    como ela funciona e como extendê-la, veja :doc:`/ref/templates/api`.
+
+A linguagem de template do Django é projetada para atingir um balanço entre
+poder e facilidade. Ela é projetada para ser confortável para aqueles que 
+acostumados a trabalhar com HTML. Se você tem qualquer exposição as outras 
+linguagens de template baseadas em texto, como o Smarty_ ou CheetahTemplate_,
+você deverá sentir-se em casa com os templates do Django.
+
+.. admonition:: Filosofia
+
+    Se você possui experiência prévea em programação, ou se você utilizou 
+    linguagens como PHP que combina código de programação diretamente no HTML, 
+    você deve ter em mente que o sistema de template de Django não é 
+    simplesmente Python embutido no HTML. Isso ocorre por definição: o sistema 
+    de template é usado para expressar apresentação, não lógica de programação.
+
+    O sistema de template do Django fornece tags que funcionam de forma similar
+    a algumas construções em programação -- uma tag :ttag:`if` para testes 
+    boleanos, uma tag :ttag:`for` para laços, etc. -- mas estes não são 
+    simplesmente executados como o código Python correspondente, e o sistema de
+    templates não executará arbitrariamente expressões Python. somente tags, 
+    filtros e a sintaxe listada abaixo são suportados pelo padrão (embora você
+    possa adicionar :doc:`suas próprias extensões </howto/custom-template-tags>
+    à linguagem de template caso seja necessário).
+
+.. _`A linguagem de template do Django: Para programadores Python`: ../templates_python/
+.. _Smarty: http://smarty.php.net/
+.. _CheetahTemplate: http://www.cheetahtemplate.org/
+
+Templates
+=========
+
+.. highlightlang:: html+django
+
+Um template é simplesmente um arquivo de texto. Ele pode gerar qualquer formato
+baseado em texto (HTML, XML, CSV, etc.).
+
+Um template contém **variáveis**, que são substituídas com valores quando o 
+template é processado, e **tags**, que controlam a lógica do template.
+
+Abaixo tem um template mínimo que ilustra coisas básicas. Cada elemento será
+explanado depois neste documento.::
+
+    {% extends "base_generic.html" %}
+
+    {% block title %}{{ section.title }}{% endblock %}
+
+    {% block content %}
+    <h1>{{ section.title }}</h1>
+
+    {% for story in story_list %}
+    <h2>
+      <a href="{{ story.get_absolute_url }}">
+        {{ story.headline|upper }}
+      </a>
+    </h2>
+    <p>{{ story.tease|truncatewords:"100" }}</p>
+    {% endfor %}
+    {% endblock %}
+
+.. admonition:: Filosofia
+
+    Porque usar um template baseado em texto ao invés de um baseado em XML (
+    como o TAL do ZOPE)? Nós queremos que a linguagem de template do Django seja
+    usável para mais do que somente templates XML/HTML. No Mundo Online, nós
+    o usamos para e-mails, JavaScript e CSV. Você pode usar a linguagem de 
+    template para qualquer formato baseado em texto.
+    
+    Oh, e uma coisa mais: Fazer humanos editarem XML é sadismo!
+
+Variáveis
+=========
+
+Variáveis se parecem com isso: ``{{ variável }}``. Quando o motor de template
+encontra uma variável, ele avalia aquela variável e a substitui pelo resultado.
+
+Use um ponto (``.``) para acessar atributos de uma variável.
+
+.. admonition:: Por trás das cenas
+
+    Tecnicamente, quando o sistema de template encontra um ponto, ele tenta
+    seguir a seguinte pesquisa, nesta ordem::
+
+        * Acesso a dicionário
+        * Acesso a atributo
+        * Chamada de método
+        * Acesso a indíce de lista
+
+No exemplo acima, ``{{ section.title }}`` será substituído pelo atributo
+``title`` do objeto ``section``.
+
+Se você usa uma variável que não existe, o sistema de template inserirá o valor
+da configuração ``TEMPLATE_STRING_IF_INVALID``, que é configurada como ``''``
+(uma string vazia) por padrão.
+
+Filtros
+=======
+
+Você pode modificar variáveis para mostrá-las usando **filtros**.
+
+Filtros se parecem com isso: ``{{ name|lower }}``. Isso mostra o valor da
+variável ``{{ name }}`` depois de ser filtrada através do filtro ``lower``, que
+converte o texto para minúsculo. Use um pipe (``|``) para aplicar um filtro.
+
+Filtros podem ser "aninhados." A saída do primeiro é aplicada no próximo.
+``{{ text|escape|linebreaks }}`` é um idioma comum para escapar o conteúdo dos
+textos, e então converter as quebras de linhas para tags ``<p>``.
+
+Alguns filtros recebem argumento. Um argumento de filtro se parece com isso:
+``{{ bio|truncatewords:30 }}``. Ele mostrará as primeiras 30 palavras da
+variável ``bio``.
+
+Argumentos de filtros que contém espaços devem ser posto entre aspas; por 
+exemplo, para unir uma lista com vírgulas e espaços você deverá usar 
+``{{ list|join:", " }}``.
+
+O Django fornece por volta de 30 filtros nativos. Você pode ler tudo sobre eles
+na :ref:`referência de filtros nativos <ref-templates-builtins-filters>`.
+Para ter uma prova do que tem disponível, aqui tem alguns dos filtros de 
+template mais comuns:
+
+    :tfilter:`default`
+        Se uma variável é falsa ou vazia, use o dado default. Do contrário,
+        use o valor da variável
+
+        Por examplo::
+
+            {{ value|default:"nothing" }}
+
+        Se ``value`` não for fornecido ou estiver vazio, a linha acima mostrará
+        "``nothing``".
+
+    :tfilter:`length`
+        Retorna o comprimento do valor. Ele funciona para ambos strings e 
+        listas;
+        Por examplo::
+
+            {{ value|length }}
+
+        Se ``value`` for ``['a', 'b', 'c', 'd']``, a saída será ``4``.
+    
+    :tfilter:`striptags`
+        Mostra todas as tags [X]HTML. Por examplo::
+
+            {{ value|striptags }}
+
+        Se ``value`` for ``"<b>Joel</b> <button>is</button> a
+        <span>slug</span>"``, a saída será ``"Joel is a slug"``.
+
+Novamente, estes são somente alguns poucos exemplo; veja a :ref:`referência de
+filtros nativos <ref-templates-builtins-filters>` para uma lista completa.
+
+Você também pode criar seus próprios filtros de templates;  veja
+:doc:`/howto/custom-template-tags`.
+
+.. seealso::
+
+    Django's admin interface can include a complete reference of all template
+    tags and filters available for a given site. See
+    :doc:`/ref/contrib/admin/admindocs`.
+
+Tags
+====
+
+Tags se parecem com isso: ``{% tag %}``. Tags snao mais complexas do que 
+variáveis: Algumas criam texto na saída, algumas controlam de fluxos executando
+laços ou lógica, e algumas carregam informação externa para dentro do template
+para ser usado por variáveis que surgirão.
+
+Algumas tags necessitam de início e fim (i.e. ``{% tag %} ... conteúdo da tag 
+... {% endtag %}``).
+
+O Django vem acompanhado umas duas dezenas de tags de templates embutidas. Você
+pode ler tudo sobre elas na :ref:`referência de tags nativas 
+<ref-templates-builtins-tags>`. Para ter uma prova do que tem disponível, aqui
+estão algumas das tags mais comuns:
+
+    :ttag:`for`
+        Executa um laço sobre itens de um array. Por exemplo, para mostrar uma
+        lista de atletas em ``athlete_list``::
+
+            <ul>
+            {% for athlete in athlete_list %}
+                <li>{{ athlete.name }}</li>
+            {% endfor %}
+            </ul>
+
+
+    :ttag:`if` and ``else``
+        Avalia se é uma variável, e se a variável é "true" os conteúdos do bloco
+        é mostrado::
+
+            {% if athlete_list %}
+                Number of athletes: {{ athlete_list|length }}
+            {% else %}
+                No athletes.
+            {% endif %}
+
+<<<<<<< HEAD
+        No código acima, se ``athlete_list`` não for vazio, o número de atletas
+        será mostrado pela variável ``{{ athlete_list|lenght }}``.
+
+        You can also use filters and various operators in the ``if`` tag::
+
+            {% if athlete_list|length > 1 %}
+               Team: {% for athlete in athlete_list %} ... {% endfor %}
+            {% else %}
+               Athlete: {{ athlete_list.0.name }}
+            {% endif %}
+
+    :ttag:`block` and :ttag:`extends`
+        Configura `herança de template`_ (veja abaixo), um recurso poderoso de
+        cortar o "clichê" em template.
+
+Novamente, acima tivemos somente uma seleção de toda lista; veja a 
+:ref:`referência de tags nativos <ref-templates-builtins-tags>` para uma lista 
+completa.
+
+Você também pode criar suas próprios tags de template; veja
+:doc:`/howto/custom-template-tags`.
+
+.. seealso::
+
+    Django's admin interface can include a complete reference of all template
+    tags and filters available for a given site. See
+    :doc:`/ref/contrib/admin/admindocs`.
+
+Comentários
+===========
+
+Para comentar parte de uma linha num template, use a sintaxe de comentário:
+``{# #}``.
+
+Por exemplo, este template poderia renderizar como ``'hello'``::
+
+    {# greeting #}hello
+
+Um comentário pode conter qualquer código de template, inválido ou não.
+Por examplo::
+
+    {# {% if foo %}bar{% else %} #}
+
+Esta sintaxe pode somente ser usada para comentário de uma linha (nenhuma linha
+nova é permitida entre os delimitadores ``{#`` e ``#}``). Se você precisa 
+comentar uma porção de linhas de template, veja o tag :ttag:`coment`.
+
+.. _template-inheritance:
+
+Herança de template
+===================
+
+A parte mais poderosa -- e também a mais complexa -- do motor de template
+do Django é a herança de template. Herança de template permite você contruir
+um template "esqueleto" que contém todos os elementos comuns do site e define
+**blocos** que seus filhos podem sobrescrever.
+
+É mais fácil de entender herança de template começando com um exemplo::
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <link rel="stylesheet" href="style.css" />
+        <title>{% block title %}My amazing site{% endblock %}</title>
+    </head>
+
+    <body>
+        <div id="sidebar">
+            {% block sidebar %}
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog/">Blog</a></li>
+            </ul>
+            {% endblock %}
+        </div>
+
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
+    </body>
+    </html>
+
+Este template, que nós chamaremos ``base.html``, define um esqueleto simples de
+um documento HTML que você pode usar para uma simples página em duas colunas.
+
+Neste exemplo, a tag ``{% block %}`` define três blocos que templates filhos
+podem preenchê-los. Todas as tags ``block`` dizem ao motor de template que um
+template filho podem sobrescrever partes de seu template.
+
+Um template filho pode se parecer com isso::
+
+    {% extends "base.html" %}
+
+    {% block title %}My amazing blog{% endblock %}
+
+    {% block content %}
+    {% for entry in blog_entries %}
+        <h2>{{ entry.title }}</h2>
+        <p>{{ entry.body }}</p>
+    {% endfor %}
+    {% endblock %}
+
+A tag ``{% extends %}`` é a chave aqui. Ela diz ao motor de template que este
+template "estende" outro template. Quando o systema de template avalia este 
+template, primeiro ele localiza o pai -- neste case, "base.html".
+
+Neste ponto, o motor de template notificará as três tags ``{% block %}`` no
+``base.html`` e substituirá seus blocos com conteúdos do template filho. 
+Dependendo do valor do ``blog_entries``, a saída pode ficar assim::
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <link rel="stylesheet" href="style.css" />
+        <title>My amazing blog</title>
+    </head>
+
+    <body>
+        <div id="sidebar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog/">Blog</a></li>
+            </ul>
+        </div>
+
+        <div id="content">
+            <h2>Entry one</h2>
+            <p>This is my first entry.</p>
+
+            <h2>Entry two</h2>
+            <p>This is my second entry.</p>
+        </div>
+    </body>
+    </html>
+
+Percebe que como o template filho não define o bloco ``sidebar`` o valor do
+template pai é usado em seu lugar. Conteúdos dentro de uma tag ``{% block %}`` 
+num template pai sempre será usado como reserva.
+
+Você pode usar tantos níveis de herança quantos precisar. Uma forma comum de 
+usar herança é seguir a abordagem de três níveis:
+
+    * Criar um template ``base.html`` que mantem a cara principal do site.
+    * Criar um template ``base_SECTIONNAME.html`` para cada "seção" de seu site.
+      Por exemplo, ``base_news.html``, ``base_sports.html``. Estes templates 
+      todos estendem ``base.html`` e incluem estilos/design específicos da 
+      seção.
+    * Criar templates individuais para cada tipo de página, como num artigo de
+      notícia ou entrada de blog. Estes templates estendem o template da seção 
+      apropriada.
+
+This approach maximizes code reuse and makes it easy to add items to shared
+content areas, such as section-wide navigation.
+Esta abordagem maximiza o reuso de código e torna mais fácil adicionar ítens
+à áreas de conteúdo compartilhado, como num menu de navegação de uma seção.
+
+Aqui tem algumas dicas para se trabalhar com herança:
+
+    * Se você usar ``{% extends %}`` num template, ele deve ser a primeira tag
+      deste template. A herança de template não funcionará, caso contrário.
+
+    * Quanto mais tags ``{% block %}`` em seu template base melhor. Lembre-se,
+      templates filho não podem definir blocos nos pais, então você pode 
+      preencher uma quantidade razoável de blocos padrão, e só então definir o 
+      que você precisará mais tarde. É melhor ter mais hooks do que poucos 
+      hooks.
+
+    * Se você se surpreender duplicando conteúdo em vários templates, é bem
+      provável que isso signifique que você deva morar este conteúdo para um
+      ``{% block %}`` no template pai.
+
+    * Se você precisa obter conteúdo de um bloco no template pai, a variável
+      ``{{ block.super }}`` fará a mágica. Isso é útil se você deseja adicionar
+      conteúdos ao bloco pai ao invés de sobrescrevê-lo completamente. Dados
+      inseridos usando ``{{ block.super }}`` não serão automaticamente escapado 
+      (veja a `próxima seção`_), uma vez que já será escapado, se necessário,
+      no template pai.
+
+    * Para facilitar a leitura extra, você pode opcionalmente dar um *nome* a
+      sua tag ``{% endblock %}``. Por exemplo::
+
+          {% block content %}
+          ...
+          {% endblock content %}
+
+      Em templates grandes, esta técnica ajuda você ver que as tags 
+      ``{% block%}`` foram fechadas.
+
+Finalmente, note que você nnao pode definir várias tags ``{% block %}`` com o
+mesmo nome no mesmo template. Essa limitação existe porque uma tag de bloco 
+funciona em "ambas" direções. Isto é, uma tag de bloco não fornece apenas um 
+buraco para preencher -- ela também define o conteúdo que preenche o buraco no
+*pai*. Se houver duas tags ``{% block %}`` iguais num template, o seu pai não 
+saberá para qual delas é o conteúdo.
+
+.. _próxima seção: #automatic-html-escaping
+.. _automatic-html-escaping:
+
+Escape de HTML automático
+=========================
+
+.. versionadded:: 1.0
+
+Quando um HTML é gerado a partir de templates, sempre há o risco de uma variável
+incluir caracteres que afetam o HTML resultante. Por exemplo, considere este
+fragmento de template::
+
+    Hello, {{ name }}.
+
+A primeira vista, isso parece uma forma inofensiva de mostar o nome do usuário,
+mas considere o que poderia acontecer se o usuário colocasse seu nome desta 
+forma::
+
+    <script>alert('hello')</script>
+
+Com este valor, o template poderia ser renderizado como::
+
+    Hello, <script>alert('hello')</script>
+
+...o que significa que o navegador poderia mostrar uma caixa de alerta de 
+Javascript!
+
+Semelhantemente, o que aconteceria se o nome tivesse um símbolo ``'<'``, tipo
+isso?
+
+    <b>username
+
+Isso poderia resultar num template renderizado desta forma::
+
+    Hello, <b>username
+
+...que, por sua vez, poderia resultar em todo conteúdo restante da página Web
+negritado!
+
+Claramente, não se deve confiar cegamente em dados submetidos por usuários e 
+inseri-los diretamente na sua página Web, pois um usuário malicioso poderia usar
+este tipo de brecha para fazer coisas potencialmente ruins. Este tipo de 
+exploração de sergurança é chamada de ataque `Cross Site Scripting`_ (XSS).
+
+Para evitar este problema, você tem duas opções:
+
+    * Um, você pode assegurar-se de executar cada variável não confiável através
+      do filtro ``escape`` (documentado abaixo), que converte caracteres HTML
+      potencialmente prejudiciais para não prejudiciais. Essa foi uma solução 
+      padrão no Django durante seus primeiros anos, mas o problema é que passa
+      o onus do problema a *você*, o desenvolvedor / autor de template, para
+      assegurar-se de escapar tudo. E é fácil esquecer de escapar dados.
+
+    * Dois, você pode obter vantagem do escape de HTML automático do Django. O
+      restante desta seção descreve como auto-escaping trabalha.
+
+Por padrão no Django, todo template automaticamente escapa a saída de toda tag
+de variável. Especialmente, estes cinco caracteres são escapados:
+
+    * ``<`` é convertido para ``&lt;``
+    * ``>`` é convertido para ``&gt;``
+    * ``'`` (aspas simples) é convertido para ``&#39;``
+    * ``"`` (aspas duplas) é convertido para ``&quot;``
+    * ``&`` é convertido para ``&amp;``
+
+Novamente, ressaltamos que esse comportamento é ativado por padrão. Se você 
+estiver usando o sistema de template do Django , você está protegido.
+
+.. _Cross Site Scripting: http://en.wikipedia.org/wiki/Cross-site_scripting
+
+Como desliga-lo
+---------------
+
+Se você não deseja que os dados sejam escapados automaticamente, ou um por site,
+por nível de template ou por nível de variável, você pode desligá-lo de várias
+formas.
+
+Por que você gostaria de desligá-lo? Porque as vezes, as variáveis de templates
+contém dados que você *pretende* renderizar como HTML puro, nestes casos você
+nnao deseja que seus conteúdos sejam escapados. Por exemplo, você pode 
+armazenar um arquivo HTML em seu banco de dados e desejar mostrá-lo diretamente
+dentro do template. Ou, você pode usar o sistema de template do Django para 
+produzir texto que *não* é HTML -- como uma mensagem de email, por exemplo.
+
+Para valores individuais
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Para desabilitar o escape atual para uma variável individual, use o filtro
+``safe``::
+
+    Isto será escapado: {{ data }}
+    Isto não será escapado: {{ data|safe }}
+
+Pense *seguro* como uma abreviação de *seguro por um escape* ou *pode ser 
+seguramente interpretado como HTML*. Neste exemplo, se ``data`` contém 
+``'<b>'``, a saída será::
+
+    Isto será escapado: &lt;b&gt;
+    Isto não será escapado: <b>
+
+Para blocos de template
+~~~~~~~~~~~~~~~~~~~~~~~
+
+O controle do escape automático para um template, envolve o template (ou somente
+uma seção particular do template) dentro da tag ``autoescape``, desta forma::
+
+    {% autoescape off %}
+        Hello {{ name }}
+    {% endautoescape %}
+
+A tag ``autoescape`` recebe tanto ``on`` quanto ``off`` como seu argumento. Às
+vezes, você pode querer forçar o auto escape quando ela poderia estar 
+desativada. Aqui tem um template de exemplo::
+
+    Auto-escaping is on by default. Hello {{ name }}
+
+    {% autoescape off %}
+        Isso não será escapado automaticamente: {{ data }}.
+
+        Isso não: {{ other_data }}
+        {% autoescape on %}
+            Auto escape aplicado novamente: {{ name }}
+        {% endautoescape %}
+    {% endautoescape %}
+
+A tag auto escape passa seu efeito dentro dos tempaltes que extendem o atual
+bem como templates inclusos via tag ``include``, exatamente como todas as tags 
+de bloco. Por exemplo::
+
+    # base.html
+
+    {% autoescape off %}
+    <h1>{% block title %}{% endblock %}</h1>
+    {% block content %}
+    {% endblock %}
+    {% endautoescape %}
+
+
+    # child.html
+
+    {% extends "base.html" %}
+    {% block title %}This & that{% endblock %}
+    {% block content %}{{ greeting }}{% endblock %}
+
+Pelo auto escape estar desligado no template base, ele também estará desligado
+no template filho, resultando no seguinte HTML renderizado quando a variável
+``greeting`` contiver a string ``<b>Hello!</b>``::
+
+    <h1>This & that</h1>
+    <b>Hello!</b>
+
+Notas
+-----
+
+Geralmente, autores de template não precisam se preocupar muito com auto escape.
+Desenvolvedores do lado do Python (pessoas escrevendo views e filtros) precisam
+pensar sobre os casos em que os dados não devem ser escapados, e marcar os dados
+apropriadamente, só assim as Coisas Funcionam no template.
+
+Se você estiver criando um template que pode ser usado em situações onde você
+não tem certeza de que o auto-escape está ativo, então adicione o filtro 
+``escape`` em qualquer variável que precise ser escapada. Quando o auto escape
+está ativo, não há perigo do filtro ``escape`` escapar duas vezes os dados -- o
+filtro ``escape`` não afeta variáveis auto escapadas.
+
+Literais de string e escape automático
+--------------------------------------
+
+Como mensionamos anteriormente, argumentos de filtros podem ser strings::
+
+    {{ data|default:"Este é um literal string." }}
+
+Todo literal de string é inserido **sem** qualquer escape automático dentro do
+template -- eles agem como se fossem todos passados através do filtro ``safe``. 
+A razão por trás disso é que os autores de templates estão no controle do
+que vai dentro da string, então eles podem estar certos de que o texto está
+corretamente escapado quando o template foi escrito.
+
+Isso significa que você poderia escrever ::
+
+    {{ data|default:"3 &lt; 2" }}
+
+...ao invés de ::
+
+    {{ data|default:"3 < 2" }}  <-- Bad! Don't do this.
+
+Isso não afeta o que acontece com os dados vindos da variável em si. Os 
+conteúdos da variável ainda serão automaticamente escapados, se necessário,
+pois eles estão além do controle do autor.
+
+.. _loading-custom-template-libraries:
+
+Bibliotecas de tags e filtros personalizados
+============================================
+
+Certas aplicaçõoes fornecem bibliotecas com tags e filtros personalizados. Para
+acessá-los no seu template, use a tag ``{% load %}``::
+
+    {% load comments %}
+
+    {% comment_form for blogs.entries entry.id with is_public yes %}
+
+Acima, a tag ``load`` carrega a biblioteca de tags ``comments``, que torna a tag
+``comment_form`` disponível para uso. Consulte a área de documentação no seu
+admin para encontrar a lista de bibliotecas personalizadas na sua instalação.
+
+A tag ``{% load %}`` pode receber vários nomes de bibliotecas, separados por
+espaços. Exemplo::
+
+    {% load comments i18n %}
+
+See :doc:`/howto/custom-template-tags` for information on writing your own custom
+template libraries.
+
+Veja :doc:`/howto/custom-template-tags` para informações sobre como escrever suas
+próprias bibliotecas de template.
+
+Bibliotecas personalizadas e herança de template
+------------------------------------------------
+
+Quando você carrega uma biblioteca de tag ou filtro personalizado, as 
+tags/filtros estão disponíveis somente para o template atual -- não para 
+qualquer pai ou filho ao longo do caminho da herança de template.
+
+Por exemplo, se um template ``foo.html`` tem ``{% load comments %}``, um 
+template filho (e.g., um que tenha ``{% extends "foo.html" %}``) *não* terá 
+acesso às tags e filtros comments. O template filho é responsável pelo seu
+próprio ``{% load comments %}``.
+
+Este é um recurso em prol da manutenção e sanidade.

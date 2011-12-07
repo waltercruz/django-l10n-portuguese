@@ -1,0 +1,170 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11298 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _topics-http-shortcuts:
+
+===========================
+Funções de atalho do Django
+===========================
+
+O pacote ``django.shortcuts`` agrega funções auxiliares e classes que "surgem"
+em múltiplos níveis do MVC. Em outras palavras, essas funções/classes
+introduzem uma união controlada em prol da conveniência.
+
+``render_to_response()``
+========================
+
+``django.shortcuts.render_to_response`` renderiza um dado template com um determinado
+dicionário de contexto e retorna um objeto ``HttpResponse`` com o texto renderizado.
+
+
+Argumentos obrigatórios
+-----------------------
+
+``template``
+	O nome completo do template utilizado ou uma sequência de nomes de template.
+
+Argumentos opcionais
+--------------------
+
+``dictionary``
+	Um dicionário com os valores a serem adicionados ao contexto do template.
+	Por via de regra, é informado um dicionário vazio. Se o valor no dicionário
+	é chamável, a view irá chamá-lo antes de renderizar o template.
+
+``context_instance``
+    Instância de contexto a ser renderizada com o template. Por padrão, o
+    o template vai renderizar com uma instância do ``Context`` (preenchida com
+    valores	de ``dicionário``). Se você precisa usar o :ref:`context processors
+    <subclassing-context-requestcontext>`, renderize o template com uma
+    instância de ``RequestContext``. Seu código pode ficar parecido com o
+    seguinte::
+
+        return render_to_response('my_template.html',
+                                  my_data_dictionary,
+                                  context_instance=RequestContext(request))
+
+``mimetype``
+
+    .. versionadded:: 1.0
+
+    O tipo MIME a ser usado para o documento resultante. Caso nenhum valor seja
+    fornecido, será utilizado o valor de :setting:`DEFAULT_CONTENT_TYPE` do
+    arquivo de settings.py.
+
+Exemplo
+-------
+
+O exemplo a seguir renderiza o template ``myapp/index.html`` com o tipo MIME
+``application/xhtml+xml``::
+
+    from django.shortcuts import render_to_response
+
+    def my_view(request):
+        # Código da View aqui...
+        return render_to_response('myapp/index.html', {"foo": "bar"},
+            mimetype="application/xhtml+xml")
+
+Esse exemplo é equivalente a::
+
+    from django.http import HttpResponse
+    from django.template import Context, loader
+
+    def my_view(request):
+        # Código da View aqui...
+        t = loader.get_template('myapp/template.html')
+        c = Context({'foo': 'bar'})
+        return HttpResponse(t.render(c),
+            mimetype="application/xhtml+xml")
+
+``get_object_or_404``
+=====================
+
+``django.shortcuts.get_object_or_404`` chama
+:meth:`~django.db.models.QuerySet.get()` de um dado gerenciador de modelos,
+mas lança um ``django.http.Http404`` no lugar da exceção ``DoesNotExist``.
+
+Argumentos obrigatórios
+-----------------------
+
+``klass``
+    Uma instância de ``Model``, ``Manager`` ou ``QuerySet`` da qual se pega o
+    objeto.
+
+``**kwargs``
+    Parâmetros de busca que devem estar em um formato aceito por ``get()`` e
+    ``filter()``.
+
+Exemplo
+-------
+
+O seguinte exemplo pega o objeto com a chave primária 1 de ``MyModel``::
+
+    from django.shortcuts import get_object_or_404
+
+    def my_view(request):
+        my_object = get_object_or_404(MyModel, pk=1)
+
+Esse exemplo é equivalente a::
+
+    from django.http import Http404
+
+    def my_view(request):
+        try:
+            my_object = MyModel.objects.get(pk=1)
+        except MyModel.DoesNotExist:
+            raise Http404
+
+Nota: Como com ``get()``, uma exceção ``MultipleObjectsReturned`` será
+lançada caso mais de um objeto seja encontrado.
+
+``get_list_or_404``
+===================
+
+``django.shortcuts.get_list_or_404`` devolve o resultado de
+:meth:`~django.db.models.QuerySet.filter()` em um dado
+gerenciador de modelo, lançando um ``django.http.Http404`` se o resultado da
+lista for vazio.
+
+Argumentos obrigatórios
+-----------------------
+
+``klass``
+    Uma instância de ``Model``, ``Manager`` ou ``QuerySet`` da qual se pega o objeto.
+
+``**kwargs``
+    Parâmetros de busca que devem estar em um formato aceito por ``get()`` e
+    ``filter()``.
+
+Exemplo
+-------
+
+O seguinte exemplo pega todos os objetos publicados de ``MyModel``::
+
+    from django.shortcuts import get_list_or_404
+
+    def my_view(request):
+        my_objects = get_list_or_404(MyModel, published=True)
+
+Esse exemplo é equivalente a::
+
+    from django.http import Http404
+
+    def my_view(request):
+        my_objects = list(MyModel.objects.filter(published=True))
+        if not my_objects:
+            raise Http404
+

@@ -1,0 +1,45 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 14072 $
+..   $TranslationAuthors: Walter Cruz $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _howto-deployment-index:
+
+Implantando o Django
+====================
+
+O Django possui uma série de atalhos para tornar a vida do desenvolvedor web 
+mais fácil, mas de nada vale se você não consegue realizar a implantação de seus 
+sites facilmente. Desde o início do desenvolvimento do Django, o conceito de
+facilidade de implantação tem sido um alvo prioritário. Existem algumas boas
+soluções para se colocar um projeto Django em produção:
+
+.. toctree::
+   :maxdepth: 1
+
+   modwsgi
+   fastcgi
+   mod_python (obsoleto) <modpython>
+
+   
+Se você é novato na implantação do Django e/ou Python, nós recomentadmos que você tente o
+:doc:`mod_wsgi </howto/deployment/modwsgi>` primeiro. Na maioria dos casos ele é a opção de
+implantação mais fácil, rápida e estável.
+
+.. seealso::
+
+    * `O capítulo 12 do Django Book`_ discute a implantação e especialmente
+      a escalabilidade em maiores detalhes.
+
+.. _O capítulo 12 do Django Book: http://djangobook.com/en/2.0/chapter12/

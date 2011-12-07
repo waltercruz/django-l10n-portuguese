@@ -1,0 +1,200 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-forms-widgets:
+
+=======
+Widgets
+=======
+
+.. module:: django.forms.widgets
+   :synopsis: Widgets de formulário embutidos do Django.
+
+.. currentmodule:: django.forms
+
+Um widget é uma representação do Django de um elemento input do HTML. O widget
+manipula a renderização do HTML, e a extração de dados de um dicionário GET/POST
+que correspondem ao widget.
+
+O Django fornece uma representação de todos os widget básicos do HTML, mais
+alguns grupos de widgets comumente usados:
+
+.. class:: TextInput
+
+    Campo de texto: ``<input type='text' ...>``
+
+.. class:: PasswordInput
+
+    Campo de senha: ``<input type='password' ...>``
+
+.. class:: HiddenInput
+
+    Campo invisível: ``<input type='hidden' ...>``
+
+.. class:: MultipleHiddenInput
+
+    Múltiplos widgets ``<input type='hidden' ...>``.
+
+.. class:: FileInput
+
+    Campo de upload de arquivo: ``<input type='file' ...>``
+
+.. class:: DateTimeInput
+
+    .. versionadded:: 1.0
+
+    Campo de Data/hora como uma caixa de texto: ``<input type='text' ...>``
+
+.. class:: Textarea
+
+    Area de texto: ``<textarea>...</textarea>``
+
+.. class:: CheckboxInput
+
+    Checkbox: ``<input type='checkbox' ...>``
+
+.. class:: Select
+
+    Campo select: ``<select><option ...>...</select>``
+
+    Requer que seu campo forneça um :attr:`~Field.choices`.
+
+.. class:: NullBooleanSelect
+
+    Um campo select com as opções 'Unknown', 'Yes' e 'No'
+
+.. class:: SelectMultiple
+
+    Um select que permite seleção múltipla: ``<select
+    multiple='multiple'>...</select>``
+
+    Requer que seu campo forneça um :attr:`~Field.choices`.
+
+.. class:: RadioSelect
+
+    Uma lista de botões radio:
+
+    .. code-block:: html
+
+        <ul>
+          <li><input type='radio' ...></li>
+          ...
+        </ul>
+
+    Requer que seu campo forneça um :attr:`~Field.choices`.
+
+.. class:: CheckboxSelectMultiple
+
+    Uma lista de checkboxes:
+
+    .. code-block:: html
+
+        <ul>
+          <li><input type='checkbox' ...></li>
+          ...
+        </ul>
+
+.. class:: MultiWidget
+
+    Invólucro em torno de vários outros widgets
+
+.. class:: SplitDateTimeWidget
+
+    Invólucro em torno de dois widgets ``TextInput``: um para data, e um para a
+    hora.
+
+Especificando widgets
+---------------------
+
+.. attribute:: Form.widget
+
+Sempre que você especificar um campo em um formulário, o Django irá usar um
+widget padrão que seja apropriado ao tipo de dado que será mostrado. Para
+encontrar que widget é usado em que campo, veja a documentação das classes Field
+embutidas.
+
+No entanto, se você quiser usar um widget diferente para um campo, você pode -
+simplesmente usar o argumento 'widget' na definição de campo. Por exemplo::
+
+    from django import forms
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField(widget=forms.Textarea)
+
+Isso poderia especificar um formulário com um comentário que usa um widget
+Textarea, ao invés do widget padrão TextInput.
+
+Customizando instâncias de widget
+---------------------------------
+
+Quando o Django renderiza um widget como HTML, ele somente renderiza o HTML
+mínimo - o Django não adicionar uma definição class, ou qualquer outro atributo
+específico de widget. Isto significa que todos os widgets 'TextInput' parecerão
+os mesmos em sua página web.
+
+If you want to make one widget look different to another, you need to
+specify additional attributes for each widget. When you specify a
+widget, you can provide a list of attributes that will be added to the
+rendered HTML for the widget.
+
+Se você quiser fazer um widget parecer diferente de outro, você precisa
+especificar atributos adicionais para cada widget. Quando você especificar um
+widget, você pode prover uma lista de atributos que serão adicionados ao HTML
+renderizado do widget.
+
+Por exemplo, pegue este simples formulário::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField()
+
+Este formulário incluirá três widgets TextInput padrão, com renderização
+padrão - sem classe CSS, sem atributos extras. Isto significa que as caixas de
+entrada fornecidas para cada widget serão renderizadas iguais::
+
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+Numa página web real, você provavelmente não vai querer todos os campos iguais.
+Você pode querer um campo maior para o comentário, e você pode querer que o
+widget 'name' tenha alguma classe CSS especial. Para fazer isto, você usa o
+argumento ``attrs`` quando estiver criando o widget:
+
+.. attribute:: Widget.attrs
+
+Por exemplo::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField(
+                    widget=forms.TextInput(attrs={'class':'special'}))
+        url = forms.URLField()
+        comment = forms.CharField(
+                   widget=forms.TextInput(attrs={'size':'40'}))
+
+O Django irá então incluir os atributos extras na saída renderizada::
+
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" class="special"/></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
+

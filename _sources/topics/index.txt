@@ -1,0 +1,53 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 11298 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _topics-index:
+
+Usando o Django
+===============
+
+Introduções para todos os partes-chaves do Django que você precisa conhecer:
+
+.. toctree::
+   :maxdepth: 1
+   
+   install
+   db/index
+   http/index
+   forms/index
+   templates
+   class-based-views
+   generic-views-migration
+   files
+   testing
+   auth
+   cache
+   conditional-view-processing
+   email
+   i18n/index
+   logging
+   pagination
+   serialization
+   settings
+   signals
+
+Deprecated features
+-------------------
+
+.. toctree::
+    :maxdepth: 1
+
+    generic-views

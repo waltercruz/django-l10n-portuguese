@@ -1,0 +1,111 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 11348 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-contrib-humanize:
+
+========================
+django.contrib.humanize
+========================
+
+.. module:: django.contrib.humanize
+   :synopsis: Um conjunto de filtros de templates do Django úteis para adicionar
+              um "toque humano" aos dados.
+
+Um conjunto de filtros de templates do Django úteis para adicinoar um
+"toque humano" aos dados.
+
+Para ativar estes filtros, adicione ``'django.contrib.humanize'`` no seu
+:setting:`INSTALLED_APPS`. Uma vez que feito isso, use ``{% load humanize %}``
+em um template, e você terá acesso a estes filtros:
+
+apnumber
+--------
+
+Para números 1-9, retorna o número como se fala. Do contrário, retorna o próprio
+número. Este segue o estilo Associated Press.
+
+Exemplos:
+
+    * ``1`` torna-se ``'one'``.
+    * ``2`` torna-se ``'two'``.
+    * ``10`` torna-se ``10``.
+
+Você pode passar um inteiro ou mesmo uma representação em string de um inteiro.
+
+intcomma
+--------
+
+Converte um inteiro em uma string contendo vírgulas a cada três dígitos.
+
+Exemplos:
+
+    * ``4500`` torna-se ``'4,500'``.
+    * ``45000`` torna-se ``'45,000'``.
+    * ``450000`` torna-se ``'450,000'``.
+    * ``4500000`` torna-se ``'4,500,000'``.
+
+Você pode passar um inteiro ou mesmo uma representação em string de um inteiro.
+
+intword
+-------
+
+Converte um inteiro grande em uma representação textual agradável. Funciona
+melhor com números acima de 1 milhão.
+
+Exemplos:
+
+    * ``1000000`` torna-se ``'1.0 million'``.
+    * ``1200000`` torna-se ``'1.2 million'``.
+    * ``1200000000`` torna-se ``'1.2 billion'``.
+
+Valores acima de 1000000000000000 (um quadrilhão) são suportados.
+
+Você pode passar um inteiro ou mesmo uma representação em string de um inteiro.
+
+ordinal
+-------
+
+Converte um inteiro em seu ordinal como uma string.
+
+Exemplos:
+
+    * ``1`` torna-se ``'1st'``.
+    * ``2`` torna-se ``'2nd'``.
+    * ``3`` torna-se ``'3rd'``.
+
+Você pode passar um inteiro ou mesmo uma representação em string de um inteiro.
+
+naturalday
+----------
+
+.. versionadded:: 1.0
+
+Para datas que são o dia atual ou dentro de um dia, retorna "today", "tomorrow"
+ou "yesterday", como for apropriado. Do contrário, formata a data usando o
+formato passado.
+
+**Argumento:** String de formato da data como descrito na tag :ttag:`now`.
+
+Exemplos (quando 'today' é 17 Feb 2007):
+
+    * ``16 Feb 2007`` torna-se ``yesterday``.
+    * ``17 Feb 2007`` torna-se ``today``.
+    * ``18 Feb 2007`` torna-se ``tomorrow``.
+    * Any other day is formatted according to given argument or the
+      :setting:`DATE_FORMAT` setting if no argument is given.
+    * Qualquer outro dia é formatado de acordo com o argumento fornecido ou pela
+      configuração :setting:`DATE_FORMAT`, se não houver argumentos informados.
+

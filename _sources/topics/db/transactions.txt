@@ -1,0 +1,396 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+========================================
+Gerenciando transações de banco de dados
+========================================
+
+.. module:: django.db.transaction
+
+O Django dá a você poucos caminhos para controlar como as transações de banco de
+dados são gerenciadas, isso se você estiver usando um banco de dados que suporta
+transações.
+
+Comportamento padrão de transações com Django
+=============================================
+
+O comportamento padrão do Django é executar com uma transação aberta que ele
+comita automaticamente quando quaisquer função interna que modifique a base
+de dados for chamada. Por exemplo, se você chamar ``model.save()`` ou ``model.delete()``,
+a mudança vai ser realizada imediatamente.
+
+Isso parece muito com a configuração auto-commit para a maioria dos bancos
+de dados. Tão logo você performe uma ação que precisa escrever no banco
+de dados, o Django produz um comando ``INSERT``/``UPDATE``/``DELETE`` e
+então faz um ``COMMIT``. Não há ``ROLLBACK`` implícito.
+
+Amarrando transações às requisições HTTP
+========================================
+
+A forma recomendada de lidar com transações em requisições Web é amarrá-las
+às fases requisição/resposta através do ``TransactionMiddleware`` do Django.
+
+Funciona assim: quando uma requisição é iniciada, o Django começa uma transação.
+Se a resposta é produzida sem problemas, o Django commita quaisquer transações
+pendentes. Se a função view produz uma exceção, o Django faz um rollback de
+quaisquer transações pendentes.
+
+Para ativar esta funcionalidade, apenas adicione o ``TransactionMiddleware``
+middleware nos eu setting ``MIDDLEWARE_CLASSES``::
+
+    MIDDLEWARE_CLASSES = (
+        'django.middleware.cache.UpdateCacheMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.transaction.TransactionMiddleware',
+        'django.middleware.cache.FetchFromCacheMiddleware',
+    )
+
+A ordem é bastante importante. O middleware de transação se aplica não somente
+às funções da view, mas também a todos os módulos middleware que que vem após o
+mesmo. Então, se você usar o session middleware após o transaction middleware, a
+criação de sessões será parte da transação.
+
+Uma exceção a isso seria o ``CacheMiddleware``, que nunca é afetado. O cache
+middleware usa seu próprio cursor de banco de dados (que é mapeado para a sua
+própria conexão de banco de dados internamente).
+
+.. _transaction-management-functions:
+
+Controlando o gerenciamento de transações direto nas views
+==========================================================
+
+.. versionchanged:: 1.3
+   Transaction management context managers are new in Django 1.3.
+
+Para a maioria das pessoas, transações baseadas em requisições funciona
+maravilhosamente bem. Porém, se você precisa de um controle mais fino
+sobre como suas transações são gerenciadas, você pode usar um conjunto de funções
+do Python em ``django.db.transaction`` para controlar transações em nível de
+funçãoou por bloco de código.
+
+These functions, described in detail below, can be used in two different ways:
+
+    * As a decorator_ on a particular function. For example::
+
+            from django.db import transaction
+
+            @transaction.commit_on_success
+            def viewfunc(request):
+                # ...
+                # this code executes inside a transaction
+                # ...
+
+    This technique works with all supported version of Python (that is, with
+    Python 2.4 and greater).
+
+    * As a `context manager`_ around a particular block of code::
+
+            from django.db import transaction
+
+            def viewfunc(request):
+                # ...
+                # this code executes using default transaction management
+                # ...
+
+                with transaction.commit_on_success():
+                    # ...
+                    # this code executes inside a transaction
+                    # ...
+
+    The ``with`` statement is new in Python 2.5, and so this syntax can only
+    be used with Python 2.5 and above.
+    
+.. _decorator: http://docs.python.org/glossary.html#term-decorator
+.. _context manager: http://docs.python.org/glossary.html#term-context-manager
+
+For maximum compatibility, all of the examples below show transactions using the
+decorator syntax, but all of the follow functions may be used as context
+managers, too.
+
+.. note::
+
+    Although the examples below use view functions as examples, these
+    decorators and context managers can be used anywhere in your code
+    that you need to deal with transactions.
+
+.. _topics-db-transactions-autocommit:
+
+.. function:: autocommit
+
+    Use o decorador ``autocommit`` para mudar o comportamento padrão de commit de
+    uma view, independente da configuração global das transações.
+
+    Exemplo::
+
+        from django.db import transaction
+
+        @transaction.autocommit
+        def viewfunc(request):
+            ....
+
+        @transaction.autocommit(using="my_other_database")
+        def viewfunc2(request):
+            ....
+
+    Within ``viewfunc()``, transactions will be committed as soon as you call
+    ``model.save()``, ``model.delete()``, or any other function that writes to
+    the database.  ``viewfunc2()`` will have this same behavior, but for the
+    ``"my_other_database"`` connection.
+    
+    Dentro de ``viewfunc()``, transações serão commitadas o tão logo você chame
+    ``model.save()``, ``model.delete()``, ou qualquer outra função que escreva
+    na base de dados. ``viewfunc2()`` will have this same behavior, but for the
+    ``"my_other_database"`` connection.
+
+.. function:: commit_on_success
+    
+    Utilize o decorador ``commit_on_success`` para usar transações únicas para
+    todo o trabalho feito em uma função::
+
+        from django.db import transaction
+
+        @transaction.commit_on_success
+        def viewfunc(request):
+            ....
+
+        @transaction.commit_on_success(using="my_other_database")
+        def viewfunc2(request):
+            ....
+    
+    Se a função retorna com sucesso, então o Django irá commitar todo o trabalho
+    feito na função até aquele ponto. Se a função levanta uma exceção, todavia,
+    o Django irá fazer um rollback na transação.
+
+.. function:: commit_manually
+    
+    Use o decorador ``commit_manually`` se você precisa de um controle
+    completo sobre as transações. Ele diz ao Django que você mesmo
+    irá gerenciar a trasação.
+    
+    Se seu view muda o dado e não executa um ``commit()`` ou ``rollback()``, o
+    Django irá lançar uma exceção ``TransactionManagementError``.
+
+    Gerenciamento manual de transações parece com isso::
+
+        from django.db import transaction
+
+        @transaction.commit_manually
+        def viewfunc(request):
+            ...
+            # You can commit/rollback however and whenever you want
+            transaction.commit()
+            ...
+
+            # But you've got to remember to do it yourself!
+            try:
+                ...
+            except:
+                transaction.rollback()
+            else:
+                transaction.commit()
+
+        @transaction.commit_manually(using="my_other_database")
+        def viewfunc2(request):
+            ....
+
+.. _topics-db-transactions-requirements:
+
+Requirements for transaction handling
+=====================================
+
+.. versionadded:: 1.3
+
+Django requires that every transaction that is opened is closed before
+the completion of a request. If you are using :func:`autocommit` (the
+default commit mode) or :func:`commit_on_success`, this will be done
+for you automatically. However, if you are manually managing
+transactions (using the :func:`commit_manually` decorator), you must
+ensure that the transaction is either committed or rolled back before
+a request is completed.
+
+This applies to all database operations, not just write operations. Even
+if your transaction only reads from the database, the transaction must
+be committed or rolled back before you complete a request.
+
+Como desativar globalmente o gerenciamentod e transações
+========================================================
+
+Controladores obsecados, podem disabilitar totalmente todo gerenciamento de
+transações
+Control freaks can totally disable all transaction management by setting
+``DISABLE_TRANSACTION_MANAGEMENT`` to ``True`` in the Django settings file.
+
+Se você fizer isso, o Django não irá prover qualquer gerenciamento de transação
+automático qualquer. O middleware não irá implicitamente comitar as transações,
+e você precisará gerenciar os rollbacks. Isto requer que você mesmo comita as
+alterações feitas pelo middleware e algo a mais.
+
+Deste modo, é melhor usar isto em situações onde você precisa rodar o seu
+próprio middleware de controle de transações ou fazer algo realmente estranho.
+Em quase todas as situações, você se dará melhor usando o comportamento padrão,
+ou o middleware, e somente modificar as funções selecionadas caso precise.
+
+.. _topics-db-transactions-savepoints:
+
+Savepoints
+==========
+
+Um savepoint é um marcador dentro de uma trasação que habilida você a retornar
+parte de uma transação, ao invés de toda ela. Os savepoints estão disponíveis
+para backends PostgreSQL 8 e Oracle. Outros backends proverão funções savepoint,
+mas eles são operações vazias - eles na verdade não fazem nada.
+
+Os savepoints não são usuais especialmente se você estiver usando o
+comportamento padrão ``autocommit`` do Django. Entretanto, se você estiver
+usando ``commit_on_success`` ou ``commit_manually``, cada transação aberta
+construirá uma série de operações de banco de dados, que aguardarão um commit ou
+um rollback. Se você emitir um rollback, a transação inteira é retrocedida. Os
+savepoints fornecem um habilidade de executar rollbacks com granularidade fina,
+ao invés de um rollback completo que poderia ser executada pelo
+``transaction.rollback()``.
+
+Os savepoints são controlados por três métodos do objeto transação:
+
+.. method:: transaction.savepoint()
+
+    Cria um novo savepoint. Este marca um ponto na transação que é tido como um
+    "bom" estado.
+
+    Retorna o ID do savepoint (sid).
+
+.. method:: transaction.savepoint_commit(sid)
+
+    Atualiza o savepoint para incluir quaisquer operações que tenham sido
+    executadas desde que o savepoint foi criado, ou desde o último commit.
+
+.. method:: transaction.savepoint_rollback(sid)
+
+    Retrocede a transação para o último ponto em que o savepoint foi commitado.
+
+O exemplo a seguir demonstra o uso de savepoints::
+
+    from django.db import transaction
+
+    @transaction.commit_manually
+    def viewfunc(request):
+
+      a.save()
+      # abre a transação agora contentdo a.save()
+      sid = transaction.savepoint()
+
+      b.save()
+      # abre a transação agora contendo a.save() e b.save()
+
+      if want_to_keep_b:
+          transaction.savepoint_commit(sid)
+          # abre a transação que ainda contém a.save() e b.save()
+      else:
+          transaction.savepoint_rollback(sid)
+          # abre a transação agora contendo somente a.save()
+
+      transaction.commit()
+
+Transações no MySQL
+===================
+
+Se você estiver usando o MySQL, suas tabelas podem ou não suportar transações;
+isto depende da versão do MySQL e do tipo de tabelas que você está usando. (Para
+"tipo de tabela," significa algo como "InnoDB" ou "MyISAM".) As peculiaridades
+de transações no MySQL são fora do escopo do artigo, mas o site do MySQL tem
+`informações sobre as transações no MySQL`_.
+
+Se sua instalação do MySQL *não* suporta transações, então o Django irá
+funcionar no modo auto-comit: As consultas serão executadas e comitadas logo que
+forem chamadas. Se sua instalação do MySQL *suporta* transações, o Django irá
+manipular as transações como explicado neste documento.
+
+.. _informações sobre as transações no MySQL: http://dev.mysql.com/doc/refman/5.0/en/sql-syntax-transactions.html
+
+Manipulando exceções em transações do PostgreSQL
+================================================
+
+Quando uma chamada para um cursor do PostgreSQL lança uma exceção (tipicamente
+``IntegrityError``), todo o SQL subsequente na mesma transação irá falhar com o
+o erro "current transation is aborted, queries ignored until end of transation
+block", ou seja, "a transação atual foi abortada, consultas ignoradas até o
+final do bloco da transação". Embora seja improvável que o uso de um simples
+``save()`` gere uma exceção no POstgreSQL, há outros usos mais avançados que
+podem, como o de salvar objetos com campos únicos, salvando usando o flag
+force_insert/force_update, ou invocando uma SQL customizada.
+
+Há várias maneiras de se deparar com este tipo de erro.
+
+Rollback de transações
+----------------------
+
+A primeira opção é retroceder toda a transação. Por exemplo::
+
+    a.save() # Sucesso, mas pode ser desfeita com rollback de transação
+    try:
+        b.save() # Could throw exception
+    except IntegrityError:
+        transaction.rollback()
+    c.save() # sucesso, mas a.save() pode ter sido desfeita
+
+Chamando ``transation.rollback()`` retrocederá toda a transação. Qualquer
+operação de banco de dados não comitada será perdida. Neste exemplo, as mudanças
+feitas pelo ``a.save()`` poderiam ser perdidas, mesmo que a operação não gere um
+erro por si só.
+
+Rollback de savepoints
+----------------------
+
+Se você está usando o PostgreSQL 8 ou superior, você pode usar :ref:`savepoints
+<topics-db-transactions-savepoints>` para controlar a extensão do rollback. Antes
+de realizar uma operação de banco de dados que possa falhar, você pode setar ou
+atualizar o savepoint; dessa forma, se a operação falhar, você pode retroceder
+uma única operação, ao invés de toda transação. Por exemplo::
+
+
+    a.save() # Sucesso, e nunca será desfeita pelo rollback do savepoint
+    try:
+        sid = transaction.savepoint()
+        b.save() # Poderia lançar uma exceção
+        transaction.savepoint_commit(sid)
+    except IntegrityError:
+        transaction.savepoint_rollback(sid)
+    c.save() # Sucesso, e a.save() não será desfeita
+
+Neste exemplo, ``a.save()`` não será desfeito no caso de ``b.save()`` lançar uma
+exceção.
+
+Database-level autocommit
+-------------------------
+
+With PostgreSQL 8.2 or later, there is an advanced option to run PostgreSQL
+with :doc:`database-level autocommit </ref/databases>`. If you use this option,
+there is no constantly open transaction, so it is always possible to continue
+after catching an exception. For example::
+
+    a.save() # succeeds
+    try:
+        b.save() # Could throw exception
+    except IntegrityError:
+        pass
+    c.save() # succeeds
+
+.. note::
+
+    This is not the same as the :ref:`autocommit decorator
+    <topics-db-transactions-autocommit>`. When using database level autocommit
+    there is no database transaction at all. The ``autocommit`` decorator
+    still uses transactions, automatically committing each transaction when
+    a database modifying operation occurs.

@@ -1,0 +1,361 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Como a documentação do Django funciona &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Django internamente" href="index.html" />
+    <link rel="next" title="Django committers" href="committers.html" />
+    <link rel="prev" title="Contributing to Django" href="contributing.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="contributing.html" title="Contributing to Django">previous</a> 
+     |
+    <a href="index.html" title="Django internamente" accesskey="U">up</a>
+   |
+    <a href="committers.html" title="Django committers">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="internals-documentation">
+            
+  <div class="section" id="s-como-a-documentacao-do-django-funciona">
+<span id="s-internals-documentation"></span><span id="como-a-documentacao-do-django-funciona"></span><span id="internals-documentation"></span><h1>Como a documentação do Django funciona<a class="headerlink" href="#como-a-documentacao-do-django-funciona" title="Permalink to this headline">¶</a></h1>
+<p>... e como contribuir.</p>
+<p>A documentação do Django usa o sistema de documentação <a class="reference external" href="http://sphinx.pocoo.org/">Sphinx</a>, que por sua vez
+é baseado no <a class="reference external" href="http://docutils.sourceforge.net/">docutils</a>. A idéia básica é ter uma documentação leve em formato
+de texto-plano, que seja transformada em HTML, PDF, ou qualquer outro formato.</p>
+<p>Na verdade para compilar a documentação localmente, você precisará instalar o
+Sphinx &#8211; <tt class="docutils literal"><span class="pre">easy_install</span> <span class="pre">Sphinx</span></tt> deve fazer a mágica.</p>
+<p>Somente então, transforme tudo em html, para isso é só executar <tt class="docutils literal"><span class="pre">make</span> <span class="pre">html</span></tt>
+dentro do diretório <tt class="docutils literal"><span class="pre">docs</span></tt>.</p>
+<p>Para começar a contribuir, você precisará ler a <a class="reference external" href="http://sphinx.pocoo.org/rest.html">ReStructuredText Primer</a>.
+Depois disso, você poderá ler sobre o <a class="reference external" href="http://sphinx.pocoo.org/markup/">Sphinx-specific markup</a> que é
+utilizado para manipular os metadados, indexação, e cruzamento de referências.</p>
+<p>A principal coisa que você deve manter em mente quando escrever ou editar a
+documentação é, quanto mais semântica você puder colocar, melhor. Então:</p>
+<div class="highlight-python"><pre>Adicione ``django.conrib.auth`` no seu ``INSTALLED_APPS``...</pre>
+</div>
+<p>Não é tão útil quanto:</p>
+<div class="highlight-python"><pre>Adicione :mod:`django.contrib.auth` no seu :setting:`INSTALLED_APPS`...</pre>
+</div>
+<p>Isto porque o Sphinx irá gerar links durante a compilação, que ajudarão muito
+os leitores. Basicamente não há limites para a quantidade de markup que você
+pode adicionar.</p>
+<div class="section" id="s-markup-especifico-do-django">
+<span id="markup-especifico-do-django"></span><h2>Markup específico do Django<a class="headerlink" href="#markup-especifico-do-django" title="Permalink to this headline">¶</a></h2>
+<p>Além das <a class="reference external" href="http://sphinx.pocoo.org/markup/desc.html">markups built-in do Sphinx</a>, a documentação do Django define algumas
+unidades de descrição extras:</p>
+<ul>
+<li><p class="first">Settings:</p>
+<div class="highlight-python"><pre>.. setting:: INSTALLED_APPS</pre>
+</div>
+<p>Para linkar o setting, use <tt class="docutils literal"><span class="pre">:setting:`INSTALLED_APPS`</span></tt>.</p>
+</li>
+<li><p class="first">Tags de template:</p>
+<div class="highlight-python"><pre>.. templatetag:: regroup</pre>
+</div>
+<p>Para linkar, use <tt class="docutils literal"><span class="pre">:ttag:`regroup`</span></tt>.</p>
+</li>
+<li><p class="first">Filtros de template:</p>
+<div class="highlight-python"><pre>.. templatefilter:: linebreaksbr</pre>
+</div>
+<p>Para linkar, use <tt class="docutils literal"><span class="pre">:tfilter:`linebreaksbr`</span></tt>.</p>
+</li>
+<li><p class="first">Lookups de campos (i.e. <tt class="docutils literal"><span class="pre">Foo.objects.filter(bar__exact=qualquercoisa)</span></tt>):</p>
+<div class="highlight-python"><pre>.. fieldlookup:: exact</pre>
+</div>
+<p>Para linkar, use <tt class="docutils literal"><span class="pre">:lookup:`exact`</span></tt>.</p>
+</li>
+<li><p class="first">Comandos do <tt class="docutils literal"><span class="pre">django-admin</span></tt>:</p>
+<div class="highlight-python"><pre>.. django-admin:: syncdb</pre>
+</div>
+<p>Para linkar, use <tt class="docutils literal"><span class="pre">:djadmin:`syncdb`</span></tt>.</p>
+</li>
+<li><p class="first">Opções de linha de comando do <tt class="docutils literal"><span class="pre">django-admin</span></tt>:</p>
+<div class="highlight-python"><pre>.. django-admin-option:: --traceback</pre>
+</div>
+<p>Para linkar, use <tt class="docutils literal"><span class="pre">:djadminopt:`--traceback`</span></tt>.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="s-um-exemplo">
+<span id="um-exemplo"></span><h2>Um Exemplo<a class="headerlink" href="#um-exemplo" title="Permalink to this headline">¶</a></h2>
+<p>Para um exemplo rápido de como tudo se agrupa, dá uma olhada nisso:</p>
+<ul>
+<li><p class="first">Primeiro, o documento <tt class="docutils literal"><span class="pre">ref/settings.txt</span></tt> começa, dessa forma:</p>
+<div class="highlight-python"><pre>.. _ref-settings:
+
+Configurações disponíveis
+=========================
+
+...</pre>
+</div>
+</li>
+<li><p class="first">Em seguida se olharmos para o documento <tt class="docutils literal"><span class="pre">topics/settings,</span> <span class="pre">você</span> <span class="pre">pode</span> <span class="pre">ver</span>
+<span class="pre">como</span> <span class="pre">um</span> <span class="pre">link</span> <span class="pre">para</span> <span class="pre">``ref/settings</span></tt> funciona:</p>
+<div class="highlight-python"><pre>.. _available-settings:
+
+Available settings
+==================
+
+...
+
+.. _deprecated-settings:
+
+Deprecated settings
+===================
+
+...</pre>
+</div>
+</li>
+<li><p class="first">Next, the <tt class="docutils literal"><span class="pre">topics/settings.txt</span></tt> document could contain something like
+this:</p>
+<div class="highlight-rst"><div class="highlight"><pre>You can access a :ref:`listing of all available settings
+<span class="nt">&lt;available-settings&gt;</span>`. For a list of deprecated settings see
+<span class="na">:ref:</span><span class="nv">`deprecated-settings`</span>.
+
+You can find both in the <span class="na">:doc:</span><span class="nv">`settings reference document &lt;/ref/settings&gt;`</span>.
+</pre></div>
+</div>
+<p>We use the Sphinx <a class="reference external" href="http://sphinx.pocoo.org/markup/inline.html#role-doc">doc</a> cross reference element when we want to link to
+another document as a whole and the <a class="reference external" href="http://sphinx.pocoo.org/markup/inline.html#role-ref">ref</a> element when we want to link to
+an arbitrary location in a document.</p>
+</li>
+</ul>
+<ul>
+<li><p class="first">Next, notice how the settings are annotated:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span class="p">..</span> <span class="ow">setting</span><span class="p">::</span> ADMIN_FOR
+
+<span class="gh">ADMIN_FOR</span>
+<span class="gh">---------</span>
+
+Padrão: <span class="s">``()``</span> (Tupla vazia)
+
+Usado para definir módulos do site de administraçaõ. este deve ser uma
+tupla de configurações de módulos (no formato <span class="s">``&#39;foo.bar.baz&#39;``</span>) para
+que este site tenha uma amdinistração.
+
+O site de administração usa isto em sua instrospecção automática da
+documentação de models, views e tags de template.
+</pre></div>
+</div>
+<p>Isto marca o seguinte cabeçalho como um alvo &quot;canonico&quot; para a
+configuração <tt class="docutils literal"><span class="pre">ADMIN_FOR</span></tt>. Isto significa que toda vez que você fores
+mencionar <tt class="docutils literal"><span class="pre">ADMIN_FOR</span></tt>, podes referenciá-lo utilizando
+<tt class="docutils literal"><span class="pre">:setting:`ADMIN_FOR`</span></tt>.</p>
+</li>
+</ul>
+<p>Basicamente, é desta forma que tudo se encaixa.</p>
+</div>
+<div class="section" id="s-todo">
+<span id="todo"></span><h2>TODO<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h2>
+<p>O trabalho está na maioria feito, mas aqui tem o que falta, em ordem de
+prioridade.</p>
+<ul>
+<li><p class="first">A maior parte dos documentos <tt class="docutils literal"><span class="pre">index.txt</span></tt> têm textos de introdução
+<em>muito</em> curtos, ou quase inexistem. Cada um destes documentos precisar de
+de um bom conteúdo de introdução.</p>
+</li>
+<li><p class="first">O glossário é muito superficial. Ele precisa ser preenchido.</p>
+</li>
+<li><p class="first">E mais alvos de metadados: há vários lugares que se parecem com isso:</p>
+<div class="highlight-python"><pre>``File.close()``
+~~~~~~~~~~~~~~~~</pre>
+</div>
+<p>... e deveria ser:</p>
+<div class="highlight-python"><pre>.. method:: File.close()</pre>
+</div>
+<p>Que é, usar os metadados no lugar de títulos.</p>
+</li>
+<li><p class="first">Adicionar mais links -- quase tudo o que um código inline literal,
+provavelmente pode ser transformado em um xref.</p>
+<p>Veja o arquivo <tt class="docutils literal"><span class="pre">literals_to_xrefs.py</span></tt> no <tt class="docutils literal"><span class="pre">_ext</span></tt> -- este é um script
+shell para ajudar no trabalho.</p>
+<p>Este será, ou provavelmente continuará sendo, um projeto sem fim.</p>
+</li>
+<li><p class="first">Adicionar <a class="reference external" href="http://sphinx.pocoo.org/markup/desc.html#info-field-lists">listas de informações de campos</a> onde for apropriado.</p>
+</li>
+<li><p class="first">Adicionar <tt class="docutils literal"><span class="pre">..</span> <span class="pre">code-block::</span> <span class="pre">&lt;lang&gt;</span></tt> para blocos literais para que eles
+sejam destacados.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="s-dicas">
+<span id="dicas"></span><h2>Dicas<a class="headerlink" href="#dicas" title="Permalink to this headline">¶</a></h2>
+<p>Algumas dicas para fazer as coisas parecerem melhor:</p>
+<ul>
+<li><p class="first">Sempre que possível, use links. Então, use <tt class="docutils literal"><span class="pre">:setting:`ADMIN_FOR`</span></tt> ao
+invés de <tt class="docutils literal"><span class="pre">``ADMIN_FOR``</span></tt>.</p>
+</li>
+<li><p class="first">Algumas diretivas (<tt class="docutils literal"><span class="pre">..</span> <span class="pre">setting::</span></tt>, por exemplo) são diretivas de estilo
+prefixado; elas vão <em>antes</em> da unidade que estão descrevendo. Estas são
+conhecidas como diretivas &quot;crossref&quot;. Já outras (<tt class="docutils literal"><span class="pre">..</span> <span class="pre">class::</span></tt>, ex.)
+geram suas próprias marcações; elas devem ir dentro da seção que estão
+descrevendo. São chamadas &quot;unidades de descrição&quot;.</p>
+<p>Você pode dizer quem é quem olhando no <tt class="file docutils literal"><span class="pre">_ext/djangodocs.py</span></tt>; que
+registra as regras tanto para uma quanto para outra.</p>
+</li>
+<li><p class="first">Quando estiver referindo-se a classes/funções/módulos, etc., você terá que
+usar um nome completo para o alvo
+(<tt class="docutils literal"><span class="pre">:class:`django.contrib.contenttypes.models.ContentType`</span></tt>).</p>
+<p>Uma vez que isto não pareça ser uma saída incrível -- ela mostra o caminho
+completo para o objeto -- você pode prefixar o alto com um <tt class="docutils literal"><span class="pre">~</span></tt> para usar
+somente o final do caminho. Então
+<tt class="docutils literal"><span class="pre">:class:`~django.contrib.contenttypes.models.ContentType`</span></tt> mostrará
+somente um link com o título &quot;ContentType&quot;.</p>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Como a documentação do Django funciona</a><ul>
+<li><a class="reference internal" href="#markup-especifico-do-django">Markup específico do Django</a></li>
+<li><a class="reference internal" href="#um-exemplo">Um Exemplo</a></li>
+<li><a class="reference internal" href="#todo">TODO</a></li>
+<li><a class="reference internal" href="#dicas">Dicas</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="contributing.html">Contributing to Django</a></li>
+    
+    
+      <li>Next: <a href="committers.html">Django committers</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Django internamente</a>
+        
+        <ul><li>Como a documentação do Django funciona</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/internals/documentation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="contributing.html" title="Contributing to Django">previous</a> 
+     |
+    <a href="index.html" title="Django internamente" accesskey="U">up</a>
+   |
+    <a href="committers.html" title="Django committers">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

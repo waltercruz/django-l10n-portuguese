@@ -1,0 +1,139 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done $
+..   $OriginalRevision: 11268 $
+..   $TranslationAuthors: Robson Mendonça, Walter Cruz $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-files-file:
+
+O objeto ``File``
+=================
+
+.. currentmodule:: django.core.files
+
+.. class:: File(file_object)
+
+atributos e métodos de ``File``
+-------------------------------
+
+O ``File`` do Django tem os seguintes atributos e métodos:
+
+.. attribute:: File.name
+
+    O nome do arquivo incluindo o caminho relativo de :setting:`MEDIA_ROOT`.
+
+.. attribute:: File.path
+
+    O caminho absoluto do arquivo no sistema de arquivos
+
+    :ref:`Sistemas de armazenamento de arquivos personalizados <howto-custom-file-storage>` podem não gravar
+    arquivos localmente; arquivos gravados nesses sistemas terão o ``path`` com valor
+    ``None``.
+
+.. attribute:: File.url
+
+    A URL onde o arquivo pode ser obtido. Isso é frequentemente útil em
+    :doc:`templates </topics/templates>`; por exemplo, um snippet de um template
+    para exibir um ``Car`` (veja abaixo) poderia ser assim:
+
+    .. code-block:: html+django
+
+        <img src='{{ car.photo.url }}' alt='{{ car.name }}' />
+
+.. attribute:: File.size
+
+    O tamanho do arquivo em bytes.
+
+.. method:: File.open(mode=None)
+
+    Abre ou reabre o arquivo (que por definição também faz um ``File.seek(0)``).
+    O argumento ``mode`` segue os mesmos valores do ``open()`` padrão
+    do Python.
+
+    Ao reabrir um arquivo, o ``mode`` irá sobrescrever o modo com quem o
+    arquivo foi originalmente aberto; ``None`` significa reabrir no modo original.
+
+.. method:: File.read(num_bytes=None)
+
+    Lê o conteúdo do arquivo. O argumento opcional ``size`` é o número de bytes a
+    serem lidos; se não for especificado, o arquivo será lido por completo.
+
+.. method:: File.__iter__()
+
+    Itera sobre o arquivo retornando uma linha por vez.
+
+.. method:: File.chunks(chunk_size=None)
+
+    Itera sobre o arquivo retornando "pedaços" de um dado tamanho. O padrão para
+    ``chunk_size`` é 64 KB.
+
+    Isto é especialmente útil com arquivos muito grandes, desde que os permitem
+    serem enviados por stream para o disco, evitando o armazenamento de todo o
+    arquivo na memória.
+
+.. method:: File.multiple_chunks(chunk_size=None)
+
+    Retorna ``True`` se o arquivo é grande o suficiente para exigir múltiplos pedaços
+    ou se todo o seu conteúdo pode ser acessado no ``chunk_size`` fornecido.
+
+.. method:: File.write(content)
+
+    Escreve a string especificada no conteúdo do arquivo. Dependendo do sistema de
+    armazenamento nos bastidores, esse conteúdo pode não estar completamente escrito até
+    ``close()`` ser chamado no arquivo.
+
+.. method:: File.close()
+
+    Fecha o arquivo.
+
+Atributos adicionais de ``ImageField``
+--------------------------------------
+
+.. attribute:: File.width
+
+    Tamanho da imagem.
+
+.. attribute:: File.height
+
+    Altura da image.
+
+Métodos adicionais de arquivos anexados a objetos
+-------------------------------------------------
+
+.. highlight:: pycon
+
+Qualquer :class:`File` que esteja associado com um objeto (como o ``Car.photo``,
+no exemplo acima) irá ter algums métodos extras:
+
+.. method:: File.save(name, content, save=True)
+
+    Salva um novo arquivo com o nome de arquivo e conteúdo fornecidos. Não irá
+    substituir o arquivo original, mas criar um novo arquivo e atualizar o objeto
+    para apontar pra ele. Se ``save`` é ``True``, o método ``save()`` do modelo irá
+    ser chamado assim que o arquivo é salvo. Assim, essas duas linhas::
+
+        >>> car.photo.save('myphoto.jpg', contents, save=False)
+        >>> car.save()
+
+    são o mesmo que essa única linha::
+
+        >>> car.photo.save('myphoto.jpg', contents, save=True)
+
+    Note que o argumento ``content`` deve ser uma instância da classe
+    :class:`File` ou uma subclasse de :class:`File`.
+
+.. method:: File.delete(save=True)
+
+    Remove o arquivo da instância do modelo e deleta o arquivo em si. O argumento
+    ``save`` funciona como acima.
+

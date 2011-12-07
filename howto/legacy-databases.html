@@ -1,0 +1,232 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Integrando o Django com um banco de dados legado &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Guias “como fazer”" href="index.html" />
+    <link rel="next" title="Exportando CSV com o Django" href="outputting-csv.html" />
+    <link rel="prev" title="Rodando Django no Jython" href="jython.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="jython.html" title="Rodando Django no Jython">previous</a> 
+     |
+    <a href="index.html" title="Guias &amp;#8220;como fazer&amp;#8221;" accesskey="U">up</a>
+   |
+    <a href="outputting-csv.html" title="Exportando CSV com o Django">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-legacy-databases">
+            
+  <div class="section" id="s-integrando-o-django-com-um-banco-de-dados-legado">
+<span id="s-howto-legacy-databases"></span><span id="integrando-o-django-com-um-banco-de-dados-legado"></span><span id="howto-legacy-databases"></span><h1>Integrando o Django com um banco de dados legado<a class="headerlink" href="#integrando-o-django-com-um-banco-de-dados-legado" title="Permalink to this headline">¶</a></h1>
+<p>Embora o Django seja mais adequado para o desenvolvimento de novas
+aplicações, é bem possível integrá-lo com bases de dados legadas. O Django
+inclui alguns utilitários para automatizar, tanto quanto possível, este
+processo.</p>
+<p>Este documento assume que você sabe o básico sobre Django, pelo menos o que já
+foi discutido no <a class="reference internal" href="../intro/tutorial01.html#intro-tutorial01"><em>tutorial</em></a>.</p>
+<p>Uma vez que você tenha o Django configurado, siga esse processo geral para integrar
+com um banco de dados pré-existente.</p>
+<div class="section" id="s-de-ao-django-seus-parametros-do-banco-de-dados">
+<span id="de-ao-django-seus-parametros-do-banco-de-dados"></span><h2>Dê ao Django seus parâmetros do banco de dados<a class="headerlink" href="#de-ao-django-seus-parametros-do-banco-de-dados" title="Permalink to this headline">¶</a></h2>
+<p>Você necessitará informar ao Django os seus parâmetros de conexão com o banco de
+dados, e qual tipo de banco de dados será usado. Faça isso editando estas
+configurações no seu <a class="reference internal" href="../topics/settings.html"><em>arquivo settings</em></a>:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../ref/settings.html#std:setting-DATABASE_NAME"><tt class="xref std std-setting docutils literal"><span class="pre">DATABASE_NAME</span></tt></a></li>
+<li><a class="reference internal" href="../ref/settings.html#std:setting-DATABASE_ENGINE"><tt class="xref std std-setting docutils literal"><span class="pre">DATABASE_ENGINE</span></tt></a></li>
+<li><a class="reference internal" href="../ref/settings.html#std:setting-DATABASE_USER"><tt class="xref std std-setting docutils literal"><span class="pre">DATABASE_USER</span></tt></a></li>
+<li><a class="reference internal" href="../ref/settings.html#std:setting-DATABASE_PASSWORD"><tt class="xref std std-setting docutils literal"><span class="pre">DATABASE_PASSWORD</span></tt></a></li>
+<li><a class="reference internal" href="../ref/settings.html#std:setting-DATABASE_HOST"><tt class="xref std std-setting docutils literal"><span class="pre">DATABASE_HOST</span></tt></a></li>
+<li><a class="reference internal" href="../ref/settings.html#std:setting-DATABASE_PORT"><tt class="xref std std-setting docutils literal"><span class="pre">DATABASE_PORT</span></tt></a></li>
+</ul>
+</div>
+<div class="section" id="s-geramento-automatico-de-modelos">
+<span id="geramento-automatico-de-modelos"></span><h2>Geramento automático de modelos<a class="headerlink" href="#geramento-automatico-de-modelos" title="Permalink to this headline">¶</a></h2>
+<p>O Django vem acompanhado de um utilitário, chamado <a class="reference internal" href="../ref/django-admin.html#django-admin-inspectdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">inspectdb</span></tt></a>, que
+pode criar modelos a partir de um banco de dados existente. Você pode ver o que
+ele gera usando este comando:</p>
+<div class="highlight-bash"><div class="highlight"><pre>python manage.py inspectdb
+</pre></div>
+</div>
+<p>Salve a saída como um arquivo usando o redirecionamento de saída padrão do
+Unix:</p>
+<div class="highlight-bash"><div class="highlight"><pre>python manage.py inspectdb &gt; models.py
+</pre></div>
+</div>
+<p>Esta funcionalidade é entendida como um shortcut (atalho), e não como um
+gerador definitivo de modelos. Veja a <a class="reference internal" href="../ref/django-admin.html#django-admin-inspectdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">documentação</span> <span class="pre">do</span> <span class="pre">inspectdb</span></tt></a>
+para mais informações.</p>
+<p>Uma vez que você tenha limpado seus modelos, nomeie o arquivo como
+<tt class="docutils literal"><span class="pre">models.py</span></tt> e coloque-o no pacote Python correspondente à sua aplicação.
+Então adicione sua aplicação nas configurações de  <a class="reference internal" href="../ref/settings.html#std:setting-INSTALLED_APPS"><tt class="xref std std-setting docutils literal"><span class="pre">INSTALLED_APPS</span></tt></a>.</p>
+</div>
+<div class="section" id="s-instale-as-tabelas-do-core-do-django">
+<span id="instale-as-tabelas-do-core-do-django"></span><h2>Instale as tabelas do core do Django<a class="headerlink" href="#instale-as-tabelas-do-core-do-django" title="Permalink to this headline">¶</a></h2>
+<p>Agora, execute o comando <a class="reference internal" href="../ref/django-admin.html#django-admin-syncdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">syncdb</span></tt></a> para instalar qualquer dado extra
+no banco de dados, como permissões de administração ou tipos de conteúdo:</p>
+<div class="highlight-bash"><div class="highlight"><pre>python manage.py syncdb
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-veja-se-funciona">
+<span id="veja-se-funciona"></span><h2>Veja se funciona<a class="headerlink" href="#veja-se-funciona" title="Permalink to this headline">¶</a></h2>
+<p>Estes são os passos básicos -- a partir daqui você terá de modificar os modelos
+gerados pelo Django até que eles funcionem da maneira que lhe é conveniente.
+Tente acessar seus dados por meio da API de banco de dados do Django, e tente
+editar objetos por meio do site de administração do Django.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Integrando o Django com um banco de dados legado</a><ul>
+<li><a class="reference internal" href="#de-ao-django-seus-parametros-do-banco-de-dados">Dê ao Django seus parâmetros do banco de dados</a></li>
+<li><a class="reference internal" href="#geramento-automatico-de-modelos">Geramento automático de modelos</a></li>
+<li><a class="reference internal" href="#instale-as-tabelas-do-core-do-django">Instale as tabelas do core do Django</a></li>
+<li><a class="reference internal" href="#veja-se-funciona">Veja se funciona</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="jython.html">Rodando Django no Jython</a></li>
+    
+    
+      <li>Next: <a href="outputting-csv.html">Exportando CSV com o Django</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Guias &#8220;como fazer&#8221;</a>
+        
+        <ul><li>Integrando o Django com um banco de dados legado</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/howto/legacy-databases.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="jython.html" title="Rodando Django no Jython">previous</a> 
+     |
+    <a href="index.html" title="Guias &amp;#8220;como fazer&amp;#8221;" accesskey="U">up</a>
+   |
+    <a href="outputting-csv.html" title="Exportando CSV com o Django">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

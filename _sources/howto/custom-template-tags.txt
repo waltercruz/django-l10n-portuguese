@@ -1,0 +1,975 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+=========================================
+Tags e filtros de template personalizados
+=========================================
+
+Introdução
+==========
+
+O sistema de template do Django vem com uma larga variedade de :doc:`tags e
+filtros embutidos </ref/templates/builtins>` projetados para direcionar a lógida
+da apresentação que sua aplicação. Todavia, você pode se encontrar precisando de
+funcionalidades que não são cobertas pelo conjunto de primitivas de template.
+Você pode extender o motor de template definindo tags e filtros personalizados
+usando Python, e então torná-los disponíveis aos seus templates usando a tag
+``{% load %}``.
+
+Layout do código
+----------------
+
+Tags e filtros de template customizados devem estar dentro de uma Django app. Se
+elas estão relacionadas a uma app existente, faz mais sentido estarem
+empacotados na app; caso contrário, você deveria criar uma nova app para
+armazená-los.
+
+A app deve conter um diretório ``templatetags``, no mesmo nível do
+``models.py``, ``views.py``, etc. Se ele não existe ainda, é só criá-lo - não
+esqueça o arquivo ``__init__.py`` para assegurar que o diretório seja tratado
+como um pacote Python.
+
+Suas tags e filtros personalizados ficaram nesse módulo dentro do diretório
+``templatetags``. O nome do arquivo do módulo é o nome que você usará para
+carregar as tags depois, então seja cuidadoso ao criar um nome que não colida
+com as tags e filtros de outras apps.
+
+Por exemplo, se sua tags/filtros estão num arquivo chamado ``poll_extras.py``,
+o layout de sua app deve parecer com isso::
+
+    polls/
+        models.py
+        templatetags/
+            __init__.py
+            poll_extras.py
+        views.py
+
+E nos seus templates você poderia usar o seguinte:
+
+.. code-block:: html+django
+
+    {% load poll_extras %}
+
+A app que contém as tags personalizadas deve estar no :setting:`INSTALLED_APPS`
+para que a tag ``{% load %}`` funcione. Esta é uma medida de segunrança: Ela
+permite que você armazene código Python para muitas bibliotecas de template num
+único servidor, sem permitir o acesso a todas elas para toda instalação do
+Django.
+
+Não há limites de quantos módulos você pode colocar no pácote ``templatetags``.
+Só tenha em mente que uma declaração ``{% load %}`` carregará tags/filtros para
+uma dado nome de módulo Python, não o nome da app.
+
+Para uma biblioteca de tag ser válida, o módulo deve conter uma variável chamada
+``register`` que é uma instância do ``templates.Library``, na qual todas as tags
+e filtros são registrados. Então, no topo de seu módulo, coloque o seguinte::
+
+    from django import template
+
+    register = template.Library()
+
+.. admonition:: Por trás das cenas
+
+    Para uma tonelada de exemplos, leia o código font dos filtros e tags padrão
+    do Django. Eles estão em ``django/templates/defaultfilters.py`` e
+    ``django/template/defaulttags.py``, respectivamente.
+
+
+Escrevendo filtros de template personalizados
+---------------------------------------------
+
+Filtros personalizados são como funções Python que recebem um ou dois
+argumentos:
+
+    * O valor de uma variável (input) -- não necessariamente uma string.
+    * O valor de um argumento -- este pode ter um valor padrão, ou ser deixado
+      de fora.
+
+Por exemplo, no filtro ``{{ var|foo:"bar"}}``, ao filtro ``foo`` seria passado
+a variável ``var`` e o argumento ``"bar"``.
+
+Funções filtro devem sem retornar algo. Elas não lançam exceções. Elas falham
+silenciosamente. No caso de um erro, elas devem retornar a entrada original ou
+uma string vazia -- o que fizer mais sentido.
+
+Aqui temos um exemplo de definição de filtro::
+
+    def cut(value, arg):
+        "Remove todos os valores do arg da string fornecida."
+        return value.replace(arg, '')
+
+E aqui tem um exemplo de como este filtro poderia ser usado:
+
+.. code-block:: html+django
+
+    {{ somevariable|cut:"0" }}
+
+A maioria dos filtros não recebem argumentos. Neste caso, é só deixar o
+argumento fora de sua função. Exemplo::
+
+    def lower(value): # Somente um argumento.
+        "Converte uma string para minúsculo"
+        return value.lower()
+
+Filtros de template que esperam strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Se você estiver escrevendo um filtro de template que somente expera uma string
+como o primeiro argumento, você deve usar o decorador ``stringfilter``. Este
+converterá um objeto para seu valor em string antes de ser passado para a sua
+função::
+
+    from django.template.defaultfilters import stringfilter
+
+    @stringfilter
+    def lower(value):
+        return value.lower()
+
+Desta forma, você será poderá passar, digo, um inteiro para este filtro, e ele
+não causará um ``AttributeError`` (pois inteiros não possuem métodos
+``lower()``).
+
+Registrando filtros personalizados
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Uma vez que tenha escrito sua definição de filtro, você precisa registrá-lo na
+sua instância ``Library``, para torná-lo disponível na linguagem de template do
+Django::
+
+    register.filter('cut', cut)
+    register.filter('lower', lower)
+
+O método ``Library.filter()`` recebe dois argumentos:
+
+    1. O nome do filtro -- uma string.
+    2. A função de compilação -- uma função Python (não o nome da função como
+       uma string).
+
+Você pode usar ``register.filter()`` como um decorador, no entanto::
+
+    @register.filter(name='cut')
+    @stringfilter
+    def cut(value, arg):
+        return value.replace(arg, '')
+
+    @register.filter
+    @stringfilter
+    def lower(value):
+        return value.lower()
+
+Se você deixa desligado o argumento ``name``, como no segundo exemplo acima, o
+Django usará o nome da função como o nome do filtro.
+
+Filtros e auto-escaping
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Quando esiver escrevendo um filtro personalizado, pense um pouco em como o
+filtro irá interagir com o comportamento de auto-escaping do Django. Note que há
+três tipos de strings que podem ser passadas por dentro de um código de
+template:
+
+    * **Strings puras** são tipos nativos do Python ``str`` ou ``unicode``. Na
+      saída, elas são escapadas se o auto-escaping estiver em efeito e
+      apresenta-se inalterado.
+
+    * **Strings seguras** são strings que foram marcadas como seguras por um
+      escape fora de tempo. Qualquer escape necessário já foi feito.
+      Elas são comumente usados para a saída que contém HTML puro que destina-se
+      a ser interpretado, assim como está, no lado do cliente.
+
+      Internamente, estas strings são do typo ``SafeString`` ou ``SafeUnicode``.
+      Elas compartilham uma classe básica comum de ``SafeData``, então você pode
+      testá-las usando um código como este::
+
+          if isinstance(value, SafeData):
+              # Faça algo com a string "safe".
+
+    * **Strings marcadas como "precisando escapar"** são *sempre* escapadas na
+      saída, indiferente se elas estão num bloco ``autoescape`` ou não.
+      Essas strings são somente escapadas uma vez, contudo, mesmo se o
+      auto-escaping se aplica.
+
+      Internamente, estas strings são do tipo ``EscapeString`` ou
+      ``EscapeUnicode``. Geralmente você não tem de se preocupar com eles; eles
+      existem para implementação do filtro ``escape``.
+
+Código de filtros de template caem em uma de duas situações:
+
+    1. Seu filtro não introduz quaisquer caracteres HTML não seguros (``<``,
+       ``>``, ``'``, ``"`` or ``&``) no resultado que ainda não foi
+       aprensentado. Neste caso, você pode deixar o Django se preocupar com todo
+       o auto-escaping por você. Tudo que você precisa fazer é colocar o
+       atributo ``is_safe`` sobre o sua função filtro e setá-lo como ``True``,
+       assim::
+
+           @register.filter
+           def myfilter(value):
+               return value
+           myfilter.is_safe = True
+
+       Este atributo diz ao Django que se uma string "safe" é passada para o seu
+       filtro, o resultado será mantido "safe" e se uma string não-safe é
+       passada, o Django automaticamente a escapará, se necessário.
+
+       Você pode pensar que nisso como significando "este filtro é seguro --
+       ele não introduz qualquer possibilidade de HTML não seguro."
+
+       A razão de ``is_safe`` ser necessário é porque há abundância de
+       operadores de string normais que tornarão um objeto ``SafeData`` uma
+       string normal ``str`` ou ``unicode`` e, ao invés de tentar pegá-los
+       todos, o que será muito difícil, o Django repara o dano depois que o
+       filtro foi completado.
+
+       Por exemplo, suponhamos que você tem um filtro que adiciona uma string
+       ``xx`` no final de uma entrada. Já que isso não introduz caracteres HTML
+       perigosos ao resultado (com exceção de alguns que já estavam presentes),
+       você deve marcar seu filtro com ``is_safe``::
+
+           @register.filter
+           def add_xx(value):
+               return '%sxx' % value
+           add_xx.is_safe = True
+
+       Quando este filtro é usado num template onde auto-escaping está
+       habilitado, o Django escapa a saída sempre que a entrada já não estiver
+       marcada como "safe".
+
+       Por padrão, ``is_safe`` é ``False``, e você pode omiti-lo de qualquer
+       filtro onde ele não é requerido.
+
+       Seja cuidadoso quando decidir se seu filtro realmente deixa strings safe
+       como safe. Se estiver *removendo* caracteres, você pode inadvertidamente
+       deixa tabs HTML desbalanceadas ou entidades no resultado. Por exemplo,
+       removendo um ``>`` de uma entrada por tornar um ``<a>`` em ``<a``, que
+       seria necessário escapar na saída para evitar problemas. Similarmente,
+       remover um ponto-e-vírgula (``;``) pode transformar um ``&amp;`` em
+       ``&amp``, que não é uma entidade válida e isso precisa ser escapado. Na
+       maioria dos casos não será tão complicado, mas mantenha o olho aberto
+       quanto a problemas como esse ao revisar o seu código.
+
+       Marcando um filtro como ``is_safe`` forçará o valor de retorno do filtro
+       a ser uma string. Se seu filtro deve retornar um booleano ou outro
+       valor não string, marcando-o ``is_safe`` provavelmente terá consequências
+       intencionais (como uma conversão do booleano False para uma string
+       'False').
+
+    2. Alternativamente, o código do seu filtro pode manualmente se preocupar
+       com qualquer escape. Isso é necessário quando você estiver introduzindo
+       uma nova marcação HTML dentro do resultado. Você quer marcar a saída de
+       escape como seguro de forma que sua marcação HTML não foi escapada,
+       então você precisará manipular a saída você mesmo.
+
+       Para marcar a saída como uma string safe, use
+       :func:`django.utils.safestring.mark_safe`.
+
+       Seja cuidadoso, contudo. Você precisa fazer mais do que somente marcar a
+       saída como safe. Você precisa assegurar-se de que realmente *é* safe, e o
+       que você faz depende de se auto-escaping está em vigor. A idéia é
+       escrever filtros que possam operar nos templates onde auto-escaping está
+       ligado ou desligado para tornar as coisas mais fáceis para os seus
+       autores de template.
+
+       A fim de seu filtro saber o estado de auto-escaping atual, configure o
+       atributo ``needs_autoescape`` como ``True`` na sua função. (Se você não
+       especificar este atributo, o padrão é ``False``). Este atributo diz ao
+       Django que sua função filtro espera um argumento extra, chamado
+       ``autoescape``, que é ``True`` se auto-escaping está em vigor é ``False``
+       caso contrário.
+
+       Por exemplo, vamos escrever um filtro que emfatiza o primeiro caracter de
+       uma string::
+
+           from django.utils.html import conditional_escape
+           from django.utils.safestring import mark_safe
+
+           def initial_letter_filter(text, autoescape=None):
+               first, other = text[0], text[1:]
+               if autoescape:
+                   esc = conditional_escape
+               else:
+                   esc = lambda x: x
+               result = '<strong>%s</strong>%s' % (esc(first), esc(other))
+               return mark_safe(result)
+           initial_letter_filter.needs_autoescape = True
+
+       O atributo ``needs_autoescape`` sobre a função filter e argumento
+       ``autoescape`` significa que nossa função saberá se o escape automático
+       está em efeito quando o filtro é chamado. Nós usamos ``autoescape`` para
+       decidir se a entrada de dados precisa ser passada através do
+       ``django.utils.html.conditional_escape`` ou não. (No último caso, nós só
+       o usamos para identificar funções como a função "escape".) A função
+       ``conditional_escape()`` é como ``escape()`` exceto que somente escapa a
+       entrada que **não** for uma instância de ``SafeData``. Se um ``SafeData``
+       é passado para o ``conditional_escape()``, os dados são retornados sem
+       mudanças.
+
+       Finalmente, no exemplo acima, nós lembramos de marcar o resultado como
+       safe, para que nosso HTML seja inserido diretamente dentro do template
+       sem escape adicional.
+
+       Não há necessidade de se preocupar com o atributo ``is_safe`` neste
+       caso (embora não inclua não doerá nada). Sempre que você manipular
+       manualmente as questões de auto-escaping e retornar uma string safe, o
+       atributo ``is_safe`` não mudará nada de qualquer forma.
+
+Escrevendo tags de template personalizado
+-----------------------------------------
+
+Tags são mais complexas que filtros, porquê tags podem fazer qualquer coisa.
+
+Uma rápida visão geral
+~~~~~~~~~~~~~~~~~~~~~~
+
+Acima, nesse documento é explicado que o sistema de template funciona num
+processo de dois passos: compilação e renderização. Para definir uma tag de
+template personalizada, você especifica com a compilação funciona e como a
+renderização funciona.
+
+Quando o Django compila um template, ele divide o texto do template puro dentro
+de ''nodes''. Cada nodo é uma instância do ``django.template.Node`` e tem um
+método ``render()``. Um template compilado é, simplesmente, uma lista de objetos
+``Node``. Quando você chama ``render()`` sobre um objeto de template compilado,
+o template chama ``render()`` em cada ``Node`` na sua lista, com o dado
+contexto. Os resultados são todos concatenados para formar a saída do template.
+
+Deste modo, para definir uma tag de template personalizada, você especifica como
+o template puro é convertido num ``Node`` (a função compilação), e o que o
+método ``render()`` do nodo faz.
+
+Escrevendo a função de compilação
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Para cada template tag o parser de template encontra, ele chama uma função
+Python com o conteúdo da tag e o objeto parser em si. Esta função é responsável
+por retornar uma instância ``Node`` baseado nos conteúdos da tag.
+
+Por exemplo, vamos escrever uma template tag, ``{% current_time %}``, que mostra
+o data/hora atual, formatado de acordo com o paramêtro dado na tag, na `sintaxe
+do strftime`_. É uma boa idéia decidir a sintaxe da tag antes de qualquer outra
+coisa. No nosso caso, vamos dizer que a tag deve ser usada desta forma:
+
+.. code-block:: html+django
+
+    <p>A hora é {% current_time "%Y-%m-%d %I:%M %p" %}.</p>
+
+.. _`sintaxe do strftime`: http://docs.python.org/library/time.html#time.strftime
+
+O parser para esta função deve abarrar o parâmetro e criar um objeto ``Node``::
+
+    from django import template
+    def do_current_time(parser, token):
+        try:
+            # split_contents() sabe que não é para dividir strings entre aspas.
+            tag_name, format_string = token.split_contents()
+        except ValueError:
+            raise template.TemplateSyntaxError, "%r tag requires a single argument" % token.contents.split()[0]
+        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+            raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
+        return CurrentTimeNode(format_string[1:-1])
+
+Notas:
+
+    * O ``parser`` é o objeto parser de template. Não não precisamos dele nesse
+      exemplo.
+
+    * O ``token.contents`` é uma string de conteúdos puros da tag. No nosso
+      exemplo, é ``'current_time "%Y-%m-%d %I:%M %p"'``.
+
+    * O método ``token.split_contents()`` quebra os argumentos nos espaços
+      mantendo as strings entre aspas agrupadas. O mais simples
+      ``token.contents.split()`` não seria tão robusto, e dividiria
+      ingenuamente *todos* os espaços, incluindo aqueles dentro de strings entre
+      aspas agrupadas. É uma boa idéia sempre usar ``token.split_contents()``.
+
+    * Essa função é responsável por lançar
+      ``django.template.TemplateSyntaxError``, com mensagens úteis, para
+      qualquer erro de sintaxe.
+
+    * As exceções ``TemplateSystemError`` usam a variável ``tag_name``. Não
+      embuta o nome da tag nas suas mensagens de erro, porque eles casam com o
+      nome de sua função. O ``token.contents.split()[0]`` ''sempre'' será o nome
+      da sua tag -- mesmo quando a tag não tenha argumentos.
+
+    * A função retorna um ``CurrentTimeNode`` com tudo o que o nodo precisa
+      saber sobre esta tag. Neste caso, é só passar o argumento --
+      ``"%Y-%m-%d %I:%M %p"``. As aspas, no início e no final, da template tag
+      são removidas no ``format_string['1:-1']``.
+
+    * O parseamento é de muito baixo nível. Os desenvolvedores do Django têm
+      experimentado escrever pequenos frameworks sobre o estes sistema de parse,
+      usando técnicas como gramáticas EBNF, mas estes experimentos tornam o
+      motor de template muito lento. Ele é de baixo nível porque é mais rápido.
+
+Escrevendo o renderizador
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+O segundo passo em escrever tags personalizadas é definir uma subclasse ``Node``
+que tem um método ``render()``.
+
+Continuando o exemplo acima, nós precisamos definir ``CurrentTimeNode``::
+
+    from django import template
+    import datetime
+    class CurrentTimeNode(template.Node):
+        def __init__(self, format_string):
+            self.format_string = format_string
+        def render(self, context):
+            return datetime.datetime.now().strftime(self.format_string)
+
+Notas:
+
+    * ``__init__()`` recebe o ``format_string`` do ``do_current_time()``.
+      Sempre passe quaisquer opções/parâmetros/argumentos para um ``Node`` via
+      seu ``__init__()``.
+
+    * O método ``render()`` é onde o trabalho realmente acontece.
+
+    * O ``render()`` nunca deve lançar um ``TemplateSyntaxError`` ou qualquer
+      outra exceção. Ele deve falhar silenciosamente, assim como os filtros de
+      template o fazem.
+
+Ultimamente, essa dissociação de compilação e renderização resulta num sistema
+de template eficiente, pois um template pode renderizar vários contextos sem
+precisar ser parsiado múltiplas vezes.
+
+Considerações do Auto-escaping
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A saída de uma template tag *não* é automaticamente executada através de filtros
+de auto-escaping. Entretanto, ainda há algumas coisas que você deve ter em mente
+quando estiver escrevendo uma template tag.
+
+Se a função ``render()`` de seu template armazena o resultado numa variável de
+contexto (ao invés de retornar o resultado numa string), ela deverá se preocupar
+em chamar ``mark_safe()`` se for apropriado. Quando a variável é finalmente
+renderizada, ela será afetada pela configuração auto-escape em efeito nessa
+hora, assim o conteúdo que deveria ser seguro além de escapado precisa ser
+marcado como tal.
+
+Também, se sua template tag cria um novo contexto para executar algumas
+sub-renderizações, configure o atributo auto-escape para o valor do contexto
+atual. O método ``__init__`` para a classe ``Context`` recebe um parâmetro
+chamado ``autoescape`` que você pode usar para este propósito. Por exemplo::
+
+    def render(self, context):
+        # ...
+        new_context = Context({'var': obj}, autoescape=context.autoescape)
+        # ... Faça algo com new_context ...
+
+Isso não é uma situação muito comum, mas é útil se você estiver renderizando um
+template você mesmo. Por exemplo::
+
+    def render(self, context):
+        t = template.loader.get_template('small_fragment.html')
+        return t.render(Context({'var': obj}, autoescape=context.autoescape))
+
+Se nós tivéssemos esquecido de passar o valor atual ``context.autoescape`` para
+nosso novo ``Context`` neste exemplo, os resultados teriam *sempre* de ser
+automaticamente escapados, o que pode não ser um comportamento desejável se a
+template tag é usada dentro de um bloco ``{% autoescape off %}``.
+
+.. _template_tag_thread_safety:
+
+Thread-safety considerations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.2
+
+Once a node is parsed, its ``render`` method may be called any number of times.
+Since Django is sometimes run in multi-threaded environments, a single node may
+be simultaneously rendering with different contexts in response to two separate
+requests. Therefore, it's important to make sure your template tags are thread
+safe.
+
+To make sure your template tags are thread safe, you should never store state
+information on the node itself. For example, Django provides a builtin ``cycle``
+template tag that cycles among a list of given strings each time it's rendered::
+
+    {% for o in some_list %}
+        <tr class="{% cycle 'row1' 'row2' %}>
+            ...
+        </tr>
+    {% endfor %}
+
+A naive implementation of ``CycleNode`` might look something like this::
+
+    class CycleNode(Node):
+        def __init__(self, cyclevars):
+            self.cycle_iter = itertools.cycle(cyclevars)
+        def render(self, context):
+            return self.cycle_iter.next()
+
+But, suppose we have two templates rendering the template snippet from above at
+the same time:
+
+    1. Thread 1 performs its first loop iteration, ``CycleNode.render()``
+       returns 'row1'
+    2. Thread 2 performs its first loop iteration, ``CycleNode.render()``
+       returns 'row2'
+    3. Thread 1 performs its second loop iteration, ``CycleNode.render()``
+       returns 'row1'
+    4. Thread 2 performs its second loop iteration, ``CycleNode.render()``
+       returns 'row2'
+
+The CycleNode is iterating, but it's iterating globally. As far as Thread 1
+and Thread 2 are concerned, it's always returning the same value. This is
+obviously not what we want!
+
+To address this problem, Django provides a ``render_context`` that's associated
+with the ``context`` of the template that is currently being rendered. The
+``render_context`` behaves like a Python dictionary, and should be used to store
+``Node`` state between invocations of the ``render`` method.
+
+Let's refactor our ``CycleNode`` implementation to use the ``render_context``::
+
+    class CycleNode(Node):
+        def __init__(self, cyclevars):
+            self.cyclevars = cyclevars
+        def render(self, context):
+            if self not in context.render_context:
+                context.render_context[self] = itertools.cycle(self.cyclevars)
+            cycle_iter = context.render_context[self]
+            return cycle_iter.next()
+
+Note that it's perfectly safe to store global information that will not change
+throughout the life of the ``Node`` as an attribute. In the case of
+``CycleNode``, the ``cyclevars`` argument doesn't change after the ``Node`` is
+instantiated, so we don't need to put it in the ``render_context``. But state
+information that is specific to the template that is currently being rendered,
+like the current iteration of the ``CycleNode``, should be stored in the
+``render_context``.
+
+.. note::
+    Notice how we used ``self`` to scope the ``CycleNode`` specific information
+    within the ``render_context``. There may be multiple ``CycleNodes`` in a
+    given template, so we need to be careful not to clobber another node's state
+    information. The easiest way to do this is to always use ``self`` as the key
+    into ``render_context``. If you're keeping track of several state variables,
+    make ``render_context[self]`` a dictionary.
+
+Registrando a tag
+~~~~~~~~~~~~~~~~~
+
+Finalmente, registrar a tag com sua instância ``Library`` do módulo, como
+explicado in "Escrevendo filtros de template personalizados" acima. Exemplo::
+
+    register.tag('current_time', do_current_time)
+
+O método ``tag()`` recebe dois argumentos:
+
+    1. O nome da template tag -- uma string. Se isso for deixado de fora, o nome
+       da função de compilação será usado.
+    2. A função de compilação -- uma função Python (não o nome da função como
+       uma string).
+
+Como no registro de filtros, também é possível usar isso como um decorador::
+
+    @register.tag(name="current_time")
+    def do_current_time(parser, token):
+        # ...
+
+    @register.tag
+    def shout(parser, token):
+        # ...
+
+Se você deixa desligado o argumento ``name``, como no segundo exemplo acima, o
+Django usará o nome da função como o nome da tag.
+
+Passando variáveis de template para a tag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Embora você possa passar qulquer número de argumentos para uma template tag
+usando ``token.split_contents()``, os argumentos são todos extraídos como
+strings literais. Um pouco mais de trabalho é necessária a fim de passar o
+conteúdo dinâmico (uma variável de template) para uma template tag como um
+argumento.
+
+Enquanto nos exemplos anteriores foram formatados a hora atual dentro de uma
+string e retornado uma string, suponhamos que você queira passar um
+``DateTimeField`` de um objeto e tem a template tag que formata essa data:
+
+.. code-block:: html+django
+
+    <p>Este post foi atualizado em {% format_time blog_entry.date_updated "%Y-%m-%d %I:%M %p" %}.</p>
+
+Inicialmente, ``token.split_contents()`` retornará três valores:
+
+    1. O nome da tag ``format_time``.
+    2. A string "blog_entry.date_updated" (sem as aspas em volta).
+    3. A string de formatação "%Y-%m-%d %I:%M %p". O valor retornado de
+       ``split_contents()`` incluirá as aspas em strings literais como esta.
+
+Agora sua tag deve começar a parecer como isso::
+
+    from django import template
+    def do_format_time(parser, token):
+        try:
+            # split_contents() não sabe como separar strings com aspas.
+            tag_name, date_to_be_formatted, format_string = token.split_contents()
+        except ValueError:
+            raise template.TemplateSyntaxError, "%r tag requires exactly two arguments" % token.contents.split()[0]
+        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+            raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
+        return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
+
+Você também tem de mudar o renderizador para receber os conteúdos atuais da
+propriedade ``date_updated`` de um objeto ``blog_entry``. Isso pode ser
+realizado usando a classe ``Variable()`` em ``django.template``.
+
+Para usar a classe ``Variable``, simplesmente instancie-o com o nome da variável
+a ser resolvida, e então chame ``variable.resolve(context)``. Assim, por
+exemplo::
+
+    class FormatTimeNode(template.Node):
+        def __init__(self, date_to_be_formatted, format_string):
+            self.date_to_be_formatted = template.Variable(date_to_be_formatted)
+            self.format_string = format_string
+
+        def render(self, context):
+            try:
+                actual_date = self.date_to_be_formatted.resolve(context)
+                return actual_date.strftime(self.format_string)
+            except template.VariableDoesNotExist:
+                return ''
+
+A resolução de variável lançará uma exceção ``VariableDoesNotExist`` se ela não
+conserguir resolver a string passada no atual contexto da página.
+
+Atalho para simple tags
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Muitas templates tags recebe vários argumentos -- strings ou variáveis de
+template -- e retornam uma string depois de fazer algum processamento baseado
+unicamente no argumento de entrada e algumas informações externas. Por exemplo,
+a tag ``current_time`` que nós escrevemos acima é desta variedade: nós
+fornecemos a ela uma string de formatação, e ela retorna a hora como uma string.
+
+Para facilitar a criação de tipos de tags, o Django fornece uma função helper,
+``simple_tag``. Esta função, que é um método de ``django.template.Library``,
+recebe uma função que aceita qualquer quantidade de argumentos, a envolve com
+uma função ``render`` e de outras coisas necessárias mencionadas acima e a
+registra no sistema de template.
+
+Nossa função ``current_time`` poderia, assim, ser escrita desta forma::
+
+    def current_time(format_string):
+        return datetime.datetime.now().strftime(format_string)
+
+    register.simple_tag(current_time)
+
+No Python 2.4, a sintaxe de decorador também funciona::
+
+    @register.simple_tag
+    def current_time(format_string):
+        ...
+
+Uma das coisas que você deve tomar nota sobre o helper ``simple_tag``:
+
+    * Verificar o número de argumentos requeridos, etc., já é feito na hora que
+      nossa função é chamada, então nós não precisamos fazer isso.
+    * As aspas em volta dos argumentos (se tive alguma) já foram retiradas,
+      desta forma nós só recebemos uma string.
+    * Se o argumento for uma variável de template, à nossa função é passada o
+      valor atual da variável, não a própria variável.
+
+Quando sua template tag não precisa acessar o contexto atual, escrever uma
+função para trabalhar com os valores de entrada e usar o helper ``simple_tag``
+é a forma mais fácil de criar uma nova tag.
+
+.. versionadded:: 1.3
+
+If your template tag needs to access the current context, you can use the
+``takes_context`` argument when registering your tag::
+
+    # The first argument *must* be called "context" here.
+    def current_time(context, format_string):
+        timezone = context['timezone']
+        return your_get_current_time_method(timezone, format_string)
+
+    register.simple_tag(takes_context=True)(current_time)
+
+Or, using decorator syntax::
+
+    @register.simple_tag(takes_context=True)
+    def current_time(context, format_string):
+        timezone = context['timezone']
+        return your_get_current_time_method(timezone, format_string)
+
+For more information on how the ``takes_context`` option works, see the section
+on `inclusion tags`_.
+
+.. _howto-custom-template-tags-inclusion-tags:
+
+Inclusion tags
+~~~~~~~~~~~~~~
+
+Outro tipo comum de template tag é o tipo que mostra algum dados renderizando
+*outro* template. Por exemplo, a inteface de administração do Django usa
+templates personalizados para mostrar botões na base das páginas de formulário
+"adicionar/atualizar". Estes botões sempre são os mesmos, mas o alvo do link
+muda dependendo do objeto que estiver sendo editado -- então eles são o caso
+perfeito para se usar um template que é preenchido com detalhes do objeto atual.
+(No caso do admin, isso é a tag ``submit_row``.)
+
+Esses tipos de tags são chamados "inclusion tags".
+
+Escrever inclusion tags é provavelmente melhor demonstrado com exemplo. Vamos
+escrever uma tag que mostra uma lista de escolhas para um dado objeto ``Poll``,
+como a que foi criada no :ref:`tutorial <creating-models>`. Nós usaremos a tag
+desta forma:
+
+.. code-block:: html+django
+
+    {% show_results poll %}
+
+...e a saída será algo assim:
+
+.. code-block:: html
+
+    <ul>
+      <li>Primeira escolha</li>
+      <li>Segunda escolha</li>
+      <li>Terceira escolha</li>
+    </ul>
+
+Primeiro, definir a função que recebe o argumento e produz um dicionário de
+dados para o resultado. O ponto importante aqui é nós somente precisarmos
+retornar um dicionário, nada mais complexo. Isso será usado como um contexto de
+template para o template fragmentado. Exemplo::
+
+    def show_results(poll):
+        choices = poll.choice_set.all()
+        return {'choices': choices}
+
+Próximo, criar o template usado para renderizar a saída da tag. Este template é
+uma funcionalidade fixa da tag: o escritor da tag o especifica, não o designer
+de template. Seguindo nosso exemplo, o template é muito simples:
+
+.. code-block:: html+django
+
+    <ul>
+    {% for choice in choices %}
+        <li> {{ choice }} </li>
+    {% endfor %}
+    </ul>
+
+Agora, criar e registrar a inclusion tag chamando o método ``inclusion_tag()``
+de um objeto ``Library``. Seguindo nosso exemplo, se o template acima estiver
+num arquivo chamado ``results.html`` num diretório que é procurado pelo
+carregador de template, nós registrariámos a tag desta forma::
+
+    # Aqui, register é uma instância do django.template.Library, como antes
+    register.inclusion_tag('results.html')(show_results)
+
+Como sempre, a sintaxe de decorador do Python 2.4 também funciona, então
+poderiámos ter escrito::
+
+    @register.inclusion_tag('results.html')
+    def show_results(poll):
+        ...
+
+...ao criar a primeira função.
+
+Algumas vezes, suas inclusion tags podem requerer um número grande de
+argumentos, causando dor aos autores de template ao passar-lhes todos os
+argumentos e lembrar de suas ordens. Para resolver isso, o Django fornece uma
+opção ``takes_context`` para inclusion_tags. Se você especificar
+``takes_context`` ao criar uma template tag, a tag não terá argumentos
+requeridos, e a função Python subjacente terá um argumento -- o contexto do
+template a partir de quando a tag foi chamada.
+
+Por exemplo, digamos que você esteja escrevendo uma inclusion tag que sempre
+será usada no contexto que contém as variáveis ``home_link`` e ``home_title``
+que apontam de volta a página principal. Aqui está como a função Python poderia
+parecer::
+
+    # O primeiro argumento *deve* ser chamado "context" aqui.
+    def jump_link(context):
+        return {
+            'link': context['home_link'],
+            'title': context['home_title'],
+        }
+    # Registra a tag personalizada como uma inclusion tag com takes_context=True.
+    register.inclusion_tag('link.html', takes_context=True)(jump_link)
+
+(Note que o primeiro parâmetro para a função *deve* ser chamado ``context``.)
+
+Nessa linha ``registar.inclusion_tag()``, nós especificamos
+``takes_context=True`` e o nome do template. Aqui temos como o template
+``link.html`` pode parecer:
+
+.. code-block:: html+django
+
+    Pule direto para <a href="{{ link }}">{{ title }}</a>.
+
+Então, em qualquer hora que você desejar usar essa tag personalizada, carregue
+sua biblioteca e chame-a sem quaisquer argumentos, dessa forma:
+
+.. code-block:: html+django
+
+    {% jump_link %}
+
+Note que quando você estiver usando ``takes_context=True``, não há necessidade
+de passar argumentos para a template tag. Ela automaticamente tem acesso ao
+contexto.
+
+O parâmetro ``takes_context`` é por padrão ``False``. Quando ele é configurado
+para *True*, à tag é passada o objeto de contexto, como nesse exemplo. Essa é a
+única diferença entre este caso e o exemplo anterior da ``inclusion_tag``.
+
+Configurando uma variável no contexto
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+O exemplo acima simplesmente mostra um valor. Geralmente, é mais flexível se
+suas template tags configurarem variáveis ou invés de mostrar valores. Desta
+forma os autores de templates podem reusar os valores que suas templates tags
+criam.
+
+Para setar uma variável no contexto, é só usar atribuição de dicionário no
+contexto de objeto no método ``render()``. Aqui temos uma versão atualizada do
+``CurrentTimeNode`` que configura uma variável de template ``current_time`` ao
+invés de mostrá-la::
+
+    class CurrentTimeNode2(template.Node):
+        def __init__(self, format_string):
+            self.format_string = format_string
+        def render(self, context):
+            context['current_time'] = datetime.datetime.now().strftime(self.format_string)
+            return ''
+
+Note que ``render()`` retorna uma string vazia. O ``render()`` deve sempre
+retornar uma string. Se tudo o que a template tag faz é setar uma variável, o
+``render()`` deve retornar uma string vazia.
+
+Aqui temos como poderiámos usar esta nova versão de tag:
+
+.. code-block:: html+django
+
+    {% current_time "%Y-%M-%d %I:%M %p" %}<p>The time is {{ current_time }}.</p>
+
+Porém, há um problema com ``CurrentTimeNode2``: O nome da variável
+``current_time`` é nativo. Isso significa que você precisará
+assegurar-se de que seu template não use ``{{ current_time }}`` em nenhum lugar
+mais, por que o ``{% current_time %}`` será cegamente sobrescrito pelo valor
+desta variável. Uma solução clara é fazer uma template tag especificar o nome da
+variável de saída, desta forma::
+
+.. code-block:: html+django
+
+    {% get_current_time "%Y-%M-%d %I:%M %p" as my_current_time %}
+    <p>The current time is {{ my_current_time }}.</p>
+
+Para fazer isso, você precisar refatorar ambos funções de compilação e classe
+``Node``, tipo::
+
+    class CurrentTimeNode3(template.Node):
+        def __init__(self, format_string, var_name):
+            self.format_string = format_string
+            self.var_name = var_name
+        def render(self, context):
+            context[self.var_name] = datetime.datetime.now().strftime(self.format_string)
+            return ''
+
+    import re
+    def do_current_time(parser, token):
+        # Essa versão usa uma expressão regular para parsear a o conteúdo da tag.
+        try:
+            # Separando None == separando por espaços.
+            tag_name, arg = token.contents.split(None, 1)
+        except ValueError:
+            raise template.TemplateSyntaxError, "%r tag requires arguments" % token.contents.split()[0]
+        m = re.search(r'(.*?) as (\w+)', arg)
+        if not m:
+            raise template.TemplateSyntaxError, "%r tag had invalid arguments" % tag_name
+        format_string, var_name = m.groups()
+        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+            raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
+        return CurrentTimeNode3(format_string[1:-1], var_name)
+
+A diferença aqui é que o ``do_current_time()`` pega a string de formato e o nome
+da variável, passando ambos ao ``CurrenttimeNode3``.
+
+Parseando até outro tag de bloco
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Template tags podem funcionar em conjunto. Por exemplo, a tag padrão
+``{% comment %}`` esconde tudo até o ``{% endcomment %}``. Para criar uma
+template tag como esta, use ``parser.parse()`` na sua função de compilação.
+
+Aqui temos como a tag padrão ``{% comment %}`` é implementado::
+
+    def do_comment(parser, token):
+        nodelist = parser.parse(('endcomment',))
+        parser.delete_first_token()
+        return CommentNode()
+
+    class CommentNode(template.Node):
+        def render(self, context):
+            return ''
+
+O ``parser.parse()`` recebe uma tupla de nomes de tags de bloco ''para parsear
+até ela''. Ela retorna uma instância do ``django.template.NodeList``, que é uma
+lista de todos objetos ``Node`` que o parser encontrar ''antes'' de encontrar
+quaisquer tags chamadas na tupla.
+
+No ``"nodelist = parser.parse(('endcomment',))"`` do exemplo acima,
+``nodelist`` é uma lista de todos os nodos entre o ``{% comment %}`` e
+``{% endcomment %}``, não contando ``{% comment %}`` e ``{% endcomment %}``.
+
+Depois que ``parser.parse()`` é chamado, o parser ainda não "consumiu" a tag
+``{% endcomment %}``, assim o código precisa explicitamente chamar
+``parser.delete_first_token()``.
+
+O ``CommentNode.render()`` simplesmente retorna uma string vazia. Qualquer coisa
+entre ``{% comment %}`` e ``{% endcomment %}`` é ignorado.
+
+Parseando até outra tag de bloco, e salvando conteúdos
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+No exemplo anterior, ``do_comment()`` tudo descartado entre ``{% comment %}`` e
+``{% endcomment %}``. Ao invés de fazer isso, é possível fazer algo com o código
+entre as tags de bloco.
+
+Por exemplo, há uma template tag personalizada, ``{% upper %}``, que capitaliza
+tudo entre ela mesma e ``{% endupper %}``.
+
+Uso:
+
+.. code-block:: html+django
+
+    {% upper %}Isso irá aparecer em maiúsuclas, {{ your_name }}.{% endupper %}
+
+Como no exemplo anterior, nós usaremos ``parser.parse()``. Mas dessa vez, nós
+passamos o resultado ``nodelist`` para o ``Node``::
+
+    def do_upper(parser, token):
+        nodelist = parser.parse(('endupper',))
+        parser.delete_first_token()
+        return UpperNode(nodelist)
+
+    class UpperNode(template.Node):
+        def __init__(self, nodelist):
+            self.nodelist = nodelist
+        def render(self, context):
+            output = self.nodelist.render(context)
+            return output.upper()
+
+O único conceito novo aqui é o ``self.nodelist.render(context)`` no
+``UpperNode.render()``.
+
+Para mais exemplos de complexidade de renderização, vej o código fonte
+``{% if %}``, ``{% for %}``, ``{% ifequal %}`` e ``{% ifchanged %}``. Eles estão
+em ``django/template/defaulttags.py``.
+

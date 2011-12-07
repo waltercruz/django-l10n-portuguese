@@ -1,0 +1,136 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Walter Cruz $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _releases-1.0-beta-2:
+
+========================================
+Notas de lançamento do Django 1.0 beta 2
+========================================
+
+Bem vindo ao Django 1.0 beta 2!
+
+Esse é o quarto em uma série de versões de preview/desenvolvimento que
+eventualmente levará ao 1.0, atualmnte agendado para acontecer no
+início de Setembro de 2008. Esse lançamento visa primeiramente
+desenvolvedores que estão interessados em testar a base de código do Django e
+ajudar a identificar e resolver bugs antes da versão 1.0 final.
+
+Como sempre, essa versão *não* deve tem a intenção de ser usada em produção, e
+tal uso é desencorajado.
+
+O que há de novo no Django 1.0 beta 2
+=====================================
+
+O trunk do desenvolvimento do Django tem sido o lugar de desenvolvimento quase
+constante durante o ano passado, com algumas novas funcionalidades desde a versão.
+Para funcionalidades que eram novas no Django 1.0
+alpha 1, veja :doc:`as notas de lançamento do 1.0 alpha 1
+</releases/1.0-alpha-1>`. Para funcionalidades que eram novas no Django 1.0
+alpha 2, veja :doc:`as notas de lançamento do 1.0 alpha 2
+</releases/1.0-alpha-2>`. Para funcionalidades que eram novas no Django 1.0
+beta 1, veja :doc:`as notas de lançamento do 1.0 beta 1 </releases/1.0-beta>`.
+
+Essa versão beta inclui duas funcionalidades principais:
+
+``django.contrib.comments`` refatorado
+    Como parte de um projeto do Google Summer of Code, Thejaswi Puthraya
+    executou uma reescrita e refatoração no sistema de comentários incluído com o
+    Django, aumentando grandemente sua flexibilidade e personalização. :doc:`Documentação completa
+    </ref/contrib/comments/index>` está disponível, assim como um :ref:`guia
+    de atualização <ref-contrib-comments-upgrade>` se você estiver usando a encarnação
+    anterior da aplicação de comentários..
+
+Documentação refatorada
+    A documentação incluída com o Django é a documentação online foram refatoradas
+    significativamente; o novo sistema de documentação usa o
+    `Sphinx`_ para construir documentos e lidar com coisas bacanas como índices de
+    tópicos, documentação referenciada e inter referenciada dentro
+    dos documentos. Você pode ver a nova documentação `online`_ ou, se você
+    tiver o Sphinx instalado, gerar você mesmo o HTML dos arquivos de documentação
+    incluídos com o Django.
+
+.. _Sphinx: http://sphinx.pocoo.org/
+.. _online: http://docs.djangoproject.com/en/dev/
+
+Junto com essas novas funcionalidades, o time do Django tem trabalhado duro
+em esmirilhar a base de código do Django  para a versão 1.0 final; essa versão beta
+contém um número grande de pequenas melhorias e correções de bugs
+a partir da versão anterior, a caminho da versão 1.0.
+
+Também, como parte do seu processo de obsolescência, o sistema antigo de processamento
+de formulários do Django foi removido; isso significa que ``django.oldforms``
+não existe mais, e seus vários ganchos de API (como manipuladores
+automáticos) não existem mais no Django. Esse sistema foi completamente
+substituído pelo :doc:`novo sistema de manipulação de formulários
+</topics/forms/index>` em ``django.forms``.
+
+
+O caminho para o Django 1.0
+===========================
+
+Um dos alvos principais com essas versão beta é focar a atenção nas
+funcionalidades restantes a serem implementadas no Django 1.0, e nos
+bugs que precisam ser resolvidos antes da versão final. A partir dessa
+versão beta, o Django está em seu "feature freeze" final para o 1.0; pedidos
+de funcionalidades novas ficarão para lançamentos posteriores, e o esforço de desenvolvimento
+será todo concentrado em correção de bugs e estabilidade. O Django está
+também em um "string freeze"; strings traduzíveis (rótulos, mensagens
+de erro, etc.) na base de código do Django nãp serão mudadas antes do lançamento,
+para que nossos tradutores possam produzir a versão final 1.0 dos arquivos de tradução
+do Django.
+
+Para esse lançamento, estaremos conduzindo um sprint de desenvolvimento final em
+30 de agosto de 2008, baseado em Londres e coordenado online; o alvo
+desse sprint é corrigir tantos bugs quantos forem possíveis em antecipação ao 
+lançamento do 1.0 final, cuja data está agendada para
+**2 de setembro de 2008**. A festa de lançamento oficial do Django 1.0 irá acontecer durante
+a primeira DjangoCon, que acontecerá em Mountain View,
+California, USA, nos dias 6 e 7 de setembro.
+
+
+O que você pode fazer para ajudar
+=================================
+
+Para produzir uma versão 1.0 de alta qualidade, precisamos de sua
+ajuda. Mesmo que essa versão beta *não* deva ser usada em produção,
+você pode ajudar a equipe do Django testando a versão beta em um ambiente
+seguro de testes e informando qualquer bug ou problema que você
+encontrar. O gerenciador de tíquetes do Django é o lugar central para procurar por
+problemas em aberto:
+
+    http://code.djangoproject.com/timeline
+
+Por favor, abra novos tíquetes apenas se você não encontrar um tíquete existente
+que corresponda ao problema que você está enfrentando.
+
+Adicionalmente, discussão sobre o desenvolvimento do Django, incluindo o processo
+até a versão 1.0, acontece diariamente na lista de e-mails
+django-developers:
+
+    http://groups.google.com/group/django-developers
+
+...e no canal de IRC ``#django-dev`` na ``irc.freenode.net``. Se
+você está interessado em ajudar o desenvolvimento do Django, sinta-se livre
+para entrar nas discussões.
+
+A documentação online do DJango também inclui instruções de como
+contrbuir com o Django:
+
+    :doc:`contribuindo para o Django </internals/contributing>`
+
+Contribuições de qualquer nível -- desenvolvimento de código, escrita de
+documentação ou simplemente a triagem de tíquetes para ajudar a testar as correções de bugs
+propostas -- são sempre bem vindas e apreciadas.

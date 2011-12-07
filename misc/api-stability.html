@@ -1,0 +1,315 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Estabilidade de API &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Meta-documentação e miscelânea" href="index.html" />
+    <link rel="next" title="Distribuições de terceiros do Django" href="distributions.html" />
+    <link rel="prev" title="Filosofia de design" href="design-philosophies.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="design-philosophies.html" title="Filosofia de design">previous</a> 
+     |
+    <a href="index.html" title="Meta-documentação e miscelânea" accesskey="U">up</a>
+   |
+    <a href="distributions.html" title="Distribuições de terceiros do Django">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="misc-api-stability">
+            
+  <div class="section" id="s-estabilidade-de-api">
+<span id="estabilidade-de-api"></span><h1>Estabilidade de API<a class="headerlink" href="#estabilidade-de-api" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="../releases/1.0.html"><em>O release do Django 1.0</em></a> vem com a promessa de
+estabilidade de API e compatibilidade futura. Em resumo, isto significa que o
+código que você construir utilizando o Django 1.0 irá funcionar com 1.1 sem
+mudanças, e você precisará fazer somente pequenas mudanças para qualquer
+release 1.x.</p>
+<div class="section" id="s-o-que-stable-significa">
+<span id="o-que-stable-significa"></span><h2>O que &#8220;stable&#8221; significa<a class="headerlink" href="#o-que-stable-significa" title="Permalink to this headline">¶</a></h2>
+<p>Neste contexto, &#8220;stable&#8221; significa:</p>
+<ul>
+<li><p class="first">Todas as APIs públicas &#8211; tudo que está documentado nos links abaixo, e
+todos os métodos que não comecem com um underscore &#8211; não serão movidas
+nem renomeadas sem fornecer aliases de compatibilidade anterior.</p>
+</li>
+<li><p class="first">Se novas funcionalidades são adicionadas a essas APIs &#8211; o que é bem
+possível &#8211; elas não irão quebrar ou mudar o significado dos métodos
+existentes. Em outras palavras, &#8220;stable&#8221; não significa, necessariamente,
+&#8220;completo&#8221;.</p>
+</li>
+<li><p class="first">Se, por alguma razão, uma API declarada &#8220;stable&#8221; tiver que ser removida ou
+substituída, ela será declarada obsoleta, porém irá permanecer até, pelo
+menos, duas novas versões secundárias. Avisos serão feitos quando um
+método obsoleto for chamado.</p>
+<p>Veja <a class="reference internal" href="../internals/release-process.html#official-releases"><em>Official releases</em></a> para mais detalhes de como a numeração das
+versões do Django funciona, e como as funcionalidades entrarão em desuso.</p>
+</li>
+<li><p class="first">Nós somente iremos quebrar a compatibilidade anterior dessas APIs se um
+bug ou uma falha de segurança fizer com que seja completamente inevitável.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="s-apis-stable">
+<span id="apis-stable"></span><h2>APIs &#8220;stable&#8221;<a class="headerlink" href="#apis-stable" title="Permalink to this headline">¶</a></h2>
+<p>Geralmente, tudo que foi documentado &#8211; com excessão de qualquer item da
+<a class="reference internal" href="../internals/index.html#internals-index"><em>area interna</em></a> é considerado &#8220;stable&#8221; na versão 1.0. Isto
+inclui estas APIs:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../topics/auth.html"><em>Autorização</em></a></li>
+<li><a class="reference internal" href="../topics/cache.html"><em>Caching</em></a>.</li>
+<li><a class="reference internal" href="../topics/db/index.html"><em>Definição de Model, gerenciadores, consultas e transações</em></a></li>
+<li><a class="reference internal" href="../topics/email.html"><em>Envio de e-email</em></a>.</li>
+<li><a class="reference internal" href="../topics/files.html"><em>Manipulação de arquivos e armazenamento</em></a></li>
+<li><a class="reference internal" href="../topics/forms/index.html"><em>Formulários</em></a></li>
+<li><a class="reference internal" href="../topics/http/index.html"><em>Manipulação de requisições/respostas HTTP</em></a>,
+incluíndo  envio de arquivos, middleware, sessões, resolução de URL,
+view, e &#8220;shortcut&#8221; APIs.</li>
+<li><a class="reference internal" href="../topics/http/generic-views.html"><em>Generic views</em></a>.</li>
+<li><a class="reference internal" href="../topics/i18n/index.html"><em>Internacionalização</em></a>.</li>
+<li><a class="reference internal" href="../topics/pagination.html"><em>Paginação</em></a></li>
+<li><a class="reference internal" href="../topics/serialization.html"><em>Serialização</em></a></li>
+<li><a class="reference internal" href="../topics/signals.html"><em>Signals</em></a></li>
+<li><a class="reference internal" href="../topics/templates.html"><em>Templates</em></a>, incluíndo a linguagem, <a class="reference internal" href="../ref/templates/index.html"><em>APIs de
+template</em></a> a nível do Python, e <a class="reference internal" href="../howto/custom-template-tags.html"><em>bibliotecas e
+tags customizadas de template</em></a>.  Nós podemos
+adicionar novas tags de template no futuro, e os nomes podem
+inadvertidamente chocar-se com tags de template externas. Antes de
+adicionar algo como tags, esteja seguro de que o Django mostrará um erro
+caso tente carregar tags com nomes duplicados.</li>
+<li><a class="reference internal" href="../topics/testing.html"><em>Testes</em></a></li>
+<li><a class="reference internal" href="../ref/django-admin.html"><em>Utilitário django-admin</em></a>.</li>
+<li><a class="reference internal" href="../ref/middleware.html"><em>Middleware embutido</em></a></li>
+<li><a class="reference internal" href="../ref/request-response.html"><em>Objetos request/response</em></a>.</li>
+<li><a class="reference internal" href="../ref/settings.html"><em>Settings</em></a>. Note, embora a <a class="reference internal" href="../ref/settings.html"><em>lista de
+configurações</em></a> possa ser conciderada completa, nós podemos
+&#8211; e provavelmente iremos &#8211; adicionar novas configurações nas versões
+futuras. Este é um dos muitos lugares onde &#8220;&#8216;stable&#8217; não significa
+&#8216;completo&#8217;&#8221;.</li>
+<li><a class="reference internal" href="../ref/signals.html"><em>Signals embutidos</em></a>. Como nas settings, nós iremos
+provavelmente adicionar novos sinais no futuro, mas os existentes não
+devem quebrar.</li>
+<li><a class="reference internal" href="../ref/unicode.html"><em>Manipulação de unicode</em></a>.</li>
+<li>Tudo coberto pelos <a class="reference internal" href="../howto/index.html#howto-index"><em>guias HOWTO</em></a>.</li>
+</ul>
+<div class="section" id="s-django-utils">
+<span id="django-utils"></span><h3><tt class="docutils literal"><span class="pre">django.utils</span></tt><a class="headerlink" href="#django-utils" title="Permalink to this headline">¶</a></h3>
+<p>A maioria dos módulos em <tt class="docutils literal"><span class="pre">django.utils</span></tt> são projetados para uso interno.
+Somente as seguintes partes do <tt class="docutils literal"><span class="pre">django.utils</span></tt> podem ser consideradas
+estáveis:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">django.utils.cache</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">django.utils.datastructures.SortedDict</span></tt> &#8211; somente está classe em
+particular; o resto do módulo é para uso interno.</li>
+<li><tt class="docutils literal"><span class="pre">django.utils.encoding</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">django.utils.feedgenerator</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">django.utils.http</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">django.utils.safestring</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">django.utils.translation</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">django.utils.tzinfo</span></tt></li>
+</ul>
+</div>
+</div>
+<div class="section" id="s-excecoes">
+<span id="excecoes"></span><h2>Exceções<a class="headerlink" href="#excecoes" title="Permalink to this headline">¶</a></h2>
+<p>Existem algumas poucas exceções para esta promessa de estabilidade e
+compatibilidade reversa.</p>
+<div class="section" id="s-correcoes-de-seguranca">
+<span id="correcoes-de-seguranca"></span><h3>Correções de segurança<a class="headerlink" href="#correcoes-de-seguranca" title="Permalink to this headline">¶</a></h3>
+<p>Se nós tomarmos consciência de um problema de segurança &#8211; esperamos sigam a
+nossa <a class="reference internal" href="../internals/contributing.html#reporting-security-issues"><em>política de relato de segurança</em></a> &#8211; nós
+iremos fazer tudo o que for necessário para corrigí-lo. Isto pode significar
+quebra de compatibilidade; A segurança triunfa sobre a garantia de
+compatibilidade.</p>
+</div>
+<div class="section" id="s-aplicacoes-contribuidas-django-contrib">
+<span id="aplicacoes-contribuidas-django-contrib"></span><h3>Aplicações contribuídas (<tt class="docutils literal"><span class="pre">django.contrib</span></tt>)<a class="headerlink" href="#aplicacoes-contribuidas-django-contrib" title="Permalink to this headline">¶</a></h3>
+<p>Nós faremos tudo para manter essas APIs estáveis &#8211; e não temos planos de
+quebrar qualquer aplicação do contrib &#8211; esta é uma área que terá mais fluxo
+entre os releases. Como a web evolui, o Django também deve evoluir com ela.</p>
+<p>No entanto, eventuais alterações nas aplicações do contrib virão com uma
+importante garantia: faremos o necessário para que seja possível utilizar uma
+versão mais antiga de uma aplicação do contrib se precisarmos fazer alterações.
+Desta forma, se o Django 1.5 vem com uma incompatibilidade no
+<tt class="docutils literal"><span class="pre">django.contrib.flatpages</span></tt>, nós faremos de forma que você continue utilizando
+o Django 1.4 em paralelo com o Django 1.5. Isto continuará permitindo
+atualizações fáceis.</p>
+<p>Historicamente, aplicações em <tt class="docutils literal"><span class="pre">django.contrib</span></tt> têm sido mais estáveis que o
+núcleo, então, na pratica, nós provavelmente nunca teremos que abrir essa
+exceção. Entretanto, é importante observar se você está construindo aplicações
+que dependam do <tt class="docutils literal"><span class="pre">django.contrib</span></tt>.</p>
+</div>
+<div class="section" id="s-apis-marcadas-como-internal">
+<span id="apis-marcadas-como-internal"></span><h3>APIs marcadas como internal<a class="headerlink" href="#apis-marcadas-como-internal" title="Permalink to this headline">¶</a></h3>
+<p>Algumas APIs são explicitamente marcadas como &#8220;internal&#8221; (interna, em inglês)
+de algumas maneiras:</p>
+<ul class="simple">
+<li>Algumas documentações referem e mencionam as partes internas como tal. Se
+a documentação diz que algo é interno, nós reservamos o direito de
+mudá-lo.</li>
+<li>Funções, métodos, e outros objetos pré-fixados por um sublinhado (<tt class="docutils literal"><span class="pre">_</span></tt>).
+Este é um padrão do Python para indicar que algo é privado; se um método
+começa com um <tt class="docutils literal"><span class="pre">_</span></tt>, ele pertence a API interna.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Estabilidade de API</a><ul>
+<li><a class="reference internal" href="#o-que-stable-significa">O que &#8220;stable&#8221; significa</a></li>
+<li><a class="reference internal" href="#apis-stable">APIs &#8220;stable&#8221;</a><ul>
+<li><a class="reference internal" href="#django-utils"><tt class="docutils literal"><span class="pre">django.utils</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#excecoes">Exceções</a><ul>
+<li><a class="reference internal" href="#correcoes-de-seguranca">Correções de segurança</a></li>
+<li><a class="reference internal" href="#aplicacoes-contribuidas-django-contrib">Aplicações contribuídas (<tt class="docutils literal"><span class="pre">django.contrib</span></tt>)</a></li>
+<li><a class="reference internal" href="#apis-marcadas-como-internal">APIs marcadas como internal</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="design-philosophies.html">Filosofia de design</a></li>
+    
+    
+      <li>Next: <a href="distributions.html">Distribuições de terceiros do Django</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Meta-documentação e miscelânea</a>
+        
+        <ul><li>Estabilidade de API</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/misc/api-stability.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="design-philosophies.html" title="Filosofia de design">previous</a> 
+     |
+    <a href="index.html" title="Meta-documentação e miscelânea" accesskey="U">up</a>
+   |
+    <a href="distributions.html" title="Distribuições de terceiros do Django">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

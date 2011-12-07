@@ -1,0 +1,268 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>FAQ: Bancos de dados e modelos &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="FAQ do Django" href="index.html" />
+    <link rel="next" title="FAQ: A administração" href="admin.html" />
+    <link rel="prev" title="FAQ: Obtendo ajuda" href="help.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="help.html" title="FAQ: Obtendo ajuda">previous</a> 
+     |
+    <a href="index.html" title="FAQ do Django" accesskey="U">up</a>
+   |
+    <a href="admin.html" title="FAQ: A administração">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="faq-models">
+            
+  <div class="section" id="s-faq-bancos-de-dados-e-modelos">
+<span id="faq-bancos-de-dados-e-modelos"></span><h1>FAQ: Bancos de dados e modelos<a class="headerlink" href="#faq-bancos-de-dados-e-modelos" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="s-como-eu-posso-ver-as-consultas-sql-que-o-django-esta-executando">
+<span id="s-faq-see-raw-sql-queries"></span><span id="como-eu-posso-ver-as-consultas-sql-que-o-django-esta-executando"></span><span id="faq-see-raw-sql-queries"></span><h2>Como eu posso ver as consultas SQL que o Django está executando?<a class="headerlink" href="#como-eu-posso-ver-as-consultas-sql-que-o-django-esta-executando" title="Permalink to this headline">¶</a></h2>
+<p>Certifique-se de que a configuração <tt class="docutils literal"><span class="pre">DEBUG</span></tt> está definida como
+<tt class="xref docutils literal"><span class="pre">True</span></tt>. Então, apenas faça isso:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">connection</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">connection</span><span class="o">.</span><span class="n">queries</span>
+<span class="go">[{&#39;sql&#39;: &#39;SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls&#39;,</span>
+<span class="go">&#39;time&#39;: &#39;0.002&#39;}]</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">connection.queries</span></tt> está disponível apenas se <tt class="docutils literal"><span class="pre">DEBUG</span></tt> for <tt class="xref docutils literal"><span class="pre">True</span></tt>. É uma
+lista de dicionários na ordem de execução das consultas. Cada dicionário tem o
+seguinte:</p>
+<div class="highlight-python"><pre>``sql`` -- A declaração SQL
+``time`` -- O tempo que a declaração levou para executar, em segundos.</pre>
+</div>
+<p><tt class="docutils literal"><span class="pre">connection.queries</span></tt> inclui todas as declarações SQL -- INSERTs, UPDATES,
+SELECTs, etc. Cada vez que o seu app aciona o banco de dados, a consulta será
+gravada.  Note que os SQL brutos logados em <tt class="docutils literal"><span class="pre">connection.queries</span></tt> podem não
+incluir os parâmetros entre aspas. A colocação de aspas nos parâmatros é
+executada pelo backend específico de banco de dados, e nem todos os backends
+fornecem uma forma de obter o SQL depois de colocadas as aspas.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<p>Se você está usando <a class="reference internal" href="../topics/db/multi-db.html"><em>múltiplos bancos de dado</em></a>, você pode usar a mesma
+interface em cada membro do dicionário <tt class="docutils literal"><span class="pre">connections</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">connections</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">connections</span><span class="p">[</span><span class="s">&#39;my_db_alias&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">queries</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-eu-posso-usar-o-django-com-um-banco-de-dados-pre-existente">
+<span id="eu-posso-usar-o-django-com-um-banco-de-dados-pre-existente"></span><h2>Eu posso usar o Django com um banco de dados pré-existente?<a class="headerlink" href="#eu-posso-usar-o-django-com-um-banco-de-dados-pre-existente" title="Permalink to this headline">¶</a></h2>
+<p>Sim. Veja <a class="reference internal" href="../howto/legacy-databases.html"><em>Integrando com um banco de dados legado</em></a>.</p>
+</div>
+<div class="section" id="s-se-eu-faco-mudancas-no-model-como-eu-atualizo-o-banco-de-dados">
+<span id="se-eu-faco-mudancas-no-model-como-eu-atualizo-o-banco-de-dados"></span><h2>Se eu faço mudanças no model, como eu atualizo o banco de dados?<a class="headerlink" href="#se-eu-faco-mudancas-no-model-como-eu-atualizo-o-banco-de-dados" title="Permalink to this headline">¶</a></h2>
+<p>Se você não se importar em &quot;resetar&quot; os dados, o utilitário <tt class="docutils literal"><span class="pre">manage.py</span></tt> do
+seu projeto tem uma opção para resetar o SQL para uma aplicação em particular:</p>
+<div class="highlight-python"><pre>manage.py reset appname</pre>
+</div>
+<p>Isso apaga quaisquer tabelas relacionadas com o <tt class="docutils literal"><span class="pre">appname</span></tt> e as recria.</p>
+<p>Se você se importa sobre a remoção dos dados, você tem de executar as
+declarações <tt class="docutils literal"><span class="pre">ALTER</span> <span class="pre">TABLE</span></tt> manualmente no seu banco de dados. Esse é o modo
+que nós sempre fizemos, porque lidar com dados é uma operação muito sensível e
+nós procuramos evitar sua automatização. Dito isso, existem trabalhos sendo
+feitos para adicionar a funcionalidade de atualização automatizada de banco de
+dados de forma parcial.</p>
+</div>
+<div class="section" id="s-os-modelos-do-django-suportam-chaves-primarias-compostas">
+<span id="os-modelos-do-django-suportam-chaves-primarias-compostas"></span><h2>Os modelos do Django suportam chaves primárias compostas?<a class="headerlink" href="#os-modelos-do-django-suportam-chaves-primarias-compostas" title="Permalink to this headline">¶</a></h2>
+<p>Não. Apenas chaves primárias simples são suportadas.</p>
+<p>Mas isso não é um problema na prática, já que nada o impede de adicionar outras
+restrições (usando a opção do model <tt class="docutils literal"><span class="pre">unique_together</span></tt> ou criando a restrição
+diretamente no seu banco de dados) garantindo a unicidade nesse nível. Chaves
+primárias simples são necessárias para que coisas como a interface
+administrativa funcione; por exemplo, você precisa de uma forma simples de ser
+capaz de especificar um objeto para editar ou remover.</p>
+</div>
+<div class="section" id="s-como-eu-adiciono-opcoes-especificas-de-banco-de-dados-as-minhas-declaracoes-create-table-como-especificar-a-tabela-como-tipo-myisam">
+<span id="como-eu-adiciono-opcoes-especificas-de-banco-de-dados-as-minhas-declaracoes-create-table-como-especificar-a-tabela-como-tipo-myisam"></span><h2>Como eu adiciono opções específicas de banco de dados às minhas declarações CREATE TABLE, como especificar a tabela como tipo MyISAM?<a class="headerlink" href="#como-eu-adiciono-opcoes-especificas-de-banco-de-dados-as-minhas-declaracoes-create-table-como-especificar-a-tabela-como-tipo-myisam" title="Permalink to this headline">¶</a></h2>
+<p>Nós tentamos evitar casos especiais no código do Django para acomodar todas as
+opções específicas de banco de dados, como tipo da tabela, etc. Se você gostaria
+de usar essa opções, crie um <a class="reference internal" href="../howto/initial-data.html#initial-sql"><em>arquivo de dados SQL inicial</em></a> que
+contenha as declarações <tt class="docutils literal"><span class="pre">ALTER</span> <span class="pre">TABLE</span></tt> que você quer fazer. Os arquivos de dados
+iniciais são executados no seu banco de dados após as declarações <tt class="docutils literal"><span class="pre">CREATE</span> <span class="pre">TABLE</span></tt>.</p>
+<p>Por exemplo, se você está usando o MySQL e quer que suas tabelas sejam do tipo
+MyISAM, crie um arquivo de dados iniciais e coloque algo assim dentro dele:</p>
+<div class="highlight-python"><pre>ALTER TABLE myapp_mytable ENGINE=MyISAM;</pre>
+</div>
+<p>Como explicado na documentação do <a class="reference internal" href="../howto/initial-data.html#initial-sql"><em>arquivo de dados SQL inicial</em></a> ,
+esse arquivo SQL pode conter comandos SQL arbitrários, assim você pode fazer
+quaisquer modificações que quiser nele.</p>
+</div>
+<div class="section" id="s-por-que-o-django-esta-vazando-memoria">
+<span id="por-que-o-django-esta-vazando-memoria"></span><h2>Por que o Django está vazando memória?<a class="headerlink" href="#por-que-o-django-esta-vazando-memoria" title="Permalink to this headline">¶</a></h2>
+<p>O Django não é conhecido por vazar memória. Se você descobrir que seus
+processos Django estão alocando mais e mais memória, sem nenhum sinal de
+liberação, verifique se o <tt class="docutils literal"><span class="pre">DEBUG</span></tt> está definido como <tt class="xref docutils literal"><span class="pre">False</span></tt>. Se o
+<tt class="docutils literal"><span class="pre">DEBUG</span></tt> for <tt class="xref docutils literal"><span class="pre">True</span></tt>, então o Django salvará uma cópia de cada declaração SQL
+que ele executou.</p>
+<p>(As consultas são salvas em <tt class="docutils literal"><span class="pre">django.db.connection.queries</span></tt>. Veja
+<a class="reference internal" href="#como-eu-posso-ver-as-consultas-sql-que-o-django-esta-executando">Como eu posso ver as consultas SQL que o Django está executando?</a>.)</p>
+<p>Para resolver esse problema, defina o <tt class="docutils literal"><span class="pre">DEBUG</span></tt> como <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<p>Se você precisa limpar a lista de consultas manualmente em qualquer ponto das
+suas funções, apenas execute <tt class="docutils literal"><span class="pre">reset_queries()</span></tt>, assim:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">db</span>
+<span class="n">db</span><span class="o">.</span><span class="n">reset_queries</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">FAQ: Bancos de dados e modelos</a><ul>
+<li><a class="reference internal" href="#como-eu-posso-ver-as-consultas-sql-que-o-django-esta-executando">Como eu posso ver as consultas SQL que o Django está executando?</a></li>
+<li><a class="reference internal" href="#eu-posso-usar-o-django-com-um-banco-de-dados-pre-existente">Eu posso usar o Django com um banco de dados pré-existente?</a></li>
+<li><a class="reference internal" href="#se-eu-faco-mudancas-no-model-como-eu-atualizo-o-banco-de-dados">Se eu faço mudanças no model, como eu atualizo o banco de dados?</a></li>
+<li><a class="reference internal" href="#os-modelos-do-django-suportam-chaves-primarias-compostas">Os modelos do Django suportam chaves primárias compostas?</a></li>
+<li><a class="reference internal" href="#como-eu-adiciono-opcoes-especificas-de-banco-de-dados-as-minhas-declaracoes-create-table-como-especificar-a-tabela-como-tipo-myisam">Como eu adiciono opções específicas de banco de dados às minhas declarações CREATE TABLE, como especificar a tabela como tipo MyISAM?</a></li>
+<li><a class="reference internal" href="#por-que-o-django-esta-vazando-memoria">Por que o Django está vazando memória?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="help.html">FAQ: Obtendo ajuda</a></li>
+    
+    
+      <li>Next: <a href="admin.html">FAQ: A administração</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">FAQ do Django</a>
+        
+        <ul><li>FAQ: Bancos de dados e modelos</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/faq/models.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="help.html" title="FAQ: Obtendo ajuda">previous</a> 
+     |
+    <a href="index.html" title="FAQ do Django" accesskey="U">up</a>
+   |
+    <a href="admin.html" title="FAQ: A administração">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

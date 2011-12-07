@@ -1,0 +1,411 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Como instalar o Django &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Usando o Django" href="index.html" />
+    <link rel="next" title="Models e bancos de dados" href="db/index.html" />
+    <link rel="prev" title="Usando o Django" href="index.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="Usando o Django">previous</a> 
+     |
+    <a href="index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="db/index.html" title="Models e bancos de dados">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-install">
+            
+  <div class="section" id="s-como-instalar-o-django">
+<span id="como-instalar-o-django"></span><h1>Como instalar o Django<a class="headerlink" href="#como-instalar-o-django" title="Permalink to this headline">¶</a></h1>
+<p>Este documento colocará o seu Django para funcionar.</p>
+<div class="section" id="s-instalando-o-python">
+<span id="instalando-o-python"></span><h2>Instalando o Python<a class="headerlink" href="#instalando-o-python" title="Permalink to this headline">¶</a></h2>
+<p>Por ser um framework escrito em Python, a instalação do Django precisa da instalação do Python.</p>
+<p>Ele roda com Python desde a versão 2.3 a 2.6 (devido a questões
+de imcompatibilidade retroativa no Python 3.0, o Django não funciona atualmente com o
+Python 3.0; veja <a class="reference internal" href="../faq/install.html#faq-install"><em>a FAQ do Django</em></a> para mais
+informação das versões suportadas do Python e s transição para o 3.0).</p>
+<p>Baixe o Python de <a class="reference external" href="http://python.org">http://python.org</a>. Se você estiver usando Linux ou Max OS X, você
+provavelmente já o tem instalado.</p>
+<div class="admonition-django-on-jython admonition ">
+<p class="first admonition-title">Django on Jython</p>
+<p class="last">Se você usa o <a class="reference external" href="http://jython.org/">Jython</a> (uma implementação do Python para plataforma Java),
+você precisará serguir alguns passos adicionais. Veja <a class="reference internal" href="../howto/jython.html"><em>Rodando Django no Jython</em></a>
+para mais detalhes.</p>
+</div>
+</div>
+<div class="section" id="s-instalando-apache-e-mod-wsgi">
+<span id="instalando-apache-e-mod-wsgi"></span><h2>Instalando Apache e mod_wsgi<a class="headerlink" href="#instalando-apache-e-mod-wsgi" title="Permalink to this headline">¶</a></h2>
+<p>Se você quiser apenas experimentar o Django, avance para a próxima sessão.
+O Django vem com um servidor Web bem leve que você pode usar para testes, de forma
+que você não precise instalar e configurar o Apache antes de colocar o Django
+em produção.</p>
+<p>Se você quer usar usar o Django em um site em produção, use o Apache com
+<a class="reference external" href="http://code.google.com/p/modwsgi/">mod_wsgi</a>. mod_wsgi é similar ao mod_perl, ele embute o Python dentro do
+Apache e carrega na memória códigos-fonte escritos em Python quando o servidor é
+iniciado. Este código fica na memória durante toda a vida do processo do Apache,
+o que leva a um ganho de desempenho significativo sobre outras configurações de
+servidor. Garanta que você tem o Apache instalado e que o módulo mod_wsgi
+esteja ativo. O Django irá funcionar com qualquer versão do Apache que
+suporte o mod_wsgi.</p>
+<p>Leia <a class="reference internal" href="../howto/deployment/modwsgi.html"><em>Como usar o Django com mod_wsgi</em></a> para
+mais informações sobre como configurar o mod_wsgi uma vez que você o tenha
+instalado.</p>
+<p>Se você não puder usar o mod_wsgi por qualquer motivo, não se desespere:
+o Django suppora muitos outras opções de implantação. Uma grande segunda escolha é
+<a class="reference internal" href="../howto/deployment/modpython.html"><em>mod_python</em></a>, o predecessor do mod_wsgi. Além disso,
+o Django segue a especificação WSGI, o que permite que ele rode em uma variedade
+de plataformas de servidor. Leia o wiki <a class="reference external" href="http://code.djangoproject.com/wiki/ServerArrangements">server-arrangements</a> para
+informações específicas de instalação em cada plataforma.</p>
+</div>
+<div class="section" id="s-ponha-seu-banco-de-dados-para-funcionar">
+<span id="s-database-installation"></span><span id="ponha-seu-banco-de-dados-para-funcionar"></span><span id="database-installation"></span><h2>Ponha seu banco de dados para funcionar<a class="headerlink" href="#ponha-seu-banco-de-dados-para-funcionar" title="Permalink to this headline">¶</a></h2>
+<p>Se você pretende usar a API de banco de dados do Django, você vai precisar ter
+certeza de que seu servidor de banco de dados está funcionando. Django suporta muitos
+backends de dancos de dados e é oficialmente suportado por <a class="reference external" href="http://www.postgresql.org/">PostgreSQL</a>, <a class="reference external" href="http://www.mysql.com/">MySQL</a>,
+<a class="reference external" href="http://www.oracle.com/">Oracle</a> e <a class="reference external" href="http://www.sqlite.org/">SQLite</a> (apesar do SQLite não precisar de um
+servidor separado para rodar).</p>
+<p>Além dos bancos de dados oficialmente suportados, há backends de terceiros
+que permite você usar outros bancos de dados com Django:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://code.google.com/p/sqlany-django/">Sybase SQL Anywhere</a></li>
+<li><a class="reference external" href="http://code.google.com/p/ibm-db/">IBM DB2</a></li>
+<li><a class="reference external" href="http://code.google.com/p/django-mssql/">Microsoft SQL Server 2005</a></li>
+<li><a class="reference external" href="http://code.google.com/p/django-firebird/">Firebird</a></li>
+<li><a class="reference external" href="http://code.google.com/p/django-pyodbc/">ODBC</a></li>
+</ul>
+<p>As versões do Django e funcionalidades do ORM suportadas por estes backends não
+oficiais variam consideravelmente. Questões específicas relativas a estes
+backends não oficiais, juntamente com qualquer suporte a consultas, devem ser
+direcionadas para os canais de suporte fornecidos pelos projetos terceiros.</p>
+<p>Em adição ao banco de dados, você vai precisar ter certeza de que as suas bibliotecas Python de
+acesso ao banco de dados estão instaladas.</p>
+<ul>
+<li><p class="first">Se você está usando PostgreSQL, você vai precisar do pacote <a class="reference external" href="http://initd.org/pub/software/psycopg/">psycopg</a>, o Django
+suporta as versões 1 e 2. (Quando você for configurar a camada de banco de
+dados do Django, escolha <tt class="docutils literal"><span class="pre">postgresql</span></tt> para a versão 1 ou
+<tt class="docutils literal"><span class="pre">postgresql_psycopg2</span></tt> para a versão 2.)</p>
+<p>Se você estiver usando Windows, olhe a <a class="reference external" href="http://stickpeople.com/projects/python/win-psycopg/">versão não-oficial compilada para
+Windows</a>.</p>
+</li>
+<li><p class="first">Se você estiver usando MySQL, você vai precisar da biblioteca <a class="reference external" href="http://sourceforge.net/projects/mysql-python">MySQLdb</a> (versão
+1.2.1p2 ou superior).
+Você também vai quiser ler as observações específicas de bancos de dados
+para o <a class="reference internal" href="../ref/databases.html#mysql-notes"><em>backend MySQL</em></a>.</p>
+</li>
+<li><p class="first">Se você estiver usando SQLite e Python 2.3 ou Python 2.4, vai precisar da
+biblioteca <a class="reference external" href="http://pysqlite.org/">pysqlite</a>. Use a versão 2.0.3 ou superior. A versão 2.5 do Python
+já vem com um wrapper sqlite na biblioteca padrão, então você não precisa
+instalar mais nada neste caso. Please read the SQLite backend <a class="reference internal" href="../ref/databases.html#sqlite-notes"><em>notes</em></a>.</p>
+</li>
+<li><p class="first">Se você estiver usando Oracle, você precisará de uma cópia do <a class="reference external" href="http://cx-oracle.sourceforge.net/">cx_Oracle</a>, mas
+por favor, leia as notas específicas do banco de dados para o <a class="reference internal" href="../ref/databases.html#oracle-notes"><em>backend
+Oracle</em></a> para informações importantes.</p>
+</li>
+<li><p class="first">Se você está usando um backed não oficial de terceiros, por favor consulte a
+documentação fornecida para quaisquer requerimentos adicionais.</p>
+</li>
+</ul>
+<p>Se você pretende usar o comando <tt class="docutils literal"><span class="pre">manage.py</span> <span class="pre">syncdb</span></tt> do Django para criar
+automaticamente as tabelas para os seus modelos, você precisa garantir que
+o Django tem permissão para criar tabelas no banco de dados que você está
+usando.
+Se você pretende criar as tabelas manualmente, precisa apenas dar permissão de
+<tt class="docutils literal"><span class="pre">SELECT</span></tt>, <tt class="docutils literal"><span class="pre">INSERT</span></tt>, <tt class="docutils literal"><span class="pre">UPDATE</span></tt> e <tt class="docutils literal"><span class="pre">DELETE</span></tt> para o usuário do Django
+(configurado em settings.py, atributo DATABASE_USER). O Django não usa comandos
+<tt class="docutils literal"><span class="pre">ALTER</span> <span class="pre">TABLE</span></tt>, então não precisa de permissão para isso.</p>
+<p>Se você pretende usar o <a class="reference internal" href="testing.html"><em>framework de teste</em></a> do Django com
+&#8216;data fixtures&#8217;, o Django também vai precisar de permissão para criar um bando
+de dados de teste temporário.</p>
+</div>
+<div class="section" id="s-remova-qualquer-versao-antiga-do-django">
+<span id="s-removing-old-versions-of-django"></span><span id="remova-qualquer-versao-antiga-do-django"></span><span id="removing-old-versions-of-django"></span><h2>Remova qualquer versão antiga do Django<a class="headerlink" href="#remova-qualquer-versao-antiga-do-django" title="Permalink to this headline">¶</a></h2>
+<p>Se você está atualizando sua instalação do Django, vai precisar desinstalar
+a versão antiga antes de instalar a nova.</p>
+<p>Se você instalou o Django usando <tt class="docutils literal"><span class="pre">setup.py</span> <span class="pre">install</span></tt>, o processo de
+desinstalação é simples: basta apagar o diretório <tt class="docutils literal"><span class="pre">django</span></tt> de seu diretório
+<tt class="docutils literal"><span class="pre">site-packages</span></tt>.</p>
+<p>Se você instalou o Django usando um egg Python, remova o arquivo <tt class="docutils literal"><span class="pre">.egg</span></tt>
+do Django e remova a referência a ele no arquivo <tt class="docutils literal"><span class="pre">easy-install.pth</span></tt> (dentro
+do diretório site-packages).</p>
+<div class="admonition-onde-fica-o-diretorio-site-packages admonition ">
+<p class="first admonition-title">Onde fica o diretório <tt class="docutils literal"><span class="pre">site-packages</span></tt> ?</p>
+<p>A localização do diretório <tt class="docutils literal"><span class="pre">site-packages</span></tt> depende de seu sistema
+operacional e o local em que o Python foi instalado. Para descobrir a
+localização de seu <tt class="docutils literal"><span class="pre">site-packages</span></tt>, execute o seguinte comando:</p>
+<div class="highlight-python"><pre>.. code-block:: bash</pre>
+</div>
+<blockquote>
+<div>python -c &quot;from distutils.sysconfig import get_python_lib; print get_python_lib()&quot;</div></blockquote>
+<p class="last">(Observe que este comando deve ser executado em um terminal, não no prompt
+interativo do Python)</p>
+</div>
+</div>
+<div class="section" id="s-instalando-o-django">
+<span id="s-install-django-code"></span><span id="instalando-o-django"></span><span id="install-django-code"></span><h2>Instalando o Django<a class="headerlink" href="#instalando-o-django" title="Permalink to this headline">¶</a></h2>
+<p>As instruções de instalação são um tanto diferentes, dependendo se você
+está instalando um pacote de uma distribuição específica, baixando a última
+versão oficial lançada ou usando a versão em desenvolvimento.</p>
+<p>O processo é simples, independentemente de qual você escolher.</p>
+<div class="section" id="s-instalando-um-pacote-de-uma-distribuicao-especifica">
+<span id="instalando-um-pacote-de-uma-distribuicao-especifica"></span><h3>Instalando um pacote de uma distribuição específica<a class="headerlink" href="#instalando-um-pacote-de-uma-distribuicao-especifica" title="Permalink to this headline">¶</a></h3>
+<p>Verifique as <a class="reference internal" href="../misc/distributions.html#misc-distributions"><em>observações específicas de distribuições</em></a>
+para ver se a sua plataforma/distribuição fornece pacotes/instaladores oficiais
+do Django. Pacotes fornecidos por distribuições geralmente permitem a instalação
+automática de dependências e atualizações fáceis.</p>
+</div>
+<div class="section" id="s-instalando-uma-versao-oficial">
+<span id="s-installing-official-release"></span><span id="instalando-uma-versao-oficial"></span><span id="installing-official-release"></span><h3>Instalando uma versão oficial<a class="headerlink" href="#instalando-uma-versao-oficial" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Baixe a última versão oficial lançada da <a class="reference external" href="http://www.djangoproject.com/download/">página de download</a> do Django.</li>
+<li>Descompacte o arquivo baixado (por exemplo: <tt class="docutils literal"><span class="pre">tar</span> <span class="pre">xzvf</span> <span class="pre">Django-NNN.tar.gz</span></tt>,
+onde <tt class="docutils literal"><span class="pre">NNN</span></tt> é o número da última versão lançada).
+Se você estiver usando Windows, você pode baixar a ferramenta linha de
+comando <a class="reference external" href="http://gnuwin32.sourceforge.net/packages/bsdtar.htm">bsdtar</a> para fazer isso, ou você usar uma ferramenta com
+interface gráfica como a <a class="reference external" href="http://www.7-zip.org/">7-zip</a>.</li>
+<li>Entre no diretório criado pelo passo 2 (por exemplo: <tt class="docutils literal"><span class="pre">cd</span> <span class="pre">Django-NNN</span></tt>).</li>
+<li>Se você estiver usando Linux, Mac OS X ou algum outro tipo de Linux,
+execute o comando <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt> no terminal.
+Se você estiver usando Windows, abra um prompt (DOS) com privilégios de
+administrador e execute o comando <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt>.</li>
+</ol>
+<p>Estes comandos instalarão o Django em seu diretório <tt class="docutils literal"><span class="pre">site-packages</span></tt> da
+instalação do Python.</p>
+</div>
+<div class="section" id="s-instalando-a-versao-em-desenvolvimento">
+<span id="s-installing-development-version"></span><span id="instalando-a-versao-em-desenvolvimento"></span><span id="installing-development-version"></span><h3>Instalando a versão em desenvolvimento<a class="headerlink" href="#instalando-a-versao-em-desenvolvimento" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-tracking-django-development admonition ">
+<p class="first admonition-title">Tracking Django development</p>
+<p class="last">Se você decidiu usar a última versão de desenvolvimento do Django, você
+terá que prestar muita atenção na <a class="reference external" href="http://code.djangoproject.com/timeline">linha do tempo do desenvolvimento</a> e
+você terá que manter um olho sobre <a class="reference external" href="http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges">a lista de mudanças de
+retro-compatibilidade</a>. Isto irá ajudá-lo a estar atualizado quanto a
+qualquer funcionalidade que você queira usar, bem como qualquer mudança que
+você precisará fazer em seu código quando atualizar suas instalações do
+Django. (Para versões estáveis, qualquer mudança necessária está documentada
+nas notas de lançamento.)</p>
+</div>
+<p>Se você gostaria de poder atualizar seu Django ocasionalmente com as
+últimas correções de bugs e melhorias, siga estas instruções:</p>
+<ol class="arabic">
+<li><p class="first">Certifique-se de que você tem o <a class="reference external" href="http://subversion.tigris.org/">Subversion</a> instalado e que você pode
+executar seus comandos em um terminal. (Digite <tt class="docutils literal"><span class="pre">svn</span> <span class="pre">help</span></tt> no terminal
+para testar.)</p>
+</li>
+<li><p class="first">Baixe o branch principal de desenvolvimento do Django (o 'trunk'):</p>
+<div class="highlight-python"><pre>.. code-block:: bash</pre>
+</div>
+<blockquote>
+<div><p>svn co <a class="reference external" href="http://code.djangoproject.com/svn/django/trunk/">http://code.djangoproject.com/svn/django/trunk/</a> django-trunk</p>
+</div></blockquote>
+</li>
+<li><p class="first">Depois, certifique-se de que o interpretador Python consegue carregar o
+código Django. Existem várias maneiras de fazer isso. Uma das mais
+convenientes, em Linux, Mac OS X ou outros sistemas Unix é usar um link
+simbólico:</p>
+<div class="highlight-bash"><div class="highlight"><pre>ln -s <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>/django-trunk/django SITE-PACKAGES-DIR/django
+</pre></div>
+</div>
+<p>(Na linha acima, troque <tt class="docutils literal"><span class="pre">SITE_PACKAGES-DIR</span></tt> pela localização do diretório
+<tt class="docutils literal"><span class="pre">site-packages</span></tt> no seu sistema, como explicado em
+&quot;Onde fica o diretório <tt class="docutils literal"><span class="pre">site-packages</span></tt>?&quot;).</p>
+<p>Alternativamente, você pode definir sua variável de ambiente <tt class="docutils literal"><span class="pre">PYTHONPATH</span></tt>
+para que ela inclua o diretório <tt class="docutils literal"><span class="pre">django</span></tt> - sub-diretório de
+<tt class="docutils literal"><span class="pre">django-trunk</span></tt>.
+Talvez essa seja a solução mais conveniente para o Windows, que não oferece
+suporte a links simbólicos. (Variáveis de ambiente podem ser definidas no
+Windows <a class="reference external" href="http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/sysdm_advancd_environmnt_addchange_variable.mspx">pelo Painel de Controle</a>)</p>
+<div class="admonition-e-o-apache-e-mod-python admonition ">
+<p class="first admonition-title">E o Apache e mod_python?</p>
+<p>Se você escolher a solução de definir sua <tt class="docutils literal"><span class="pre">PYTHONPATH</span></tt> você precisa
+lembrar de fazer o mesmo na sua configuração do Apache quando for colocar
+seu site em produção. Faça isso definindo <tt class="docutils literal"><span class="pre">PythonPath</span></tt> no seu arquivo
+de configuração do Apache.</p>
+<p class="last">Mais informações sobre implementações em produção, é lógico, estão
+disponíveis na documentação <a class="reference internal" href="../howto/deployment/modpython.html"><em>Como usar o Django com mod_python</em></a>.</p>
+</div>
+</li>
+<li><p class="first">Em sistemas Unix, crie um link simbólico para o arquivo
+<tt class="docutils literal"><span class="pre">django-trunk/django/bin/django-admin.py</span></tt> para um diretório no seu
+'system path', por exemplo: <tt class="docutils literal"><span class="pre">/usr/local/bin</span></tt>:</p>
+<div class="highlight-python"><pre>.. code-block:: bash</pre>
+</div>
+<blockquote>
+<div><p>ln -s <cite>pwd</cite>/django-trunk/django/bin/django-admin.py /usr/local/bin</p>
+</div></blockquote>
+<p>Isso permite a você simplesmente digitar <tt class="docutils literal"><span class="pre">django-admin.py</span></tt> de qualquer
+diretório, em vez de de ter que escrever o caminho inteiro para o script.</p>
+<p>Quando em Windows, o mesmo resultado pode ser obtido copiando o arquivo
+<tt class="docutils literal"><span class="pre">django-trunk/django/bin/django-admin.py</span></tt> para algum lugar no seu
+'system path'. Por exemplo: <tt class="docutils literal"><span class="pre">C:\Python24\Scripts</span></tt>.</p>
+</li>
+</ol>
+<p>Você <em>não</em> precisa executar <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">intall</span></tt>, pois você já fez
+o equivalente nos passos 3 e 4.</p>
+<p>Quando você quiser atualizar a sua cópia do código-fonte do Django,
+apenas execute <tt class="docutils literal"><span class="pre">svn</span> <span class="pre">update</span></tt> dentro do diretório <tt class="docutils literal"><span class="pre">django-trunk</span></tt>.
+Ao fazer isso, o Subversion vai automaticamente baixar as atualizações.</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Como instalar o Django</a><ul>
+<li><a class="reference internal" href="#instalando-o-python">Instalando o Python</a></li>
+<li><a class="reference internal" href="#instalando-apache-e-mod-wsgi">Instalando Apache e mod_wsgi</a></li>
+<li><a class="reference internal" href="#ponha-seu-banco-de-dados-para-funcionar">Ponha seu banco de dados para funcionar</a></li>
+<li><a class="reference internal" href="#remova-qualquer-versao-antiga-do-django">Remova qualquer versão antiga do Django</a></li>
+<li><a class="reference internal" href="#instalando-o-django">Instalando o Django</a><ul>
+<li><a class="reference internal" href="#instalando-um-pacote-de-uma-distribuicao-especifica">Instalando um pacote de uma distribuição específica</a></li>
+<li><a class="reference internal" href="#instalando-uma-versao-oficial">Instalando uma versão oficial</a></li>
+<li><a class="reference internal" href="#instalando-a-versao-em-desenvolvimento">Instalando a versão em desenvolvimento</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="index.html">Usando o Django</a></li>
+    
+    
+      <li>Next: <a href="db/index.html">Models e bancos de dados</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Usando o Django</a>
+        
+        <ul><li>Como instalar o Django</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/topics/install.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="Usando o Django">previous</a> 
+     |
+    <a href="index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="db/index.html" title="Models e bancos de dados">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

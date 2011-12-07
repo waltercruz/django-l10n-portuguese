@@ -1,0 +1,1128 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Generic views (Visões genéricas) &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Referência da API" href="index.html" />
+    <link rel="next" title="Meta-documentação e miscelânea" href="../misc/index.html" />
+    <link rel="prev" title="Validators" href="validators.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="validators.html" title="Validators">previous</a> 
+     |
+    <a href="index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="../misc/index.html" title="Meta-documentação e miscelânea">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-generic-views">
+            
+  <div class="section" id="s-generic-views-visoes-genericas">
+<span id="s-ref-generic-views"></span><span id="generic-views-visoes-genericas"></span><span id="ref-generic-views"></span><h1>Generic views (Visões genéricas)<a class="headerlink" href="#generic-views-visoes-genericas" title="Permalink to this headline">¶</a></h1>
+<p>Escrever aplicações Web pode ser monotono, pois nós repetimos certos padrões
+repetidamente. No Django, os mais comuns dentre esses padrões são abstraidos
+dentro de &#8220;generic views&#8221; que permitem você rapidamente fornecer views comuns
+de um objeto sem precisar escrever qualquer código Python.</p>
+<p>Uma introdução geral de generic views pode ser encontrado em <a class="reference internal" href="../topics/generic-views.html"><em>topic guide</em></a>.</p>
+<p>Esta referência contém detalhes das generic views embutidas do Django, junto com
+uma lista de todos os argumentos que uma generic view espera. Lembre-se que
+argumentos podem vir tanto de uma URL quanto de infomações adicionais num
+dicionário <tt class="docutils literal"><span class="pre">extra-context</span></tt>.</p>
+<p>A maioria dos generic views requer a chave <tt class="docutils literal"><span class="pre">queryset</span></tt>, que é uma instância do
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt>; veja <a class="reference internal" href="../topics/db/queries.html"><em>Fazendo consultas</em></a> para mais informações sobre objetos
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt>.</p>
+<div class="section" id="s-simple-generic-views">
+<span id="simple-generic-views"></span><h2>&#8220;Simple&#8221; generic views<a class="headerlink" href="#simple-generic-views" title="Permalink to this headline">¶</a></h2>
+<p>O módulo <tt class="docutils literal"><span class="pre">django.views.generic.simple</span></tt> contém views simples para manipular
+alguns casos comuns: renderizar um template quando nenhuma view lógica é
+necessária, e emitir redirecionamentos.</p>
+<div class="section" id="s-django-views-generic-simple-direct-to-template">
+<span id="django-views-generic-simple-direct-to-template"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.simple.direct_to_template</span></tt><a class="headerlink" href="#django-views-generic-simple-direct-to-template" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Renderiza um dado template, passando-o uma variável de template
+<tt class="docutils literal"><span class="pre">{{</span> <span class="pre">params</span> <span class="pre">}}</span></tt>, que é um dicionário de parametros capturados numa URL.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">template</span></tt>: O nome completo de um template a se usar.</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário de valores para adicionar ao contexto do
+template. Por padrão, este é um dicionário vazio. Se um valor no
+dicionário for chamável, o generic view o chamará assim que estiver
+renderizando o template.</li>
+<li><tt class="docutils literal"><span class="pre">mimetype</span></tt>: O tipo MIME a ser usado no documento resultante. Por padrão
+é o valor da configuração <tt class="docutils literal"><span class="pre">DEFAULT_CONTEXT_TYPE</span></tt>.</li>
+</ul>
+<p><strong>Exemplo:</strong></p>
+<p>Dados os seguintes padrões de URL:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;django.views.generic.simple&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^foo/$&#39;</span><span class="p">,</span>             <span class="s">&#39;direct_to_template&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;template&#39;</span><span class="p">:</span> <span class="s">&#39;foo_index.html&#39;</span><span class="p">}),</span>
+    <span class="p">(</span><span class="s">r&#39;^foo/(?P&lt;id&gt;\d+)/$&#39;</span><span class="p">,</span> <span class="s">&#39;direct_to_template&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;template&#39;</span><span class="p">:</span> <span class="s">&#39;foo_detail.html&#39;</span><span class="p">}),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>... uma requisição para <tt class="docutils literal"><span class="pre">/foo/</span></tt> renderizaria o template <tt class="docutils literal"><span class="pre">foo_index.html</span></tt>, e
+uma requisição para <tt class="docutils literal"><span class="pre">/foo/15/</span></tt> renderizaria o <tt class="docutils literal"><span class="pre">foo_detail.html</span></tt> com uma
+variável de contexto <tt class="docutils literal"><span class="pre">{{</span> <span class="pre">params.id</span> <span class="pre">}}</span></tt> que está setado como <tt class="docutils literal"><span class="pre">15</span></tt>.</p>
+</div>
+<div class="section" id="s-django-views-generic-simple-redirect-to">
+<span id="django-views-generic-simple-redirect-to"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.simple.redirect_to</span></tt><a class="headerlink" href="#django-views-generic-simple-redirect-to" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Redireciona para uma dada URL.</p>
+<p>A dada URL pode conter strings na forma de dicionário, que serão intercaladas
+contra os parametros capturados na URL. Pois a interpolação de chaves é
+<em>sempre</em> feita (mesmo se nenhum argumento for passado), qualquer caracter
+<tt class="docutils literal"><span class="pre">&quot;%&quot;</span></tt> na URL deve ser escrito como <tt class="docutils literal"><span class="pre">&quot;%%&quot;</span></tt> assim o Python os converterá para
+um único sinal de percentual na saída.</p>
+<p>Se uma dada URL é <tt class="xref docutils literal"><span class="pre">None</span></tt>, o Django retornará um <tt class="docutils literal"><span class="pre">HttpResponseGone</span></tt> (410).</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">url</span></tt>: A URL para onde redirecionar, como uma string. Ou <tt class="xref docutils literal"><span class="pre">None</span></tt> para
+lançar um erro HTTP 410 (Gone).</li>
+</ul>
+<p><strong>Exemplo:</strong></p>
+<p>Este exemplo redireciona de <tt class="docutils literal"><span class="pre">/foo/&lt;id&gt;/</span></tt> para <tt class="docutils literal"><span class="pre">/bar/&lt;id&gt;/</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;django.views.generic.simple&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">&#39;^foo/(?P&lt;id&gt;\d+)/$&#39;</span><span class="p">,</span> <span class="s">&#39;redirect_to&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;url&#39;</span><span class="p">:</span> <span class="s">&#39;/bar/</span><span class="si">%(id)s</span><span class="s">/&#39;</span><span class="p">}),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Este exemplo retorna um erro HTTP 410 para a requisição <tt class="docutils literal"><span class="pre">/bar/</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;django.views.generic.simple&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">&#39;^bar/$&#39;</span><span class="p">,</span> <span class="s">&#39;redirect_to&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;url&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">}),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Este exemplo mostra como caracteres <tt class="docutils literal"><span class="pre">&quot;%&quot;</span></tt> devem ser escritos na URL afim de
+evitar confusão com os marcadores de strings do Python. Se a strings de
+redirecionamento é escrita como <tt class="docutils literal"><span class="pre">&quot;%7Ejacob/&quot;</span></tt> (com somente um <tt class="docutils literal"><span class="pre">%</span></tt>), uma
+exceção poderia ser lançada:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;django.views.generic.simple&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">&#39;^bar/$&#39;</span><span class="p">,</span> <span class="s">&#39;redirect_to&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;url&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="si">%%</span><span class="s">7Ejacob.&#39;</span><span class="p">}),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="s-generic-view-baseada-em-dados">
+<span id="generic-view-baseada-em-dados"></span><h2>Generic view baseada em dados<a class="headerlink" href="#generic-view-baseada-em-dados" title="Permalink to this headline">¶</a></h2>
+<p>Generic views baseada em datas (no módulo <tt class="docutils literal"><span class="pre">django.views.generic.date_based</span></tt>)
+são views para mostrar páginas de pesquisa para datos baseados em datas.</p>
+<div class="section" id="s-django-views-generic-date-based-archive-index">
+<span id="django-views-generic-date-based-archive-index"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_index</span></tt><a class="headerlink" href="#django-views-generic-date-based-archive-index" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Um página de índice de alto nível mostrando os &quot;últimos&quot; objetos, por data.
+Objetos com ma data no <em>futuro</em> não são incluídos a menos que você configure
+<tt class="docutils literal"><span class="pre">allow_future</span></tt> para <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">queryset</span></tt>: Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> de objetos para que o arquivo sirva.</li>
+<li><tt class="docutils literal"><span class="pre">date_field</span></tt>: O nome do <tt class="docutils literal"><span class="pre">DateField</span></tt> ou <tt class="docutils literal"><span class="pre">DateTimeField</span></tt> no
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> do model que o arquivo baseado em data deve usar para
+determinar os objetos da página.</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">num_latest</span></tt>: O número dos últimos objetos que serão enviados para o
+contexto do template. Por padrão é 15.</li>
+<li><tt class="docutils literal"><span class="pre">template_name</span></tt>: O nome completo de um template para rederizar a página.
+Isso permite você sobrescrever o nome do template padrão. (veja abaixo).</li>
+<li><tt class="docutils literal"><span class="pre">template_loader</span></tt>: O carregador de template a ser usado quando carregar
+o template. Por padrão, ele é <tt class="docutils literal"><span class="pre">django.template.loader</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário com os valores para adicionar no contexto
+do template. Por padrão, este é um dicionário vazio. Se um valor no
+dicionário é chamável, a generic view o chamará antes de renderizar o
+template.</li>
+<li><tt class="docutils literal"><span class="pre">allow_empty</span></tt>: Um boleano especificando se pra exibir a página não há
+objetos disponíveis. Se este for <tt class="xref docutils literal"><span class="pre">False</span></tt> e nenhum objeto estiver
+disponível, a view lançará um 404 ao invés de mostrar uma página vazia.
+Por padrão, isso é <tt class="xref docutils literal"><span class="pre">True</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">context_processors</span></tt>: Uma lista de processadores de contexto de template
+para aplicar na view do template.</li>
+<li><tt class="docutils literal"><span class="pre">mimetype</span></tt>: O tipo MIME para usar no documento resultante. Padrão é o
+valor da configuração <tt class="docutils literal"><span class="pre">DEFAULT_CONTENT_TYPE</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">allow_future</span></tt>: Um boleano especificando se é para incluir objetos no
+&quot;futuro&quot; nesta página, onde &quot;futuro&quot; significa objetos em que o campo
+especificado em <tt class="docutils literal"><span class="pre">date_field</span></tt> é maior que a data/hora atual. Por padrão,
+isso é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</li>
+</ul>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">template_object_name</span></tt>: Designa o nome da variável de template para usar
+no contexto do template. Por padrão, este é <tt class="docutils literal"><span class="pre">'latest'</span></tt>.</li>
+</ul>
+</div></blockquote>
+<p><strong>Nome do template:</strong></p>
+<p>Se o <tt class="docutils literal"><span class="pre">template_name</span></tt> não for especificado, esta view usará o template
+<tt class="docutils literal"><span class="pre">&lt;app_label&gt;/&lt;model_name&gt;_archive.html</span></tt> por padrão, onde:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">&lt;model_name&gt;</span></tt> é seu nome todo em minúsculo. Para um model
+<tt class="docutils literal"><span class="pre">StaffMember</span></tt>, que seria <tt class="docutils literal"><span class="pre">staffmember</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">&lt;app_label&gt;</span></tt> é a parte mais a direita do caminho completo do Python
+para o model de sua aplicação. Por exemplo, se seu model fica em
+<tt class="docutils literal"><span class="pre">apps/blog/models.py</span></tt>, então ficará <tt class="docutils literal"><span class="pre">blog</span></tt>.</li>
+</ul>
+<p><strong>Contexto de template:</strong></p>
+<p>Além de <tt class="docutils literal"><span class="pre">extra_context</span></tt>, o contexto de template será:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">date_list</span></tt>: Uma lista de objetos <tt class="docutils literal"><span class="pre">datetime.date</span></tt> representando todos
+os anos que possuem objetos disponíveis de acordo com o <tt class="docutils literal"><span class="pre">queryset</span></tt>. Eles
+são ordenados reversamente. Isso é equivalente a
+<tt class="docutils literal"><span class="pre">queryset.dates(date_field,</span> <span class="pre">'year')[::-1]</span></tt>.</li>
+</ul>
+<div class="versionchanged">
+<span class="title">Changed in Django 1.0:</span> O comportamento dependendo se o <tt class="docutils literal"><span class="pre">template_object_name</span></tt> está numa nova
+versão.</div>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">latest</span></tt>: Os objetos <tt class="docutils literal"><span class="pre">num_latest</span></tt> no sistema, em ordem decrescente por
+<tt class="docutils literal"><span class="pre">date_field</span></tt>. Por exemplo, se o <tt class="docutils literal"><span class="pre">num_latest</span></tt> é <tt class="docutils literal"><span class="pre">10</span></tt>, então
+<tt class="docutils literal"><span class="pre">latest</span></tt> será uma lista dos últimos 10 objetos na <tt class="docutils literal"><span class="pre">queryset</span></tt>.</p>
+<p>Este nome de variável depende do paramétro <tt class="docutils literal"><span class="pre">template_object_name</span></tt>, que é
+<tt class="docutils literal"><span class="pre">'latest'</span></tt> por padrão. Se <tt class="docutils literal"><span class="pre">template_object_name</span></tt> é <tt class="docutils literal"><span class="pre">'foo'</span></tt>, o nome
+da variável será <tt class="docutils literal"><span class="pre">foo</span></tt>.</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="s-django-views-generic-date-based-archive-year">
+<span id="django-views-generic-date-based-archive-year"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_year</span></tt><a class="headerlink" href="#django-views-generic-date-based-archive-year" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Uma página de arquivo anual mostrando todos os meses em um dado ano. Objetos com
+uma data no <em>futuro</em> não são exibidos a menos que você configure
+<tt class="docutils literal"><span class="pre">allow_future</span></tt> para <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">year</span></tt>: O ano com quatro digitos para o arquivo servir.</li>
+<li><tt class="docutils literal"><span class="pre">queryset</span></tt>: Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> de objetos para o arquivo servir.</li>
+<li><tt class="docutils literal"><span class="pre">date_field</span></tt>: O nome do <tt class="docutils literal"><span class="pre">DateField</span></tt> ou <tt class="docutils literal"><span class="pre">DateTimeField</span></tt> no
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> do model que o arquivo baseado em data deve usar para
+determinar os objetos da página.</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">template_name</span></tt>: O nome completo de um template para usar na
+renderização da página. Isso deixa você sobrescrever o nome do template
+padrão (veja abaixo).</li>
+<li><tt class="docutils literal"><span class="pre">template_loader</span></tt>: O carregador de template para a ser utilizado quando
+carregar o template. Por padrão, este é <tt class="docutils literal"><span class="pre">django.template.loader</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário de valores para adicionar ao contexto do
+template. Por padrão, este é um dicionário vazio. Se o valor no dicionário
+for chamável, a generic view o chamará antes de renderizar o template.</li>
+<li><tt class="docutils literal"><span class="pre">allow_empty</span></tt>: Um boleano especificando se é para mostrar a página se
+não houver objetos disponíveis. Se este for <tt class="xref docutils literal"><span class="pre">False</span></tt> e nenhum objeto
+estiver disponível, a view lançará um 404 ao invés de mostrar uma página
+vazia. Por padrão, este é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">context_processors</span></tt>: Uma lista de processadores de contexto de
+template a se aplicar nas views do template.</li>
+<li><tt class="docutils literal"><span class="pre">template_object_name</span></tt>: Designa o nome da variável de template para usar
+no contexto do template. Por padrão, este é <tt class="docutils literal"><span class="pre">'object'</span></tt>. A view
+adicionará <tt class="docutils literal"><span class="pre">'_list'</span></tt> ao valor deste paramêtro ao determinar o nome da
+variável.</li>
+<li><tt class="docutils literal"><span class="pre">make_object_list</span></tt>: Um booleano especificando se é para receber a lista
+completa de objetos para este ano e passá-los para o template. Se
+<tt class="xref docutils literal"><span class="pre">True</span></tt>, esta lista de objetos será disponibilizada para o template como
+<tt class="docutils literal"><span class="pre">object_list</span></tt>. (O nome <tt class="docutils literal"><span class="pre">object_list</span></tt> pode ser diferente; veja a
+documentação para <tt class="docutils literal"><span class="pre">object_list</span></tt> na seção &quot;Contexto de template&quot; abaixo.)
+Por padrnao, este é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">mimetype</span></tt>: O tipo MIME a ser utilizado no documento resultante.
+O padrão é o valor da configuração <tt class="docutils literal"><span class="pre">DEFAULT_CONTENT_TYPE</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">allow_future</span></tt>: Um boleano especificando se é para incluir objetos no
+&quot;futuro&quot; nesta página, onde &quot;futuro&quot; significa objetos cujo o campo
+especificado  em <tt class="docutils literal"><span class="pre">date_field</span></tt> é maior que a data/hora atual. Por padrão,
+isso é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</li>
+</ul>
+<p><strong>Nome do emplate:</strong></p>
+<p>Se <tt class="docutils literal"><span class="pre">template_name</span></tt> não for especificado, esta view usará o template
+<tt class="docutils literal"><span class="pre">&lt;app_label&gt;/&lt;model_name&gt;_archive_year.html</span></tt> por padrão.</p>
+<p><strong>Contexto de template:</strong></p>
+<p>Além do <tt class="docutils literal"><span class="pre">extra_context</span></tt>, o contexto do template será:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">date_list</span></tt>: Uma lista de objetos <tt class="docutils literal"><span class="pre">datetime.date</span></tt> representando todos
+os meses que possuam objetos disponíveis em um dado ano, de acordo com o
+<tt class="docutils literal"><span class="pre">queryset</span></tt>, em ordem ascendente.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">year</span></tt>: O ano informado, como uma string com 4 dígitos.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">object_list</span></tt>: Se o parâmetro <tt class="docutils literal"><span class="pre">make_object_list</span></tt> for <tt class="xref docutils literal"><span class="pre">True</span></tt>, este
+será configurado para uma lista de objetos disponíveis para o dado ano,
+ordenado pelo campo de data. Este nome de variável depende do parámetro
+<tt class="docutils literal"><span class="pre">template_object_name</span></tt>, que é <tt class="docutils literal"><span class="pre">'object'</span></tt> por padrão. Se o
+<tt class="docutils literal"><span class="pre">template_object_name</span></tt> for <tt class="docutils literal"><span class="pre">'foo'</span></tt>, o nome da variável será
+<tt class="docutils literal"><span class="pre">foo_list</span></tt>.</p>
+<p>Se <tt class="docutils literal"><span class="pre">make_object_list</span></tt> for <tt class="xref docutils literal"><span class="pre">False</span></tt>, <tt class="docutils literal"><span class="pre">object_list</span></tt> será passado para
+o template como uma lista vazia.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="s-django-views-generic-date-based-archive-month">
+<span id="django-views-generic-date-based-archive-month"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_month</span></tt><a class="headerlink" href="#django-views-generic-date-based-archive-month" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Uma página de arquivo mensal mostrando todos os objetos para um dado mês.
+Objetos com uma data no <em>futuro</em> não será exibidos a menos que <tt class="docutils literal"><span class="pre">allow_future</span></tt>
+seja <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">year</span></tt>: O ano com quatro digitos para o arquivo servir. (uma string)</li>
+<li><tt class="docutils literal"><span class="pre">month</span></tt>: O mês para qual o arquivo serve, formatado de acordo com o
+argumento <tt class="docutils literal"><span class="pre">month_format</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">queryset</span></tt>: Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> de objetos para o arquivo servir.</li>
+<li><tt class="docutils literal"><span class="pre">date_field</span></tt>: O nome do <tt class="docutils literal"><span class="pre">DateField</span></tt> ou <tt class="docutils literal"><span class="pre">DateTimeField</span></tt> no
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> do model que o arquivo baseado em data deve usar para
+determinar os objetos da página.</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">month_format</span></tt>: Uma string de formato que regula qual formato o
+paramêtro <tt class="docutils literal"><span class="pre">month</span></tt> usará. Este deve ser na sintaxe aceita pelo
+<tt class="docutils literal"><span class="pre">time.strftime</span></tt> do Python. (Veja a <a class="reference external" href="http://docs.python.org/library/time.html#time.strftime">documentação do strftime</a>.) Ele é
+configurado para <tt class="docutils literal"><span class="pre">&quot;%b&quot;</span></tt> por padrão, que é uma abreviação de três letras
+do nome do mês. Para mudá-lo e usar números, use <tt class="docutils literal"><span class="pre">&quot;%m&quot;</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">template_name</span></tt>: O nome completo de um template a ser utilizado para
+renderizar a página. Isso permite você sobrescrever o nome do template
+padrão. (veja abaixo).</li>
+<li><tt class="docutils literal"><span class="pre">template_loader</span></tt>: O carregador de template para se usar quando carrear
+o template. Por padrão, ele é <tt class="docutils literal"><span class="pre">django.template.loader</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário de valores para adicionar ao contexto do
+template. Por padrão, ele é um dicionário vazio. Se um valor no dicionário
+é chamável, a generic view o chamará antes de renderizar o template.</li>
+<li><tt class="docutils literal"><span class="pre">allow_empty</span></tt>: Um boleano especificando se é para mostrar a página caso
+não tenha objetos disponíveis. Se ele for <tt class="xref docutils literal"><span class="pre">False</span></tt> e não houver objetos
+disponíveis, a view lançará um 404 ao invés de mostrar uma página em
+branco. Por padrão, ele é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">context_processors</span></tt>: Uma lista de processadores de contexto de
+template a se aplicar nas views do template.</li>
+<li><tt class="docutils literal"><span class="pre">template_object_name</span></tt>: Designa o nome da variável de template para usar
+no contexto do template. Por padrão, este é <tt class="docutils literal"><span class="pre">'object'</span></tt>. A view
+adicionará <tt class="docutils literal"><span class="pre">'_list'</span></tt> ao valor deste paramêtro ao determinar o nome da
+variável.</li>
+<li><tt class="docutils literal"><span class="pre">make_object_list</span></tt>: Um booleano especificando se é para receber a lista
+completa de objetos para este ano e passá-los para o template. Se
+<tt class="xref docutils literal"><span class="pre">True</span></tt>, esta lista de objetos será disponibilizada para o template como
+<tt class="docutils literal"><span class="pre">object_list</span></tt>. (O nome <tt class="docutils literal"><span class="pre">object_list</span></tt> pode ser diferente; veja a
+documentação para <tt class="docutils literal"><span class="pre">object_list</span></tt> na seção &quot;Contexto de template&quot; abaixo.)
+Por padrnao, este é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">mimetype</span></tt>: O tipo MIME a ser utilizado no documento resultante.
+O padrão é o valor da configuração <tt class="docutils literal"><span class="pre">DEFAULT_CONTENT_TYPE</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">allow_future</span></tt>: Um boleano especificando se é para incluir objetos no
+&quot;futuro&quot; nesta página, onde &quot;futuro&quot; significa objetos cujo o campo
+especificado  em <tt class="docutils literal"><span class="pre">date_field</span></tt> é maior que a data/hora atual. Por padrão,
+isso é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</li>
+</ul>
+<p><strong>Nome do template:</strong></p>
+<p>Se o <tt class="docutils literal"><span class="pre">template_name</span></tt> não for especificado, esta view usará o template
+<tt class="docutils literal"><span class="pre">&lt;app_label&gt;/&lt;model_name&gt;_archive_month.html</span></tt> por padrão.</p>
+<p><strong>Contexto de template:</strong></p>
+<p>Além do <tt class="docutils literal"><span class="pre">extra_context</span></tt>, o contexto do template será:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">month</span></tt>: Um objeto <tt class="docutils literal"><span class="pre">datetime.date</span></tt> representando o mês informado.</li>
+<li><tt class="docutils literal"><span class="pre">next_month</span></tt>: Um objeto <tt class="docutils literal"><span class="pre">datetime.date</span></tt> representando o primeiro dia
+do mês seguinte. Se o próximo mês estiver no futuro, ele será <tt class="xref docutils literal"><span class="pre">None</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">previous_month</span></tt>: Um objeto <tt class="docutils literal"><span class="pre">datetime.date</span></tt> representando o primeiro
+dia do mês anterior. Diferentemente do <tt class="docutils literal"><span class="pre">next_month</span></tt>, este nunca será
+<tt class="xref docutils literal"><span class="pre">None</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">object_list</span></tt>: Uma lista de objetos para o dado mês. Este nome de
+variável depende do parâmetro <tt class="docutils literal"><span class="pre">template_object_name</span></tt>, que é <tt class="docutils literal"><span class="pre">'object'</span></tt>
+por padrão. Se <tt class="docutils literal"><span class="pre">template_object_name</span></tt> é <tt class="docutils literal"><span class="pre">'foo'</span></tt>, o nome desta variável
+será <tt class="docutils literal"><span class="pre">foo_list</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="s-django-views-generic-date-based-archive-week">
+<span id="django-views-generic-date-based-archive-week"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_week</span></tt><a class="headerlink" href="#django-views-generic-date-based-archive-week" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Uma página de arquivo semanal mostrando todos os objetos em uma dada semana.
+Objetos com uma data no <em>futuro</em> não são mostrados a menos que você configure
+<tt class="docutils literal"><span class="pre">allow_future</span></tt> para <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">year</span></tt>: O ano com quatro digitos para o arquivo servir. (uma string)</li>
+<li><tt class="docutils literal"><span class="pre">week</span></tt>: A semana do ano para qual o arquivo serve (uma string).
+Semanas começam com Sunday (Domingo).</li>
+<li><tt class="docutils literal"><span class="pre">queryset</span></tt>: Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> de objetos para o arquivo servir.</li>
+<li><tt class="docutils literal"><span class="pre">date_field</span></tt>: O nome do <tt class="docutils literal"><span class="pre">DateField</span></tt> ou <tt class="docutils literal"><span class="pre">DateTimeField</span></tt> no
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> do model que o arquivo baseado em data deve usar para
+determinar os objetos da página.</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">template_name</span></tt>: O nome completo de um template a ser utilizado para
+renderizar a página. Isso permite você sobrescrever o nome do template
+padrão. (veja abaixo).</li>
+<li><tt class="docutils literal"><span class="pre">template_loader</span></tt>: O carregador de template para se usar quando carrear
+o template. Por padrão, ele é <tt class="docutils literal"><span class="pre">django.template.loader</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário de valores para adicionar ao contexto do
+template. Por padrão, ele é um dicionário vazio. Se um valor no dicionário
+é chamável, a generic view o chamará antes de renderizar o template.</li>
+<li><tt class="docutils literal"><span class="pre">allow_empty</span></tt>: Um boleano especificando se é para mostrar a página caso
+não tenha objetos disponíveis. Se ele for <tt class="xref docutils literal"><span class="pre">False</span></tt> e não houver objetos
+disponíveis, a view lançará um 404 ao invés de mostrar uma página em
+branco. Por padrão, ele é <tt class="xref docutils literal"><span class="pre">True</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">context_processors</span></tt>: Uma lista de processadores de contexto de
+template a se aplicar nas views do template.</li>
+<li><tt class="docutils literal"><span class="pre">template_object_name</span></tt>: Designa o nome da variável de template para usar
+no contexto do template. Por padrão, este é <tt class="docutils literal"><span class="pre">'object'</span></tt>. A view
+adicionará <tt class="docutils literal"><span class="pre">'_list'</span></tt> ao valor deste paramêtro ao determinar o nome da
+variável.</li>
+<li><tt class="docutils literal"><span class="pre">mimetype</span></tt>: O tipo MIME a ser utilizado no documento resultante.
+O padrão é o valor da configuração <tt class="docutils literal"><span class="pre">DEFAULT_CONTENT_TYPE</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">allow_future</span></tt>: Um boleano especificando se é para incluir objetos no
+&quot;futuro&quot; nesta página, onde &quot;futuro&quot; significa objetos cujo o campo
+especificado  em <tt class="docutils literal"><span class="pre">date_field</span></tt> é maior que a data/hora atual. Por padrão,
+isso é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</li>
+</ul>
+<p><strong>Nome do template:</strong></p>
+<p>Se o <tt class="docutils literal"><span class="pre">template_name</span></tt> não for especificado, esta view usará o template
+<tt class="docutils literal"><span class="pre">&lt;app_label&gt;/&lt;model_name&gt;_archive_week.html</span></tt> por padrão.</p>
+<p><strong>Contexto de template:</strong></p>
+<p>Além do <tt class="docutils literal"><span class="pre">extra_context</span></tt>, o contexto do template será:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">week</span></tt>: Um objeto <tt class="docutils literal"><span class="pre">datetime.date</span></tt> representando o primeiro dia da
+semana informada.</li>
+<li><tt class="docutils literal"><span class="pre">object_list</span></tt>: Uma lista de objetos para a semana informada. Este nome de</li>
+</ul>
+<p>variável depende do parâmetro <tt class="docutils literal"><span class="pre">template_object_name</span></tt>, que é <tt class="docutils literal"><span class="pre">'object'</span></tt>
+por padrão. Se <tt class="docutils literal"><span class="pre">template_object_name</span></tt> é <tt class="docutils literal"><span class="pre">'foo'</span></tt>, o nome desta variável
+será <tt class="docutils literal"><span class="pre">foo_list</span></tt>.</p>
+</div></blockquote>
+</div>
+<div class="section" id="s-django-views-generic-date-based-archive-day">
+<span id="django-views-generic-date-based-archive-day"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_day</span></tt><a class="headerlink" href="#django-views-generic-date-based-archive-day" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Uma página de arquivo diário mostrando todos os objetos para um certo dia. Dias
+no futuro lançam um erro 404, independentemente de se quaiquer objetos
+existentes nos dias futuros, a menos que você configure <tt class="docutils literal"><span class="pre">allow_future</span></tt> para
+<tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">year</span></tt>: O ano com quatro digitos para o arquivo servir. (uma string)</li>
+<li><tt class="docutils literal"><span class="pre">month</span></tt>: O mês para o qual o arquivo serve, formatado de acordo com o
+argumento <tt class="docutils literal"><span class="pre">month_format</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">day</span></tt>: O dia para o qual o arquivo serve, formatado de acordo com o
+argumento <tt class="docutils literal"><span class="pre">day_format</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">queryset</span></tt>: Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> de objetos para o arquivo servir.</li>
+<li><tt class="docutils literal"><span class="pre">date_field</span></tt>: O nome do <tt class="docutils literal"><span class="pre">DateField</span></tt> ou <tt class="docutils literal"><span class="pre">DateTimeField</span></tt> no
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> do model que o arquivo baseado em data deve usar para
+determinar os objetos da página.</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">month_format</span></tt>: Uma string que regula qual o formato que o paramêtro
+<tt class="docutils literal"><span class="pre">month</span></tt> usa. Este deve estar na sintaxe aceita pelo <tt class="docutils literal"><span class="pre">time.strftime</span></tt>
+do Python. (Veja a <a class="reference external" href="http://docs.python.org/library/time.html#time.strftime">documentação do strftime</a>.) Ele é configurado para
+<tt class="docutils literal"><span class="pre">&quot;%b&quot;</span></tt> por padrão, que é uma abreviação de três letras do nome do mês.
+Para mudá-lo e usar números, use <tt class="docutils literal"><span class="pre">&quot;%m&quot;</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">day_format</span></tt>: Assim como <tt class="docutils literal"><span class="pre">month_format</span></tt>, mas para o paramêtro <tt class="docutils literal"><span class="pre">day</span></tt>.
+O padrão é <tt class="docutils literal"><span class="pre">&quot;%d&quot;</span></tt> (dia do mês como um número decimal, 01-31).</li>
+<li><tt class="docutils literal"><span class="pre">template_name</span></tt>: O nome completo de um template a ser utilizado para
+renderizar a página. Isso permite você sobrescrever o nome do template
+padrão. (veja abaixo).</li>
+<li><tt class="docutils literal"><span class="pre">template_loader</span></tt>: O carregador de template para se usar quando carrear
+o template. Por padrão, ele é <tt class="docutils literal"><span class="pre">django.template.loader</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário de valores para adicionar ao contexto do
+template. Por padrão, ele é um dicionário vazio. Se um valor no dicionário
+é chamável, a generic view o chamará antes de renderizar o template.</li>
+<li><tt class="docutils literal"><span class="pre">allow_empty</span></tt>: Um boleano especificando se é para mostrar a página caso
+não tenha objetos disponíveis. Se ele for <tt class="xref docutils literal"><span class="pre">False</span></tt> e não houver objetos
+disponíveis, a view lançará um 404 ao invés de mostrar uma página em
+branco. Por padrão, ele é <tt class="xref docutils literal"><span class="pre">True</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">context_processors</span></tt>: Uma lista de processadores de contexto de
+template a se aplicar nas views do template.</li>
+<li><tt class="docutils literal"><span class="pre">template_object_name</span></tt>: Designa o nome da variável de template para usar
+no contexto do template. Por padrão, este é <tt class="docutils literal"><span class="pre">'object'</span></tt>. A view
+adicionará <tt class="docutils literal"><span class="pre">'_list'</span></tt> ao valor deste paramêtro ao determinar o nome da
+variável.</li>
+<li><tt class="docutils literal"><span class="pre">mimetype</span></tt>: O tipo MIME a ser utilizado no documento resultante.
+O padrão é o valor da configuração <tt class="docutils literal"><span class="pre">DEFAULT_CONTENT_TYPE</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">allow_future</span></tt>: Um boleano especificando se é para incluir objetos no
+&quot;futuro&quot; nesta página, onde &quot;futuro&quot; significa objetos cujo o campo
+especificado  em <tt class="docutils literal"><span class="pre">date_field</span></tt> é maior que a data/hora atual. Por padrão,
+isso é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</li>
+</ul>
+<p><strong>Nome do template:</strong></p>
+<p>Se o <tt class="docutils literal"><span class="pre">template_name</span></tt> não for especificado, esta view usará o template
+<tt class="docutils literal"><span class="pre">&lt;app_label&gt;/&lt;model_name&gt;_archive_day.html</span></tt> por padrão.</p>
+<p><strong>Contexto de template:</strong></p>
+<p>Além do <tt class="docutils literal"><span class="pre">extra_context</span></tt>, o contexto do template será:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">day</span></tt>: Um objeto <tt class="docutils literal"><span class="pre">datetime.date</span></tt> representando o dia informado.</li>
+<li><tt class="docutils literal"><span class="pre">next_day</span></tt>: Um objeto <tt class="docutils literal"><span class="pre">datetime.date</span></tt> representando o próximo dia.
+Se o próximo dia está no futuro, ele será <tt class="xref docutils literal"><span class="pre">None</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">previous_day</span></tt>: Um objeto <tt class="docutils literal"><span class="pre">datetime.date</span></tt> representando o dia
+informado. Diferentemente do <tt class="docutils literal"><span class="pre">next_day</span></tt>, este nunca será <tt class="xref docutils literal"><span class="pre">None</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">object_list</span></tt>: Uma lista de objetos para o dia informado. Este nome de</li>
+</ul>
+<p>variável depende do parâmetro <tt class="docutils literal"><span class="pre">template_object_name</span></tt>, que é <tt class="docutils literal"><span class="pre">'object'</span></tt>
+por padrão. Se <tt class="docutils literal"><span class="pre">template_object_name</span></tt> é <tt class="docutils literal"><span class="pre">'foo'</span></tt>, o nome desta variável
+será <tt class="docutils literal"><span class="pre">foo_list</span></tt>.</p>
+</div></blockquote>
+</div>
+<div class="section" id="s-django-views-generic-date-based-archive-today">
+<span id="django-views-generic-date-based-archive-today"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_today</span></tt><a class="headerlink" href="#django-views-generic-date-based-archive-today" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Uma página de arquivo que mostra todos os objetos para <em>hoje</em>. Este é o mesmo
+que <tt class="docutils literal"><span class="pre">archive_day</span></tt>, exceto pelos argumentos <tt class="docutils literal"><span class="pre">year</span></tt>/<tt class="docutils literal"><span class="pre">month</span></tt>/<tt class="docutils literal"><span class="pre">day</span></tt> que não
+são usados, e em seu lugar é usado o dia atual.</p>
+</div>
+<div class="section" id="s-django-views-generic-date-based-object-detail">
+<span id="django-views-generic-date-based-object-detail"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.date_based.object_detail</span></tt><a class="headerlink" href="#django-views-generic-date-based-object-detail" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Uma página representando um objeto individual. Se o objeto tem um valor de data
+no futuro, a view lançará um error 404 por padrão, a menos que você configure
+<tt class="docutils literal"><span class="pre">allow_future</span></tt> para <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">year</span></tt>: O ano com quatro digitos para o arquivo servir. (uma string)</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">month</span></tt>: O mês do objeto , formatado de acordo com o argumento
+<tt class="docutils literal"><span class="pre">month_format</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">day</span></tt>: O dia do objeto, formatado de acordo com o argumento
+<tt class="docutils literal"><span class="pre">day_format</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">queryset</span></tt>: Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que contém o objeto.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">date_field</span></tt>: The name of the <tt class="docutils literal"><span class="pre">DateField</span></tt> or <tt class="docutils literal"><span class="pre">DateTimeField</span></tt> in
+the <tt class="docutils literal"><span class="pre">QuerySet</span></tt>'s model that the generic view should use to look up the
+object according to <tt class="docutils literal"><span class="pre">year</span></tt>, <tt class="docutils literal"><span class="pre">month</span></tt> and <tt class="docutils literal"><span class="pre">day</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">date_field</span></tt>: O nome do <tt class="docutils literal"><span class="pre">DateField</span></tt> ou <tt class="docutils literal"><span class="pre">DateTimeField</span></tt> no
+<tt class="docutils literal"><span class="pre">QuerySet</span></tt> do model que a generic view deve usar para procurar o objeto
+de acordo com o <tt class="docutils literal"><span class="pre">year</span></tt>, <tt class="docutils literal"><span class="pre">month</span></tt> e <tt class="docutils literal"><span class="pre">day</span></tt>.</p>
+</li>
+<li><p class="first">Ambos <tt class="docutils literal"><span class="pre">object_id</span></tt> ou (<tt class="docutils literal"><span class="pre">slug</span></tt> <em>e</em> <tt class="docutils literal"><span class="pre">slug_field</span></tt>) são obrigatórios.</p>
+<p>Se você fornece <tt class="docutils literal"><span class="pre">object_id</span></tt>, ele deve ser o valor da chave primária do
+objeto que está em exibição nesta página.</p>
+<p>Caso contrário, <tt class="docutils literal"><span class="pre">slug</span></tt> deve ser o slug do objeto em questão, e
+<tt class="docutils literal"><span class="pre">slug_field</span></tt> deve ser o nome do campo slugh no model do <tt class="docutils literal"><span class="pre">QuerySet</span></tt>.
+Por padrão, <tt class="docutils literal"><span class="pre">slug_field</span></tt> é <tt class="docutils literal"><span class="pre">'slug'</span></tt>.</p>
+</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">month_format</span></tt>: Uma string que regula qual o formato que o paramêtro
+<tt class="docutils literal"><span class="pre">month</span></tt> usa. Este deve estar na sintaxe aceita pelo <tt class="docutils literal"><span class="pre">time.strftime</span></tt>
+do Python. (Veja a <a class="reference external" href="http://docs.python.org/library/time.html#time.strftime">documentação do strftime</a>.) Ele é configurado para
+<tt class="docutils literal"><span class="pre">&quot;%b&quot;</span></tt> por padrão, que é uma abreviação de três letras do nome do mês.
+Para mudá-lo e usar números, use <tt class="docutils literal"><span class="pre">&quot;%m&quot;</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">day_format</span></tt>: Assim como <tt class="docutils literal"><span class="pre">month_format</span></tt>, mas para o paramêtro <tt class="docutils literal"><span class="pre">day</span></tt>.
+O padrão é <tt class="docutils literal"><span class="pre">&quot;%d&quot;</span></tt> (dia do mês como um número decimal, 01-31).</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_name</span></tt>: O nome completo de um template a ser utilizado para
+renderizar a página. Isso permite você sobrescrever o nome do template
+padrão. (veja abaixo).</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_name_field</span></tt>: O nome de um campo sobre o objeto cujo valor é o
+nome do template a se usar. Este permite que você armazene os nomes dos
+templates nos dados. Em outras palavras, se seu objeto tem um campo
+<tt class="docutils literal"><span class="pre">'the_template'</span></tt> que contém uma string <tt class="docutils literal"><span class="pre">'foo.html'</span></tt>, e você configura
+<tt class="docutils literal"><span class="pre">template_name_field</span></tt> para <tt class="docutils literal"><span class="pre">'the_template'</span></tt>, então o generic view para
+este objeto usará o template <tt class="docutils literal"><span class="pre">'foo.html'</span></tt>.</p>
+<p>É um pouco perturbador, mas é útil em alguns casos.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_loader</span></tt>: O carregador de template para se usar quando carrear
+o template. Por padrão, ele é <tt class="docutils literal"><span class="pre">django.template.loader</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário de valores para adicionar ao contexto do
+template. Por padrão, ele é um dicionário vazio. Se um valor no dicionário
+é chamável, a generic view o chamará antes de renderizar o template.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">context_processors</span></tt>: Uma lista de processadores de contexto de
+template a se aplicar nas views do template.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_object_name</span></tt>: Designa o nome da variável de template para usar
+no contexto do template. Por padrão, este é <tt class="docutils literal"><span class="pre">'object'</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">mimetype</span></tt>: O tipo MIME a ser utilizado no documento resultante.
+O padrão é o valor da configuração <tt class="docutils literal"><span class="pre">DEFAULT_CONTENT_TYPE</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">allow_future</span></tt>: Um boleano especificando se é para incluir objetos no
+&quot;futuro&quot; nesta página, onde &quot;futuro&quot; significa objetos cujo o campo
+especificado  em <tt class="docutils literal"><span class="pre">date_field</span></tt> é maior que a data/hora atual. Por padrão,
+isso é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+</li>
+</ul>
+<p><strong>Nome do template:</strong></p>
+<p>Se o <tt class="docutils literal"><span class="pre">template_name</span></tt> não for especificado, esta view usará o template
+<tt class="docutils literal"><span class="pre">&lt;app_label&gt;/&lt;model_name&gt;_detail.html</span></tt> por padrão.</p>
+<p><strong>Contexto de template:</strong></p>
+<p>Além do <tt class="docutils literal"><span class="pre">extra_context</span></tt>, o contexto do template será:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">object</span></tt>: O objeto. O nome desta variável depende do paramêtro
+<tt class="docutils literal"><span class="pre">template_object_name</span></tt>, que é <tt class="docutils literal"><span class="pre">'object'</span></tt> por padrão. Se o
+<tt class="docutils literal"><span class="pre">template_object_name</span></tt> for <tt class="docutils literal"><span class="pre">'foo'</span></tt>, o nome desta variável será
+<tt class="docutils literal"><span class="pre">foo</span></tt>.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="s-generic-views-de-lista-detalhes">
+<span id="generic-views-de-lista-detalhes"></span><h2>Generic views de lista/detalhes<a class="headerlink" href="#generic-views-de-lista-detalhes" title="Permalink to this headline">¶</a></h2>
+<p>O framework de generic views de lista e detalhes (no módulo
+<tt class="docutils literal"><span class="pre">django.views.generic.list_detail</span></tt>) é similar ao baseado em datas, exceto pela
+forma mais simples com duas views: uma lista de ojbeto e uma página individual
+para objeto.</p>
+<div class="section" id="s-django-views-generic-list-detail-object-list">
+<span id="django-views-generic-list-detail-object-list"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.list_detail.object_list</span></tt><a class="headerlink" href="#django-views-generic-list-detail-object-list" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Uma página representando uma lista de objetos.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">queryset</span></tt>: Uma <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que representa os objetos.</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">paginate_by</span></tt>: Um inteiro especificando quantos objetos devem aparecer
+por página. Se este for fornecido, a view paginará os objetos com
+<tt class="docutils literal"><span class="pre">paginate_by</span></tt> objetos por página. A view espera por um paramêtro na
+string de consulta <tt class="docutils literal"><span class="pre">page</span></tt> (via <tt class="docutils literal"><span class="pre">GET</span></tt>) ou uma variável <tt class="docutils literal"><span class="pre">page</span></tt>
+especificada no URLconf. Veja <a class="reference internal" href="#notas-sobre-paginacao">Notas sobre paginação</a> abaixo.</li>
+<li><tt class="docutils literal"><span class="pre">page</span></tt>: O número da página atual, como um inteiro, ou a string
+<tt class="docutils literal"><span class="pre">'last'</span></tt>. Este é um número que começa no 1. Veja
+<a class="reference internal" href="#notas-sobre-paginacao">Notas sobre paginação</a> abaixo.</li>
+<li><tt class="docutils literal"><span class="pre">template_name</span></tt>: O nome completo de um template a ser utilizado para
+renderizar a página. Isso permite você sobrescrever o nome do template
+padrão. (veja abaixo).</li>
+<li><tt class="docutils literal"><span class="pre">template_loader</span></tt>: O carregador de template para se usar quando carrear
+o template. Por padrão, ele é <tt class="docutils literal"><span class="pre">django.template.loader</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário de valores para adicionar ao contexto do
+template. Por padrão, ele é um dicionário vazio. Se um valor no dicionário
+é chamável, a generic view o chamará antes de renderizar o template.</li>
+<li><tt class="docutils literal"><span class="pre">allow_empty</span></tt>: A boolean specifying whether to display the page if no
+objects are available. If this is <tt class="xref docutils literal"><span class="pre">False</span></tt> and no objects are available,
+the view will raise a 404 instead of displaying an empty page. By
+default, this is <tt class="xref docutils literal"><span class="pre">True</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">context_processors</span></tt>: Uma lista de processadores de contexto de
+template a se aplicar nas views do template.</li>
+<li><tt class="docutils literal"><span class="pre">template_object_name</span></tt>: Designa o nome da variável de template para usar
+no contexto do template. Por padrão, este é <tt class="docutils literal"><span class="pre">'object'</span></tt>. A view
+adicionará <tt class="docutils literal"><span class="pre">'_list'</span></tt> ao valor deste paramêtro ao determinar o nome da
+variável.</li>
+<li><tt class="docutils literal"><span class="pre">mimetype</span></tt>: O tipo MIME a ser utilizado no documento resultante.
+O padrão é o valor da configuração <tt class="docutils literal"><span class="pre">DEFAULT_CONTENT_TYPE</span></tt>.</li>
+</ul>
+<p><strong>Nome do template:</strong></p>
+<p>Se o <tt class="docutils literal"><span class="pre">template_name</span></tt> não for especificado, esta view usará o template
+<tt class="docutils literal"><span class="pre">&lt;app_label&gt;/&lt;model_name&gt;_list.html</span></tt> por padrão.</p>
+<p><strong>Contexto de template:</strong></p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> As variáveis de contexto <tt class="docutils literal"><span class="pre">paginator</span></tt> e <tt class="docutils literal"><span class="pre">page_obj</span></tt> são novos.</div>
+<p>Além do <tt class="docutils literal"><span class="pre">extra_context</span></tt>, o contexto do template será:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">object</span></tt>: A lista de objetos. O nome desta variável depende do paramêtro
+<tt class="docutils literal"><span class="pre">template_object_name</span></tt>, que é <tt class="docutils literal"><span class="pre">'object'</span></tt> por padrão. Se o
+<tt class="docutils literal"><span class="pre">template_object_name</span></tt> for <tt class="docutils literal"><span class="pre">'foo'</span></tt>, o nome desta variável será
+<tt class="docutils literal"><span class="pre">foo_list</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">is_paginated</span></tt>: Um boleano representando se os resultado são paginados.
+Especificamente, este é configurado como <tt class="xref docutils literal"><span class="pre">False</span></tt> se o número de objetos
+disponíveis for menor ou igual ao <tt class="docutils literal"><span class="pre">paginate_by</span></tt>.</li>
+</ul>
+<p>Se os resultados são paginados, o contexto conterá estas variáveis extras:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">paginator</span></tt>: Uma instância do <tt class="docutils literal"><span class="pre">django.core.paginator.Paginator</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">page_obj</span></tt>: Uma instância do <tt class="docutils literal"><span class="pre">django.core.paginator.Page</span></tt>.</li>
+</ul>
+<div class="section" id="s-notas-sobre-paginacao">
+<span id="notas-sobre-paginacao"></span><h4>Notas sobre paginação<a class="headerlink" href="#notas-sobre-paginacao" title="Permalink to this headline">¶</a></h4>
+<p>Se <tt class="docutils literal"><span class="pre">paginate_by</span></tt> for especificado, o Django paginará os resultados. Você pode
+especifiar o número da página na URL em uma de duas formas:</p>
+<ul>
+<li><p class="first">Use o paramêtro <tt class="docutils literal"><span class="pre">page</span></tt> no URLconf. Por examplo, seu URLconf pode ficar
+assim:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="s">r&#39;^objects/page(?P&lt;page&gt;[0-9]+)/$&#39;</span><span class="p">,</span> <span class="s">&#39;object_list&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">info_dict</span><span class="p">))</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Passe o número da página através do paramêtro <tt class="docutils literal"><span class="pre">page</span></tt> da string de
+consulta. For exemplo, uma URL pode parecer com isso:</p>
+<div class="highlight-python"><pre>/objects/?page=3</pre>
+</div>
+</li>
+<li><p class="first">Para iterar sobre todos os números de páginas, use a variável
+<tt class="docutils literal"><span class="pre">page_range</span></tt>. Você pode iterar sobre a lista fornecida por
+<tt class="docutils literal"><span class="pre">page_range</span></tt> para criar um link para todas as páginas de resultados.</p>
+</li>
+</ul>
+<p>Esses valores e listas começam no 1, não 0, então a primeira página será
+representada com <tt class="docutils literal"><span class="pre">1</span></tt>.</p>
+<p>Para mais sobre paginação, leia a <a class="reference internal" href="../topics/pagination.html"><em>documentação da paginação</em></a>.</p>
+<p>Como um caso especial, a você também é permitido o uso do <tt class="docutils literal"><span class="pre">last</span></tt> como valor
+para <tt class="docutils literal"><span class="pre">page</span></tt>:</p>
+<div class="highlight-python"><pre>/objects/?page=last</pre>
+</div>
+<p>Isso permite você acessar a página final de resultados sem determinar quantas
+páginas você tem primeiro.</p>
+<p>Perceba que <tt class="docutils literal"><span class="pre">page</span></tt> <em>deve</em> ser ou um número de página válido ou o valor
+<tt class="docutils literal"><span class="pre">last</span></tt>; qualquer outro valor para <tt class="docutils literal"><span class="pre">page</span></tt> resultará num erro 404.</p>
+</div>
+</div>
+<div class="section" id="s-django-views-generic-list-detail-object-detail">
+<span id="django-views-generic-list-detail-object-detail"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.list_detail.object_detail</span></tt><a class="headerlink" href="#django-views-generic-list-detail-object-detail" title="Permalink to this headline">¶</a></h3>
+<p>Uma página representando um objeto individual.</p>
+<p><strong>Descrição:</strong></p>
+<p>Uma página representando um objeto individual.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">queryset</span></tt>: Um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que contém o objeto.</p>
+</li>
+<li><p class="first">Ambos <tt class="docutils literal"><span class="pre">object_id</span></tt> ou (<tt class="docutils literal"><span class="pre">slug</span></tt> <em>e</em> <tt class="docutils literal"><span class="pre">slug_field</span></tt>) são obrigatórios.</p>
+<p>Se você fornece <tt class="docutils literal"><span class="pre">object_id</span></tt>, ele deve ser o valor da chave primária do
+objeto que está em exibição nesta página.</p>
+<p>Caso contrário, <tt class="docutils literal"><span class="pre">slug</span></tt> deve ser o slug do objeto em questão, e
+<tt class="docutils literal"><span class="pre">slug_field</span></tt> deve ser o nome do campo slugh no model do <tt class="docutils literal"><span class="pre">QuerySet</span></tt>.
+Por padrão, <tt class="docutils literal"><span class="pre">slug_field</span></tt> é <tt class="docutils literal"><span class="pre">'slug'</span></tt>.</p>
+</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_name</span></tt>: O nome completo de um template a ser utilizado para
+renderizar a página. Isso permite você sobrescrever o nome do template
+padrão. (veja abaixo).</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_name_field</span></tt>: O nome de um campo sobre o objeto cujo valor é o
+nome do template a se usar. Este permite que você armazene os nomes dos
+templates nos dados. Em outras palavras, se seu objeto tem um campo
+<tt class="docutils literal"><span class="pre">'the_template'</span></tt> que contém uma string <tt class="docutils literal"><span class="pre">'foo.html'</span></tt>, e você configura
+<tt class="docutils literal"><span class="pre">template_name_field</span></tt> para <tt class="docutils literal"><span class="pre">'the_template'</span></tt>, então o generic view para
+este objeto usará o template <tt class="docutils literal"><span class="pre">'foo.html'</span></tt>.</p>
+<p>É um pouco perturbador, mas é útil em alguns casos.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_loader</span></tt>: O carregador de template para se usar quando carrear
+o template. Por padrão, ele é <tt class="docutils literal"><span class="pre">django.template.loader</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário de valores para adicionar ao contexto do
+template. Por padrão, ele é um dicionário vazio. Se um valor no dicionário
+é chamável, a generic view o chamará antes de renderizar o template.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">context_processors</span></tt>: Uma lista de processadores de contexto de
+template a se aplicar nas views do template.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_object_name</span></tt>: Designa o nome da variável de template para usar
+no contexto do template. Por padrão, este é <tt class="docutils literal"><span class="pre">'object'</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">mimetype</span></tt>: O tipo MIME a ser utilizado no documento resultante.
+O padrão é o valor da configuração <tt class="docutils literal"><span class="pre">DEFAULT_CONTENT_TYPE</span></tt>.</p>
+</li>
+</ul>
+<p><strong>Nome do template:</strong></p>
+<p>Se o <tt class="docutils literal"><span class="pre">template_name</span></tt> não for especificado, esta view usará o template
+<tt class="docutils literal"><span class="pre">&lt;app_label&gt;/&lt;model_name&gt;_detail.html</span></tt> por padrão.</p>
+<p><strong>Contexto de template:</strong></p>
+<p>Além do <tt class="docutils literal"><span class="pre">extra_context</span></tt>, o contexto do template será:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">object</span></tt>: O objeto. O nome desta variável depende do paramêtro
+<tt class="docutils literal"><span class="pre">template_object_name</span></tt>, que é <tt class="docutils literal"><span class="pre">'object'</span></tt> por padrão. Se o
+<tt class="docutils literal"><span class="pre">template_object_name</span></tt> for <tt class="docutils literal"><span class="pre">'foo'</span></tt>, o nome desta variável será
+<tt class="docutils literal"><span class="pre">foo_list</span></tt>.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="s-create-update-delete-generic-views">
+<span id="create-update-delete-generic-views"></span><h2>Create/update/delete generic views<a class="headerlink" href="#create-update-delete-generic-views" title="Permalink to this headline">¶</a></h2>
+<p>O módulo <tt class="docutils literal"><span class="pre">django.views.generic.create_update</span></tt> contém um conjunto de funções
+para criar, editar e deletar objetos.</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p><tt class="docutils literal"><span class="pre">django.views.generic.create_update.create_object</span></tt> e
+<tt class="docutils literal"><span class="pre">django.views.generic.create_update.update_object</span></tt> agora usam a nova
+<a class="reference internal" href="../topics/forms/index.html"><em>biblioteca de formulários</em></a> para construir e mostrar
+o forumulário.</p>
+<div class="section" id="s-django-views-generic-create-update-create-object">
+<span id="django-views-generic-create-update-create-object"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.create_update.create_object</span></tt><a class="headerlink" href="#django-views-generic-create-update-create-object" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Uma página que mostra um formulário para criar um objeto, o re-exibe o
+formulário com erros de validação (se houver algum) e salva o objeto.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul>
+<li><p class="first">Ambos <tt class="docutils literal"><span class="pre">form_class</span></tt> ou <tt class="docutils literal"><span class="pre">model</span></tt> são obrigatórios.</p>
+<p>Se você fornecer <tt class="docutils literal"><span class="pre">form_class</span></tt>, ela deverá ser uma subclasse de
+<tt class="docutils literal"><span class="pre">django.forms.ModelForm</span></tt>. Use este argumento quando você precisar
+personalizar o formulário do model. Veja a <a class="reference internal" href="../topics/forms/modelforms.html"><em>documentação do
+ModelForm</em></a> para saber mais.</p>
+<p>Caso contrário, <tt class="docutils literal"><span class="pre">model</span></tt> deve ser uma classe model do Django e o
+formulário usado será um <tt class="docutils literal"><span class="pre">ModelForm</span></tt> padrão para <tt class="docutils literal"><span class="pre">model</span></tt>.</p>
+</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">post_save_redirect</span></tt>: Uma URL para a qual a view será redirecionada
+depois de salvar o objeto. Por padrão, ela é
+<tt class="docutils literal"><span class="pre">object.get_absolute_url()</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">post_save_redirect</span></tt> pode conter um dicionário de formatos de strings,
+que será interpolado contra os atributos/campos do objeto. Por exemplo,
+você poderia usar <tt class="docutils literal"><span class="pre">post_save_redirect=&quot;/polls/%(slug)s/&quot;</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">login_required</span></tt>: Um boleano que designa ser um usuário deve estar
+logado, para poder ver a página e salvar modificações. Estes hooks ficam
+dentro do <a class="reference internal" href="../topics/auth.html"><em>sistema de autenticação</em></a> do Django. Por
+padrão, ele é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<p>Se ele for <tt class="xref docutils literal"><span class="pre">True</span></tt> e um usuário não logado tentar visitar esta página
+ou salvar um formulário, o Django redirecionará a requisição para
+<tt class="docutils literal"><span class="pre">/accounts/login/</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_name</span></tt>: O nome completo de um template a ser utilizado para
+renderizar a página. Isso permite você sobrescrever o nome do template
+padrão. (veja abaixo).</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_loader</span></tt>: O carregador de template para se usar quando carrear
+o template. Por padrão, ele é <tt class="docutils literal"><span class="pre">django.template.loader</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário de valores para adicionar ao contexto do
+template. Por padrão, ele é um dicionário vazio. Se um valor no dicionário
+é chamável, a generic view o chamará antes de renderizar o template.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">context_processors</span></tt>: Uma lista de processadores de contexto de
+template a se aplicar nas views do template.</p>
+</li>
+</ul>
+<p><strong>Nome do template:</strong></p>
+<p>Se o <tt class="docutils literal"><span class="pre">template_name</span></tt> não for especificado, esta view usará o template
+<tt class="docutils literal"><span class="pre">&lt;app_label&gt;/&lt;model_name&gt;_form.html</span></tt> por padrão.</p>
+<p><strong>Contexto de template:</strong></p>
+<p>Além do <tt class="docutils literal"><span class="pre">extra_context</span></tt>, o contexto do template será:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">form</span></tt>: Uma instância do <tt class="docutils literal"><span class="pre">django.forms.ModelForm</span></tt> representando o
+formulário criado para o objeto. Este permite você referenciar o campo
+do formulário facilmente no sistema de template.</p>
+<p>Por exemplo, se o model tem dois campos <tt class="docutils literal"><span class="pre">name</span></tt> e <tt class="docutils literal"><span class="pre">address</span></tt>:</p>
+<div class="highlight-python"><pre>&lt;form action="" method="post"&gt;
+&lt;p&gt;{{ form.name.label_tag }} {{ form.name }}&lt;/p&gt;
+&lt;p&gt;{{ form.address.label_tag }} {{ form.address }}&lt;/p&gt;
+&lt;/form&gt;</pre>
+</div>
+<p>Veja o <a class="reference internal" href="../topics/forms/index.html"><em>documentação dos formulários</em></a> para mais
+informações sobre usar objetos <tt class="docutils literal"><span class="pre">Form</span></tt> nos templates.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="s-django-views-generic-create-update-update-object">
+<span id="django-views-generic-create-update-update-object"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.create_update.update_object</span></tt><a class="headerlink" href="#django-views-generic-create-update-update-object" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Uma página que mostra um formulário para editar um objeto existente, re-exibindo
+o formulário com erros de validação (se houver algum) e salvando as mudanças
+no objeto. Ele usa um formulário, automaticamente gerado, para o objeto de uma
+classe model.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul>
+<li><p class="first">Ambos <tt class="docutils literal"><span class="pre">form_class</span></tt> ou <tt class="docutils literal"><span class="pre">model</span></tt> são obrigatórios.</p>
+<p>Se você fornecer <tt class="docutils literal"><span class="pre">form_class</span></tt>, ela deverá ser uma subclasse de
+<tt class="docutils literal"><span class="pre">django.forms.ModelForm</span></tt>. Use este argumento quando você precisar
+personalizar o formulário do model. Veja a <a class="reference internal" href="../topics/forms/modelforms.html"><em>documentação do
+ModelForm</em></a> para saber mais.</p>
+<p>Caso contrário, <tt class="docutils literal"><span class="pre">model</span></tt> deve ser uma classe model do Django e o
+formulário usado será um <tt class="docutils literal"><span class="pre">ModelForm</span></tt> padrão para <tt class="docutils literal"><span class="pre">model</span></tt>.</p>
+</li>
+<li><p class="first">Ambos <tt class="docutils literal"><span class="pre">object_id</span></tt> ou (<tt class="docutils literal"><span class="pre">slug</span></tt> <em>e</em> <tt class="docutils literal"><span class="pre">slug_field</span></tt>) são obrigatórios.</p>
+<p>Se você fornece <tt class="docutils literal"><span class="pre">object_id</span></tt>, ele deve ser o valor da chave primária do
+objeto que está em exibição nesta página.</p>
+<p>Caso contrário, <tt class="docutils literal"><span class="pre">slug</span></tt> deve ser o slug do objeto em questão, e
+<tt class="docutils literal"><span class="pre">slug_field</span></tt> deve ser o nome do campo slugh no model do <tt class="docutils literal"><span class="pre">QuerySet</span></tt>.
+Por padrão, <tt class="docutils literal"><span class="pre">slug_field</span></tt> é <tt class="docutils literal"><span class="pre">'slug'</span></tt>.</p>
+</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">post_save_redirect</span></tt>: Um URL para a qual a view será redirecionada
+depois de salvar o objeto. Por padrão, ela será
+<tt class="docutils literal"><span class="pre">object.get_absolute_url()</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">post_save_redirect</span></tt> pode conter um dicionário de formatos de strings,
+que será interpolado contra os atributos/campos do objeto. Por exemplo,
+você poderia usar <tt class="docutils literal"><span class="pre">post_save_redirect=&quot;/polls/%(slug)s/&quot;</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">login_required</span></tt>: Um boleano que designa ser um usuário deve estar
+logado, para poder ver a página e salvar modificações. Estes hooks ficam
+dentro do <a class="reference internal" href="../topics/auth.html"><em>sistema de autenticação</em></a> do Django. Por
+padrão, ele é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<p>Se ele for <tt class="xref docutils literal"><span class="pre">True</span></tt> e um usuário não logado tentar visitar esta página
+ou salvar um formulário, o Django redirecionará a requisição para
+<tt class="docutils literal"><span class="pre">/accounts/login/</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_name</span></tt>: O nome completo de um template a ser utilizado para
+renderizar a página. Isso permite você sobrescrever o nome do template
+padrão. (veja abaixo).</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_loader</span></tt>: O carregador de template para se usar quando carrear
+o template. Por padrão, ele é <tt class="docutils literal"><span class="pre">django.template.loader</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário de valores para adicionar ao contexto do
+template. Por padrão, ele é um dicionário vazio. Se um valor no dicionário
+é chamável, a generic view o chamará antes de renderizar o template.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">context_processors</span></tt>: Uma lista de processadores de contexto de
+template a se aplicar nas views do template.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_object_name</span></tt>: Designa o nome da variável de template para usar
+no contexto do template. Por padrão, este é <tt class="docutils literal"><span class="pre">'object'</span></tt>.</p>
+</li>
+</ul>
+<p><strong>Nome do template:</strong></p>
+<p>Se o <tt class="docutils literal"><span class="pre">template_name</span></tt> não for especificado, esta view usará o template
+<tt class="docutils literal"><span class="pre">&lt;app_label&gt;/&lt;model_name&gt;_form.html</span></tt> por padrão.</p>
+<p><strong>Contexto de template:</strong></p>
+<p>Além do <tt class="docutils literal"><span class="pre">extra_context</span></tt>, o contexto do template será:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">form</span></tt>: Uma instância do <tt class="docutils literal"><span class="pre">django.forms.ModelForm</span></tt> representando o
+formulário para editar o objeto. Ele permite você referenciar os campos
+do formulário facilmente dentro do sistema de template.</p>
+<p>Por exemplo, se o model tem dois campos, <tt class="docutils literal"><span class="pre">name</span></tt> e <tt class="docutils literal"><span class="pre">address</span></tt>:</p>
+<div class="highlight-python"><pre>&lt;form action="" method="post"&gt;
+&lt;p&gt;{{ form.name.label_tag }} {{ form.name }}&lt;/p&gt;
+&lt;p&gt;{{ form.address.label_tag }} {{ form.address }}&lt;/p&gt;
+&lt;/form&gt;</pre>
+</div>
+<p>Veja a <a class="reference internal" href="../topics/forms/index.html"><em>documentação de formulário</em></a> para mais
+informações sobre como usar objetos <tt class="docutils literal"><span class="pre">Form</span></tt> dentro dos templates.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">object</span></tt>: O objeto. O nome desta variável depende do paramêtro
+<tt class="docutils literal"><span class="pre">template_object_name</span></tt>, que é <tt class="docutils literal"><span class="pre">'object'</span></tt> por padrão. Se o
+<tt class="docutils literal"><span class="pre">template_object_name</span></tt> for <tt class="docutils literal"><span class="pre">'foo'</span></tt>, o nome desta variável será
+<tt class="docutils literal"><span class="pre">foo_list</span></tt>.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="s-django-views-generic-create-update-delete-object">
+<span id="django-views-generic-create-update-delete-object"></span><h3><tt class="docutils literal"><span class="pre">django.views.generic.create_update.delete_object</span></tt><a class="headerlink" href="#django-views-generic-create-update-delete-object" title="Permalink to this headline">¶</a></h3>
+<p><strong>Descrição:</strong></p>
+<p>Uma view que mostra uma página de confirmação e deleta um objeto existente.
+Somente o dado objeto será removido se o método de requisição for <tt class="docutils literal"><span class="pre">POST</span></tt>. Se
+este view é acessado via <tt class="docutils literal"><span class="pre">GET</span></tt>, ele mostrará uma página de confirmação que
+deve conter um formulário que posta para a mesma URL.</p>
+<p><strong>Argumentos obrigatórios:</strong></p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">model</span></tt>: A classe do objeto de model do Django que formulário criará.</p>
+</li>
+<li><p class="first">Ambos <tt class="docutils literal"><span class="pre">object_id</span></tt> ou (<tt class="docutils literal"><span class="pre">slug</span></tt> <em>e</em> <tt class="docutils literal"><span class="pre">slug_field</span></tt>) são obrigatórios.</p>
+<p>Se você fornece <tt class="docutils literal"><span class="pre">object_id</span></tt>, ele deve ser o valor da chave primária do
+objeto que está em exibição nesta página.</p>
+<p>Caso contrário, <tt class="docutils literal"><span class="pre">slug</span></tt> deve ser o slug do objeto em questão, e
+<tt class="docutils literal"><span class="pre">slug_field</span></tt> deve ser o nome do campo slugh no model do <tt class="docutils literal"><span class="pre">QuerySet</span></tt>.
+Por padrão, <tt class="docutils literal"><span class="pre">slug_field</span></tt> é <tt class="docutils literal"><span class="pre">'slug'</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">post_delete_redirect</span></tt>: Uma URL para qual a view será redirecionada
+depois de deletar o objeto.</p>
+</li>
+</ul>
+<p><strong>Argumentos opcionais:</strong></p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">login_required</span></tt>: Um boleano que designa ser um usuário deve estar
+logado, para poder ver a página e salvar modificações. Estes hooks ficam
+dentro do <a class="reference internal" href="../topics/auth.html"><em>sistema de autenticação</em></a> do Django. Por
+padrão, ele é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<p>Se ele for <tt class="xref docutils literal"><span class="pre">True</span></tt> e um usuário não logado tentar visitar esta página
+ou salvar um formulário, o Django redirecionará a requisição para
+<tt class="docutils literal"><span class="pre">/accounts/login/</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_name</span></tt>: O nome completo de um template a ser utilizado para
+renderizar a página. Isso permite você sobrescrever o nome do template
+padrão. (veja abaixo).</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_loader</span></tt>: O carregador de template para se usar quando carrear
+o template. Por padrão, ele é <tt class="docutils literal"><span class="pre">django.template.loader</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">extra_context</span></tt>: Um dicionário de valores para adicionar ao contexto do
+template. Por padrão, ele é um dicionário vazio. Se um valor no dicionário
+é chamável, a generic view o chamará antes de renderizar o template.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">context_processors</span></tt>: Uma lista de processadores de contexto de
+template a se aplicar nas views do template.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">template_object_name</span></tt>: Designa o nome da variável de template para usar
+no contexto do template. Por padrão, este é <tt class="docutils literal"><span class="pre">'object'</span></tt>.</p>
+</li>
+</ul>
+<p><strong>Nome do template:</strong></p>
+<p>Se o <tt class="docutils literal"><span class="pre">template_name</span></tt> não for especificado, esta view usará o template
+<tt class="docutils literal"><span class="pre">&lt;app_label&gt;/&lt;model_name&gt;_confirm_delete.html</span></tt> por padrão.</p>
+<p><strong>Contexto de template:</strong></p>
+<p>Além do <tt class="docutils literal"><span class="pre">extra_context</span></tt>, o contexto do template será:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">object</span></tt>: O objeto original que será deletado. O nome desta variável
+depende do paramêtro <tt class="docutils literal"><span class="pre">template_object_name</span></tt>, que é <tt class="docutils literal"><span class="pre">'object'</span></tt> por
+padrão. Se o <tt class="docutils literal"><span class="pre">template_object_name</span></tt> for <tt class="docutils literal"><span class="pre">'foo'</span></tt>, o nome desta
+variável será <tt class="docutils literal"><span class="pre">foo_list</span></tt>.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Generic views (Visões genéricas)</a><ul>
+<li><a class="reference internal" href="#simple-generic-views">&#8220;Simple&#8221; generic views</a><ul>
+<li><a class="reference internal" href="#django-views-generic-simple-direct-to-template"><tt class="docutils literal"><span class="pre">django.views.generic.simple.direct_to_template</span></tt></a></li>
+<li><a class="reference internal" href="#django-views-generic-simple-redirect-to"><tt class="docutils literal"><span class="pre">django.views.generic.simple.redirect_to</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#generic-view-baseada-em-dados">Generic view baseada em dados</a><ul>
+<li><a class="reference internal" href="#django-views-generic-date-based-archive-index"><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_index</span></tt></a></li>
+<li><a class="reference internal" href="#django-views-generic-date-based-archive-year"><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_year</span></tt></a></li>
+<li><a class="reference internal" href="#django-views-generic-date-based-archive-month"><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_month</span></tt></a></li>
+<li><a class="reference internal" href="#django-views-generic-date-based-archive-week"><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_week</span></tt></a></li>
+<li><a class="reference internal" href="#django-views-generic-date-based-archive-day"><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_day</span></tt></a></li>
+<li><a class="reference internal" href="#django-views-generic-date-based-archive-today"><tt class="docutils literal"><span class="pre">django.views.generic.date_based.archive_today</span></tt></a></li>
+<li><a class="reference internal" href="#django-views-generic-date-based-object-detail"><tt class="docutils literal"><span class="pre">django.views.generic.date_based.object_detail</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#generic-views-de-lista-detalhes">Generic views de lista/detalhes</a><ul>
+<li><a class="reference internal" href="#django-views-generic-list-detail-object-list"><tt class="docutils literal"><span class="pre">django.views.generic.list_detail.object_list</span></tt></a><ul>
+<li><a class="reference internal" href="#notas-sobre-paginacao">Notas sobre paginação</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#django-views-generic-list-detail-object-detail"><tt class="docutils literal"><span class="pre">django.views.generic.list_detail.object_detail</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#create-update-delete-generic-views">Create/update/delete generic views</a><ul>
+<li><a class="reference internal" href="#django-views-generic-create-update-create-object"><tt class="docutils literal"><span class="pre">django.views.generic.create_update.create_object</span></tt></a></li>
+<li><a class="reference internal" href="#django-views-generic-create-update-update-object"><tt class="docutils literal"><span class="pre">django.views.generic.create_update.update_object</span></tt></a></li>
+<li><a class="reference internal" href="#django-views-generic-create-update-delete-object"><tt class="docutils literal"><span class="pre">django.views.generic.create_update.delete_object</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="validators.html">Validators</a></li>
+    
+    
+      <li>Next: <a href="../misc/index.html">Meta-documentação e miscelânea</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Referência da API</a>
+        
+        <ul><li>Generic views (Visões genéricas)</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/ref/generic-views.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="validators.html" title="Validators">previous</a> 
+     |
+    <a href="index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="../misc/index.html" title="Meta-documentação e miscelânea">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

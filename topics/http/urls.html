@@ -1,0 +1,1026 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>URL dispatcher &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Manipulando requisições HTTP" href="index.html" />
+    <link rel="next" title="Escrevendo Views" href="views.html" />
+    <link rel="prev" title="Manipulando requisições HTTP" href="index.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="Manipulando requisições HTTP">previous</a> 
+     |
+    <a href="../index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="views.html" title="Escrevendo Views">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-http-urls">
+            
+  <div class="section" id="s-module-django.core.urlresolvers">
+<span id="s-url-dispatcher"></span><span id="module-django.core.urlresolvers"></span><span id="url-dispatcher"></span><h1>URL dispatcher<a class="headerlink" href="#module-django.core.urlresolvers" title="Permalink to this headline">¶</a></h1>
+<p>Um esquema de URLs limpo e elegante é um detalhe importante numa aplicação Web
+de qualidade. O Django permite que você defina as URLs da maneira que quiser,
+sem limitações impostas pelo framework.</p>
+<p>Não são necessários <tt class="docutils literal"><span class="pre">.php</span></tt>, <tt class="docutils literal"><span class="pre">.cgi</span></tt> ou outras coisas sem o menor sentido
+como <tt class="docutils literal"><span class="pre">0,2097,1-1-1928,00</span></tt>.</p>
+<p>Veja <a class="reference external" href="http://www.w3.org/Provider/Style/URI">Cool URIs don&#8217;t change</a>, pelo criador da World Wide Web Tim Berners-Lee,
+para ter excelentes argumentos do porquê as URLs devem ser limpas e facilmente
+utilizáveis.</p>
+<div class="section" id="s-visao-geral">
+<span id="visao-geral"></span><h2>Visão geral<a class="headerlink" href="#visao-geral" title="Permalink to this headline">¶</a></h2>
+<p>Para definir URLs para uma aplicação, você cria um módulo Python informalmente
+chamado de <strong>URLconf</strong> (URL configuration). Este módulo é Python puro e é um
+mapeamento simples entre padrões de URL (na forma de expressões regulares
+simples) para funções Python de callback (suas views).</p>
+<p>Este mapeamento pode ser tão extenso ou curto quanto necessário. Ele pode
+referenciar outros mapeamentos. E, por ser código Python puro, pode ser
+construído dinamicamente.</p>
+</div>
+<div class="section" id="s-como-o-django-processa-uma-requisicao">
+<span id="s-how-django-processes-a-request"></span><span id="como-o-django-processa-uma-requisicao"></span><span id="how-django-processes-a-request"></span><h2>Como o Django processa uma requisição<a class="headerlink" href="#como-o-django-processa-uma-requisicao" title="Permalink to this headline">¶</a></h2>
+<p>Quando um usuário requisita uma página de nosso site em Django, este é o
+algoritmo que o sistema segue para determinar qual código Python irá executar:</p>
+<ol class="arabic simple">
+<li>O Django determina o módulo URLconf inicial a ser usado. Normalmente,
+este é o valor de configuração do <tt class="docutils literal"><span class="pre">ROOT_URLCONF</span></tt> no
+arquivo settings, mas se o objeto <tt class="docutils literal"><span class="pre">HttpRequest</span></tt> de entrada tem um
+atributo chamado <tt class="docutils literal"><span class="pre">urlconf</span></tt>, esse valor será utilizado no lugar da
+configuração <tt class="docutils literal"><span class="pre">ROOT_URLCONF</span></tt>.</li>
+<li>O Django carrega o módulo Python em questão e procura a variável
+<tt class="docutils literal"><span class="pre">urlpatterns</span></tt>. Esta deve ser uma lista Python, no formato retornado
+pela função <tt class="docutils literal"><span class="pre">django.conf.urls.defaults.patterns()</span></tt>.</li>
+<li>O Django percorre cada padrão de URL, ordenadamente, e pára no primeiro
+padrão em que exista uma correspondência com a URL requisitada.</li>
+<li>Uma vez que uma das expressões regulares corresponda, o Django importa
+e chama a view associada, que é uma simples função Python. Um
+<a class="reference internal" href="../../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a> é sempre passado como primeiro
+argumento da view e qualquer outro valor capturado pela expressão regular
+é passado como argumento adicional.</li>
+</ol>
+</div>
+<div class="section" id="s-exemplo">
+<span id="exemplo"></span><h2>Exemplo<a class="headerlink" href="#exemplo" title="Permalink to this headline">¶</a></h2>
+<p>Aqui está um URLconf de exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/2003/$&#39;</span><span class="p">,</span> <span class="s">&#39;news.views.special_case_2003&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(\d{4})/$&#39;</span><span class="p">,</span> <span class="s">&#39;news.views.year_archive&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(\d{4})/(\d{2})/$&#39;</span><span class="p">,</span> <span class="s">&#39;news.views.month_archive&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(\d{4})/(\d{2})/(\d+)/$&#39;</span><span class="p">,</span> <span class="s">&#39;news.views.article_detail&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Notas:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">from</span> <span class="pre">django.conf.urls.defaults</span> <span class="pre">import</span> <span class="pre">*</span></tt> disponibiliza a função
+<tt class="docutils literal"><span class="pre">patterns()</span></tt>.</li>
+<li>Para capturar um valor da URL, simplesmente coloque parênteses em volta
+dele.</li>
+<li>Não é necessário adicionar uma barra no início, porque toda URL tem isso.
+Por exemplo, o correto é <tt class="docutils literal"><span class="pre">^articles</span></tt>, e não <tt class="docutils literal"><span class="pre">^/articles</span></tt>.</li>
+<li>O <tt class="docutils literal"><span class="pre">'r'</span></tt> na frente de cada string de expressão regular é opcional, mas
+recomendado. Ele diz ao Python que o conteúdo de uma string deve levar
+em conta caracteres como <tt class="docutils literal"><span class="pre">'\'</span></tt> literalmente em vez de interpretá-los
+como um caractere especial. Veja <a class="reference external" href="http://diveintopython.org/regular_expressions/street_addresses.html#re.matching.2.3">a explicação do Dive Into Python</a>.</li>
+</ul>
+<p>Requisições de exemplo:</p>
+<ul class="simple">
+<li>Uma requisição para <tt class="docutils literal"><span class="pre">/articles/2005/03/</span></tt> corresponde ao terceiro
+elemento da lista. O Django então chama a função
+<tt class="docutils literal"><span class="pre">news.views.month_archive(request,</span> <span class="pre">'2005',</span> <span class="pre">'03')</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">/articles/2005/3/</span></tt> não corresponde a nenhum padrão, porque o terceiro
+elemento da lista requer dois dígitos para o mês.</li>
+<li><tt class="docutils literal"><span class="pre">/articles/2003/</span></tt> corresponde ao primeiro elemento da lista, e não ao
+segundo, porque os padrões são testados seguindo a ordem da lista,
+portanto o primeiro elemento é o primeiro a ser testado. Esteja à vontade
+para explorar a ordem das regras para inserir casos especiais como este.</li>
+<li><tt class="docutils literal"><span class="pre">/articles/2003</span></tt> não corresponde a nenhum destes padrões, pois cada
+padrão exige que a URL termine com uma barra.</li>
+<li><tt class="docutils literal"><span class="pre">/articles/2003/03/3/</span></tt> corresponde ao último padrão. O Django chama a
+função <tt class="docutils literal"><span class="pre">news.views.article_detail(request,</span> <span class="pre">'2003',</span> <span class="pre">'03',</span> <span class="pre">'3')</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="s-grupos-nomeados">
+<span id="grupos-nomeados"></span><h2>Grupos nomeados<a class="headerlink" href="#grupos-nomeados" title="Permalink to this headline">¶</a></h2>
+<p>O exemplo acima usou grupos de expressões regulares simples e <em>não-nomeados</em>
+(usando parênteses) para capturar pedaços da URL e passá-los como argumentos
+<em>posicionais</em> para a view. Em um uso mais avançado, é possível utilizar grupos
+<em>nomeados</em> de expressões regulares para capturar pedaços de URL e passá-los como
+argumentos <em>nomeados</em> para a view.</p>
+<p>Em expressões regulares Python, a sintaxe para grupos nomeados é
+<tt class="docutils literal"><span class="pre">(?P&lt;nome&gt;padrão)</span></tt>, onde <tt class="docutils literal"><span class="pre">nome</span></tt> é o nome do grupo e <tt class="docutils literal"><span class="pre">padrão</span></tt> é algum
+padrão a ser correspondido.</p>
+<p>Segue o URLconf do exemplo acima, reescrita para utilizar grupos nomeados:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/2003/$&#39;</span><span class="p">,</span> <span class="s">&#39;news.views.special_case_2003&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(?P&lt;year&gt;\d{4})/$&#39;</span><span class="p">,</span> <span class="s">&#39;news.views.year_archive&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(?P&lt;year&gt;\d{4})/(?P&lt;month&gt;\d{2})/$&#39;</span><span class="p">,</span> <span class="s">&#39;news.views.month_archive&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(?P&lt;year&gt;\d{4})/(?P&lt;month&gt;\d{2})/(?P&lt;day&gt;\d+)/$&#39;</span><span class="p">,</span> <span class="s">&#39;news.views.article_detail&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Este exemplo faz exatamente a mesma coisa que o anterior, com uma pequena
+diferença: Os valores capturados são passados para as funções de view como
+argumentos nomeados em vez de argumentos posicionais. Por exemplo:</p>
+<ul class="simple">
+<li>Uma requisição para <tt class="docutils literal"><span class="pre">/articles/2005/03/</span></tt> chama a função
+<tt class="docutils literal"><span class="pre">news.views.month_archive(request,</span> <span class="pre">year='2005',</span> <span class="pre">month='03')</span></tt>, em vez
+de <tt class="docutils literal"><span class="pre">news.views.month_archive(request,</span> <span class="pre">'2005',</span> <span class="pre">'03')</span></tt>.</li>
+<li>Uma requisição para <tt class="docutils literal"><span class="pre">/articles/2003/03/3/</span></tt> chama a função
+<tt class="docutils literal"><span class="pre">news.views.article_detail(request,</span> <span class="pre">year='2003',</span> <span class="pre">month='03',</span> <span class="pre">day='3')</span></tt>.</li>
+</ul>
+<p>Na prática, isso significa que seus URLconfs são um pouco mais explícitos e
+menos propensos a bugs de ordem de argumentos -- e você pode reordenar os
+argumentos nas definições de função de view. Obviamente, estes benefícios são
+obtidos ao custo da brevidade; alguns desenvolvedores acham a sintaxe
+de grupos nomeados feia e muito prolixa.</p>
+<div class="section" id="s-o-algoritmo-de-correspondencia-agrupamento">
+<span id="o-algoritmo-de-correspondencia-agrupamento"></span><h3>O algoritmo de correspondência/agrupamento<a class="headerlink" href="#o-algoritmo-de-correspondencia-agrupamento" title="Permalink to this headline">¶</a></h3>
+<p>Eis o algoritmo que o parser URLconf segue, no que diz respeito a grupos
+nomeados contra grupos não-nomeados em uma expressão regular:</p>
+<p>Se existe algum argumento nomeado, ele será utilizado, ignorando argumentos
+não-nomeados. Caso contrário, ele passará todos os argumentos não-nomeados como
+argumentos posicionais.</p>
+<p>Em ambos os casos, serão passados quaisquer argumentos nomeados adicionais como
+argumentos nomeados. Veja &quot;Passando opções adicionais para funções de view&quot;
+abaixo.</p>
+</div>
+</div>
+<div class="section" id="s-onde-o-urlconf-faz-sua-busca">
+<span id="onde-o-urlconf-faz-sua-busca"></span><h2>Onde o URLconf faz sua busca<a class="headerlink" href="#onde-o-urlconf-faz-sua-busca" title="Permalink to this headline">¶</a></h2>
+<p>O URLconf faz a busca de correspondência na URL requisitada, como uma string
+Python normal. Isso não inclui parâmetros GET ou POST, ou do nome de domínio.</p>
+<p>Por exemplo, numa requisição para <tt class="docutils literal"><span class="pre">http://www.example.com/myapp/</span></tt>, o URLconf
+irá procurar por <tt class="docutils literal"><span class="pre">myapp/</span></tt>.</p>
+<p>Em uma requisição para <tt class="docutils literal"><span class="pre">http://www.example.com/myapp/?page=3</span></tt>, o URLconf irá
+procurar por <tt class="docutils literal"><span class="pre">myapp/</span></tt>.</p>
+<p>O URLconf não se importa com o método de requisição. Em outras palavras, todos
+os métodos de requisição -- <tt class="docutils literal"><span class="pre">POST</span></tt>, <tt class="docutils literal"><span class="pre">GET</span></tt>, <tt class="docutils literal"><span class="pre">HEAD</span></tt>, etc. -- serão roteados
+para a mesma função da mesma URL.</p>
+</div>
+<div class="section" id="s-a-sintaxe-da-varivavel-urlpatterns">
+<span id="a-sintaxe-da-varivavel-urlpatterns"></span><h2>A sintaxe da varivável urlpatterns<a class="headerlink" href="#a-sintaxe-da-varivavel-urlpatterns" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">urlpatterns</span></tt> deve ser uma lista Python no formato retornado pela função
+<tt class="docutils literal"><span class="pre">django.conf.urls.defaults.patterns()</span></tt>. Sempre use <tt class="docutils literal"><span class="pre">patterns()</span></tt> para criar
+a variável <tt class="docutils literal"><span class="pre">urlpatterns</span></tt>.</p>
+<p>A convenção é usar <tt class="docutils literal"><span class="pre">from</span> <span class="pre">django.conf.urls.defaults</span> <span class="pre">import</span> <span class="pre">*</span></tt> no topo de seu
+URLconf. Isso dá ao módulo acesso a estes objetos:</p>
+<div class="section" id="s-patterns">
+<span id="patterns"></span><h3>patterns<a class="headerlink" href="#patterns" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="django.core.urlresolvers.patterns">
+<tt class="descname">patterns</tt>(<em>prefix</em>, <em>pattern_description</em>, <em>...</em>)<a class="headerlink" href="#django.core.urlresolvers.patterns" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Uma função que recebe um prefixo e um número arbitrário de padrões de URL, e
+retorna uma lista de padrões de URL no formato de que o Django precisa.</p>
+<p>O primeiro argumento para <tt class="docutils literal"><span class="pre">patterns()</span></tt> é uma string <tt class="docutils literal"><span class="pre">prefix</span></tt>. Veja
+<a class="reference internal" href="#o-prefixo-da-view">O prefixo da view</a> abaixo.</p>
+<p>Os argumentos restantes devem ser tuplas neste formato:</p>
+<div class="highlight-python"><pre>(expressão regular, função de callbak Python, [, dicionário opcional [, nome opcional]])</pre>
+</div>
+<p>...onde <tt class="docutils literal"><span class="pre">dicionário</span> <span class="pre">opcional</span></tt> e <tt class="docutils literal"><span class="pre">nome</span> <span class="pre">opcional</span></tt> são opcionais. (Veja
+<a class="reference internal" href="#passando-opcoes-adicionais-para-funcoes-de-view">Passando opções adicionais para funções de view</a> abaixo.)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Por <cite>patterns()</cite> ser uma chamada de função, ela aceita um máximo de 255
+argumentos (padrões de URL, neste caso). Isso é um limite para todas as
+chamadas de função Python. Isso raramente é um problema na prática, porque
+você normalmente estrutura seus padrões de URL modularmente usando seções
+<cite>include()</cite>. Entretanto, se mesmo assim você chegar ao limite de 255
+argumentos, perceba que <cite>patterns()</cite> retorna uma lista Python, então você
+pode dividir a construção da lista.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="o">...</span>
+    <span class="p">)</span>
+<span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="o">...</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">As listas Python possuem um tamanho ilimitado, então não há um número
+máximo para quantos padrões de URL você pode construir. O único limite é
+que você só pode criar 254 de cada vez (o 255o argumento é o prefixo
+inicial).</p>
+</div>
+</div>
+<div class="section" id="s-url">
+<span id="url"></span><h3>url<a class="headerlink" href="#url" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<dl class="function">
+<dt id="django.core.urlresolvers.url">
+<tt class="descname">url</tt>(<em>regex</em>, <em>view</em>, <em>kwargs=None</em>, <em>name=None</em>, <em>prefix=''</em>)<a class="headerlink" href="#django.core.urlresolvers.url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Você pode utilizar a função <tt class="docutils literal"><span class="pre">url()</span></tt> no lugar de uma tupla, como um argumento
+para <tt class="docutils literal"><span class="pre">patterns()</span></tt>. Isso é conveniente se você quer especificar um nome sem
+utilizar o dicionário de argumentos opcionais adicionais. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^index/$&#39;</span><span class="p">,</span> <span class="n">index_view</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;main-view&quot;</span><span class="p">),</span>
+    <span class="o">...</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Esta função recebe cinco argumentos, onde a maioria é opcional:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">url</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Veja <a class="reference internal" href="#nomeando-padroes-de-url">Nomeando padrões de URL</a> para saber da utilidade do parâmetro <tt class="docutils literal"><span class="pre">name</span></tt>.</p>
+<p>O parâmetro <tt class="docutils literal"><span class="pre">prefix</span></tt> tem o mesmo significado que o primeiro argumento de
+<tt class="docutils literal"><span class="pre">patterns()</span></tt> e somente é relevante quando você está passando uma string como
+um parâmetro para a <tt class="docutils literal"><span class="pre">view</span></tt>.</p>
+</div>
+<div class="section" id="s-handler404">
+<span id="handler404"></span><h3>handler404<a class="headerlink" href="#handler404" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.core.urlresolvers.handler404">
+<tt class="descname">handler404</tt><a class="headerlink" href="#django.core.urlresolvers.handler404" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Uma string representando o caminho completo para a importação Python da view
+que deve ser chamada se nenhum dos padrões de URL corresponder.</p>
+<p>Por padrão, este valor é <tt class="docutils literal"><span class="pre">'django.views.defaults.page_not_found'</span></tt>, que na
+maioria das vezes deve ser suficiente.</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 1.2:</span> Previous versions of Django only accepted strings representing import paths.</div>
+</div>
+<div class="section" id="s-handler500">
+<span id="handler500"></span><h3>handler500<a class="headerlink" href="#handler500" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="django.core.urlresolvers.handler500">
+<tt class="descname">handler500</tt><a class="headerlink" href="#django.core.urlresolvers.handler500" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Uma string representando o caminho completo para a importação Python da view que
+deve ser chamada em caso de erros no servidor. Erros no servidor acontecem
+quando você tem erros em tempo de execução no código da sua view.</p>
+<p>Por padrão, este valor é <tt class="docutils literal"><span class="pre">'django.views.defaults.server_error'</span></tt>, que na
+maioria das vezes deve ser suficiente.</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 1.2:</span> Previous versions of Django only accepted strings representing import paths.</div>
+</div>
+<div class="section" id="s-include">
+<span id="include"></span><h3>include<a class="headerlink" href="#include" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="django.core.urlresolvers.include">
+<tt class="descname">include</tt>(<em>&lt;module or pattern_list&gt;</em>)<a class="headerlink" href="#django.core.urlresolvers.include" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Uma função que recebe o caminho completo para a importação Python de outro
+URLconf que deve ser &quot;incluído&quot; neste local. Veja <a class="reference internal" href="#incluindo-outros-urlconfs">Incluindo outros URLconfs</a>
+abaixo.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<p><a class="reference internal" href="#django.core.urlresolvers.include" title="django.core.urlresolvers.include"><tt class="xref py py-func docutils literal"><span class="pre">include()</span></tt></a> also accepts as an argument an iterable that returns URL
+patterns.</p>
+<p>Veja <a class="reference internal" href="#incluindo-outros-urlconfs">Incluindo outros URLconfs</a> abaixo.</p>
+</div>
+</div>
+<div class="section" id="s-notas-na-captura-de-texto-em-urls">
+<span id="notas-na-captura-de-texto-em-urls"></span><h2>Notas na captura de texto em URLs<a class="headerlink" href="#notas-na-captura-de-texto-em-urls" title="Permalink to this headline">¶</a></h2>
+<p>Cada argumento capturado é enviado para a view como uma string Python,
+independente do tipo de correspondência feita pela expressão regular. Por
+exemplo, nesta linha do URLconf:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="s">r&#39;^articles/(?P&lt;year&gt;\d{4})/$&#39;</span><span class="p">,</span> <span class="s">&#39;news.views.year_archive&#39;</span><span class="p">),</span>
+</pre></div>
+</div>
+<p>...o argumento <tt class="docutils literal"><span class="pre">year</span></tt> para <tt class="docutils literal"><span class="pre">news.views.year_archive()</span></tt> será uma string, não
+um inteiro, embora o <tt class="docutils literal"><span class="pre">\d{4}</span></tt> só vá corresponder a strings que contenham
+números inteiros.</p>
+<p>Um truque conveniente é especificar parâmetros padrão para os argumentos de
+suas views. Aqui vai um exemplo de URLconf e view:</p>
+<div class="highlight-python"><pre># URLconf
+urlpatterns = patterns('',
+    (r'^blog/$', 'blog.views.page'),
+    (r'^blog/page(?P&lt;num&gt;\d+)/$', 'blog.views.page'),
+)
+
+# View (em blog/views.py)
+def page(request, num="1"):
+    # Mostra a página apropriada das postagens de blog, de acordo com num.</pre>
+</div>
+<p>No exemplo acima, os dois padrões de URL apontam para a mesma view --
+<tt class="docutils literal"><span class="pre">blog.views.page</span></tt> --, mas o primeiro padrão não captura nada da URL. Se o
+primeiro padrão corresponder, a função <tt class="docutils literal"><span class="pre">page()</span></tt> usará seu argumento padrão
+para <tt class="docutils literal"><span class="pre">num</span></tt>, <tt class="docutils literal"><span class="pre">&quot;1&quot;</span></tt>. Se o segundo padrão corresponder, <tt class="docutils literal"><span class="pre">page()</span></tt> usará o
+valor de <tt class="docutils literal"><span class="pre">num</span></tt> que foi capturado pela expressão regular.</p>
+</div>
+<div class="section" id="s-performance">
+<span id="performance"></span><h2>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h2>
+<p>Cada expressão regular em um <tt class="docutils literal"><span class="pre">urlpatterns</span></tt> é compilada na primeira vez em que
+é accessada. Isso torna o sistema extremamente rápido.</p>
+</div>
+<div class="section" id="s-o-prefixo-da-view">
+<span id="o-prefixo-da-view"></span><h2>O prefixo da view<a class="headerlink" href="#o-prefixo-da-view" title="Permalink to this headline">¶</a></h2>
+<p>Você pode especificar um prefixo comum em sua chamada <tt class="docutils literal"><span class="pre">patterns()</span></tt> para
+diminuir a duplicação de código.</p>
+<p>Segue um exemplo de URLconf da <a class="reference internal" href="../../intro/overview.html"><em>Visão geral do Django</em></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(\d{4})/$&#39;</span><span class="p">,</span> <span class="s">&#39;mysite.news.views.year_archive&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(\d{4})/(\d{2})/$&#39;</span><span class="p">,</span> <span class="s">&#39;mysite.news.views.month_archive&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(\d{4})/(\d{2})/(\d+)/$&#39;</span><span class="p">,</span> <span class="s">&#39;mysite.news.views.article_detail&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Neste exemplo, cada view tem um prefixo comum -- <tt class="docutils literal"><span class="pre">'mysite.news.views'</span></tt>.
+Em vez de digitar isso para cada entrada em <tt class="docutils literal"><span class="pre">urlpatterns</span></tt>, você pode usar
+o primeiro argumento da função <tt class="docutils literal"><span class="pre">patterns()</span></tt> para especificar o prefixo que se
+aplica a cada função de view.</p>
+<p>Com isso em mente, o exemplo acima pode ser reescrito de maneira mais concisa
+assim:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;news.views&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(\d{4})/$&#39;</span><span class="p">,</span> <span class="s">&#39;year_archive&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(\d{4})/(\d{2})/$&#39;</span><span class="p">,</span> <span class="s">&#39;month_archive&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^articles/(\d{4})/(\d{2})/(\d+)/$&#39;</span><span class="p">,</span> <span class="s">&#39;article_detail&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Note que você não coloca um ponto final (<tt class="docutils literal"><span class="pre">&quot;.&quot;</span></tt>) no prefixo. O Django coloca
+isso automaticamente.</p>
+<div class="section" id="s-multiplos-prefixos-de-view">
+<span id="multiplos-prefixos-de-view"></span><h3>Múltiplos prefixos de view<a class="headerlink" href="#multiplos-prefixos-de-view" title="Permalink to this headline">¶</a></h3>
+<p>Na prática, você provavelmente acabará misturando views ao ponto em que as views
+em seu <tt class="docutils literal"><span class="pre">urlpatterns</span></tt> não terão um prefixo comum. Entretanto, você ainda pode
+tirar vantagem do atalho de prefixo da view para remover código duplicado.
+Simplesmente concatene múltiplos objetos <tt class="docutils literal"><span class="pre">patterns()</span></tt>, assim:</p>
+<p>Antigo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^$&#39;</span><span class="p">,</span> <span class="s">&#39;django.views.generic.date_based.archive_index&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^(?P&lt;year&gt;\d{4})/(?P&lt;month&gt;[a-z]{3})/$&#39;</span><span class="p">,</span> <span class="s">&#39;django.views.generic.date_based.archive_month&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^tag/(?P&lt;tag&gt;\w+)/$&#39;</span><span class="p">,</span> <span class="s">&#39;weblog.views.tag&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Novo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;django.views.generic.date_based&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^$&#39;</span><span class="p">,</span> <span class="s">&#39;archive_index&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^(?P&lt;year&gt;\d{4})/(?P&lt;month&gt;[a-z]{3})/$&#39;</span><span class="p">,</span><span class="s">&#39;archive_month&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;weblog.views&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^tag/(?P&lt;tag&gt;\w+)/$&#39;</span><span class="p">,</span> <span class="s">&#39;tag&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="s-incluindo-outros-urlconfs">
+<span id="incluindo-outros-urlconfs"></span><h2>Incluindo outros URLconfs<a class="headerlink" href="#incluindo-outros-urlconfs" title="Permalink to this headline">¶</a></h2>
+<p>Em qualquer ponto, seu <tt class="docutils literal"><span class="pre">urlpatterns</span></tt> pode &quot;incluir&quot; outros módulos URLconf.
+Isso essencialmente &quot;inclui&quot; um conjunto de URLs abaixo de outras.</p>
+<p>Por exemplo, eis o URLconf para o próprio <a class="reference external" href="http://www.djangoproject.com/">Web site do Django</a>. Ele inclui um
+número de outros URLconfs:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^weblog/&#39;</span><span class="p">,</span>        <span class="n">include</span><span class="p">(</span><span class="s">&#39;django_website.apps.blog.urls.blog&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s">r&#39;^documentation/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;django_website.apps.docs.urls.docs&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s">r&#39;^comments/&#39;</span><span class="p">,</span>      <span class="n">include</span><span class="p">(</span><span class="s">&#39;django.contrib.comments.urls.comments&#39;</span><span class="p">)),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Note que as expressões regulares neste exemplo não possue um <tt class="docutils literal"><span class="pre">$</span></tt> (caractere
+que corresponde ao final de string), mas incluem a barra final. Sempre que o
+Django encontra <tt class="docutils literal"><span class="pre">include()</span></tt>, ele recorta qualquer parte da URL correspondida
+até aquele ponto e envia a string restante ao URLconf incluído para
+processamento adicional.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<p>Another possibility is to include additional URL patterns not by specifying the
+URLconf Python module defining them as the <a class="reference internal" href="#include">include</a> argument but by using
+directly the pattern list as returned by <a class="reference internal" href="#patterns">patterns</a> instead. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">extra_patterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;reports/(?P&lt;id&gt;\d+)/$&#39;</span><span class="p">,</span> <span class="s">&#39;credit.views.report&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;credit-reports&#39;</span><span class="p">),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;charge/$&#39;</span><span class="p">,</span> <span class="s">&#39;credit.views.charge&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;credit-charge&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^$&#39;</span><span class="p">,</span>    <span class="s">&#39;apps.main.views.homepage&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;site-homepage&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^help/&#39;</span><span class="p">,</span>   <span class="n">include</span><span class="p">(</span><span class="s">&#39;apps.help.urls&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s">r&#39;^credit/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">extra_patterns</span><span class="p">)),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>This approach can be seen in use when you deploy an instance of the Django
+Admin application. The Django Admin is deployed as instances of a
+<a class="reference internal" href="../../ref/contrib/admin/index.html#django.contrib.admin.AdminSite" title="django.contrib.admin.AdminSite"><tt class="xref py py-class docutils literal"><span class="pre">AdminSite</span></tt></a>; each
+<a class="reference internal" href="../../ref/contrib/admin/index.html#django.contrib.admin.AdminSite" title="django.contrib.admin.AdminSite"><tt class="xref py py-class docutils literal"><span class="pre">AdminSite</span></tt></a> instance has an attribute <tt class="docutils literal"><span class="pre">urls</span></tt>
+that returns the url patterns available to that instance. It is this attribute
+that you <tt class="docutils literal"><span class="pre">include()</span></tt> into your projects <tt class="docutils literal"><span class="pre">urlpatterns</span></tt> when you deploy the
+admin instance.</p>
+<div class="section" id="s-parametros-capturados">
+<span id="parametros-capturados"></span><h3>Parâmetros capturados<a class="headerlink" href="#parametros-capturados" title="Permalink to this headline">¶</a></h3>
+<p>Um URLconf incluído recebe quaisquer parâmetros capturados do URLconf pai,
+então o seguinte exemplo é válido:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Em settings/urls/main.py</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^(?P&lt;username&gt;\w+)/blog/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;foo.urls.blog&#39;</span><span class="p">)),</span>
+<span class="p">)</span>
+
+<span class="c"># Em foo/urls/blog.py</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;foo.views&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^$&#39;</span><span class="p">,</span> <span class="s">&#39;blog.index&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^archive/$&#39;</span><span class="p">,</span> <span class="s">&#39;blog.archive&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>No exemplo acima, a variável <tt class="docutils literal"><span class="pre">&quot;username&quot;</span></tt> capturada é passada para o URLconf,
+como esperado.</p>
+</div>
+<div class="section" id="s-defining-url-namespaces">
+<span id="s-topics-http-defining-url-namespaces"></span><span id="defining-url-namespaces"></span><span id="topics-http-defining-url-namespaces"></span><h3>Defining URL Namespaces<a class="headerlink" href="#defining-url-namespaces" title="Permalink to this headline">¶</a></h3>
+<p>When you need to deploy multiple instances of a single application, it can be
+helpful to be able to differentiate between instances. This is especially
+important when using <a class="reference internal" href="#naming-url-patterns"><em>named URL patterns</em></a>, since
+multiple instances of a single application will share named URLs. Namespaces
+provide a way to tell these named URLs apart.</p>
+<p>A URL namespace comes in two parts, both of which are strings:</p>
+<ul class="simple">
+<li>An <strong>application namespace</strong>. This describes the name of the application
+that is being deployed. Every instance of a single application will have
+the same application namespace. For example, Django's admin application
+has the somewhat predictable application namespace of <tt class="docutils literal"><span class="pre">admin</span></tt>.</li>
+<li>An <strong>instance namespace</strong>. This identifies a specific instance of an
+application. Instance namespaces should be unique across your entire
+project. However, an instance namespace can be the same as the
+application namespace. This is used to specify a default instance of an
+application. For example, the default Django Admin instance has an
+instance namespace of <tt class="docutils literal"><span class="pre">admin</span></tt>.</li>
+</ul>
+<p>URL Namespaces can be specified in two ways.</p>
+<p>Firstly, you can provide the application and instance namespace as arguments
+to <tt class="docutils literal"><span class="pre">include()</span></tt> when you construct your URL patterns. For example,:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="s">r&#39;^help/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;apps.help.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="n">app_name</span><span class="o">=</span><span class="s">&#39;bar&#39;</span><span class="p">)),</span>
+</pre></div>
+</div>
+<p>This will include the URLs defined in <tt class="docutils literal"><span class="pre">apps.help.urls</span></tt> into the application
+namespace <tt class="docutils literal"><span class="pre">bar</span></tt>, with the instance namespace <tt class="docutils literal"><span class="pre">foo</span></tt>.</p>
+<p>Secondly, you can include an object that contains embedded namespace data. If
+you <tt class="docutils literal"><span class="pre">include()</span></tt> a <tt class="docutils literal"><span class="pre">patterns</span></tt> object, that object will be added to the
+global namespace. However, you can also <tt class="docutils literal"><span class="pre">include()</span></tt> an object that contains
+a 3-tuple containing:</p>
+<div class="highlight-python"><pre>(&lt;patterns object&gt;, &lt;application namespace&gt;, &lt;instance namespace&gt;)</pre>
+</div>
+<p>This will include the nominated URL patterns into the given application and
+instance namespace. For example, the <tt class="docutils literal"><span class="pre">urls</span></tt> attribute of Django's
+<a class="reference internal" href="../../ref/contrib/admin/index.html#django.contrib.admin.AdminSite" title="django.contrib.admin.AdminSite"><tt class="xref py py-class docutils literal"><span class="pre">AdminSite</span></tt></a> object returns a 3-tuple that contains
+all the patterns in an admin site, plus the name of the admin instance, and the
+application namespace <tt class="docutils literal"><span class="pre">admin</span></tt>.</p>
+<p>Once you have defined namespaced URLs, you can reverse them. For details on
+reversing namespaced urls, see the documentation on <a class="reference internal" href="#topics-http-reversing-url-namespaces"><em>reversing namespaced
+URLs</em></a>.</p>
+</div>
+</div>
+<div class="section" id="s-passando-opcoes-adicionais-para-funcoes-de-view">
+<span id="passando-opcoes-adicionais-para-funcoes-de-view"></span><h2>Passando opções adicionais para funções de view<a class="headerlink" href="#passando-opcoes-adicionais-para-funcoes-de-view" title="Permalink to this headline">¶</a></h2>
+<p>URLconfs possuem um &quot;hook&quot; que permite passar argumentos adicionais para suas
+funções de view como um dicionário Python.</p>
+<p>Qualquer tupla URLconf pode ter um terceiro elemento opcional, que deve ser um
+dicionário de argumentos nomeados adicionais a serem passados para a função de
+view.</p>
+<p>Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;blog.views&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^blog/(?P&lt;year&gt;\d{4})/$&#39;</span><span class="p">,</span> <span class="s">&#39;year_archive&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;foo&#39;</span><span class="p">:</span> <span class="s">&#39;bar&#39;</span><span class="p">}),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Neste exemplo, numa requisição para <tt class="docutils literal"><span class="pre">/blog/2005/</span></tt>, o Django chamará a view
+<tt class="docutils literal"><span class="pre">blog.views.year_archive()</span></tt>, passando estes argumentos nomeados:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">year</span><span class="o">=</span><span class="s">&#39;2005&#39;</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s">&#39;bar&#39;</span>
+</pre></div>
+</div>
+<p>Essa técnica é utilizada em <a class="reference internal" href="../../ref/generic-views.html"><em>views genéricas</em></a> e em
+<a class="reference internal" href="../../ref/contrib/syndication.html"><em>syndication framework</em></a> para passar metadados e
+opções para as views.</p>
+<div class="admonition-lidando-com-conflitos admonition ">
+<p class="first admonition-title">Lidando com conflitos</p>
+<p class="last">É possível ter um padrão de URL que captura argumentos nomeados e também
+passa argumentos com os mesmos nomes no seu dicionário de argumentos
+adicionais. Quando isso acontece, os argumentos no dicionário serão usados
+em vez dos argumentos capturados na URL.</p>
+</div>
+<div class="section" id="s-passando-opcoes-adicionais-para-include">
+<span id="passando-opcoes-adicionais-para-include"></span><h3>Passando opções adicionais para <tt class="docutils literal"><span class="pre">include()</span></tt><a class="headerlink" href="#passando-opcoes-adicionais-para-include" title="Permalink to this headline">¶</a></h3>
+<p>Do mesmo modo, você pode passar opções adicionais para <tt class="docutils literal"><span class="pre">include()</span></tt>. Quando
+você passa opções adicionais para <tt class="docutils literal"><span class="pre">include()</span></tt>, elas serão passadas para
+<em>cada</em> linha no URLconf incluído.</p>
+<p>Por exemplo, estes dois conjuntos URLconf são funcionalmente idênticos:</p>
+<p>Conjunto 1:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># main.py</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^blog/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;inner&#39;</span><span class="p">),</span> <span class="p">{</span><span class="s">&#39;blogid&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}),</span>
+<span class="p">)</span>
+
+<span class="c"># inner.py</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^archive/$&#39;</span><span class="p">,</span> <span class="s">&#39;mysite.views.archive&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^about/$&#39;</span><span class="p">,</span> <span class="s">&#39;mysite.views.about&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Conjunto 2:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># main.py</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^blog/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;inner&#39;</span><span class="p">)),</span>
+<span class="p">)</span>
+
+<span class="c"># inner.py</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^archive/$&#39;</span><span class="p">,</span> <span class="s">&#39;mysite.views.archive&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;blogid&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}),</span>
+    <span class="p">(</span><span class="s">r&#39;^about/$&#39;</span><span class="p">,</span> <span class="s">&#39;mysite.views.about&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;blogid&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Note que as opções adicionais serão <em>sempre</em> passadas para <em>cada</em> linha no
+URLconf incluído, independentemente se a view da linha aceita as opções como
+válidas. Por este motivo, esta técnica somente é útil se você está seguro de
+que cada view no URLconf incluído aceita as opções adicionais que você está
+passando.</p>
+</div>
+</div>
+<div class="section" id="s-passando-objetos-que-podem-ser-chamados-callable-objects-em-vez-de-strings">
+<span id="passando-objetos-que-podem-ser-chamados-callable-objects-em-vez-de-strings"></span><h2>Passando objetos que podem ser chamados (callable objects) em vez de strings<a class="headerlink" href="#passando-objetos-que-podem-ser-chamados-callable-objects-em-vez-de-strings" title="Permalink to this headline">¶</a></h2>
+<p>Alguns desenvolvedores acham mais natural passar o próprio objeto de função
+Python do que a string contendo o caminho para seu módulo. Esta alternativa é
+suportada -- você pode passar qualquer objeto que pode ser chamado como a view.</p>
+<p>Por exemplo, dado este URLconf na notação de &quot;string&quot;:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^archive/$&#39;</span><span class="p">,</span> <span class="s">&#39;mysite.views.archive&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^about/$&#39;</span><span class="p">,</span> <span class="s">&#39;mysite.views.about&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^contact/$&#39;</span><span class="p">,</span> <span class="s">&#39;mysite.views.contact&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Você pode obter a mesma coisa passando objetos em vez de strings. Apenas
+assegure-se de importar os objetos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">mysite.views</span> <span class="kn">import</span> <span class="n">archive</span><span class="p">,</span> <span class="n">about</span><span class="p">,</span> <span class="n">contact</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^archive/$&#39;</span><span class="p">,</span> <span class="n">archive</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^about/$&#39;</span><span class="p">,</span> <span class="n">about</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^contact/$&#39;</span><span class="p">,</span> <span class="n">contact</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>O exemplo seguinte é funcionalmente idêntico. Somente um pouco mais compacto
+porque importa o módulo que contém as views, em vez de importar cada view
+individualmente:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">mysite</span> <span class="kn">import</span> <span class="n">views</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^archive/$&#39;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">archive</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^about/$&#39;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">about</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^contact/$&#39;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">contact</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>O estilo que você usa fica por sua conta.</p>
+<p>Note que se você usa esta técnica -- passando objetos em vez de strings --,
+o prefixo da view (como explicado em &quot;O prefixo da view&quot; acima) não terá efeito.</p>
+</div>
+<div class="section" id="s-nomeando-padroes-de-url">
+<span id="s-naming-url-patterns"></span><span id="nomeando-padroes-de-url"></span><span id="naming-url-patterns"></span><h2>Nomeando padrões de URL<a class="headerlink" href="#nomeando-padroes-de-url" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>É bastante comum usar a mesma função de view em múltiplos padrões de URL em seu
+URLconf. Por exemplo, estes dois padrões de URL apontam para a view
+<tt class="docutils literal"><span class="pre">archive</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^archive/(\d{4})/$&#39;</span><span class="p">,</span> <span class="n">archive</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">r&#39;^archive-summary/(\d{4})/$&#39;</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;summary&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Isso é complemente válido, mas ocasiona problemas quando você tenta fazer uma
+correspondência de URL reversa (através do decorator <tt class="docutils literal"><span class="pre">permalink()</span></tt> ou a tag
+<a class="reference internal" href="../../ref/templates/builtins.html#std:templatetag-url"><tt class="xref std std-ttag docutils literal"><span class="pre">url</span></tt></a>). Continuando este exemplo, se você quisesse recuperar a URL para a
+view <tt class="docutils literal"><span class="pre">archive</span></tt>, o mecanismo de correspondência de URL reverso do Django
+ficaria confuso, pois <em>dois</em> padrões de URL apontam para esta view.</p>
+<p>Para resolver este problema, o Django suporta <strong>padrões de URL nomeados</strong>.
+Ou seja, você pode dar nomes para um padrão de URL afim de distingui-lo de
+outros padrões usando a mesma view e parâmetros. Então, você pode usar este
+nome na correspondência reversa de URL.</p>
+<p>Veja o exemplo acima, reescrito para utilizar padrões de URL nomeados:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^archive/(\d{4})/$&#39;</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;full-archive&quot;</span><span class="p">),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^archive-summary/(\d{4})/$&#39;</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;summary&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span> <span class="s">&quot;arch-summary&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Com estes nomes no lugar (<tt class="docutils literal"><span class="pre">full-archive</span></tt> and <tt class="docutils literal"><span class="pre">arch-summary</span></tt>), você pode
+apontar cada padrão individualmente utilizando seu nome:</p>
+<div class="highlight-python"><pre>.. code-block:: html+django</pre>
+</div>
+<blockquote>
+<div>{% url arch-summary 1945 %}
+{% url full-archive 2007 %}</div></blockquote>
+<p>Apesar de ambos padrões de URL referirem-se à view <tt class="docutils literal"><span class="pre">archive</span></tt>, ao usar o
+parâmetro <tt class="docutils literal"><span class="pre">name</span></tt> de <tt class="docutils literal"><span class="pre">url()</span></tt> é possível distigui-los em templates.</p>
+<p>A string usada para o nome da URL pode conter quaisquer caracteres que você
+queira. Você não está restrito a nomes válidos em Python.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Quando você nomear seus padrões de URL, certifique-se de que está utilizando
+nomes que não têm chances óbvias de colidir com nomes escolhidos em outras
+aplicações. Se você chama seu padrão de URL <tt class="docutils literal"><span class="pre">comment</span></tt>, e outra aplicação
+faz a mesma coisa, não há garantias de qual URL será inserida no seu
+template quando você usa este nome.</p>
+<p class="last">Colocar um prefixo nos nomes de suas URLs, talvez derivado do nome da
+aplicação, diminuirá as chances de colisão. Recomendamos algo como
+<tt class="docutils literal"><span class="pre">myapp-comment</span></tt> em vez de <tt class="docutils literal"><span class="pre">comment</span></tt>.</p>
+</div>
+<div class="section" id="s-url-namespaces">
+<span id="s-topics-http-reversing-url-namespaces"></span><span id="url-namespaces"></span><span id="topics-http-reversing-url-namespaces"></span><h3>URL namespaces<a class="headerlink" href="#url-namespaces" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<p>Namespaced URLs are specified using the <tt class="docutils literal"><span class="pre">:</span></tt> operator. For example, the main
+index page of the admin application is referenced using <tt class="docutils literal"><span class="pre">admin:index</span></tt>. This
+indicates a namespace of <tt class="docutils literal"><span class="pre">admin</span></tt>, and a named URL of <tt class="docutils literal"><span class="pre">index</span></tt>.</p>
+<p>Namespaces can also be nested. The named URL <tt class="docutils literal"><span class="pre">foo:bar:whiz</span></tt> would look for
+a pattern named <tt class="docutils literal"><span class="pre">whiz</span></tt> in the namespace <tt class="docutils literal"><span class="pre">bar</span></tt> that is itself defined within
+the top-level namespace <tt class="docutils literal"><span class="pre">foo</span></tt>.</p>
+<p>When given a namespaced URL (e.g. <tt class="docutils literal"><span class="pre">myapp:index</span></tt>) to resolve, Django splits
+the fully qualified name into parts, and then tries the following lookup:</p>
+<ol class="arabic">
+<li><p class="first">First, Django looks for a matching application namespace (in this
+example, <tt class="docutils literal"><span class="pre">myapp</span></tt>). This will yield a list of instances of that
+application.</p>
+</li>
+<li><p class="first">If there is a <em>current</em> application defined, Django finds and returns
+the URL resolver for that instance. The <em>current</em> application can be
+specified as an attribute on the template context - applications that
+expect to have multiple deployments should set the <tt class="docutils literal"><span class="pre">current_app</span></tt>
+attribute on any <tt class="docutils literal"><span class="pre">Context</span></tt> or <tt class="docutils literal"><span class="pre">RequestContext</span></tt> that is used to
+render a template.</p>
+<p>The current application can also be specified manually as an argument
+to the <a class="reference internal" href="#django.core.urlresolvers.reverse" title="django.core.urlresolvers.reverse"><tt class="xref py py-func docutils literal"><span class="pre">reverse()</span></tt></a> function.</p>
+</li>
+<li><p class="first">If there is no current application. Django looks for a default
+application instance. The default application instance is the instance
+that has an instance namespace matching the application namespace (in
+this example, an instance of the <tt class="docutils literal"><span class="pre">myapp</span></tt> called <tt class="docutils literal"><span class="pre">myapp</span></tt>).</p>
+</li>
+<li><p class="first">If there is no default application instance, Django will pick the last
+deployed instance of the application, whatever its instance name may be.</p>
+</li>
+<li><p class="first">If the provided namespace doesn't match an application namespace in
+step 1, Django will attempt a direct lookup of the namespace as an
+instance namespace.</p>
+</li>
+</ol>
+<p>If there are nested namespaces, these steps are repeated for each part of the
+namespace until only the view name is unresolved. The view name will then be
+resolved into a URL in the namespace that has been found.</p>
+<p>To show this resolution strategy in action, consider an example of two instances
+of <tt class="docutils literal"><span class="pre">myapp</span></tt>: one called <tt class="docutils literal"><span class="pre">foo</span></tt>, and one called <tt class="docutils literal"><span class="pre">bar</span></tt>. <tt class="docutils literal"><span class="pre">myapp</span></tt> has a main
+index page with a URL named <cite>index</cite>. Using this setup, the following lookups are
+possible:</p>
+<ul class="simple">
+<li>If one of the instances is current - say, if we were rendering a utility page
+in the instance <tt class="docutils literal"><span class="pre">bar</span></tt> - <tt class="docutils literal"><span class="pre">myapp:index</span></tt> will resolve to the index page of
+the instance <tt class="docutils literal"><span class="pre">bar</span></tt>.</li>
+<li>If there is no current instance - say, if we were rendering a page
+somewhere else on the site - <tt class="docutils literal"><span class="pre">myapp:index</span></tt> will resolve to the last
+registered instance of <tt class="docutils literal"><span class="pre">myapp</span></tt>. Since there is no default instance,
+the last instance of <tt class="docutils literal"><span class="pre">myapp</span></tt> that is registered will be used. This could
+be <tt class="docutils literal"><span class="pre">foo</span></tt> or <tt class="docutils literal"><span class="pre">bar</span></tt>, depending on the order they are introduced into the
+urlpatterns of the project.</li>
+<li><tt class="docutils literal"><span class="pre">foo:index</span></tt> will always resolve to the index page of the instance <tt class="docutils literal"><span class="pre">foo</span></tt>.</li>
+</ul>
+<p>If there was also a default instance - i.e., an instance named <cite>myapp</cite> - the
+following would happen:</p>
+<ul class="simple">
+<li>If one of the instances is current - say, if we were rendering a utility page
+in the instance <tt class="docutils literal"><span class="pre">bar</span></tt> - <tt class="docutils literal"><span class="pre">myapp:index</span></tt> will resolve to the index page of
+the instance <tt class="docutils literal"><span class="pre">bar</span></tt>.</li>
+<li>If there is no current instance - say, if we were rendering a page somewhere
+else on the site - <tt class="docutils literal"><span class="pre">myapp:index</span></tt> will resolve to the index page of the
+default instance.</li>
+<li><tt class="docutils literal"><span class="pre">foo:index</span></tt> will again resolve to the index page of the instance <tt class="docutils literal"><span class="pre">foo</span></tt>.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="s-metodos-utilitarios">
+<span id="metodos-utilitarios"></span><h2>Métodos utilitários<a class="headerlink" href="#metodos-utilitarios" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-reverse">
+<span id="reverse"></span><h3>reverse()<a class="headerlink" href="#reverse" title="Permalink to this headline">¶</a></h3>
+<p>Se você precisa usar algo similar a tag de template <a class="reference internal" href="../../ref/templates/builtins.html#std:templatetag-url"><tt class="xref std std-ttag docutils literal"><span class="pre">url</span></tt></a> no seu código,
+o Django provê um método (no módulo <tt class="docutils literal"><span class="pre">django.core.urlresolvers</span></tt>):</p>
+<dl class="function">
+<dt id="django.core.urlresolvers.reverse">
+<tt class="descname">reverse</tt>(<em>viewname</em>, <em>urlconf=None</em>, <em>args=None</em>, <em>kwargs=None</em>)<a class="headerlink" href="#django.core.urlresolvers.reverse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><tt class="docutils literal"><span class="pre">viewname</span></tt> é o nome da função (podendo ser uma referência para a função, ou
+o nome dela como uma string, se foi utilizado desta forma em <tt class="docutils literal"><span class="pre">urlpatterns</span></tt>)
+ou o <a class="reference internal" href="#nomeando-padroes-de-url">Nome do padrão de URL</a>. Normalmente, você não precisa se preocupar com o
+parâmetro <tt class="docutils literal"><span class="pre">urlconf</span></tt> e irá passar somente os argumentos posicionais e nomeados
+para serem usados na correspondência de URL. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+
+<span class="k">def</span> <span class="nf">myview</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s">&#39;arch-summary&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="mi">1945</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>A função <tt class="docutils literal"><span class="pre">reverse()</span></tt> pode reverter uma grande variedade de padrões de
+expressões regulares nas URLs, mas não todas. A principal restrição é quando
+o padrão não contém escolhas alternativas, como quando se usa o caracter barra
+vertical (<tt class="docutils literal"><span class="pre">&quot;|&quot;</span></tt>). Você pode utilizar esses padrões tranquilamente para
+corresponderem às requisições recebidas e envia-las para os views, mas você não
+pode reverter tais padrões.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<p>The <tt class="docutils literal"><span class="pre">current_app</span></tt> argument allows you to provide a hint to the resolver
+indicating the application to which the currently executing view belongs.
+This <tt class="docutils literal"><span class="pre">current_app</span></tt> argument is used as a hint to resolve application
+namespaces into URLs on specific application instances, according to the
+<a class="reference internal" href="#topics-http-reversing-url-namespaces"><em>namespaced URL resolution strategy</em></a>.</p>
+<div class="admonition-esteja-certo-de-que-suas-views-estao-todas-corretas admonition ">
+<p class="first admonition-title">Esteja certo de que suas views estão todas corretas</p>
+<p>Como parte do trabalho no qual os nomes de URL mapeiam os padrões, a função
+<tt class="docutils literal"><span class="pre">reverse()</span></tt> tem de importar todos os seus arquivos URLconf e examinar o
+nome de cada view. Isto envolve importar todos as suas funções view. Se
+houver <em>qualquer</em> erro enquanto importa qualquer uma de suas funções views,
+irá fazer o <tt class="docutils literal"><span class="pre">reverse()</span></tt> gerar um erro, mesmo que para tal função não
+esteja destinado o reverse.</p>
+<p class="last">Esteja certo que qualquer view referenciado nos seus arquivos URLconf
+existam e que possam ser importados corretamente. Não inclua linhas que
+apontem para views que você ainda não criou, por que estas views não serão
+importáveis.</p>
+</div>
+</div>
+<div class="section" id="s-resolve">
+<span id="resolve"></span><h3>resolve()<a class="headerlink" href="#resolve" title="Permalink to this headline">¶</a></h3>
+<p>A função <a class="reference internal" href="#django.core.urlresolvers.resolve" title="django.core.urlresolvers.resolve"><tt class="xref py py-func docutils literal"><span class="pre">django.core.urlresolvers.resolve()</span></tt></a> pode ser usada para resolver
+caminhos de URL que correspondem a um funções view. Ela possui a seguinte
+assinatura:</p>
+<dl class="function">
+<dt id="django.core.urlresolvers.resolve">
+<tt class="descname">resolve</tt>(<em>path</em>, <em>urlconf=None</em>)<a class="headerlink" href="#django.core.urlresolvers.resolve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><tt class="docutils literal"><span class="pre">path</span></tt> é o caminho da URL que você deseja resolver. Como com <tt class="docutils literal"><span class="pre">reverse()</span></tt>
+acima, você não precisa se preocupar com o parâmetro <tt class="docutils literal"><span class="pre">urlconf</span></tt>. A função
+retorna uma tuple tripla (função view, argumentos, argumentos nomeados).</p>
+<p>If the URL does not resolve, the function raises an
+<tt class="xref py py-class docutils literal"><span class="pre">Http404</span></tt> exception.s</p>
+<p>Por exemplo, ela pode ser usada para testar se um view geraria um erro
+<tt class="docutils literal"><span class="pre">Http404</span></tt> antes de redirecioná-lo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">urlparse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">resolve</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponseRedirect</span><span class="p">,</span> <span class="n">Http404</span>
+
+<span class="k">def</span> <span class="nf">myview</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="nb">next</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;HTTP_REFERER&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">or</span> <span class="s">&#39;/&#39;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span>
+
+    <span class="c"># modifica a requisição e a resposta quando necessário, e.g. mudar</span>
+    <span class="c"># localidade e setar o cookie correspondente a localidade</span>
+
+    <span class="n">view</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="n">resolve</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="nb">next</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;request&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">request</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">Http404</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-permalink">
+<span id="permalink"></span><h3>permalink()<a class="headerlink" href="#permalink" title="Permalink to this headline">¶</a></h3>
+<p>O decorator <tt class="xref py py-func docutils literal"><span class="pre">django.db.models.permalink`()</span></tt> é útil para escrever métodos
+curtos que retornam o caminho inteiro da URL. Por exemplo, o método
+<tt class="docutils literal"><span class="pre">get_absolute_url()</span></tt> do modelo. Consulte <a class="reference internal" href="../../ref/models/instances.html#django.db.models.permalink" title="django.db.models.permalink"><tt class="xref py py-func docutils literal"><span class="pre">django.db.models.permalink()</span></tt></a>
+para mais informações.</p>
+</div>
+<div class="section" id="s-get-script-prefix">
+<span id="get-script-prefix"></span><h3>get_script_prefix()<a class="headerlink" href="#get-script-prefix" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="django.core.urlresolvers.get_script_prefix">
+<tt class="descname">get_script_prefix</tt>()<a class="headerlink" href="#django.core.urlresolvers.get_script_prefix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Normally, you should always use <a class="reference internal" href="#django.core.urlresolvers.reverse" title="django.core.urlresolvers.reverse"><tt class="xref py py-func docutils literal"><span class="pre">reverse()</span></tt></a> or
+<a class="reference internal" href="../../ref/models/instances.html#django.db.models.permalink" title="django.db.models.permalink"><tt class="xref py py-func docutils literal"><span class="pre">permalink()</span></tt></a> to define URLs within your application.
+However, if your application constructs part of the URL hierarchy itself, you
+may occasionally need to generate URLs. In that case, you need to be able to
+find the base URL of the Django project within its web server
+(normally, <a class="reference internal" href="#django.core.urlresolvers.reverse" title="django.core.urlresolvers.reverse"><tt class="xref py py-func docutils literal"><span class="pre">reverse()</span></tt></a> takes care of this for
+you). In that case, you can call <tt class="docutils literal"><span class="pre">get_script_prefix()</span></tt>, which will return the
+script prefix portion of the URL for your Django project. If your Django
+project is at the root of its webserver, this is always <tt class="docutils literal"><span class="pre">&quot;/&quot;</span></tt>, but it can be
+changed, for instance  by using <tt class="docutils literal"><span class="pre">django.root</span></tt> (see <a class="reference internal" href="../../howto/deployment/modpython.html"><em>How to use
+Django with Apache and mod_python</em></a>).</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">URL dispatcher</a><ul>
+<li><a class="reference internal" href="#visao-geral">Visão geral</a></li>
+<li><a class="reference internal" href="#como-o-django-processa-uma-requisicao">Como o Django processa uma requisição</a></li>
+<li><a class="reference internal" href="#exemplo">Exemplo</a></li>
+<li><a class="reference internal" href="#grupos-nomeados">Grupos nomeados</a><ul>
+<li><a class="reference internal" href="#o-algoritmo-de-correspondencia-agrupamento">O algoritmo de correspondência/agrupamento</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#onde-o-urlconf-faz-sua-busca">Onde o URLconf faz sua busca</a></li>
+<li><a class="reference internal" href="#a-sintaxe-da-varivavel-urlpatterns">A sintaxe da varivável urlpatterns</a><ul>
+<li><a class="reference internal" href="#patterns">patterns</a></li>
+<li><a class="reference internal" href="#url">url</a></li>
+<li><a class="reference internal" href="#handler404">handler404</a></li>
+<li><a class="reference internal" href="#handler500">handler500</a></li>
+<li><a class="reference internal" href="#include">include</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#notas-na-captura-de-texto-em-urls">Notas na captura de texto em URLs</a></li>
+<li><a class="reference internal" href="#performance">Performance</a></li>
+<li><a class="reference internal" href="#o-prefixo-da-view">O prefixo da view</a><ul>
+<li><a class="reference internal" href="#multiplos-prefixos-de-view">Múltiplos prefixos de view</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#incluindo-outros-urlconfs">Incluindo outros URLconfs</a><ul>
+<li><a class="reference internal" href="#parametros-capturados">Parâmetros capturados</a></li>
+<li><a class="reference internal" href="#defining-url-namespaces">Defining URL Namespaces</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#passando-opcoes-adicionais-para-funcoes-de-view">Passando opções adicionais para funções de view</a><ul>
+<li><a class="reference internal" href="#passando-opcoes-adicionais-para-include">Passando opções adicionais para <tt class="docutils literal"><span class="pre">include()</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#passando-objetos-que-podem-ser-chamados-callable-objects-em-vez-de-strings">Passando objetos que podem ser chamados (callable objects) em vez de strings</a></li>
+<li><a class="reference internal" href="#nomeando-padroes-de-url">Nomeando padrões de URL</a><ul>
+<li><a class="reference internal" href="#url-namespaces">URL namespaces</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#metodos-utilitarios">Métodos utilitários</a><ul>
+<li><a class="reference internal" href="#reverse">reverse()</a></li>
+<li><a class="reference internal" href="#resolve">resolve()</a></li>
+<li><a class="reference internal" href="#permalink">permalink()</a></li>
+<li><a class="reference internal" href="#get-script-prefix">get_script_prefix()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="index.html">Manipulando requisições HTTP</a></li>
+    
+    
+      <li>Next: <a href="views.html">Escrevendo Views</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Usando o Django</a>
+        
+          <ul><li><a href="index.html">Manipulando requisições HTTP</a>
+        
+        <ul><li>URL dispatcher</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/topics/http/urls.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="Manipulando requisições HTTP">previous</a> 
+     |
+    <a href="../index.html" title="Usando o Django" accesskey="U">up</a>
+   |
+    <a href="views.html" title="Escrevendo Views">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

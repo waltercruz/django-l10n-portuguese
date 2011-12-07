@@ -1,0 +1,1145 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>O framework syndication feed &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Os add-ons “django.contrib”" href="index.html" />
+    <link rel="next" title="django.contrib.webdesign" href="webdesign.html" />
+    <link rel="prev" title="The staticfiles app" href="staticfiles.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="staticfiles.html" title="The staticfiles app">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="webdesign.html" title="django.contrib.webdesign">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-syndication">
+            
+  <div class="section" id="s-module-django.contrib.syndication">
+<span id="s-o-framework-syndication-feed"></span><span id="module-django.contrib.syndication"></span><span id="o-framework-syndication-feed"></span><h1>O framework syndication feed<a class="headerlink" href="#module-django.contrib.syndication" title="Permalink to this headline">¶</a></h1>
+<p>O Django vem com um framework de alto nível para geração de feeds que criam
+feeds em <a class="reference external" href="http://www.whatisrss.com/">RSS</a> e <a class="reference external" href="http://www.atomenabled.org/">Atom</a> facilmente.</p>
+<p>Para criar qualquer feed, tudo que você tem de fazer é escrever uma pequena
+classe Python. Você pode criar quantos feeds você quiser.</p>
+<p>O Django também vem com uma API de baixo nível para geração de feeds. Use-a se
+você deseja gerar feeds fora do contexto Web, ou de alguma outra forma de mais
+baixo nível.</p>
+<div class="section" id="s-o-framework-de-alto-nivel">
+<span id="o-framework-de-alto-nivel"></span><h2>O framework de alto nível<a class="headerlink" href="#o-framework-de-alto-nivel" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-visao-geral">
+<span id="visao-geral"></span><h3>Visão geral<a class="headerlink" href="#visao-geral" title="Permalink to this headline">¶</a></h3>
+<p>O framework de alto nível é um view vinculada a URL <tt class="docutils literal"><span class="pre">/feeds/</span></tt> por padrão. O
+Django usa o restante da URL (tudo que vier depois de <tt class="docutils literal"><span class="pre">/feeds/</span></tt>) para
+determinar qual feed mostrar.</p>
+<p>Para criar um feed, é só escrever uma classe
+<a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a> e apontá-la para seu
+<a class="reference internal" href="../../topics/http/urls.html"><em>URLconf</em></a>.</p>
+</div>
+<div class="section" id="s-inicializacao">
+<span id="inicializacao"></span><h3>Inicialização<a class="headerlink" href="#inicializacao" title="Permalink to this headline">¶</a></h3>
+<p>Para ativar os feeds no seu site Django, adicione esta linha ao seu
+<a class="reference internal" href="../../topics/http/urls.html"><em>URLconf</em></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="s">r&#39;^feeds/(?P&lt;url&gt;.*)/$&#39;</span><span class="p">,</span> <span class="s">&#39;django.contrib.syndication.views.feed&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;feed_dict&#39;</span><span class="p">:</span> <span class="n">feeds</span><span class="p">}),</span>
+</pre></div>
+</div>
+<p>Isso diz ao Django para usar o framework RSS para manipular todas as URLs que
+começam com <tt class="file docutils literal"><span class="pre">&quot;feeds/&quot;</span></tt>. (Você pode mudar o prefixo <tt class="file docutils literal"><span class="pre">&quot;feeds/&quot;</span></tt> para
+fechar com suas próprias necessidades.)</p>
+<p>Esta linha do URLconf tem um argumento extra: <tt class="docutils literal"><span class="pre">{'feed_dict':</span> <span class="pre">feeds}</span></tt>. Use este
+argumento extra para passar ao framework os feeds que devem ser publicados sob
+aquela URL.</p>
+<p>Especificamente, <tt class="xref py py-data docutils literal"><span class="pre">feed_dict</span></tt> deve ser um dicionário que mapeia um slug de
+um feed (uma label curta da URL) para sua classe
+<a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a>.</p>
+<p>Você pode definir o <tt class="docutils literal"><span class="pre">feed_dict</span></tt> no próprio URLconf. Aqui temos um exemplo
+completo do URLconf:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">myproject.feeds</span> <span class="kn">import</span> <span class="n">LatestEntries</span><span class="p">,</span> <span class="n">LatestEntriesByCategory</span>
+
+<span class="n">feeds</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;latest&#39;</span><span class="p">:</span> <span class="n">LatestEntries</span><span class="p">,</span>
+    <span class="s">&#39;categories&#39;</span><span class="p">:</span> <span class="n">LatestEntriesByCategory</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="c"># ...</span>
+    <span class="p">(</span><span class="s">r&#39;^feeds/(?P&lt;url&gt;.*)/$&#39;</span><span class="p">,</span> <span class="s">&#39;django.contrib.syndication.views.feed&#39;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s">&#39;feed_dict&#39;</span><span class="p">:</span> <span class="n">feeds</span><span class="p">}),</span>
+    <span class="c"># ...</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>O exemplo acima registra dois feeds:</p>
+<ul class="simple">
+<li>O feed representado pelo <tt class="docutils literal"><span class="pre">LatestEntries</span></tt> ficará em <tt class="docutils literal"><span class="pre">feeds/latest/</span></tt>.</li>
+<li>O feed representado pelo <tt class="docutils literal"><span class="pre">LatestEntriesByCategory</span></tt> ficará em
+<tt class="docutils literal"><span class="pre">feeds/categories/</span></tt>.</li>
+</ul>
+<p>Uma vez configurado, você só precisa definir as classes
+<a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a> elas mesmas.</p>
+</div>
+<div class="section" id="s-classes-feed">
+<span id="classes-feed"></span><h3>Classes Feed<a class="headerlink" href="#classes-feed" title="Permalink to this headline">¶</a></h3>
+<p>Uma classe <a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a> é uma simples classe
+Python que representa um feed. Um feed pode ser uma simples (e.g., um feed de
+&quot;notícias do site&quot;, ou um feed básico mostrando as últimas entradas de um blog)
+ou algo mais complexo (e.g., um feed mostrando todas as entradas do blog numa
+categoria particular, onde a categoria é variável).</p>
+<p>As classes <a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a> devem extender
+<tt class="docutils literal"><span class="pre">django.contrib.syndication.feeds.Feed</span></tt>. Elas podem estar em qualquer parte
+de sua base de código.</p>
+</div>
+<div class="section" id="s-um-exemplo-simples">
+<span id="um-exemplo-simples"></span><h3>Um exemplo simples<a class="headerlink" href="#um-exemplo-simples" title="Permalink to this headline">¶</a></h3>
+<p>Este exemplo simples, extraído do <a class="reference external" href="http://www.chicagocrime.org/">chicagocrime.org</a>, descreve um feed dos
+últimos cinco ítens mais novos:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.syndication.feeds</span> <span class="kn">import</span> <span class="n">Feed</span>
+<span class="kn">from</span> <span class="nn">chicagocrime.models</span> <span class="kn">import</span> <span class="n">NewsItem</span>
+
+<span class="k">class</span> <span class="nc">LatestEntries</span><span class="p">(</span><span class="n">Feed</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s">&quot;Chicagocrime.org site news&quot;</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="s">&quot;/sitenews/&quot;</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="s">&quot;Updates on changes and additions to chicagocrime.org.&quot;</span>
+
+    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">NewsItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-pub_date&#39;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Note:</p>
+<ul class="simple">
+<li>A classe extende <tt class="docutils literal"><span class="pre">django.contrib.syndication.feeds.Feed</span></tt>.</li>
+<li><tt class="xref py py-attr docutils literal"><span class="pre">title</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">link</span></tt> e <tt class="xref py py-attr docutils literal"><span class="pre">description</span></tt> correspondem aos elementos
+padrão do RSS <tt class="docutils literal"><span class="pre">&lt;title&gt;</span></tt>, <tt class="docutils literal"><span class="pre">&lt;link&gt;</span></tt> e <tt class="docutils literal"><span class="pre">&lt;description&gt;</span></tt>, repectivamente.</li>
+<li>O <tt class="xref py py-meth docutils literal"><span class="pre">items()</span></tt> é, simplesmente, um métod que retorna a lista de objetos que
+deveriam ser incluídos no feed como elementos <tt class="docutils literal"><span class="pre">&lt;item&gt;</span></tt>. Embora este exemplo
+retorne objetos <tt class="docutils literal"><span class="pre">NewsItem</span></tt> usando o <a class="reference internal" href="../models/querysets.html"><em>mapeador objeto-relacional</em></a> do Django, o <tt class="xref py py-meth docutils literal"><span class="pre">items()</span></tt> não tem como retornar
+instâncias de model. Apesar de você ter algumas funcionalidades &quot;for free&quot;
+usando os models do Django, o <tt class="xref py py-meth docutils literal"><span class="pre">items()</span></tt> pode retornar qualquer tipo de
+objeto que você quiser.</li>
+<li>Se você estiver criando um feed Atom, ao invés de um feed RSS, configure o
+atributo <tt class="xref py py-attr docutils literal"><span class="pre">subtitle</span></tt> ao invés do atributo <tt class="xref py py-attr docutils literal"><span class="pre">description</span></tt>.
+Veja <a class="reference internal" href="#publicando-feeds-atom-e-rss-no-tandem">Publicando feeds Atom e RSS no tandem</a>, depois, só para exemplificar.</li>
+</ul>
+<p>Uma coisa que resta fazer. Num feed RSS, cada <tt class="docutils literal"><span class="pre">&lt;item&gt;</span></tt> tem um <tt class="docutils literal"><span class="pre">&lt;title&gt;</span></tt>,
+<tt class="docutils literal"><span class="pre">&lt;link&gt;</span></tt> e <tt class="docutils literal"><span class="pre">&lt;description&gt;</span></tt>. Nós precisamos dizer ao framework quais dados
+por nesses elementos.</p>
+<ul>
+<li><p class="first">Para especificar os conteúdos de <tt class="docutils literal"><span class="pre">&lt;title&gt;</span></tt> e <tt class="docutils literal"><span class="pre">&lt;description&gt;</span></tt>, crie
+<a class="reference internal" href="../../topics/templates.html"><em>templates Django</em></a> chamados
+<tt class="file docutils literal"><span class="pre">feeds/latest_title.html</span></tt> e
+<tt class="file docutils literal"><span class="pre">feeds/latest_description.html</span></tt>, onde <tt class="xref py py-attr docutils literal"><span class="pre">latest</span></tt> é o
+<tt class="xref py py-attr docutils literal"><span class="pre">slug</span></tt> especificado no URLconf para o dado feed. Note que a extenção
+<tt class="docutils literal"><span class="pre">.html</span></tt> é obrigatória. O sistema RSS renderiza este template para cada
+item, passando-o duas variáveis de contexto:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">{{</span> <span class="pre">obj</span> <span class="pre">}}</span></tt> -- O objeto atual (um dos objetos que você retornou em
+<tt class="xref py py-meth docutils literal"><span class="pre">items()</span></tt>).</li>
+<li><tt class="docutils literal"><span class="pre">{{</span> <span class="pre">site</span> <span class="pre">}}</span></tt> -- Um objeto <tt class="xref py py-class docutils literal"><span class="pre">django.contrib.sites.models.Site</span></tt>
+representando o site atual. Este é útil para <tt class="docutils literal"><span class="pre">{{</span> <span class="pre">site.domain</span>
+<span class="pre">}}</span></tt> ou <tt class="docutils literal"><span class="pre">{{</span> <span class="pre">site.name</span> <span class="pre">}}</span></tt>. Se você <em>não</em> tem o framework Django
+sites instalado, isso será setado com um objeto
+<tt class="xref py py-class docutils literal"><span class="pre">django.contrib.sites.models.RequestSite</span></tt>. Veja a
+<a class="reference internal" href="sites.html#id1"><em>a seção RequestSite da documentação do framework sites</em></a> para mais.</li>
+</ul>
+<p>Se você não cirar um template para ambos título ou descrição, o framework
+usará o template <tt class="docutils literal"><span class="pre">&quot;{{</span> <span class="pre">obj</span> <span class="pre">}&quot;</span></tt> por padrão -- isto é, a representação
+normal do objeto. Você pode também mudar os nomes deste dois templates
+especificando <tt class="docutils literal"><span class="pre">title_template</span></tt> e <tt class="docutils literal"><span class="pre">description_template</span></tt> como atributos
+de sua própria classe <a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a>.</p>
+</li>
+<li><p class="first">Para especificar os conteúdos do  <tt class="docutils literal"><span class="pre">&lt;link&gt;</span></tt>, você tem duas opções. Para
+cada ítem em <tt class="xref py py-meth docutils literal"><span class="pre">items()</span></tt>, O Django primeiro tenta chamar o método
+<tt class="xref py py-meth docutils literal"><span class="pre">item_link()</span></tt> na classe
+<a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a>, passando-o um único
+parametro, <tt class="xref py py-attr docutils literal"><span class="pre">item</span></tt>, que 'o objeto em si. Se este método não existe,
+o Django tenta executar um método <tt class="docutils literal"><span class="pre">get_absolute_url()</span></tt> neste objeto.
+Ambos <tt class="docutils literal"><span class="pre">get_absolute_url()</span></tt> e <tt class="xref py py-meth docutils literal"><span class="pre">item_link()</span></tt> devem retornar a URL
+do item como uma string normal do Python. Como no <tt class="docutils literal"><span class="pre">get_absolute_url()</span></tt>,
+o resultado do <tt class="xref py py-meth docutils literal"><span class="pre">item_link()</span></tt> será incluído diretamente na URL, então
+você é responsável por fazer todo o necessário para escapar a URL e
+convertê-la para ASCII dentro do método.</p>
+</li>
+<li><p class="first">Para o exemplo LatestEntries acima, nós poderiámos ter um template de feed
+muito mais simples:</p>
+<ul>
+<li><p class="first">latest_title.html:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{{</span> <span class="nv">obj.title</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">latest_description.html:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{{</span> <span class="nv">obj.description</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="s-um-exemplo-complexo">
+<span id="um-exemplo-complexo"></span><h3>Um exemplo complexo<a class="headerlink" href="#um-exemplo-complexo" title="Permalink to this headline">¶</a></h3>
+<p>O framework também suporta feeds mais complexos, via paramêtros.</p>
+<p>Por exemplo, <a class="reference external" href="http://www.chicagocrime.org/">chicagocrime.org</a> oferece um RSS feed de crimes recentes para
+cada batida policial em Chicago. Seria bobagem criar uma classe
+<a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a> para cada batida policial; o que
+poderia violar o <a class="reference internal" href="../../misc/design-philosophies.html#dry"><em>princípio DRY</em></a> e juntamente a lógica de
+programação dos dados. Ao invés, o framework deixa você fazer feeds genéricos
+que mostram ítens baseados em informações da URL do feed.</p>
+<p>No chicagocrime.org, os feeds de batidas policiais são acessíveis por URLs como
+estas:</p>
+<ul class="simple">
+<li><tt class="file docutils literal"><span class="pre">/rss/beats/0613/</span></tt> -- Retorna crimes recentes para batida 0613.</li>
+<li><tt class="file docutils literal"><span class="pre">/rss/beats/1424/</span></tt> -- Retorna crimes recentes para batida 1424.</li>
+</ul>
+<p>O slug aqui é <tt class="docutils literal"><span class="pre">&quot;beats&quot;</span> <span class="pre">``.</span> <span class="pre">O</span> <span class="pre">framework</span> <span class="pre">exerga</span> <span class="pre">os</span> <span class="pre">fragmentos</span> <span class="pre">extras</span> <span class="pre">na</span> <span class="pre">URL</span>
+<span class="pre">depois</span> <span class="pre">do</span> <span class="pre">slug</span> <span class="pre">--</span> <span class="pre">``0613</span></tt> e <tt class="docutils literal"><span class="pre">1424</span></tt> -- e dá a você um hook para dizer-lhe o
+que esses fragmentos significam, e como eles podem influênciar em quais ítens
+serão publicados no feed.</p>
+<p>Um exemplo deixará tudo mais claro. Aqui temos um código para esses feeds de
+batidas em específico:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.syndication.feeds</span> <span class="kn">import</span> <span class="n">FeedDoesNotExist</span>
+<span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">ObjectDoesNotExist</span>
+
+<span class="k">class</span> <span class="nc">BeatFeed</span><span class="p">(</span><span class="n">Feed</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">):</span>
+        <span class="c"># No caso de &quot;/rss/beats/0613/foo/bar/baz/&quot;, ou outra coisa do tipo,</span>
+        <span class="c"># checa se fragmentos possui somente um membro.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ObjectDoesNotExist</span>
+        <span class="k">return</span> <span class="n">Beat</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">beat__exact</span><span class="o">=</span><span class="n">bits</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Chicagocrime.org: Crimes for beat </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">obj</span><span class="o">.</span><span class="n">beat</span>
+
+    <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FeedDoesNotExist</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Crimes recently reported in police beat </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">obj</span><span class="o">.</span><span class="n">beat</span>
+
+    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+       <span class="k">return</span> <span class="n">Crime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">beat__id__exact</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-crime_date&#39;</span><span class="p">)[:</span><span class="mi">30</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Aqui temos um algorítimo básico que o framework RSS segue, dada esta classe e
+uma requisição para uma URL <tt class="file docutils literal"><span class="pre">/rss/beats/0613</span></tt>:</p>
+<ul>
+<li><p class="first">O framework pega a URL <tt class="file docutils literal"><span class="pre">/rss/beats/0613/</span></tt> e identidica onde há um
+fragmento extra na URL depois do slug. Ele separa esta string remanescente
+por um caracter barra (<tt class="docutils literal"><span class="pre">&quot;/&quot;</span></tt>) e chama o método da classe
+<a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a> <tt class="xref py py-meth docutils literal"><span class="pre">get_object()</span></tt>,
+passando-o os fragmentos. Neste caso, fragmentos são <tt class="docutils literal"><span class="pre">['0613']</span></tt>. Para
+uma requisição como <tt class="file docutils literal"><span class="pre">/rss/beats/0613/foo/bar/</span></tt>, os fragmentos
+poderiam ser <tt class="docutils literal"><span class="pre">['0613',</span> <span class="pre">'foo',</span> <span class="pre">'bar']</span></tt>.</p>
+</li>
+<li><p class="first">O <tt class="xref py py-meth docutils literal"><span class="pre">get_object()</span></tt> é responsável por receber a certa batida, de um
+fragmento. Neste caso, ele usa a API de banco de dados do Django para
+receber a batida. Note que <tt class="xref py py-meth docutils literal"><span class="pre">get_object()</span></tt> deve lançar um
+<a class="reference internal" href="../exceptions.html#django.core.exceptions.ObjectDoesNotExist" title="django.core.exceptions.ObjectDoesNotExist"><tt class="xref py py-exc docutils literal"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></tt></a> se os paramêtros dados
+forem inválidos. Não há <tt class="docutils literal"><span class="pre">try</span></tt>/<tt class="docutils literal"><span class="pre">except</span></tt> numa chamada
+<tt class="docutils literal"><span class="pre">Beat.objects.get()</span></tt>, pois não é necessário; esta função lança um
+<tt class="xref py py-exc docutils literal"><span class="pre">Beat.DoesNotExist</span></tt> em caso de falha, e <tt class="xref py py-exc docutils literal"><span class="pre">Beat.DoesNotExist</span></tt>
+é uma subclassse de <tt class="xref py py-exc docutils literal"><span class="pre">ObjectDoesNotExist</span></tt>. Lançando
+<tt class="xref py py-exc docutils literal"><span class="pre">ObjectDoesNotExist</span></tt> no <tt class="xref py py-meth docutils literal"><span class="pre">get_object()</span></tt> diz ao Django para
+produzir um erro 404 para aquela requisição.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <tt class="xref py py-meth docutils literal"><span class="pre">get_object()</span></tt> pode manipular a url <tt class="file docutils literal"><span class="pre">/rss/beats/</span></tt>.</div>
+<p>O método <tt class="xref py py-meth docutils literal"><span class="pre">get_object()</span></tt> também tem a oportunidade de lidar com a url
+<tt class="file docutils literal"><span class="pre">/rss/beats/</span></tt>. Neste caso, <tt class="xref py py-data docutils literal"><span class="pre">bits</span></tt> será uma lista vazia. No
+nosso exemplo, <tt class="docutils literal"><span class="pre">len(bits)</span> <span class="pre">!=</span> <span class="pre">1</span></tt> e uma exceção <tt class="xref py py-exc docutils literal"><span class="pre">ObjectDoesNotExist</span></tt>
+serão lançados, então <tt class="file docutils literal"><span class="pre">/rss/beats/</span></tt> gerará uma página 404. Mas você
+pode lidar com este caso da forma como quiser. Por exemplo, você poderia
+gerar um feed combinado para todas as batidas.</p>
+</li>
+<li><p class="first">Para gerar o <tt class="docutils literal"><span class="pre">&lt;title&gt;</span></tt>, <tt class="docutils literal"><span class="pre">&lt;link&gt;</span></tt> e <tt class="docutils literal"><span class="pre">&lt;description&gt;</span></tt> do feed,
+O Django usa os métodos <tt class="xref py py-meth docutils literal"><span class="pre">title()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">link()</span></tt> e
+<tt class="xref py py-meth docutils literal"><span class="pre">description()</span></tt>. No exemplo anterior, eles foram uma string simples
+num atributo da classe, mas este exemplo ilustra que eles podem ser tanto
+strings quanto métodos. Para cada um <tt class="xref py py-attr docutils literal"><span class="pre">title</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">link</span></tt> e
+<tt class="xref py py-attr docutils literal"><span class="pre">description</span></tt>, o Django segue este algorítimo:</p>
+<ul class="simple">
+<li>Primeiro, ele tenta chamar o método, passando o argumento <tt class="docutils literal"><span class="pre">obj</span></tt>,
+onde <tt class="docutils literal"><span class="pre">obj</span></tt> é o objeto retornado por <tt class="xref py py-meth docutils literal"><span class="pre">get_object()</span></tt>.</li>
+<li>Caso falhe, ele tenta chamar o método sem argumentos.</li>
+<li>Caso falhe, ele usa o atributo da classe.</li>
+</ul>
+<p>Dentro do método <tt class="xref py py-meth docutils literal"><span class="pre">link()</span></tt>, nós lidamos com a possibilidade de que o
+<tt class="docutils literal"><span class="pre">obj</span></tt> pode ser <tt class="xref docutils literal"><span class="pre">None</span></tt>, isso pode ocorrer quando a URL não foi
+completamente especificada. Em alguns casos, você pode querer fazer algo a
+mais, o que poderia significar que você precisará chegar a existência do
+<tt class="docutils literal"><span class="pre">obj</span></tt> nos outros métodos também.
+(O método <tt class="xref py py-meth docutils literal"><span class="pre">link()</span></tt> é chamada muito antes do processo de geração do
+feed, então é um bom lugar para liberá-lo logo.)</p>
+</li>
+<li><p class="first">Finalmente, no que <tt class="xref py py-meth docutils literal"><span class="pre">items()</span></tt> nesse exemplo também recebe o argumento
+<tt class="docutils literal"><span class="pre">obj</span></tt>. O algoritmo para o <tt class="xref py py-attr docutils literal"><span class="pre">items</span></tt> é o mesmo descrito no passo
+anterior -- primeiro, ele tenta o <tt class="xref py py-meth docutils literal"><span class="pre">items(obj)()</span></tt>, depois
+<tt class="xref py py-meth docutils literal"><span class="pre">items()</span></tt>, e finalmente o atributo da classe <tt class="xref py py-attr docutils literal"><span class="pre">items</span></tt> (que
+deve ser uma lista).</p>
+</li>
+</ul>
+<p>The <tt class="docutils literal"><span class="pre">ExampleFeed</span></tt> class below gives full documentation on methods and
+attributes of <a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a> classes.</p>
+</div>
+<div class="section" id="s-especificando-o-tipo-de-feed">
+<span id="especificando-o-tipo-de-feed"></span><h3>Especificando o tipo de feed<a class="headerlink" href="#especificando-o-tipo-de-feed" title="Permalink to this headline">¶</a></h3>
+<p>Por padrão, o s feeds produzidos neste framework usa RSS 2.0.</p>
+<p>Para mudar isso, adicione um atributo <tt class="docutils literal"><span class="pre">feed_type</span></tt> na sua classe
+<a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a>, tipo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.utils.feedgenerator</span> <span class="kn">import</span> <span class="n">Atom1Feed</span>
+
+<span class="k">class</span> <span class="nc">MyFeed</span><span class="p">(</span><span class="n">Feed</span><span class="p">):</span>
+    <span class="n">feed_type</span> <span class="o">=</span> <span class="n">Atom1Feed</span>
+</pre></div>
+</div>
+<p>Note que é para setar <tt class="docutils literal"><span class="pre">feed_type</span></tt> no objeto da classe, não numa instância.</p>
+<p>Atualmente os tipos de feed disponíveis são:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../utils.html#django.utils.feedgenerator.Rss201rev2Feed" title="django.utils.feedgenerator.Rss201rev2Feed"><tt class="xref py py-class docutils literal"><span class="pre">django.utils.feedgenerator.Rss201rev2Feed</span></tt></a> (RSS 2.01. Padrão.)</li>
+<li><a class="reference internal" href="#django.contrib.syndication.django.utils.feedgenerator.RssUserland091Feed" title="django.contrib.syndication.django.utils.feedgenerator.RssUserland091Feed"><tt class="xref py py-class docutils literal"><span class="pre">django.utils.feedgenerator.RssUserland091Feed</span></tt></a> (RSS 0.91.)</li>
+<li><a class="reference internal" href="../utils.html#django.utils.feedgenerator.Atom1Feed" title="django.utils.feedgenerator.Atom1Feed"><tt class="xref py py-class docutils literal"><span class="pre">django.utils.feedgenerator.Atom1Feed</span></tt></a> (Atom 1.0.)</li>
+</ul>
+</div>
+<div class="section" id="s-compartimentos">
+<span id="compartimentos"></span><h3>Compartimentos<a class="headerlink" href="#compartimentos" title="Permalink to this headline">¶</a></h3>
+<p>Para especificar compartimento, como estes usados na criação de feeds de
+podcasts, use os hooks <tt class="xref py py-attr docutils literal"><span class="pre">item_enclosure_url</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">item_enclosure_length</span></tt>
+e <tt class="xref py py-attr docutils literal"><span class="pre">item_enclosure_mime_type</span></tt>. Veja a classe <tt class="docutils literal"><span class="pre">ExampleFeed</span></tt> abaixo para
+exemplos de uso.</p>
+</div>
+<div class="section" id="s-language">
+<span id="language"></span><h3>Language<a class="headerlink" href="#language" title="Permalink to this headline">¶</a></h3>
+<p>Os feeds criados pelo framework syndication automaticamente incluem a tag
+<tt class="docutils literal"><span class="pre">&lt;language&gt;</span></tt> (RSS 2.0) ou atributo <tt class="docutils literal"><span class="pre">xml:lang</span></tt> (Atom). Este vem diretamente
+de sua configuração <a class="reference internal" href="../settings.html#std:setting-LANGUAGE_CODE"><tt class="xref std std-setting docutils literal"><span class="pre">LANGUAGE_CODE</span></tt></a>.</p>
+</div>
+<div class="section" id="s-urls">
+<span id="urls"></span><h3>URLs<a class="headerlink" href="#urls" title="Permalink to this headline">¶</a></h3>
+<p>O método/atributo <tt class="xref py py-attr docutils literal"><span class="pre">link</span></tt> pode retornar tanto uma URL absoluta (e.g.
+<tt class="file docutils literal"><span class="pre">&quot;/blog/&quot;</span></tt>) quanto uma URL completa com o domínio e protocolo (e.g.
+<tt class="docutils literal"><span class="pre">&quot;http://www.example.com/blog/&quot;</span></tt>). Se <tt class="xref py py-attr docutils literal"><span class="pre">link</span></tt> não retorna o domínio,
+o framework inserirá o domínio do site atual, de acordo com a sua configuração
+<a class="reference internal" href="../settings.html#std:setting-SITE_ID"><tt class="xref std std-setting docutils literal"><span class="pre">SITE_ID</span></tt></a>.</p>
+<p>O feeds Atom requerem um <tt class="docutils literal"><span class="pre">&lt;link</span> <span class="pre">rel=&quot;self&quot;&gt;</span></tt> que define a localização do feed
+atual. O framework syndication popula isso automaticamente, usando o domínio
+do site atual de acordo com a configuração <a class="reference internal" href="../settings.html#std:setting-SITE_ID"><tt class="xref std std-setting docutils literal"><span class="pre">SITE_ID</span></tt></a>.</p>
+</div>
+<div class="section" id="s-publicando-feeds-atom-e-rss-no-tandem">
+<span id="publicando-feeds-atom-e-rss-no-tandem"></span><h3>Publicando feeds Atom e Rss no tandem<a class="headerlink" href="#publicando-feeds-atom-e-rss-no-tandem" title="Permalink to this headline">¶</a></h3>
+<p>Alguns desenvolvedore disponibilizam ambos versões Atom <em>e</em> RSS de seus feeds.
+Isso é fácil de fazer com o Django: É só criar uma subclasse para sua classe
+<a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a> e setar o <tt class="xref py py-attr docutils literal"><span class="pre">feed_type</span></tt> para
+algo diferente. Então atualizar seu URLconf para adicionar as versões extras.</p>
+<p>Aqui temos um exemplo completo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.syndication.feeds</span> <span class="kn">import</span> <span class="n">Feed</span>
+<span class="kn">from</span> <span class="nn">chicagocrime.models</span> <span class="kn">import</span> <span class="n">NewsItem</span>
+<span class="kn">from</span> <span class="nn">django.utils.feedgenerator</span> <span class="kn">import</span> <span class="n">Atom1Feed</span>
+
+<span class="k">class</span> <span class="nc">RssSiteNewsFeed</span><span class="p">(</span><span class="n">Feed</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s">&quot;Chicagocrime.org site news&quot;</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="s">&quot;/sitenews/&quot;</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="s">&quot;Updates on changes and additions to chicagocrime.org.&quot;</span>
+
+    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">NewsItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-pub_date&#39;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">AtomSiteNewsFeed</span><span class="p">(</span><span class="n">RssSiteNewsFeed</span><span class="p">):</span>
+    <span class="n">feed_type</span> <span class="o">=</span> <span class="n">Atom1Feed</span>
+    <span class="n">subtitle</span> <span class="o">=</span> <span class="n">RssSiteNewsFeed</span><span class="o">.</span><span class="n">description</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Neste exemplo, o feed RSS usa um <tt class="xref py py-attr docutils literal"><span class="pre">description</span></tt> enquanto o feed Atom
+usa um <tt class="xref py py-attr docutils literal"><span class="pre">subtitle</span></tt>. Isso porque os feeds Atom não fornece um
+&quot;description&quot; a nível de feed, mas eles*fornece* um &quot;subtitle.&quot;</p>
+<p>Se você fornecer um <tt class="xref py py-attr docutils literal"><span class="pre">description</span></tt> na sua classe
+<a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a>, o Django <em>não</em>
+colocará automaticamente isso dentro do elemento <tt class="xref py py-attr docutils literal"><span class="pre">subtitle</span></tt>, pois um
+subtitle e um description não são necessáriamente a mesma coisa. Ao invés
+disso, você deve definir um atributo <tt class="xref py py-attr docutils literal"><span class="pre">subtitle</span></tt>.</p>
+<p class="last">No exemplo acima, nós simplesmente setamos o <tt class="xref py py-attr docutils literal"><span class="pre">sibutitle</span></tt> do feed Atom
+para o <tt class="xref py py-attr docutils literal"><span class="pre">description</span></tt> do feed RSS, pois é bastante curto já.</p>
+</div>
+<p>E o URLconf acompanhante:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls.defaults</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">myproject.feeds</span> <span class="kn">import</span> <span class="n">RssSiteNewsFeed</span><span class="p">,</span> <span class="n">AtomSiteNewsFeed</span>
+
+<span class="n">feeds</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;rss&#39;</span><span class="p">:</span> <span class="n">RssSiteNewsFeed</span><span class="p">,</span>
+    <span class="s">&#39;atom&#39;</span><span class="p">:</span> <span class="n">AtomSiteNewsFeed</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="c"># ...</span>
+    <span class="p">(</span><span class="s">r&#39;^feeds/(?P&lt;url&gt;.*)/$&#39;</span><span class="p">,</span> <span class="s">&#39;django.contrib.syndication.views.feed&#39;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s">&#39;feed_dict&#39;</span><span class="p">:</span> <span class="n">feeds</span><span class="p">}),</span>
+    <span class="c"># ...</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-referencia-da-classe-feed">
+<span id="referencia-da-classe-feed"></span><h3>Referência da classe Feed<a class="headerlink" href="#referencia-da-classe-feed" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.contrib.syndication.django.contrib.syndication.feeds.Feed">
+<em class="property">class </em><tt class="descclassname">django.contrib.syndication.feeds.</tt><tt class="descname">Feed</tt><a class="headerlink" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Este exemplo ilustra todos os possíveis atributos e métodos para uma classe
+<a class="reference internal" href="#django.contrib.syndication.django.contrib.syndication.feeds.Feed" title="django.contrib.syndication.django.contrib.syndication.feeds.Feed"><tt class="xref py py-class docutils literal"><span class="pre">Feed</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.contrib.syndication.feeds</span> <span class="kn">import</span> <span class="n">Feed</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">feedgenerator</span>
+
+<span class="k">class</span> <span class="nc">ExampleFeed</span><span class="p">(</span><span class="n">Feed</span><span class="p">):</span>
+
+    <span class="c"># FEED TYPE -- Opcional. Este deve ser uma classe que extende</span>
+    <span class="c"># django.utils.feedgenerator.SyndicationFeed. Este designa qual tipo</span>
+    <span class="c"># de feed deve ser: RSS 2.0, Atom 1.0, etc.</span>
+    <span class="c"># Se você não especificar feed_type, seu feed será RSS 2.0.</span>
+    <span class="c"># Este deve ser uma classe, não uma instância de classe.</span>
+
+    <span class="n">feed_type</span> <span class="o">=</span> <span class="n">feedgenerator</span><span class="o">.</span><span class="n">Rss201rev2Feed</span>
+
+    <span class="c"># TEMPLATE NAMES -- Opcional. Estes devem ser strings representando</span>
+    <span class="c"># nome dos templates do Django que o sistema deve usar para renderizar o</span>
+    <span class="c"># title e description de seus ítens do feed. Ambos são opcionais.</span>
+    <span class="c"># Se você não especificar um, ou ambos, o Django usará o template</span>
+    <span class="c"># &#39;feeds/SLUG_title.html&#39; e &#39;feeds/SLUG_description.html&#39;, onde SLUG</span>
+    <span class="c"># é o slug que você especificar na URL.</span>
+
+    <span class="n">title_template</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">description_template</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="c"># TITLE -- Pelo menos um dos três é obrigatório. O framework procura por</span>
+    <span class="c"># eles nessa ordem.</span>
+
+    <span class="k">def</span> <span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe o objeto retornado por get_object() e retorna o title do feed</span>
+<span class="sd">        como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o title do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">title</span> <span class="o">=</span> <span class="s">&#39;foo&#39;</span> <span class="c"># Hard-coded title.</span>
+
+    <span class="c"># LINK -- Pelo menos um dos três é obrigatório. O framework procura por</span>
+    <span class="c"># eles nessa ordem.</span>
+
+    <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe o objeto retornado por get_object() e retorna o link do feed</span>
+<span class="sd">        como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o link do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">link</span> <span class="o">=</span> <span class="s">&#39;/foo/bar/&#39;</span> <span class="c"># Hard-coded link.</span>
+
+    <span class="c"># GUID -- Pelo menos um dos três é opcional. O framework procura por</span>
+    <span class="c"># eles nesta ordem. Esta propriedade é somente usada em feeds Atom</span>
+    <span class="c"># (onde é o ID do elemento no nível do feed). Se não for fornecido, o</span>
+    <span class="c"># link do feed é usado como um ID.</span>
+
+    <span class="k">def</span> <span class="nf">feed_guid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um objeto retornado por get_object() e retorna o ID único</span>
+<span class="sd">        global para o feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">feed_guid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o ID único global do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">feed_guid</span> <span class="o">=</span> <span class="s">&#39;/foo/bar/1234&#39;</span> <span class="c"># Hard-coded guid.</span>
+
+    <span class="c"># DESCRIPTION -- Pelo menos um dos três é obrigatório. O framework</span>
+    <span class="c"># procura por eles nesta ordem.</span>
+
+    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe o objeto retornado pelo get_object() e retorna o description</span>
+<span class="sd">        do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o description do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="s">&#39;Foo bar baz.&#39;</span> <span class="c"># Hard-coded description.</span>
+
+    <span class="c"># AUTHOR NAME -- Pelo menos um dos três é opcional. O framework procura</span>
+    <span class="c"># por eles nesta ordem.</span>
+
+    <span class="k">def</span> <span class="nf">author_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um objeto retornado por get_object() e retorna o nome do</span>
+<span class="sd">        autor do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">author_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o nome do autor do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">author_name</span> <span class="o">=</span> <span class="s">&#39;Sally Smith&#39;</span> <span class="c"># Hard-coded author name.</span>
+
+    <span class="c"># AUTHOR E-MAIL --Pelo menos um dos três é opcional. O framework procura</span>
+    <span class="c"># por eles nesta ordem.</span>
+
+    <span class="k">def</span> <span class="nf">author_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um objeto retornado por get_object() e retorna o e-mail do</span>
+<span class="sd">        autor como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">author_email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o e-mail do autor como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">author_email</span> <span class="o">=</span> <span class="s">&#39;test@example.com&#39;</span> <span class="c"># Hard-coded author e-mail.</span>
+
+    <span class="c"># AUTHOR LINK --Pelo menos um dos três é opcional. O framework</span>
+    <span class="c"># procura por eles nessa ordem. Em cada caso, a URL deve incluir</span>
+    <span class="c"># o &quot;http://&quot; e o nome do domínio.</span>
+
+    <span class="k">def</span> <span class="nf">author_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe o objeto retornado por get_object() e retorna a URL do autor</span>
+<span class="sd">        do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">author_link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna a URL do autor do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">author_link</span> <span class="o">=</span> <span class="s">&#39;http://www.example.com/&#39;</span> <span class="c"># Hard-coded author URL.</span>
+
+    <span class="c"># CATEGORIES -- Pelo menos um dos três é opcional. O framework</span>
+    <span class="c"># procura por eles nessa ordem. Em cada caso, o método/atributo</span>
+    <span class="c"># deve retornar um objeto iterável que retorna strings.</span>
+
+    <span class="k">def</span> <span class="nf">categories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe o objeto retornado por get_object() e retorna as categorias</span>
+<span class="sd">        do feed como iteráveis sobre strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">categories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna as categorias do feed como iteráveis sobre strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">categories</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;python&quot;</span><span class="p">,</span> <span class="s">&quot;django&quot;</span><span class="p">)</span> <span class="c"># Hard-coded list of categories.</span>
+
+    <span class="c"># COPYRIGHT NOTICE -- Pelo menos um dos três é opcional. O framework</span>
+    <span class="c"># procura por eles nessa ordem..</span>
+
+    <span class="k">def</span> <span class="nf">copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe o objeto retornado por get_object() e retorna o aviso de</span>
+<span class="sd">        copyright do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o aviso de copyright do feed como uma string normal do</span>
+<span class="sd">        Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">copyright</span> <span class="o">=</span> <span class="s">&#39;Copyright (c) 2007, Sally Smith&#39;</span> <span class="c"># Hard-coded copyright notice.</span>
+
+    <span class="c"># TTL -- Pelo menos um dos três é opcional. O framework procura por eles</span>
+    <span class="c"># nessa ordem. Ignorado por feeds Atom.</span>
+
+    <span class="k">def</span> <span class="nf">ttl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe o objeto retornado por get_object() e retorna o TTL (Tempo de</span>
+<span class="sd">        vida) do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">ttl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o TTL do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">ttl</span> <span class="o">=</span> <span class="mi">600</span> <span class="c"># Hard-coded Time To Live.</span>
+
+    <span class="c"># ITEMS -- Pelo menos um dos três é obrigatório. O framework procura</span>
+    <span class="c"># por eles nessa ordem.</span>
+
+    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe o objeto retornado por get_object() e retorna uma lista de</span>
+<span class="sd">        ítens para publicar nesse feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna uma lista de ítens para publicar neste feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">items</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;Item 1&#39;</span><span class="p">,</span> <span class="s">&#39;Item 2&#39;</span><span class="p">)</span> <span class="c"># Hard-coded items.</span>
+
+    <span class="c"># GET_OBJECT -- Esse é obrigatório para feeds que publicam diferentes</span>
+    <span class="c"># dados para diferentes parâmetros de URL. (Veja &quot;Um exemplo complexo&quot;</span>
+    <span class="c"># acima.)</span>
+
+    <span class="k">def</span> <span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe uma lista de strings recolhidos de uma URL e retorna um</span>
+<span class="sd">        objeto representado por este feed. Lança</span>
+<span class="sd">        django.core.exceptions.ObjectDoesNotExist sobre erro.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c"># ITEM LINK -- Pelo menos um dos três é obrigatório. O framework procura</span>
+    <span class="c"># por eles nessa ordem.</span>
+
+    <span class="c"># Primeiro, o framework tenta os dois métodos abaixo, na ordem.</span>
+    <span class="c"># Caso falhem, ele cai de volta para no método get_absolute_url()</span>
+    <span class="c"># de cada item retornado por items().</span>
+
+    <span class="k">def</span> <span class="nf">item_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um item, como retornado por items(), e retorna a URL do item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">item_link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna a URL para todo item no feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c"># ITEM_GUID -- O seguinte método é opcional. Se não fornecido, o link</span>
+    <span class="c"># do item é usado por padrão.</span>
+
+    <span class="k">def</span> <span class="nf">item_guid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um item, como retornado por items(), e retorna o ID do item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c"># ITEM AUTHOR NAME -- Pelo menos um dos três é opcional. O framework</span>
+    <span class="c"># procura por eles nessa ordem.</span>
+
+    <span class="k">def</span> <span class="nf">item_author_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um item, como retornado por items(), e retorna o nome do</span>
+<span class="sd">        autor do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">item_author_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o nome do autor do feed para todo item do feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_author_name</span> <span class="o">=</span> <span class="s">&#39;Sally Smith&#39;</span> <span class="c"># Hard-coded author name.</span>
+
+    <span class="c"># ITEM AUTHOR E-MAIL --Pelo menos um dos três é opcional. O</span>
+    <span class="c"># framework procura por eles nessa ordem.</span>
+    <span class="c">#</span>
+    <span class="c"># Se você especifica isso, você pode especificar item_author_name.</span>
+
+    <span class="k">def</span> <span class="nf">item_author_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um item, como retornado por items(), e retorna o e-mail do</span>
+<span class="sd">        autor do feed como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">item_author_email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o e-mail do autor para todo item no feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_author_email</span> <span class="o">=</span> <span class="s">&#39;test@example.com&#39;</span> <span class="c"># Hard-coded author e-mail.</span>
+
+    <span class="c"># ITEM AUTHOR LINK --Pelo menos um dos três é opcional. O</span>
+    <span class="c"># framework procura por eles nessa ordem. Em cada caso, a URL deve</span>
+    <span class="c"># incluir o &quot;http://&quot; e nome de domínio.</span>
+    <span class="c">#</span>
+    <span class="c"># Se você especificar isso, você deve especificar o item_author_name.</span>
+
+    <span class="k">def</span> <span class="nf">item_author_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um item, como retornado por items(), e retorna a URL do autor</span>
+<span class="sd">        do item como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">item_author_link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna a URL do autor para todo item do feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_author_link</span> <span class="o">=</span> <span class="s">&#39;http://www.example.com/&#39;</span> <span class="c"># Hard-coded author URL.</span>
+
+    <span class="c"># ITEM ENCLOSURE URL -- Pelo menos um dos três é obrigatório se você</span>
+    <span class="c"># estiver publicando compartimentos. O framework procura por eles nessa</span>
+    <span class="c"># ordem..</span>
+
+    <span class="k">def</span> <span class="nf">item_enclosure_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um item, como retornado por items(), e retorna o</span>
+<span class="sd">        URL de compartimento do item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">item_enclosure_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna a URL do compartimento para todo item do feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_enclosure_url</span> <span class="o">=</span> <span class="s">&quot;/foo/bar.mp3&quot;</span> <span class="c"># Hard-coded enclosure link.</span>
+
+    <span class="c"># ITEM ENCLOSURE LENGTH -- Pelo menos um dos três é obrigatório se você</span>
+    <span class="c"># estiver publicando compartimentos. O framework procura por eles nessa</span>
+    <span class="c"># ordem. Em cada caso, o valor retornado deve ser um inteiro, ou uma</span>
+    <span class="c"># representação em string de um inteiro, em bytes.</span>
+
+    <span class="k">def</span> <span class="nf">item_enclosure_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um item, como retornado por items(), e retorna o comprimento</span>
+<span class="sd">        do compartimento do item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">item_enclosure_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o comprimento do compartimento do item para todo item no</span>
+<span class="sd">        feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_enclosure_length</span> <span class="o">=</span> <span class="mi">32000</span> <span class="c"># Hard-coded enclosure length.</span>
+
+    <span class="c"># ITEM ENCLOSURE MIME TYPE -- Pelo menos um dos três é obrigatório se</span>
+    <span class="c"># você estiver publicando compartimentos. O framework procura por eles</span>
+    <span class="c"># nessa ordem.</span>
+
+    <span class="k">def</span> <span class="nf">item_enclosure_mime_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um item, como retornado por items(), e retorna o tipo MIME do</span>
+<span class="sd">        compartimento do item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">item_enclosure_mime_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the enclosure MIME type for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_enclosure_mime_type</span> <span class="o">=</span> <span class="s">&quot;audio/mpeg&quot;</span> <span class="c"># Hard-coded enclosure MIME type.</span>
+
+    <span class="c"># ITEM PUBDATE -- É opcional para usar um dos três. Este é um hook</span>
+    <span class="c"># que especifica como obter a data de um dado item.</span>
+    <span class="c"># Em cada caso, o método/atributo deve retornar um objeto</span>
+    <span class="c"># datetime.datetime do Python.</span>
+
+    <span class="k">def</span> <span class="nf">item_pubdate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um item, como retornado por items(), e retorna o pubdate do</span>
+<span class="sd">        item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">item_pubdate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o pubdate para todo item do feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_pubdate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c"># Hard-coded pubdate.</span>
+
+    <span class="c"># ITEM CATEGORIES -- É opcional usar um dos três. Este é um hook que</span>
+    <span class="c"># especifica como obter a lista de categorias para um dado item.</span>
+    <span class="c"># Em cada caso, o método/atributo deve retorna um objeto iterável que</span>
+    <span class="c"># retorna strings.</span>
+
+    <span class="k">def</span> <span class="nf">item_categories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um item, como retornado por items(), e retorna as categorias</span>
+<span class="sd">        do item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">item_categories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna as categorias para cada item no feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_categories</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;python&quot;</span><span class="p">,</span> <span class="s">&quot;django&quot;</span><span class="p">)</span> <span class="c"># Hard-coded categories.</span>
+
+    <span class="c"># ITEM COPYRIGHT NOTICE (somente aplicável a feeds Atom) -- Pelo menos</span>
+    <span class="c"># um dos três é opcional. O framework procura por eles nessa ordem.</span>
+
+    <span class="k">def</span> <span class="nf">item_copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recebe um item, como retornado por items(), e retorna o aviso de</span>
+<span class="sd">        copyright do item como uma string normal do Python.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">item_copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna o aviso de copyright para todo item no feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_copyright</span> <span class="o">=</span> <span class="s">&#39;Copyright (c) 2007, Sally Smith&#39;</span> <span class="c"># Hard-coded copyright notice.</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="s-o-framework-de-baixo-nivel">
+<span id="o-framework-de-baixo-nivel"></span><h2>O framework de baixo nível<a class="headerlink" href="#o-framework-de-baixo-nivel" title="Permalink to this headline">¶</a></h2>
+<p>Por trás das cenas, o framework RSS de alto nível usa o framework de baixo nível
+para gerar o XML do feed. Este framework fica num único módulo:
+<a class="reference external" href="http://code.djangoproject.com/browser/django/trunk/django/utils/feedgenerator.py">django/utils/feedgenerator.py</a>.</p>
+<p>Você usa este framework você mesmo, para geração de feed de baixo nível. Você
+pode também criar um gerador de feed personalizado extendendo-o para usar com
+a opção <tt class="docutils literal"><span class="pre">feed_type</span></tt> do <tt class="docutils literal"><span class="pre">Feed</span></tt>.</p>
+<div class="section" id="s-classes-syndicationfeed">
+<span id="classes-syndicationfeed"></span><h3>Classes <tt class="docutils literal"><span class="pre">SyndicationFeed</span></tt><a class="headerlink" href="#classes-syndicationfeed" title="Permalink to this headline">¶</a></h3>
+<p>O módulo <a class="reference internal" href="../utils.html#module-django.utils.feedgenerator" title="django.utils.feedgenerator: Syndication feed generation library -- used for generating RSS, etc."><tt class="xref py py-mod docutils literal"><span class="pre">feedgenerator</span></tt></a> contém uma classe base:</p>
+<dl class="class">
+<dt id="django.contrib.syndication.django.utils.feedgenerator.SyndicationFeed">
+<em class="property">class </em><tt class="descclassname">django.utils.feedgenerator.</tt><tt class="descname">SyndicationFeed</tt><a class="headerlink" href="#django.contrib.syndication.django.utils.feedgenerator.SyndicationFeed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>e várias subclasses:</p>
+<dl class="class">
+<dt id="django.contrib.syndication.django.utils.feedgenerator.RssUserland091Feed">
+<em class="property">class </em><tt class="descclassname">django.utils.feedgenerator.</tt><tt class="descname">RssUserland091Feed</tt><a class="headerlink" href="#django.contrib.syndication.django.utils.feedgenerator.RssUserland091Feed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.syndication.django.utils.feedgenerator.Rss201rev2Feed">
+<em class="property">class </em><tt class="descclassname">django.utils.feedgenerator.</tt><tt class="descname">Rss201rev2Feed</tt><a class="headerlink" href="#django.contrib.syndication.django.utils.feedgenerator.Rss201rev2Feed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="django.contrib.syndication.django.utils.feedgenerator.Atom1Feed">
+<em class="property">class </em><tt class="descclassname">django.utils.feedgenerator.</tt><tt class="descname">Atom1Feed</tt><a class="headerlink" href="#django.contrib.syndication.django.utils.feedgenerator.Atom1Feed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Cada uma dessas três classes sabe como renderizar um certo tipo de feed como
+XML. Elas compartilham essa interface:</p>
+<dl class="method">
+<dt id="django.contrib.syndication.SyndicationFeed.__init__">
+<tt class="descclassname">SyndicationFeed.</tt><tt class="descname">__init__</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.contrib.syndication.SyndicationFeed.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inicia o feed com o dicionário de metadado fornecido, que é aplicado ao feed
+todo. Os argumento nomeados obrigatórios são:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">title</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">link</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">description</span></tt></li>
+</ul>
+<p>Também existe um conjunto de outros argumentos opções:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">language</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">author_email</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">author_name</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">author_link</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">subtitle</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">categories</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">feed_url</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">feed_copyright</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">feed_guid</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">ttl</span></tt></li>
+</ul>
+<p>Qualquer argumento extra que você passar para o <tt class="docutils literal"><span class="pre">__init__</span></tt> será armazenado
+no <tt class="docutils literal"><span class="pre">self.feed</span></tt> para uso com <a class="reference internal" href="#geradores-de-feed-personalizados">geradores de feed personalizados</a>.</p>
+<p>Todos os paramêtros devem ser objetos Unicode, exceto <tt class="docutils literal"><span class="pre">categories</span></tt>, que
+deve ser uma sequência de objetos Unicode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.contrib.syndication.SyndicationFeed.add_item">
+<tt class="descclassname">SyndicationFeed.</tt><tt class="descname">add_item</tt>(<em>**kwargs</em>)<a class="headerlink" href="#django.contrib.syndication.SyndicationFeed.add_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adiciona um item ao feed com os dados paramêtros.</p>
+<p>Os Argumentos requeridos são:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">title</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">link</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">description</span></tt></li>
+</ul>
+<p>O argumentos opcionais são:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">author_email</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">author_name</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">author_link</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">pubdate</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">comments</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">unique_id</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">enclosure</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">categories</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">item_copyright</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">ttl</span></tt></li>
+</ul>
+<p>Argumentos extra serão armazenados para <a class="reference internal" href="#geradores-de-feed-personalizados">geradores de feed personalizados</a>.</p>
+<p>Todos os parametros, se fornecidos, devem ser objetos Unicode, exceto:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">pubdate</span></tt> deve ser um <a class="reference external" href="http://docs.python.org/library/datetime.html#datetime-objects">objeto datetime do Python</a>.</li>
+<li><tt class="docutils literal"><span class="pre">enclosure</span></tt> deve ser uma instância do <tt class="docutils literal"><span class="pre">feedgenerator.Enclosure</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">categories</span></tt> deve ser uma sequência de objetos Unicode.</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.contrib.syndication.SyndicationFeed.write">
+<tt class="descclassname">SyndicationFeed.</tt><tt class="descname">write</tt>(<em>outfile</em>, <em>encoding</em>)<a class="headerlink" href="#django.contrib.syndication.SyndicationFeed.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mostra o feed na codificação fornecida para o outfile, que é um objeto tipo
+arquivo.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.contrib.syndication.SyndicationFeed.writeString">
+<tt class="descclassname">SyndicationFeed.</tt><tt class="descname">writeString</tt>(<em>encoding</em>)<a class="headerlink" href="#django.contrib.syndication.SyndicationFeed.writeString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna o feed como uma string numa dada codificação.</p>
+</dd></dl>
+
+<p>Por exemplo, para criar um Atom 1.0 e imprimi-lo na saída padrão:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">feedgenerator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">feedgenerator</span><span class="o">.</span><span class="n">Atom1Feed</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s">u&quot;My Weblog&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">link</span><span class="o">=</span><span class="s">u&quot;http://www.example.com/&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s">u&quot;In which I write about what I ate today.&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">language</span><span class="o">=</span><span class="s">u&quot;en&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">u&quot;Hot dog today&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">link</span><span class="o">=</span><span class="s">u&quot;http://www.example.com/entries/1/&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s">u&quot;&lt;p&gt;Today I had a Vienna Beef hot dog. It was pink, plump and perfect.&lt;/p&gt;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f</span><span class="o">.</span><span class="n">writeString</span><span class="p">(</span><span class="s">&#39;UTF-8&#39;</span><span class="p">)</span>
+<span class="go">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="go">&lt;feed xmlns=&quot;http://www.w3.org/2005/Atom&quot; xml:lang=&quot;en&quot;&gt;</span>
+<span class="gp">...</span>
+<span class="go">&lt;/feed&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-geradores-de-feed-personalizados">
+<span id="geradores-de-feed-personalizados"></span><h3>Geradores de feed personalizados<a class="headerlink" href="#geradores-de-feed-personalizados" title="Permalink to this headline">¶</a></h3>
+<p>Se você precisa produzir um formato de feed personalizado, você tem algumas opções.</p>
+<p>Se o formato do feed é totalmente personalizado, você poderia extender o
+<tt class="docutils literal"><span class="pre">SyndicationFeed</span></tt> e substituir completamente os métodos <tt class="docutils literal"><span class="pre">write()</span></tt> e
+<tt class="docutils literal"><span class="pre">writeString()</span></tt>.</p>
+<p>No entanto, se o formato do feed é um spin-off de RSS ou Atom (i.e. <a class="reference external" href="http://georss.org/">GeoRSS</a>,
+<a class="reference external" href="http://www.apple.com/itunes/store/podcaststechspecs.html">formato iTunes podcast</a> da Apple, etc.) você tem uma escolha melhor. Esses
+tipos de feeds tipicamente adicionam elementos extra e/ou atributos ao formato
+subjacente, e há um conjunto de métodos que <tt class="docutils literal"><span class="pre">SyndicationFeed</span></tt> chama para obter
+estes atributos extra. Deste modo, você pode extender a classe geradora de feed
+apropriada (<tt class="docutils literal"><span class="pre">Atom1Feed</span></tt> ou <tt class="docutils literal"><span class="pre">rss201rev2Feed</span></tt>) e extender estes callbacks.
+São eles:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">SyndicationFeed.root_attributes(self,</span> <span class="pre">)</span></tt></dt>
+<dd>Retorna um <tt class="docutils literal"><span class="pre">dict</span></tt> de atributos para adicionar ao elemento raiz do feed.
+(<tt class="docutils literal"><span class="pre">feed</span></tt>/<tt class="docutils literal"><span class="pre">channel</span></tt>).</dd>
+<dt><tt class="docutils literal"><span class="pre">SyndicationFeed.add_root_elements(self,</span> <span class="pre">handler)</span></tt></dt>
+<dd>Callback para adicionar elementos dentro do elemento raiz do feed
+(<tt class="docutils literal"><span class="pre">feed</span></tt>/<tt class="docutils literal"><span class="pre">channel</span></tt>). <tt class="docutils literal"><span class="pre">handler</span></tt> é um <a class="reference external" href="http://docs.python.org/dev/library/xml.sax.utils.html#xml.sax.saxutils.XMLGenerator">XMLGenerator</a> da biblioteca SAX
+built-in do Python; você poderia chamar métodos sobre ela para adicionar o
+documento XML no processo.</dd>
+<dt><tt class="docutils literal"><span class="pre">SyndicationFeed.item_attributes(self,</span> <span class="pre">item)</span></tt></dt>
+<dd>Retorna um <tt class="docutils literal"><span class="pre">dict</span></tt> de atributos para adicionar a cada item
+(<tt class="docutils literal"><span class="pre">item</span></tt>/<tt class="docutils literal"><span class="pre">entry</span></tt>). O argumento, <tt class="docutils literal"><span class="pre">item</span></tt>, é um dicionário com todos os
+dados passados ao <tt class="docutils literal"><span class="pre">SyndicationFeed.add_item()</span></tt>.</dd>
+<dt><tt class="docutils literal"><span class="pre">SyndicationFeed.add_item_elements(self,</span> <span class="pre">handler,</span> <span class="pre">item)</span></tt></dt>
+<dd>Callback para adicionar elementos a cada item (<tt class="docutils literal"><span class="pre">item</span></tt>/<tt class="docutils literal"><span class="pre">entry</span></tt>).
+<tt class="docutils literal"><span class="pre">handler</span></tt> e <tt class="docutils literal"><span class="pre">item</span></tt> são como mostrado acima.</dd>
+</dl>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Se você sobrescrever qualquer um destes métodos, esteja seguro de chamar os
+métodos da superclasse de modo que eles adicionem os elementos obrigatórios
+para cada formato de feed.</p>
+</div>
+<p>Por exemplo, você pode começar a implementando um gerador de feed iTunes RSS
+desta forma:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">iTunesFeed</span><span class="p">(</span><span class="n">Rss201rev2Feed</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">root_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">iTunesFeed</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">root_attributes</span><span class="p">()</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s">&#39;xmlns:itunes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;http://www.itunes.com/dtds/podcast-1.0.dtd&#39;</span>
+        <span class="k">return</span> <span class="n">attrs</span>
+
+    <span class="k">def</span> <span class="nf">add_root_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">iTunesFeed</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_root_elements</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">addQuickElement</span><span class="p">(</span><span class="s">&#39;itunes:explicit&#39;</span><span class="p">,</span> <span class="s">&#39;clean&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Obviamente há um monte de trabaho a ser feito para uma classe de feed
+personalizada completa, mas o exemplo acima deve demonstrar a idéia básica.</p>
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">O framework syndication feed</a><ul>
+<li><a class="reference internal" href="#o-framework-de-alto-nivel">O framework de alto nível</a><ul>
+<li><a class="reference internal" href="#visao-geral">Visão geral</a></li>
+<li><a class="reference internal" href="#inicializacao">Inicialização</a></li>
+<li><a class="reference internal" href="#classes-feed">Classes Feed</a></li>
+<li><a class="reference internal" href="#um-exemplo-simples">Um exemplo simples</a></li>
+<li><a class="reference internal" href="#um-exemplo-complexo">Um exemplo complexo</a></li>
+<li><a class="reference internal" href="#especificando-o-tipo-de-feed">Especificando o tipo de feed</a></li>
+<li><a class="reference internal" href="#compartimentos">Compartimentos</a></li>
+<li><a class="reference internal" href="#language">Language</a></li>
+<li><a class="reference internal" href="#urls">URLs</a></li>
+<li><a class="reference internal" href="#publicando-feeds-atom-e-rss-no-tandem">Publicando feeds Atom e Rss no tandem</a></li>
+<li><a class="reference internal" href="#referencia-da-classe-feed">Referência da classe Feed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#o-framework-de-baixo-nivel">O framework de baixo nível</a><ul>
+<li><a class="reference internal" href="#classes-syndicationfeed">Classes <tt class="docutils literal"><span class="pre">SyndicationFeed</span></tt></a></li>
+<li><a class="reference internal" href="#geradores-de-feed-personalizados">Geradores de feed personalizados</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="staticfiles.html">The staticfiles app</a></li>
+    
+    
+      <li>Next: <a href="webdesign.html">django.contrib.webdesign</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Referência da API</a>
+        
+          <ul><li><a href="index.html">Os add-ons &#8220;django.contrib&#8221;</a>
+        
+        <ul><li>O framework syndication feed</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/contrib/syndication.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="staticfiles.html" title="The staticfiles app">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="webdesign.html" title="django.contrib.webdesign">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

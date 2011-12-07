@@ -1,0 +1,892 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Objetos de requisição e resposta &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Referência da API" href="index.html" />
+    <link rel="next" title="TemplateResponse and SimpleTemplateResponse" href="template-response.html" />
+    <link rel="prev" title="Referência da API QuerySet" href="models/querysets.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="models/querysets.html" title="Referência da API QuerySet">previous</a> 
+     |
+    <a href="index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="template-response.html" title="TemplateResponse and SimpleTemplateResponse">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-request-response">
+            
+  <div class="section" id="s-module-django.http">
+<span id="s-objetos-de-requisicao-e-resposta"></span><span id="s-ref-request-response"></span><span id="module-django.http"></span><span id="objetos-de-requisicao-e-resposta"></span><span id="ref-request-response"></span><h1>Objetos de requisição e resposta<a class="headerlink" href="#module-django.http" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="s-visao-geral">
+<span id="visao-geral"></span><h2>Visão Geral<a class="headerlink" href="#visao-geral" title="Permalink to this headline">¶</a></h2>
+<p>O Django utiliza objetos de requisição e resposta para passar estado através
+do sistema.</p>
+<p>Quando uma página é requisitada, o Django cria um objeto <a class="reference internal" href="#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a>
+que contém metadados sobre a requisição. Então o Django carrega a view
+apropriada, passando o <a class="reference internal" href="#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a> como o primeiro argumento para a
+função de view. Cada view é responsável por devolver um objeto
+<a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a>.</p>
+<p>Este documento explica as APIs para os objetos <a class="reference internal" href="#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a> e
+<a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a>.</p>
+</div>
+<div class="section" id="s-objetos-httprequest">
+<span id="objetos-httprequest"></span><h2>Objetos HttpRequest<a class="headerlink" href="#objetos-httprequest" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.http.HttpRequest">
+<em class="property">class </em><tt class="descname">HttpRequest</tt><a class="headerlink" href="#django.http.HttpRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="section" id="s-atributos">
+<span id="atributos"></span><h3>Atributos<a class="headerlink" href="#atributos" title="Permalink to this headline">¶</a></h3>
+<p>Todos os atributos, exceto <tt class="docutils literal"><span class="pre">session</span></tt>, devem ser considerados
+somente para leitura.</p>
+<dl class="attribute">
+<dt id="django.http.HttpRequest.path">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">path</tt><a class="headerlink" href="#django.http.HttpRequest.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uma string representando o caminho completo para a página requisitada,
+não incluindo o domínio.</p>
+<p>Exemplo: <tt class="docutils literal"><span class="pre">&quot;/music/bands/the_beatles/&quot;</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.method">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">method</tt><a class="headerlink" href="#django.http.HttpRequest.method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uma string representando o método HTTP usado na requisição. Este valor
+está sempre em maiúsculo. Exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;GET&#39;</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+    <span class="n">do_something_else</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.encoding">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">encoding</tt><a class="headerlink" href="#django.http.HttpRequest.encoding" title="Permalink to this definition">¶</a></dt>
+<dd><div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Uma string representando o valor atual de codificação utilizado para
+decodificar o envio de dados de formulário (ou <tt class="xref docutils literal"><span class="pre">None</span></tt>, que quer dizer
+que o parâmetro de configuração <tt class="docutils literal"><span class="pre">DEFAULT_CHARSET</span></tt> é utilizado). Você
+pode alterar este atributo para modificar a codificação usada quando
+acessar os dados do formulário. Quaisquer acessos subseqüentes a atributos
+(como ler de <tt class="docutils literal"><span class="pre">GET</span></tt> ou <tt class="docutils literal"><span class="pre">POST</span></tt>) utilizará no novo valor de encodig. Isto é
+útil se você sabe que os dados do formulário não estão na codificação
+<tt class="docutils literal"><span class="pre">DEFAULT_CHARSET</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.GET">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">GET</tt><a class="headerlink" href="#django.http.HttpRequest.GET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um objeto, tipo dicionário, contendo todos os parâmetros HTTP GET. Veja a
+documentação do <tt class="docutils literal"><span class="pre">QueryDict</span></tt> abaixo.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.POST">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">POST</tt><a class="headerlink" href="#django.http.HttpRequest.POST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um objeto dicionário contendo todos os parametros passados por HTTP POST.
+Veja a documentação do <tt class="docutils literal"><span class="pre">QueryDict</span></tt> abaixo.</p>
+<p>It's possible that a request can come in via POST with an empty <tt class="docutils literal"><span class="pre">POST</span></tt>
+dictionary -- if, say, a form is requested via the POST HTTP method but
+does not include form data. Therefore, you shouldn't use <tt class="docutils literal"><span class="pre">if</span> <span class="pre">request.POST</span></tt>
+to check for use of the POST method; instead, use <tt class="docutils literal"><span class="pre">if</span> <span class="pre">request.method</span> <span class="pre">==</span>
+<span class="pre">&quot;POST&quot;</span></tt> (see above).
+É possível que um requisição POST possa vir com um dicionário POST vazio --
+se, digo, um formulário é requisitado via metodo HTTP POST mas não inclui
+dados. Portanto, você não deve usar <tt class="docutils literal"><span class="pre">if</span> <span class="pre">request.POST</span></tt> para checar o uso
+do método POST; ao invés, use <tt class="docutils literal"><span class="pre">if</span> <span class="pre">request.method</span> <span class="pre">==</span> <span class="pre">&quot;POST&quot;</span></tt> (veja acima).</p>
+<p>Perceba: <tt class="docutils literal"><span class="pre">POST</span></tt> <em>não</em> inclui informações de upload de arquivos. Veja
+<tt class="docutils literal"><span class="pre">FILES</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.REQUEST">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">REQUEST</tt><a class="headerlink" href="#django.http.HttpRequest.REQUEST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Por conveniência, um objeto dicionário que procura <tt class="docutils literal"><span class="pre">POST</span></tt> primeiro, somente
+depois <tt class="docutils literal"><span class="pre">GET</span></tt>. Inpirado no <tt class="docutils literal"><span class="pre">$_REQUEST</span></tt> do PHP.</p>
+<p>Por exemplo, se <tt class="docutils literal"><span class="pre">GET</span> <span class="pre">=</span> <span class="pre">{&quot;name&quot;:</span> <span class="pre">&quot;john&quot;}</span></tt> and <tt class="docutils literal"><span class="pre">POST</span> <span class="pre">=</span> <span class="pre">{&quot;age&quot;:</span> <span class="pre">'34'}</span></tt>,
+<tt class="docutils literal"><span class="pre">REQUEST[&quot;name&quot;]</span></tt> poderia ser <tt class="docutils literal"><span class="pre">&quot;john&quot;</span></tt>, e <tt class="docutils literal"><span class="pre">REQUEST[&quot;age&quot;]</span></tt> poderia ser
+<tt class="docutils literal"><span class="pre">&quot;34&quot;</span></tt>.</p>
+<p>É fortemente sugerido que você use o <tt class="docutils literal"><span class="pre">GET</span></tt> e <tt class="docutils literal"><span class="pre">POST</span></tt> ao invés de
+<tt class="docutils literal"><span class="pre">REQUEST</span></tt>, porque são mais explicitos.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.COOKIES">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">COOKIES</tt><a class="headerlink" href="#django.http.HttpRequest.COOKIES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um dicionário padrão do Python contendo todos os cookies. Chaves e valores
+são strings.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.FILES">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">FILES</tt><a class="headerlink" href="#django.http.HttpRequest.FILES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um objeto dicionário contendo todos os arquivos enviados. Cada chave em
+<tt class="docutils literal"><span class="pre">FILES</span></tt> é o <tt class="docutils literal"><span class="pre">name</span></tt> do <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;file&quot;</span> <span class="pre">name=&quot;&quot;</span> <span class="pre">/&gt;</span></tt>. Cada valor em
+<tt class="docutils literal"><span class="pre">FILES</span></tt> é um objeto <tt class="docutils literal"><span class="pre">UploadedFile</span></tt> contendo os seguintes atributos:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">read(num_bytes=None)</span></tt> -- Lê um número de bytes do arquivo.</li>
+<li><tt class="docutils literal"><span class="pre">name</span></tt> -- O nome do arquivo enviado.</li>
+<li><tt class="docutils literal"><span class="pre">size</span></tt> -- O tamanho, em bytes, do arquivo enviado.</li>
+<li><tt class="docutils literal"><span class="pre">chunks(chunk_size=None)</span></tt> -- Um gerado que fornece pedaços
+sequenciais de dados.</li>
+</ul>
+<p>Veja <a class="reference internal" href="../topics/files.html"><em>Gerenciando arquivos</em></a> para mais informações.</p>
+<p>Note que <tt class="docutils literal"><span class="pre">FILES</span></tt> conterá somente dados se o método de requisição for POST
+e o <tt class="docutils literal"><span class="pre">&lt;form&gt;</span></tt> que postou a requisição tenha
+<tt class="docutils literal"><span class="pre">enctype=&quot;multipart/form-data&quot;</span></tt>. De outra forma, <tt class="docutils literal"><span class="pre">FILES</span></tt> será um
+dicionário em branco.</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Nas versões anteriores do Django, <tt class="docutils literal"><span class="pre">request.FILES</span></tt> contendo um simples
+<tt class="docutils literal"><span class="pre">dict</span></tt> representando os arquivos enviados. Isto já não é verdade -- os
+arquivos são representados por objetos <tt class="docutils literal"><span class="pre">UploadedFile</span></tt> como decrito abaixo.</p>
+<p>Estes objetos <tt class="docutils literal"><span class="pre">UploadedFile</span></tt> emulam a interface do velho <tt class="docutils literal"><span class="pre">dict</span></tt>, mas
+que é depreciada e será removida no próximo lançamento do Djando.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.META">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">META</tt><a class="headerlink" href="#django.http.HttpRequest.META" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um dicionário padrão do Python contendo todos cabeçalhos disponíveis do
+HTTP. Os cabeçalhos disponíveis dependem do cliente e do servidor, mas aqui
+há alguns exemplos:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">CONTENT_LENGTH</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">CONTENT_TYPE</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">HTTP_ACCEPT_ENCODING</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">HTTP_ACCEPT_LANGUAGE</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">HTTP_HOST</span></tt> -- O cabeçalho HTTP Host enviado pelo cliente.</li>
+<li><tt class="docutils literal"><span class="pre">HTTP_REFERER</span></tt> -- A página remetente, se ouver uma.</li>
+<li><tt class="docutils literal"><span class="pre">HTTP_USER_AGENT</span></tt> -- A string do user-agent do cliente.</li>
+<li><tt class="docutils literal"><span class="pre">QUERY_STRING</span></tt> -- A query string, como uma string única (não parseada).</li>
+<li><tt class="docutils literal"><span class="pre">REMOTE_ADDR</span></tt> -- O endereço IP do cliente.</li>
+<li><tt class="docutils literal"><span class="pre">REMOTE_HOST</span></tt> -- O hostname do cliente.</li>
+<li><tt class="docutils literal"><span class="pre">REQUEST_METHOD</span></tt> -- Uma string como <tt class="docutils literal"><span class="pre">&quot;GET&quot;</span></tt> ou <tt class="docutils literal"><span class="pre">&quot;POST&quot;</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">SERVER_NAME</span></tt> -- O hostname do servidor.</li>
+<li><tt class="docutils literal"><span class="pre">SERVER_PORT</span></tt> -- A porta do servidor.</li>
+</ul>
+<p>Com a exceção do <tt class="docutils literal"><span class="pre">CONTENT_LENGTH</span></tt> e <tt class="docutils literal"><span class="pre">CONTENT_TYPE</span></tt>, mostrados acima,
+qualquer cabeçalho HTTP na requisição é convertido para a chave <tt class="docutils literal"><span class="pre">META</span></tt>,
+tendo todos os seus caracteres passados para maiúsculo, substituindo os
+hífens por underscores e adicionando um <tt class="docutils literal"><span class="pre">HTTP_</span></tt> como prefixo do nome.
+Então, por exemplo, um cabeçalho chamado <tt class="docutils literal"><span class="pre">X-Bender</span></tt> seria mapeado para a
+chave <tt class="docutils literal"><span class="pre">META</span></tt> como <tt class="docutils literal"><span class="pre">HTTP_X_BENDER</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.user">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">user</tt><a class="headerlink" href="#django.http.HttpRequest.user" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <tt class="docutils literal"><span class="pre">django.contrib.auth.models.User</span></tt> object representing the currently
+logged-in user. If the user isn't currently logged in, <tt class="docutils literal"><span class="pre">user</span></tt> will be set
+to an instance of <tt class="docutils literal"><span class="pre">django.contrib.auth.models.AnonymousUser</span></tt>. You
+can tell them apart with <tt class="docutils literal"><span class="pre">is_authenticated()</span></tt>, like so::
+Um objeto <tt class="docutils literal"><span class="pre">django.contrib.auth.models.User</span></tt> representando o usuário atual
+logado. Se o usuário não estiver logado, o <tt class="docutils literal"><span class="pre">user</span></tt> conterá uma instância do
+<tt class="docutils literal"><span class="pre">django.contrib.auth.models.AnonymousUser</span></tt>. Você pode usar o método
+<tt class="docutils literal"><span class="pre">is_authenticated()</span></tt>, tipo:</p>
+<div class="highlight-python"><pre>if request.user.is_authenticated():
+    # Faça algo para usuários logados.
+else:
+    # Faça algo para usuários anônimos.</pre>
+</div>
+<p>O <tt class="docutils literal"><span class="pre">user</span></tt> é somente disponível se sua instalação do Django tem o middleware
+<tt class="docutils literal"><span class="pre">AuthenticationMiddleware</span></tt> ativado. Para mais, veja <a class="reference internal" href="../topics/auth.html"><em>Autenticação de Usuário no Django</em></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.session">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">session</tt><a class="headerlink" href="#django.http.HttpRequest.session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um objeto dicionário, onde é possivel ler e escrever dados, que representa a
+sessão corrente. Ele somente é disponível se sua instalação do Django tiver
+o suporte a sessão ativado. Veja a <a class="reference internal" href="../topics/http/sessions.html"><em>documentação do session</em></a> para destalhes completos.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.raw_post_data">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">raw_post_data</tt><a class="headerlink" href="#django.http.HttpRequest.raw_post_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Os dados do HTTP POST puros. Este é usual somente para processamentos
+avançados. Use <tt class="docutils literal"><span class="pre">POST</span></tt> no lugar dele.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.http.HttpRequest.urlconf">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">urlconf</tt><a class="headerlink" href="#django.http.HttpRequest.urlconf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Não definido pelo Django em si, mas será lido se outro código (e.g., uma
+classe middleware) setá-lo. Quando presente, será usado como o URLconf raiz
+para a requisição corrent, sobrescrever a configuração <tt class="docutils literal"><span class="pre">ROOT_URLCONF</span></tt>.
+Veja <a class="reference internal" href="../topics/http/urls.html#how-django-processes-a-request"><em>Como o Django processa uma requisição</em></a> para detalhes.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-metodos">
+<span id="metodos"></span><h3>Métodos<a class="headerlink" href="#metodos" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="django.http.HttpRequest.get_host">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">get_host</tt>()<a class="headerlink" href="#django.http.HttpRequest.get_host" title="Permalink to this definition">¶</a></dt>
+<dd><div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Retorna o servidor originador da requisição usando informações dos cabeçalhos
+<tt class="docutils literal"><span class="pre">HTTP_X_FORWARDED_HOST</span></tt> e <tt class="docutils literal"><span class="pre">HTTP_HOST</span></tt> (nesta ordem). Se eles não fornecem
+um valor, o método usa uma combinação de <tt class="docutils literal"><span class="pre">SERVER_NAME</span></tt> e <tt class="docutils literal"><span class="pre">SERVER_PORT</span></tt>
+como detalhado em <a class="reference external" href="http://www.python.org/dev/peps/pep-0333/">PEP 333</a>.</p>
+<p>Exemplo: <tt class="docutils literal"><span class="pre">&quot;127.0.0.1:8000&quot;</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpRequest.get_full_path">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">get_full_path</tt>()<a class="headerlink" href="#django.http.HttpRequest.get_full_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna o <tt class="docutils literal"><span class="pre">path</span></tt>, mais uma query string anexa, se aplicável.</p>
+<p>Exemplo: <tt class="docutils literal"><span class="pre">&quot;/music/bands/the_beatles/?print=true&quot;</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpRequest.build_absolute_uri">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">build_absolute_uri</tt>(<em>location</em>)<a class="headerlink" href="#django.http.HttpRequest.build_absolute_uri" title="Permalink to this definition">¶</a></dt>
+<dd><div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Retorna a URI absoluta de <tt class="docutils literal"><span class="pre">location</span></tt>. Se nenhum location é fornecido, o
+location será setado para <cite>request.get_full_path()`</cite>.</p>
+<p>Se o location já é uma URI absoluta, ele não será alterado. De outra forma a
+URI absoluta é construída usando as variáveis de servidor disponíveis nesta
+requisição.</p>
+<p>Exemplo: <tt class="docutils literal"><span class="pre">&quot;http://example.com/music/bands/the_beatles/?print=true&quot;</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpRequest.is_secure">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">is_secure</tt>()<a class="headerlink" href="#django.http.HttpRequest.is_secure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna <tt class="xref docutils literal"><span class="pre">True</span></tt> se a requisição é segura; isto é, se ela foi feita com
+HTTPS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpRequest.is_ajax">
+<tt class="descclassname">HttpRequest.</tt><tt class="descname">is_ajax</tt>()<a class="headerlink" href="#django.http.HttpRequest.is_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Retorna <tt class="xref docutils literal"><span class="pre">True</span></tt> se a requisição foi feita via um <tt class="docutils literal"><span class="pre">XMLHttpRequest</span></tt>,
+checando o cabeçalho <tt class="docutils literal"><span class="pre">HTTP_X_REQUESTED_WITH</span></tt> por um string
+<tt class="docutils literal"><span class="pre">'XMLHttpRequest'</span></tt>. As seguintes bibliotecas JavaScript enviam seus
+cabeçalhos:</p>
+<ul class="simple">
+<li>jQuery</li>
+<li>Dojo</li>
+<li>MochiKit</li>
+<li>MooTools</li>
+<li>Prototype</li>
+<li>YUI</li>
+</ul>
+<p>Se você escrever sua própria chamada XMLHttpRequest (no lado do navergador),
+terá de setar este cabeçalho manualmente se quiser que o <tt class="docutils literal"><span class="pre">is_ajax()</span></tt>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-objetos-querydict">
+<span id="objetos-querydict"></span><h3>Objetos QueryDict<a class="headerlink" href="#objetos-querydict" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.http.QueryDict">
+<em class="property">class </em><tt class="descname">QueryDict</tt><a class="headerlink" href="#django.http.QueryDict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Num objeto <a class="reference internal" href="#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a>, os atributos <tt class="docutils literal"><span class="pre">GET</span></tt> e <tt class="docutils literal"><span class="pre">POST</span></tt> são instâncias
+do <tt class="docutils literal"><span class="pre">django.http.QueryDict</span></tt>. O <a class="reference internal" href="#django.http.QueryDict" title="django.http.QueryDict"><tt class="xref py py-class docutils literal"><span class="pre">QueryDict</span></tt></a> é uma classe tipo dicionário
+customizada para lidar com múltiplos valores para a mesma chave. Isto é
+necessário porquê alguns elementos de formulário HTML, notavelmente,
+<tt class="docutils literal"><span class="pre">&lt;select</span> <span class="pre">multiple=&quot;multiple&quot;&gt;</span></tt>, passam multiplos valores para a mesma chave.</p>
+<p><tt class="docutils literal"><span class="pre">QueryDict</span></tt> instances are immutable, unless you create a <tt class="docutils literal"><span class="pre">copy()</span></tt> of them.
+That means you can't change attributes of <tt class="docutils literal"><span class="pre">request.POST</span></tt> and <tt class="docutils literal"><span class="pre">request.GET</span></tt>
+directly.
+A instância <tt class="docutils literal"><span class="pre">QueryDict</span></tt> é imutável, a menos que você crie uma <tt class="docutils literal"><span class="pre">copy()</span></tt>
+deles. O que significa que você não poderá mudar atributos do <tt class="docutils literal"><span class="pre">request.POST</span></tt> e
+<tt class="docutils literal"><span class="pre">request.GET</span></tt> diretamente.</p>
+</div>
+<div class="section" id="s-id1">
+<span id="id1"></span><h3>Métodos<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>O <a class="reference internal" href="#django.http.QueryDict" title="django.http.QueryDict"><tt class="xref py py-class docutils literal"><span class="pre">QueryDict</span></tt></a> implementa todo os métodos padrão de dicionários, porque
+ele é uma subclasse de dicionário. Execeções são esboçadas aqui:</p>
+<dl class="method">
+<dt id="django.http.QueryDict.__getitem__">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">__getitem__</tt>(<em>key</em>)<a class="headerlink" href="#django.http.QueryDict.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna o valor para a chave dada. Se a chave tem mais de um valor,
+<tt class="docutils literal"><span class="pre">__getitem__()</span></tt> retorna o último valor. Ele lança
+<tt class="docutils literal"><span class="pre">django.utils.datastructure.MultiValueDictKeyError</span></tt> se a chave não existe.
+(Esta é uma subclasse da classe <tt class="docutils literal"><span class="pre">KeyError</span></tt> padrão do Python, então você
+pode cutucá-la para pegar o <tt class="docutils literal"><span class="pre">KeyError</span></tt>.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.__setitem__">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">__setitem__</tt>(<em>key</em>, <em>value</em>)<a class="headerlink" href="#django.http.QueryDict.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Seta a chave data para <tt class="docutils literal"><span class="pre">[value]`</span>&nbsp; <span class="pre">(uma</span> <span class="pre">lista</span> <span class="pre">do</span> <span class="pre">Python</span> <span class="pre">cujo</span> <span class="pre">o</span> <span class="pre">único</span>
+<span class="pre">elemento</span> <span class="pre">é</span> <span class="pre">``value</span></tt>). Note que esta, como outras funções de dicionário que
+têm efeitos segundários, ela somente pode ser chamada num <tt class="docutils literal"><span class="pre">QueryDict</span></tt>
+mutável (um que foi criado via <tt class="docutils literal"><span class="pre">copy()</span></tt>).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.__contains__">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">__contains__</tt>(<em>key</em>)<a class="headerlink" href="#django.http.QueryDict.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna <tt class="xref docutils literal"><span class="pre">True</span></tt> se a chave dada estiver setada. Este te permite fazer,
+e.g., <tt class="docutils literal"><span class="pre">if</span> <span class="pre">&quot;foo&quot;</span> <span class="pre">in</span> <span class="pre">request.GET</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.get">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">get</tt>(<em>key</em>, <em>default</em>)<a class="headerlink" href="#django.http.QueryDict.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use a mesma lógica em <tt class="docutils literal"><span class="pre">__getitem__()</span></tt> acima, com um hook para retornar um
+valor padrão se a chave não existe.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.setdefault">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">setdefault</tt>(<em>key</em>, <em>default</em>)<a class="headerlink" href="#django.http.QueryDict.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd><p>É como um método <tt class="docutils literal"><span class="pre">setdefault()</span></tt> padrão de dicionário, exceto por ele usar
+<tt class="docutils literal"><span class="pre">__setitem__</span></tt> internamente.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.update">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">update</tt>(<em>other_dict</em>)<a class="headerlink" href="#django.http.QueryDict.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recebe ambos <tt class="docutils literal"><span class="pre">QueryDict</span></tt> ou um dicionário padrão. É como o método
+<tt class="docutils literal"><span class="pre">update()</span></tt> padrão de dicionário, exceto por <em>atachar</em> os ítems no
+dicionário atual ao invés de substituí-los. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s">&#39;a=1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c"># para torná-lo mutável</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;a&#39;</span><span class="p">:</span> <span class="s">&#39;2&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<span class="go">[&#39;1&#39;, &#39;2&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">]</span> <span class="c"># retorna o último</span>
+<span class="go">[&#39;2&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.items">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">items</tt>()<a class="headerlink" href="#django.http.QueryDict.items" title="Permalink to this definition">¶</a></dt>
+<dd><p>É como o método <tt class="docutils literal"><span class="pre">items()</span></tt> padrão de dicionários, exceto por usar o mesmo
+último valor lógico como <tt class="docutils literal"><span class="pre">__getitem()__</span></tt>. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s">&#39;a=1&amp;a=2&amp;a=3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<span class="go">[(&#39;a&#39;, &#39;3&#39;)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.iteritems">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">iteritems</tt>()<a class="headerlink" href="#django.http.QueryDict.iteritems" title="Permalink to this definition">¶</a></dt>
+<dd><p>É como o método <tt class="docutils literal"><span class="pre">iteritems()</span></tt> padrão de dicionários. Como o
+<a class="reference internal" href="#django.http.QueryDict.items" title="django.http.QueryDict.items"><tt class="xref py py-meth docutils literal"><span class="pre">QueryDict.items()</span></tt></a> este usa o mesmo último valor lógico como o
+<tt class="xref py py-meth docutils literal"><span class="pre">QueryDict.__getitem()__()</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.iterlists">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">iterlists</tt>()<a class="headerlink" href="#django.http.QueryDict.iterlists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Como <tt class="xref py py-meth docutils literal"><span class="pre">QueryDict.iteritems()`()</span></tt> exceto por incluir todos os valores,
+como uma lista, para cada membro do dicionário.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.values">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">values</tt>()<a class="headerlink" href="#django.http.QueryDict.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Como o médodo <tt class="docutils literal"><span class="pre">values()</span></tt> padrão de dicionários, exceto por usar o mesmo
+último valor lógico como <tt class="docutils literal"><span class="pre">__getitem()__</span></tt>. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s">&#39;a=1&amp;a=2&amp;a=3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+<span class="go">[&#39;3&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.itervalues">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">itervalues</tt>()<a class="headerlink" href="#django.http.QueryDict.itervalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Como <a class="reference internal" href="#django.http.QueryDict.values" title="django.http.QueryDict.values"><tt class="xref py py-meth docutils literal"><span class="pre">QueryDict.values()</span></tt></a>, exceto por ser um iterador.</p>
+</dd></dl>
+
+<p>Além disso, o <tt class="docutils literal"><span class="pre">QueryDict</span></tt> tem os seguintes métodos:</p>
+<dl class="method">
+<dt id="django.http.QueryDict.copy">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">copy</tt>()<a class="headerlink" href="#django.http.QueryDict.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna uma cópia do objeto, usando <tt class="docutils literal"><span class="pre">copy.deepcopy()</span></tt> da biblioteca padrão
+do Python. A cópia será mutável -- isto é, você poderá mudar seus valores.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.getlist">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">getlist</tt>(<em>key</em>)<a class="headerlink" href="#django.http.QueryDict.getlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna os dados da da chave requisitada, como uma lista Python. Retorna uma
+lista vazia se a chave não existe. É garantido o retorno de uma lista de
+algum tipo.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.setlist">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">setlist</tt>(<em>key</em>, <em>list_</em>)<a class="headerlink" href="#django.http.QueryDict.setlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Seta a chave dada com <tt class="docutils literal"><span class="pre">list_</span></tt> (diferentemente de <tt class="docutils literal"><span class="pre">__setitem__()</span></tt>).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.appendlist">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">appendlist</tt>(<em>key</em>, <em>item</em>)<a class="headerlink" href="#django.http.QueryDict.appendlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appends an item to the internal list associated with key.
+Atache um item para a lista interna associada com a chave.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.setlistdefault">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">setlistdefault</tt>(<em>key</em>, <em>default_list</em>)<a class="headerlink" href="#django.http.QueryDict.setlistdefault" title="Permalink to this definition">¶</a></dt>
+<dd><p>Como <tt class="docutils literal"><span class="pre">setdefault</span></tt>, exceto por receber uma lista de valores ao invés de um
+valor único.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.lists">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">lists</tt>()<a class="headerlink" href="#django.http.QueryDict.lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Como <a class="reference internal" href="#django.http.QueryDict.items" title="django.http.QueryDict.items"><tt class="xref py py-meth docutils literal"><span class="pre">items()</span></tt></a>, exceto por incluír todos os valores, como uma lista,
+para cada membro do dicionário. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s">&#39;a=1&amp;a=2&amp;a=3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">lists</span><span class="p">()</span>
+<span class="go">[(&#39;a&#39;, [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;])]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.QueryDict.urlencode">
+<tt class="descclassname">QueryDict.</tt><tt class="descname">urlencode</tt>()<a class="headerlink" href="#django.http.QueryDict.urlencode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna uma string de dados no formato query string.
+Exemplo: <tt class="docutils literal"><span class="pre">&quot;a=2&amp;b=3&amp;b=5&quot;</span></tt>.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="s-objetos-httpresponse">
+<span id="objetos-httpresponse"></span><h2>Objetos HttpResponse<a class="headerlink" href="#objetos-httpresponse" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="django.http.HttpResponse">
+<em class="property">class </em><tt class="descname">HttpResponse</tt><a class="headerlink" href="#django.http.HttpResponse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Em contrate com objetos <a class="reference internal" href="#django.http.HttpRequest" title="django.http.HttpRequest"><tt class="xref py py-class docutils literal"><span class="pre">HttpRequest</span></tt></a>, que são criados automaticamente
+pelo Django, os objetos <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> são sua responsabilidade. Cada
+view que você escrever é responsável por instanciar, popular e retornar um
+<a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a>.</p>
+<p>The <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> class lives in the <tt class="docutils literal"><span class="pre">django.http</span></tt> module.
+A classe <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> reside o módulo <tt class="docutils literal"><span class="pre">django.http</span></tt>.</p>
+<div class="section" id="s-uso">
+<span id="uso"></span><h3>Uso<a class="headerlink" href="#uso" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="s-passando-strings">
+<span id="passando-strings"></span><h4>Passando strings<a class="headerlink" href="#passando-strings" title="Permalink to this headline">¶</a></h4>
+<p>Um uso típico é passar os conteúdos de uma página, como uma string, para o
+construtor <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">&quot;Aqui tem um texto para a página Web.&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">&quot;Somente texto, por favor.&quot;</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s">&quot;text/plain&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Mas se você quiser adicionar conteúdo incrementalmente, você pode usar o
+<tt class="docutils literal"><span class="pre">response</span></tt> como um objeto:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;&lt;p&gt;Aqui tem um texto para a página Web.&lt;/p&gt;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;&lt;p&gt;Aqui tem outro parágrafo.&lt;/p&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Você pode adicionar e deletar cabeçalhos usando sintaxe de dicionário:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">[</span><span class="s">&#39;X-DJANGO&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Ele é o melhor.&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">response</span><span class="p">[</span><span class="s">&#39;X-PHP&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">[</span><span class="s">&#39;X-DJANGO&#39;</span><span class="p">]</span>
+<span class="go">&quot;Ele é o melhor.&quot;</span>
+</pre></div>
+</div>
+<p>Note que <tt class="docutils literal"><span class="pre">del</span></tt> não lança um <tt class="docutils literal"><span class="pre">KeyError</span></tt> se o cabeçalho não existe.</p>
+</div>
+<div class="section" id="s-passando-iteradores">
+<span id="passando-iteradores"></span><h4>Passando iteradores<a class="headerlink" href="#passando-iteradores" title="Permalink to this headline">¶</a></h4>
+<p>Finalmente, você pode passar ao <tt class="docutils literal"><span class="pre">HttpResponse</span></tt> um iterador ao invés de passar
+strings na mão. Se você usar esta técnica, siga estas dicas:</p>
+<ul class="simple">
+<li>O iterador deve retornar strings.</li>
+<li>Se um <tt class="xref py py-class docutils literal"><span class="pre">HttpResponse`</span></tt> foi inicializado com um iterador como seu
+conteúdo, você não pode usar a instância <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> como um
+objeto. Fazendo-o então lançar uma <tt class="docutils literal"><span class="pre">Exception</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="s-configurando-cabecalhos">
+<span id="configurando-cabecalhos"></span><h4>Configurando cabeçalhos<a class="headerlink" href="#configurando-cabecalhos" title="Permalink to this headline">¶</a></h4>
+<p>Para setar um cabeçalho em sua resposta, é só tratá-la como um dicionário:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">[</span><span class="s">&#39;Pragma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;no-cache&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-dizendo-ao-navegador-para-tratar-a-resposta-como-um-arquivo-atachado">
+<span id="dizendo-ao-navegador-para-tratar-a-resposta-como-um-arquivo-atachado"></span><h4>Dizendo ao navegador para tratar a resposta como um arquivo atachado<a class="headerlink" href="#dizendo-ao-navegador-para-tratar-a-resposta-como-um-arquivo-atachado" title="Permalink to this headline">¶</a></h4>
+<p>Para dizer ao navegador para tratar a resposta como um arquivo atachado, use o
+argumento <tt class="docutils literal"><span class="pre">mimetype</span></tt> e set o cabeçalho <tt class="docutils literal"><span class="pre">Content-Disposition</span></tt>. Por exemplo,
+esta é a forma como você pode retornar uma planilha do Microsoft Excel:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">my_data</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s">&#39;application/vnd.ms-excel&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">[</span><span class="s">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;attachment; filename=foo.xls&#39;</span>
+</pre></div>
+</div>
+<p>Não há nada específico sobre o cabeçalho <tt class="docutils literal"><span class="pre">Content-Disposition</span></tt> do Django, mas
+é fácil esquecer a sintaxe, então nós incluimos ela aqui.</p>
+</div>
+</div>
+<div class="section" id="s-id2">
+<span id="id2"></span><h3>Atributos<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.http.HttpResponse.content">
+<tt class="descclassname">HttpResponse.</tt><tt class="descname">content</tt><a class="headerlink" href="#django.http.HttpResponse.content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uma string normal do Python reprensentando o conteúdo, codificado como um
+objeto Unicode se necessário.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-id3">
+<span id="id3"></span><h3>Métodos<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="django.http.HttpResponse.__init__">
+<tt class="descclassname">HttpResponse.</tt><tt class="descname">__init__</tt>(<em>content=''</em>, <em>mimetype=None</em>, <em>status=200</em>, <em>content_type=DEFAULT_CONTENT_TYPE</em>)<a class="headerlink" href="#django.http.HttpResponse.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instancia um objeto <tt class="docutils literal"><span class="pre">HttpResponse</span></tt> com o conteúdo da página fornecida (uma
+string) e o &quot;MIME type&quot;. O <tt class="docutils literal"><span class="pre">DEFAULT_CONTENT_TYPE</span></tt> é <tt class="docutils literal"><span class="pre">'text/html'</span></tt>.</p>
+<p>O <tt class="docutils literal"><span class="pre">content</span></tt> pode ser um iterador ou string. Se for um iterador, ele deve
+retornar strings, e suas strings serão unidas para formar o conteúdo da
+resposta.</p>
+<p>O <tt class="docutils literal"><span class="pre">status</span></tt> é o <a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10">Status code HTTP</a> para a resposta.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>O <tt class="docutils literal"><span class="pre">content_type</span></tt> é um alias para <tt class="docutils literal"><span class="pre">mimetype</span></tt>. Historicamente, este
+parâmetro foi chamado somente <tt class="docutils literal"><span class="pre">mimetype</span></tt>, mas como na verdade ele é o
+valor incluso no cabeçalho HTTP <tt class="docutils literal"><span class="pre">Content-Type</span></tt>, também pode incluir o
+conjunto de caracteres de codificação.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpResponse.__setitem__">
+<tt class="descclassname">HttpResponse.</tt><tt class="descname">__setitem__</tt>(<em>header</em>, <em>value</em>)<a class="headerlink" href="#django.http.HttpResponse.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Seta o nome do cabeçalho dado com o valor fornecido. Ambos <tt class="docutils literal"><span class="pre">header</span></tt> e
+<tt class="docutils literal"><span class="pre">value</span></tt> devem ser strings.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpResponse.__delitem__">
+<tt class="descclassname">HttpResponse.</tt><tt class="descname">__delitem__</tt>(<em>header</em>)<a class="headerlink" href="#django.http.HttpResponse.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deleta o cabeçalho com o nome dado. Falha silenciosamente se o cabeçalho
+não existe. É case-sensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpResponse.__getitem__">
+<tt class="descclassname">HttpResponse.</tt><tt class="descname">__getitem__</tt>(<em>header</em>)<a class="headerlink" href="#django.http.HttpResponse.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna o valor para o nome do cabeçalho dado. É case-sensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpResponse.has_header">
+<tt class="descclassname">HttpResponse.</tt><tt class="descname">has_header</tt>(<em>header</em>)<a class="headerlink" href="#django.http.HttpResponse.has_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna <tt class="xref docutils literal"><span class="pre">True</span></tt> ou <tt class="xref docutils literal"><span class="pre">False</span></tt> baseado em uma checagem case-insensitive para
+o cabeçalho com o nome fornecido.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpResponse.set_cookie">
+<tt class="descclassname">HttpResponse.</tt><tt class="descname">set_cookie</tt>(<em>key</em>, <em>value=''</em>, <em>max_age=None</em>, <em>expires=None</em>, <em>path='/'</em>, <em>domain=None</em>, <em>secure=None</em>)<a class="headerlink" href="#django.http.HttpResponse.set_cookie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Seta um cookie. Os parametros são os mesmo do objeto <a class="reference external" href="http://docs.python.org/library/cookie.html#Cookie.Morsel">cookie Morsel</a>
+da biblioteca padrão do Python.</p>
+<ul class="simple">
+<li>O <tt class="docutils literal"><span class="pre">max_age</span></tt> deve ser um número de segundo, ou <tt class="xref docutils literal"><span class="pre">None</span></tt> (padrão) se
+o cookie deve durar somente enquanto a sessão do browser do cliente
+estiver aberta.</li>
+<li><tt class="docutils literal"><span class="pre">expires</span></tt> deve ser uma string no formato
+<tt class="docutils literal"><span class="pre">&quot;Wdy,</span> <span class="pre">DD-Mon-YY</span> <span class="pre">HH:MM:SS</span> <span class="pre">GMT&quot;</span></tt>.</li>
+<li>Usa o <tt class="docutils literal"><span class="pre">domain</span></tt> se você quiser setar um cross-domain cookie. Por
+exemplo, <tt class="docutils literal"><span class="pre">domain=&quot;.lawrence.com&quot;</span></tt> setará um cookie que é legível
+pelo domínio www.lawrence.com, blogs.lawrence.com e
+calendars.lawrence.com. Caso contrário, um cookie somente será
+acessível pelo domínio que o setar.</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpResponse.delete_cookie">
+<tt class="descclassname">HttpResponse.</tt><tt class="descname">delete_cookie</tt>(<em>key</em>, <em>path='/'</em>, <em>domain=None</em>)<a class="headerlink" href="#django.http.HttpResponse.delete_cookie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deleta o cookie com o a chave fornecida. Falha silenciosamente se a chave
+não existe.</p>
+<p>Devido a forma como os cookies funcionam, <tt class="docutils literal"><span class="pre">path</span></tt> e <tt class="docutils literal"><span class="pre">domain</span></tt> devem ser o
+mesmo valor usado em <tt class="docutils literal"><span class="pre">set_cookie()</span></tt> -- caso contrário o cookie pode não
+ser deletado.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpResponse.write">
+<tt class="descclassname">HttpResponse.</tt><tt class="descname">write</tt>(<em>content</em>)<a class="headerlink" href="#django.http.HttpResponse.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Este método monta uma instância de um objeto <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> em um
+arquivo.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpResponse.flush">
+<tt class="descclassname">HttpResponse.</tt><tt class="descname">flush</tt>()<a class="headerlink" href="#django.http.HttpResponse.flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Este método monta uma instância do objeto <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> em um
+arquivo.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.http.HttpResponse.tell">
+<tt class="descclassname">HttpResponse.</tt><tt class="descname">tell</tt>()<a class="headerlink" href="#django.http.HttpResponse.tell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Este método monta uma instância de objeto <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> em um
+arquivo.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-subclasses-do-httpresponse">
+<span id="s-ref-httpresponse-subclasses"></span><span id="subclasses-do-httpresponse"></span><span id="ref-httpresponse-subclasses"></span><h3>Subclasses do HttpResponse<a class="headerlink" href="#subclasses-do-httpresponse" title="Permalink to this headline">¶</a></h3>
+<p>O Django incluí um número de subclasses <tt class="docutils literal"><span class="pre">HttpResponse</span></tt> que manipulam direntes
+tipos de respostas HTTP. Como <tt class="docutils literal"><span class="pre">HttpResponse</span></tt>, estas subclasses residem o
+módulo <a class="reference internal" href="#module-django.http" title="django.http: Classes para trabalhar com requisições e respostas HTTP."><tt class="xref py py-mod docutils literal"><span class="pre">django.http</span></tt></a>.</p>
+<dl class="class">
+<dt id="django.http.HttpResponseRedirect">
+<em class="property">class </em><tt class="descname">HttpResponseRedirect</tt><a class="headerlink" href="#django.http.HttpResponseRedirect" title="Permalink to this definition">¶</a></dt>
+<dd><p>O construtor recebe um único argumento -- o caminho para onde deve ser
+redirecionado. Este pode ser uma URL completa
+(e.g. <tt class="docutils literal"><span class="pre">'http://www.yahoo.com/search/'</span></tt>) ou uma URL absoluta sem domínio
+(e.g. <tt class="docutils literal"><span class="pre">'/search'</span></tt>). Note que ele retorna o status code 302.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.http.HttpResponsePermanentRedirect">
+<em class="property">class </em><tt class="descname">HttpResponsePermanentRedirect</tt><a class="headerlink" href="#django.http.HttpResponsePermanentRedirect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Como um <a class="reference internal" href="#django.http.HttpResponseRedirect" title="django.http.HttpResponseRedirect"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponseRedirect</span></tt></a>, mas ele retorna um redirecionamento
+permanente (HTTP status code 300) ao invés de um redirecionamento
+&quot;found&quot; (status code 302).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.http.HttpResponseNotModified">
+<em class="property">class </em><tt class="descname">HttpResponseNotModified</tt><a class="headerlink" href="#django.http.HttpResponseNotModified" title="Permalink to this definition">¶</a></dt>
+<dd><p>O construtor não recebe qualquer argumento. Use isto para designar que uma
+página não foi modificada desde a última requisição do usuário (status code
+304).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.http.HttpResponseBadRequest">
+<em class="property">class </em><tt class="descname">HttpResponseBadRequest</tt><a class="headerlink" href="#django.http.HttpResponseBadRequest" title="Permalink to this definition">¶</a></dt>
+<dd><div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Age como um <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> mas usa um &quot;status code&quot; 400.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.http.HttpResponseNotFound">
+<em class="property">class </em><tt class="descname">HttpResponseNotFound</tt><a class="headerlink" href="#django.http.HttpResponseNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Age como um <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> mas usa um &quot;status code&quot; 404.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.http.HttpResponseForbidden">
+<em class="property">class </em><tt class="descname">HttpResponseForbidden</tt><a class="headerlink" href="#django.http.HttpResponseForbidden" title="Permalink to this definition">¶</a></dt>
+<dd><p>Age como um <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> mas usa o &quot;status code&quot; 403.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.http.HttpResponseNotAllowed">
+<em class="property">class </em><tt class="descname">HttpResponseNotAllowed</tt><a class="headerlink" href="#django.http.HttpResponseNotAllowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Como o <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a>, mas usa um &quot;status code&quot; 405. Recebe um
+argumento único, obrigatório: uma lista de métodos permitidos
+(e.g. <cite>['GET','POST']`</cite>).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.http.HttpResponseGone">
+<em class="property">class </em><tt class="descname">HttpResponseGone</tt><a class="headerlink" href="#django.http.HttpResponseGone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Age como um <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> mas usa um &quot;status code&quot; 410.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="django.http.HttpResponseServerError">
+<em class="property">class </em><tt class="descname">HttpResponseServerError</tt><a class="headerlink" href="#django.http.HttpResponseServerError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Age como um <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> mas usa um &quot;status code&quot; 500.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Objetos de requisição e resposta</a><ul>
+<li><a class="reference internal" href="#visao-geral">Visão Geral</a></li>
+<li><a class="reference internal" href="#objetos-httprequest">Objetos HttpRequest</a><ul>
+<li><a class="reference internal" href="#atributos">Atributos</a></li>
+<li><a class="reference internal" href="#metodos">Métodos</a></li>
+<li><a class="reference internal" href="#objetos-querydict">Objetos QueryDict</a></li>
+<li><a class="reference internal" href="#id1">Métodos</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#objetos-httpresponse">Objetos HttpResponse</a><ul>
+<li><a class="reference internal" href="#uso">Uso</a><ul>
+<li><a class="reference internal" href="#passando-strings">Passando strings</a></li>
+<li><a class="reference internal" href="#passando-iteradores">Passando iteradores</a></li>
+<li><a class="reference internal" href="#configurando-cabecalhos">Configurando cabeçalhos</a></li>
+<li><a class="reference internal" href="#dizendo-ao-navegador-para-tratar-a-resposta-como-um-arquivo-atachado">Dizendo ao navegador para tratar a resposta como um arquivo atachado</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2">Atributos</a></li>
+<li><a class="reference internal" href="#id3">Métodos</a></li>
+<li><a class="reference internal" href="#subclasses-do-httpresponse">Subclasses do HttpResponse</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="models/querysets.html">Referência da API QuerySet</a></li>
+    
+    
+      <li>Next: <a href="template-response.html">TemplateResponse and SimpleTemplateResponse</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Referência da API</a>
+        
+        <ul><li>Objetos de requisição e resposta</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/ref/request-response.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="models/querysets.html" title="Referência da API QuerySet">previous</a> 
+     |
+    <a href="index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="template-response.html" title="TemplateResponse and SimpleTemplateResponse">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

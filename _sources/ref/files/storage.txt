@@ -1,0 +1,71 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done $
+..   $OriginalRevision: 11268 $
+..   $TranslationAuthors: Robson Mendonça, Walter Cruz $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _ref-files-storage:
+
+API de armazenamento de arquivos.
+=================================
+
+``Storage.exists(name)``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+``True`` se um determinado arquivo já existe com ``name``.
+
+``Storage.path(name)``
+~~~~~~~~~~~~~~~~~~~~~~
+
+O caminho do sistema de arquivos de onde o arquivo pode ser aberto usando a
+função padrão do Python, ``open()``. Para sistemas de armazenamento que não
+são acessíveis do sistema de arquivo local, esta função irá gerar um erro
+``NotImplementedError``.
+
+``Storage.size(name)``
+~~~~~~~~~~~~~~~~~~~~~~
+
+Retorna o tamanho total, em bytes, do arquivo referenciado por ``name``.
+
+``Storage.url(name)``
+~~~~~~~~~~~~~~~~~~~~~
+
+Retorna a URL onde o conteúdo do arquivo referenciado por ``name`` pode ser
+acessado.
+
+``Storage.open(name, mode='rb')``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Abre o arquivo dado por ``name``. Note que apesar do arquivo retornado ser mesmo
+um objeto ``File``, ele pode na verdade ser alguma subclasse. No caso de ser
+um sistema de armazenamento remoto, isto significa que a leitura/escrita pode
+ser lenta, então fique atento.
+
+``Storage.save(name, content)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Salva um novo arquivo usando o sistema de armazenamento, preferencialmente com o
+nome especificado. Se já existe um arquivo com este nome ``name``, o sistema
+pode modificar o nome para ter um nome único. O nome real do arquivo armazenado
+será retornado.
+
+O argumento ``content`` ponde ser uma instancia de
+:class:`django.core.files.File` ou de uma subclasse de
+:class:`~django.core.files.File`.
+
+``Storage.delete(name)``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Deleta o arquivo referenciado por ``name``. Este método não irá lançar uma
+exceção caso o arquivo não exista.
+

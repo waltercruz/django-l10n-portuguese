@@ -1,0 +1,194 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Distribuições de terceiros do Django &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Meta-documentação e miscelânea" href="index.html" />
+    <link rel="next" title="Glossário" href="../glossary.html" />
+    <link rel="prev" title="Estabilidade de API" href="api-stability.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="api-stability.html" title="Estabilidade de API">previous</a> 
+     |
+    <a href="index.html" title="Meta-documentação e miscelânea" accesskey="U">up</a>
+   |
+    <a href="../glossary.html" title="Glossário">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="misc-distributions">
+            
+  <div class="section" id="s-distribuicoes-de-terceiros-do-django">
+<span id="s-misc-distributions"></span><span id="distribuicoes-de-terceiros-do-django"></span><span id="misc-distributions"></span><h1>Distribuições de terceiros do Django<a class="headerlink" href="#distribuicoes-de-terceiros-do-django" title="Permalink to this headline">¶</a></h1>
+<p>Muitas distribuições de terceiros estão agora disponibilizando versões do Django
+integradas com seus sistemas de gerenciamento de pacotes. Isso pode tornar a
+instalação e atualização muito mais fácil para usuários do Django uma vez que a
+integração inclui a possibilidade de instalação automática de dependências (como
+drivers de bancos de dados) que o Django requer.</p>
+<p>Tipicamente estes pacotes são baseados na última versão estável do Django, então
+se você deseja usar a versão em desenvolvimento do Djanto você necessitará seguir
+as seguintes instruções para <a class="reference internal" href="../topics/install.html#installing-development-version"><em>instalar a versão em desenvolvimento</em></a> do nosso repositório Subversion.</p>
+<p>Se você está usando o GNU/Linux ou uma instalação do Unix, como o OpenSolaris,
+verifique com o seu fornecedor se ele já tem o Django empacotado. Se você está
+usando uma distribuição do GNU/Linux e não sabe como descobrir se um pacote
+está disponível, é uma boa hora pra aprender isso. O Wiki do Django contém uma
+lista de <a class="reference external" href="http://code.djangoproject.com/wiki/Distributions">Distribuições de terceiros</a> para ajudá-lo.</p>
+<div class="section" id="s-para-distribuidores">
+<span id="para-distribuidores"></span><h2>Para distribuidores<a class="headerlink" href="#para-distribuidores" title="Permalink to this headline">¶</a></h2>
+<p>Se você gostaria de empacotar o Django para distribuição, nós ficaremos felizes
+em ajudar. Por favor, participe da <a class="reference external" href="http://groups.google.com/group/django-developers/">lista de discussão django-developers</a> e se
+apresente.</p>
+<p>Nós também incentivamos todos os distribuidores a participar da <cite>lista de
+discussão django-announce</cite>, uma lista com baixíssima atividade para o anúncio
+de novos lançamentos do Django e importantes correções de bugs.</p>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Distribuições de terceiros do Django</a><ul>
+<li><a class="reference internal" href="#para-distribuidores">Para distribuidores</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="api-stability.html">Estabilidade de API</a></li>
+    
+    
+      <li>Next: <a href="../glossary.html">Glossário</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Meta-documentação e miscelânea</a>
+        
+        <ul><li>Distribuições de terceiros do Django</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/misc/distributions.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="api-stability.html" title="Estabilidade de API">previous</a> 
+     |
+    <a href="index.html" title="Meta-documentação e miscelânea" accesskey="U">up</a>
+   |
+    <a href="../glossary.html" title="Glossário">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

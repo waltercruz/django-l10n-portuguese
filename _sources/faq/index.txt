@@ -1,0 +1,32 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done $
+..   $OriginalRevision: 11348 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _faq-index:
+
+=============
+FAQ do Django
+=============
+
+.. toctree::
+   :maxdepth: 2
+   
+   general
+   install
+   usage
+   help
+   models
+   admin
+   contributing

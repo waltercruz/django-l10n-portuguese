@@ -1,0 +1,34 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision. $
+..   $OriginalRevision: 11348 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+Referência do Template
+======================
+
+O motor de template do Django provê uma poderosa mini-linguagem para definir as
+camadas de sua aplicação, encorajando uma separação limpa entre lógica e
+apresentação. Os templates podem ser mantidos por qualquer um que tenha
+conhecimento de HTML; não é necessário saber Python.
+
+.. toctree::
+   :maxdepth: 2
+
+   builtins
+   api
+
+.. seealso::
+
+    Para informações de como criar suas próprias tags e filters, veja
+    :doc:`/howto/custom-template-tags`.
+

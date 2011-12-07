@@ -1,0 +1,1245 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Referência de campos do Model &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Modelos" href="index.html" />
+    <link rel="next" title="Referência de objetos relacionados" href="relations.html" />
+    <link rel="prev" title="Modelos" href="index.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="Modelos">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="relations.html" title="Referência de objetos relacionados">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-models-fields">
+            
+  <div class="section" id="s-module-django.db.models.fields">
+<span id="s-referencia-de-campos-do-model"></span><span id="s-ref-models-fields"></span><span id="module-django.db.models.fields"></span><span id="referencia-de-campos-do-model"></span><span id="ref-models-fields"></span><h1>Referência de campos do Model<a class="headerlink" href="#module-django.db.models.fields" title="Permalink to this headline">¶</a></h1>
+<p>Este documento contém todos os detalhes sobre todas as <a class="reference internal" href="#opcoes-dos-campos">opções dos campos</a> e
+<a class="reference internal" href="#tipos-de-campos">tipos de campos</a> que o Django oferece.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">Se os campos embutidos não atendem a sua necessidade, você pode facilmente
+<a class="reference internal" href="../../howto/custom-model-fields.html#howto-custom-model-fields"><em>escrever seus próprios campos de model</em></a>.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Tecnicamente, estes models são definidos em <a class="reference internal" href="#module-django.db.models.fields" title="django.db.models.fields: Tipos de campos embutidos."><tt class="xref py py-mod docutils literal"><span class="pre">django.db.models.fields</span></tt></a>,
+mas por conveniência eles são importados dentro do <a class="reference internal" href="../../topics/db/models.html#module-django.db.models" title="django.db.models"><tt class="xref py py-mod docutils literal"><span class="pre">django.db.models</span></tt></a>;
+a convenção padrão é usar <tt class="docutils literal"><span class="pre">from</span> <span class="pre">django.db</span> <span class="pre">import</span> <span class="pre">models</span></tt> e referir-se aos
+campos como <tt class="docutils literal"><span class="pre">models.&lt;Foo&gt;Field</span></tt>.</p>
+</div>
+<div class="section" id="s-opcoes-dos-campos">
+<span id="s-common-model-field-options"></span><span id="opcoes-dos-campos"></span><span id="common-model-field-options"></span><h2>Opções dos campos<a class="headerlink" href="#opcoes-dos-campos" title="Permalink to this headline">¶</a></h2>
+<p>O seguintes argumentos estão disponíveis para todos os tipos de campos. Todos
+são opcionais.</p>
+<div class="section" id="s-null">
+<span id="null"></span><h3><tt class="docutils literal"><span class="pre">null</span></tt><a class="headerlink" href="#null" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.null">
+<tt class="descclassname">Field.</tt><tt class="descname">null</tt><a class="headerlink" href="#django.db.models.Field.null" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Se <tt class="xref docutils literal"><span class="pre">True</span></tt>, o Django irá gravar  valores vazios como <tt class="docutils literal"><span class="pre">NULL</span></tt> no banco de dados.
+O padrão é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<p>Repare que strings vazias sempre serão gravadas como strings vazias, não
+como <tt class="docutils literal"><span class="pre">NULL</span></tt>. Use o <tt class="docutils literal"><span class="pre">null=True</span></tt> apenas para campos que não sejam texto, como
+inteiros, booleanos e datas. Para ambos os tipos de campos, você irá precisar
+configurar o <tt class="docutils literal"><span class="pre">blank=True</span></tt> se você quer permitir valores vazios nos formulários,
+como o parâmetro <a class="reference internal" href="#django.db.models.Field.null" title="django.db.models.Field.null"><tt class="xref py py-attr docutils literal"><span class="pre">null</span></tt></a> afeta somente o banco de dados (veja
+<a class="reference internal" href="#django.db.models.Field.blank" title="django.db.models.Field.blank"><tt class="xref py py-attr docutils literal"><span class="pre">blank</span></tt></a>, abaixo).</p>
+<p>Evite o uso de <a class="reference internal" href="#django.db.models.Field.null" title="django.db.models.Field.null"><tt class="xref py py-attr docutils literal"><span class="pre">null</span></tt></a> em campos de texto, como <a class="reference internal" href="#django.db.models.CharField" title="django.db.models.CharField"><tt class="xref py py-class docutils literal"><span class="pre">CharField</span></tt></a> e
+<a class="reference internal" href="#django.db.models.TextField" title="django.db.models.TextField"><tt class="xref py py-class docutils literal"><span class="pre">TextField</span></tt></a> a menos que você tenha uma ótima razão. Se um campo baseado
+em texto tem <tt class="docutils literal"><span class="pre">null=True</span></tt>, isso significa que ele tem dois valores possíveis
+para &#8220;sem dados&#8221;: <tt class="docutils literal"><span class="pre">NULL</span></tt>, e a string vazia. Na maioria dos casos, é redundante
+ter dois valores possíveis para &#8220;sem dados;&#8221; a convenção do Django é usar a
+string vazia, não <tt class="docutils literal"><span class="pre">NULL</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Ao usar o Oracle como backend, a opção <tt class="docutils literal"><span class="pre">null=True</span></tt> será convertida
+para campos de texto que podem ser vazios, e o valor <tt class="docutils literal"><span class="pre">NULL</span></tt> será gravado
+para indicar a string vazia.</p>
+</div>
+</div>
+<div class="section" id="s-blank">
+<span id="blank"></span><h3><tt class="docutils literal"><span class="pre">blank</span></tt><a class="headerlink" href="#blank" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.blank">
+<tt class="descclassname">Field.</tt><tt class="descname">blank</tt><a class="headerlink" href="#django.db.models.Field.blank" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Se <tt class="xref docutils literal"><span class="pre">True</span></tt>, o campo pode ser vazio. o padrão é <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<p>Note que isso é diferente de <a class="reference internal" href="#django.db.models.Field.null" title="django.db.models.Field.null"><tt class="xref py py-attr docutils literal"><span class="pre">null</span></tt></a>. <a class="reference internal" href="#django.db.models.Field.null" title="django.db.models.Field.null"><tt class="xref py py-attr docutils literal"><span class="pre">null</span></tt></a> é
+puramente relacionado ao banco de dados, e <a class="reference internal" href="#django.db.models.Field.blank" title="django.db.models.Field.blank"><tt class="xref py py-attr docutils literal"><span class="pre">blank</span></tt></a> é relacionado
+com validação. Se um campo tem <tt class="docutils literal"><span class="pre">blank=True</span></tt>, a validação na administração do
+Django irá permitir a entrada de um valor vazio. Se um campo tem
+<tt class="docutils literal"><span class="pre">blank=False</span></tt>, o campo será obrigatório.</p>
+</div>
+<div class="section" id="s-choices">
+<span id="choices"></span><h3><tt class="docutils literal"><span class="pre">choices</span></tt><a class="headerlink" href="#choices" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.choices">
+<tt class="descclassname">Field.</tt><tt class="descname">choices</tt><a class="headerlink" href="#django.db.models.Field.choices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um iterável(e.g., uma lista ou tupla) de tupla duplas para usar como escolhas
+para esse campo.</p>
+<p>Se fornecido, a administração do Django irá usar uma caixa de seleção no lugar
+de um campo de texto padrão e irá limitar as escolhas as opções dadas.</p>
+<p>Uma lista de opções parece com isto:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">YEAR_IN_SCHOOL_CHOICES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s">&#39;FR&#39;</span><span class="p">,</span> <span class="s">&#39;Freshman&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;SO&#39;</span><span class="p">,</span> <span class="s">&#39;Sophomore&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;JR&#39;</span><span class="p">,</span> <span class="s">&#39;Junior&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;SR&#39;</span><span class="p">,</span> <span class="s">&#39;Senior&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;GR&#39;</span><span class="p">,</span> <span class="s">&#39;Graduate&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>O primeiro elemeno de cada tupla é o verdadeiro valor a ser gravado. O segundo
+elemento é o nome legível por humanos para essa opção.</p>
+<p>A lista de escolhas pode ser definida como uma parte de sua classe de modelo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">GENDER_CHOICES</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s">&#39;M&#39;</span><span class="p">,</span> <span class="s">&#39;Male&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;Female&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">gender</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">GENDER_CHOICES</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>ou fora da sua classe de modelo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">GENDER_CHOICES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s">&#39;M&#39;</span><span class="p">,</span> <span class="s">&#39;Male&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;Female&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">gender</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">GENDER_CHOICES</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Você pode também coletar suas escolhas disponíveis em grupos nomeados que podem
+ser usados com o proposito de organização:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">MEDIA_CHOICES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s">&#39;Audio&#39;</span><span class="p">,</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s">&#39;vinyl&#39;</span><span class="p">,</span> <span class="s">&#39;Vinyl&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s">&#39;cd&#39;</span><span class="p">,</span> <span class="s">&#39;CD&#39;</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;Video&#39;</span><span class="p">,</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s">&#39;vhs&#39;</span><span class="p">,</span> <span class="s">&#39;VHS Tape&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s">&#39;dvd&#39;</span><span class="p">,</span> <span class="s">&#39;DVD&#39;</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;unknown&#39;</span><span class="p">,</span> <span class="s">&#39;Unknown&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>O primeiro elemento em cada tupla é o nome a ser aplicado no grupo. O segundo
+elemento é um iterável de tuplas duplas, com cada tupla dupla contendo um valor
+e um nome, legível para humanos, para uma opção. Opções agrupadas podem ser
+combinadas com opções não agrupadas em uma única lista (como a opção <cite>unknown</cite>
+deste exemplo).</p>
+<p>Para cada campo de modelo que tem o <a class="reference internal" href="#django.db.models.Field.choices" title="django.db.models.Field.choices"><tt class="xref py py-attr docutils literal"><span class="pre">choices</span></tt></a> configurado, o Django
+adicionará um método para obter o valor legível para o valor atual do campo.
+Veja <a class="reference internal" href="instances.html#django.db.models.Model.get_FOO_display" title="django.db.models.Model.get_FOO_display"><tt class="xref py py-meth docutils literal"><span class="pre">get_FOO_display()</span></tt></a> na documentação da API de
+banco de dados.</p>
+<p>Finalmente, veja que as opções podem ser qualquer objeto iterável -- não
+necessariamente uma lista ou tupla. Isso permite qu evocê construa suas opções
+dinamicamente. Mas se você se pegar hackeando o <a class="reference internal" href="#django.db.models.Field.choices" title="django.db.models.Field.choices"><tt class="xref py py-attr docutils literal"><span class="pre">choices</span></tt></a> para ser
+dinâmico, você provavelmente deveria estar usando uma tabela do banco de dados
+com uma <a class="reference internal" href="#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><tt class="xref py py-class docutils literal"><span class="pre">ForeignKey</span></tt></a>. <a class="reference internal" href="#django.db.models.Field.choices" title="django.db.models.Field.choices"><tt class="xref py py-attr docutils literal"><span class="pre">choices</span></tt></a> deve ser usados para dados
+que não mudem muito, ou que não mudem nunca.</p>
+</div>
+<div class="section" id="s-db-column">
+<span id="db-column"></span><h3><tt class="docutils literal"><span class="pre">db_column</span></tt><a class="headerlink" href="#db-column" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.db_column">
+<tt class="descclassname">Field.</tt><tt class="descname">db_column</tt><a class="headerlink" href="#django.db.models.Field.db_column" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O nome da coluna do banco de dados a ser usada com esse campo. Se não for
+informada, o Django irá usar o nome do campo.</p>
+<p>Se o nome da sua coluna no banco de dados é uma palavra chave SQL reservada, ou
+contém caracteres que não são permitidos em nomes de variáveis no Python --
+notadamente, o hífen tudo bem. O Django escapa os nomes de colunas e tabelas por
+trás dos panos.</p>
+</div>
+<div class="section" id="s-db-index">
+<span id="db-index"></span><h3><tt class="docutils literal"><span class="pre">db_index</span></tt><a class="headerlink" href="#db-index" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.db_index">
+<tt class="descclassname">Field.</tt><tt class="descname">db_index</tt><a class="headerlink" href="#django.db.models.Field.db_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Se``True``, djadmin:<cite>django-admin.py sqlindexes &lt;sqlindexes&gt;</cite> irá gerar uma
+declaração <tt class="docutils literal"><span class="pre">CREATE</span> <span class="pre">INDEX</span></tt> para esse campo.</p>
+</div>
+<div class="section" id="s-db-tablespace">
+<span id="db-tablespace"></span><h3><tt class="docutils literal"><span class="pre">db_tablespace</span></tt><a class="headerlink" href="#db-tablespace" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.db_tablespace">
+<tt class="descclassname">Field.</tt><tt class="descname">db_tablespace</tt><a class="headerlink" href="#django.db.models.Field.db_tablespace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>O nome do tablespace no banco de dados a ser usado para esse o índice desse
+campo, se esse campo é indexado. O padrão é a configuração
+<a class="reference internal" href="../settings.html#std:setting-DEFAULT_INDEX_TABLESPACE"><tt class="xref std std-setting docutils literal"><span class="pre">DEFAULT_INDEX_TABLESPACE</span></tt></a>  do projeto, se configurado, ou o
+<a class="reference internal" href="#django.db.models.Field.db_tablespace" title="django.db.models.Field.db_tablespace"><tt class="xref py py-attr docutils literal"><span class="pre">db_tablespace</span></tt></a> do modelo, se houver. Se o backend não suporta
+tablespaces, essa opção é ignorada.</p>
+</div>
+<div class="section" id="s-default">
+<span id="default"></span><h3><tt class="docutils literal"><span class="pre">default</span></tt><a class="headerlink" href="#default" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.default">
+<tt class="descclassname">Field.</tt><tt class="descname">default</tt><a class="headerlink" href="#django.db.models.Field.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>O valor padrão para o campo. Pode ser também um objeto chamável. Se
+for um chamável, será chamado a cada vez que um novo objeto for criado.</p>
+</div>
+<div class="section" id="s-editable">
+<span id="editable"></span><h3><tt class="docutils literal"><span class="pre">editable</span></tt><a class="headerlink" href="#editable" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.editable">
+<tt class="descclassname">Field.</tt><tt class="descname">editable</tt><a class="headerlink" href="#django.db.models.Field.editable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Se <tt class="xref docutils literal"><span class="pre">False</span></tt>, o campo não será editável na administração ou por formulários
+gerados automaticamente a partir de models. O padrão é <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+</div>
+<div class="section" id="s-help-text">
+<span id="help-text"></span><h3><tt class="docutils literal"><span class="pre">help_text</span></tt><a class="headerlink" href="#help-text" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.help_text">
+<tt class="descclassname">Field.</tt><tt class="descname">help_text</tt><a class="headerlink" href="#django.db.models.Field.help_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>&quot;Ajuda&quot; extra a ser exibida subre o campo na administração de formulários
+do objeto. É útil para documentação, mesmo que seu objeto não tenha um
+formulário administrativo.</p>
+<p>Note que esse valor <em>não</em> é escapado pelo processamento de HTML ao ser exibido
+na interface administrativa. Isso permite que você inclua HTML  no
+<a class="reference internal" href="#django.db.models.Field.help_text" title="django.db.models.Field.help_text"><tt class="xref py py-attr docutils literal"><span class="pre">help_text</span></tt></a> se você desejar. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">help_text</span><span class="o">=</span><span class="s">&quot;Por favor use o seguinte formato: &lt;em&gt;DD/MM/YYYY&lt;/em&gt;.&quot;</span>
+</pre></div>
+</div>
+<p>Como alternativa você pode utilizar texto plano e
+<tt class="docutils literal"><span class="pre">django.utils.html.escape()</span></tt> para escapar quaisquer caracter especial do HTML.</p>
+</div>
+<div class="section" id="s-primary-key">
+<span id="primary-key"></span><h3><tt class="docutils literal"><span class="pre">primary_key</span></tt><a class="headerlink" href="#primary-key" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.primary_key">
+<tt class="descclassname">Field.</tt><tt class="descname">primary_key</tt><a class="headerlink" href="#django.db.models.Field.primary_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Se <tt class="xref docutils literal"><span class="pre">True</span></tt>, esse campo será a chave primária para o modelo.</p>
+<p>Se você não especificar <tt class="docutils literal"><span class="pre">primary_key=True</span></tt> para nenhum campo no seu modelo, o
+Django irá adicionar automaticamente um <a class="reference internal" href="#django.db.models.IntegerField" title="django.db.models.IntegerField"><tt class="xref py py-class docutils literal"><span class="pre">IntegerField</span></tt></a> para ser a chave
+primária, então você não precisa setar <tt class="docutils literal"><span class="pre">primary_key=True</span></tt> sobre algum de seus
+campos, a menos que você queira sobrescrever o comportamento de chave primária
+padrão. Para mais, veja <a class="reference internal" href="../../topics/db/models.html#automatic-primary-key-fields"><em>Campos de chave primária automáticos</em></a>.</p>
+<p><tt class="docutils literal"><span class="pre">primary_key=True</span></tt> implica em <a class="reference internal" href="#django.db.models.Field.blank" title="django.db.models.Field.blank"><tt class="xref py py-attr docutils literal"><span class="pre">blank=False</span></tt></a>,
+<tt class="xref py py-attr docutils literal"><span class="pre">null=False</span> <span class="pre">&lt;Field.null&gt;`</span></tt> e <a class="reference internal" href="#django.db.models.Field.unique" title="django.db.models.Field.unique"><tt class="xref py py-attr docutils literal"><span class="pre">unique=True</span></tt></a>. Somente
+uma chave primária é permitida por objeto.</p>
+</div>
+<div class="section" id="s-unique">
+<span id="unique"></span><h3><tt class="docutils literal"><span class="pre">unique</span></tt><a class="headerlink" href="#unique" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.unique">
+<tt class="descclassname">Field.</tt><tt class="descname">unique</tt><a class="headerlink" href="#django.db.models.Field.unique" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Se <tt class="xref docutils literal"><span class="pre">True</span></tt>, esse campo deve ser único na tabela.</p>
+<p>Isso é garantido no banco de dedos e no formulário de administração do Django. Se
+você tentar salvar um modelo com um valor duplicado em um campo
+<a class="reference internal" href="#django.db.models.Field.unique" title="django.db.models.Field.unique"><tt class="xref py py-attr docutils literal"><span class="pre">unique</span></tt></a>, uma exceção <tt class="xref py py-exc docutils literal"><span class="pre">django.db.IntegrityError</span></tt> será lançada
+pelo método <a class="reference internal" href="instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><tt class="xref py py-meth docutils literal"><span class="pre">save()</span></tt></a> do modelo.</p>
+<p>Esta opção é válida para todos os tipos de campos exceto :class:ManyToManyField`
+e <a class="reference internal" href="#django.db.models.FileField" title="django.db.models.FileField"><tt class="xref py py-class docutils literal"><span class="pre">FileField</span></tt></a>.</p>
+</div>
+<div class="section" id="s-unique-for-date">
+<span id="unique-for-date"></span><h3><tt class="docutils literal"><span class="pre">unique_for_date</span></tt><a class="headerlink" href="#unique-for-date" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.unique_for_date">
+<tt class="descclassname">Field.</tt><tt class="descname">unique_for_date</tt><a class="headerlink" href="#django.db.models.Field.unique_for_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Configure isso para o nome de um campo <a class="reference internal" href="#django.db.models.DateField" title="django.db.models.DateField"><tt class="xref py py-class docutils literal"><span class="pre">DateField</span></tt></a> ou
+<a class="reference internal" href="#django.db.models.DateTimeField" title="django.db.models.DateTimeField"><tt class="xref py py-class docutils literal"><span class="pre">DateTimeField</span></tt></a> para exigir que esse campo seja único para o valor da data.</p>
+<p>Por exemplo, se você tem um campo <tt class="docutils literal"><span class="pre">title</span></tt> que tem
+<tt class="docutils literal"><span class="pre">unique_for_date=&quot;pub_date&quot;</span></tt>, o Django não irá permitir a criação
+de dois registros com o mesmo <tt class="docutils literal"><span class="pre">title</span></tt> e <tt class="docutils literal"><span class="pre">pub_date</span></tt>.</p>
+<p>Isso é reforçado no nível do formulário de administração do Django, mas não no
+banco de dados.</p>
+</div>
+<div class="section" id="s-unique-for-month">
+<span id="unique-for-month"></span><h3><tt class="docutils literal"><span class="pre">unique_for_month</span></tt><a class="headerlink" href="#unique-for-month" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.unique_for_month">
+<tt class="descclassname">Field.</tt><tt class="descname">unique_for_month</tt><a class="headerlink" href="#django.db.models.Field.unique_for_month" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Semelhante ao <a class="reference internal" href="#django.db.models.Field.unique_for_date" title="django.db.models.Field.unique_for_date"><tt class="xref py py-attr docutils literal"><span class="pre">unique_for_date</span></tt></a>, mas requer que o campo seja único
+com respeito ao mês.</p>
+</div>
+<div class="section" id="s-unique-for-year">
+<span id="unique-for-year"></span><h3><tt class="docutils literal"><span class="pre">unique_for_year</span></tt><a class="headerlink" href="#unique-for-year" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.unique_for_year">
+<tt class="descclassname">Field.</tt><tt class="descname">unique_for_year</tt><a class="headerlink" href="#django.db.models.Field.unique_for_year" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Semelhante a <a class="reference internal" href="#django.db.models.Field.unique_for_date" title="django.db.models.Field.unique_for_date"><tt class="xref py py-attr docutils literal"><span class="pre">unique_for_date</span></tt></a> e <a class="reference internal" href="#django.db.models.Field.unique_for_month" title="django.db.models.Field.unique_for_month"><tt class="xref py py-attr docutils literal"><span class="pre">unique_for_month</span></tt></a>.</p>
+</div>
+<div class="section" id="s-verbose-name">
+<span id="verbose-name"></span><h3><tt class="docutils literal"><span class="pre">verbose_name</span></tt><a class="headerlink" href="#verbose-name" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="django.db.models.Field.verbose_name">
+<tt class="descclassname">Field.</tt><tt class="descname">verbose_name</tt><a class="headerlink" href="#django.db.models.Field.verbose_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um nome, legível para humanos, para o campo. Se o nome prolíxo não for dado, o
+Django criará um automaticamente, usando o nome do campo, convertendo os
+underscores em espaços. Veja
+<a class="reference internal" href="../../topics/db/models.html#verbose-field-names"><em>Nomes de campos  por extenso</em></a>.</p>
+</div>
+</div>
+<div class="section" id="s-tipos-de-campos">
+<span id="s-model-field-types"></span><span id="tipos-de-campos"></span><span id="model-field-types"></span><h2>Tipos de campos<a class="headerlink" href="#tipos-de-campos" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-autofield">
+<span id="autofield"></span><h3><tt class="docutils literal"><span class="pre">AutoField</span></tt><a class="headerlink" href="#autofield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.AutoField">
+<em class="property">class </em><tt class="descname">AutoField</tt>(<em>**options</em>)<a class="headerlink" href="#django.db.models.AutoField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um <a class="reference internal" href="#django.db.models.IntegerField" title="django.db.models.IntegerField"><tt class="xref py py-class docutils literal"><span class="pre">IntegerField</span></tt></a> que incrementa seu valor automaticamente de acordo com os
+IDs disponíveis. Você normalmente não precisa usá-lo diretamente; um campo de
+chave primária será automaticamente adicionado ao seu modelo se você não
+especificar um. Veja <a class="reference internal" href="../../topics/db/models.html#automatic-primary-key-fields"><em>Campos de chave primária automáticos</em></a>.</p>
+</div>
+<div class="section" id="s-booleanfield">
+<span id="booleanfield"></span><h3><tt class="docutils literal"><span class="pre">BooleanField</span></tt><a class="headerlink" href="#booleanfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.BooleanField">
+<em class="property">class </em><tt class="descname">BooleanField</tt>(<em>**options</em>)<a class="headerlink" href="#django.db.models.BooleanField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um campo Verdadeiro/Falso.</p>
+<p>O site administrativo representa-o como uma checkbox.</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 1.2:</span> <a class="reference internal" href="../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+</div>
+<div class="section" id="s-charfield">
+<span id="charfield"></span><h3><tt class="docutils literal"><span class="pre">CharField</span></tt><a class="headerlink" href="#charfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.CharField">
+<em class="property">class </em><tt class="descname">CharField</tt>(<em>max_length=None</em><span class="optional">[</span>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.CharField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um campo string, para campos texto de tamanhos pequeno e médio.</p>
+<p>Para grandes quantidades de texto, use <a class="reference internal" href="#django.db.models.TextField" title="django.db.models.TextField"><tt class="xref py py-class docutils literal"><span class="pre">django.db.models.TextField</span></tt></a>.</p>
+<p>A administração representa-o como um <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;text&quot;&gt;</span></tt> (um input de uma
+única linha).</p>
+<p><a class="reference internal" href="#django.db.models.CharField" title="django.db.models.CharField"><tt class="xref py py-class docutils literal"><span class="pre">CharField</span></tt></a> tem um argumento extra obrigatório:</p>
+<dl class="attribute">
+<dt id="django.db.models.CharField.max_length">
+<tt class="descclassname">CharField.</tt><tt class="descname">max_length</tt><a class="headerlink" href="#django.db.models.CharField.max_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>O tamanho máximo (em caracteres) do campo. O <tt class="docutils literal"><span class="pre">max_length</span></tt> é verificado a
+nível de banco de dados e na validação do Django.</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Se você estiver escrevendo uma aplicação que deve ser portável para vários
+backends de banco de dados, você deve estar alerta, pois há restrições para
+o <tt class="docutils literal"><span class="pre">max_length</span></tt> em alguns backends. Leia as <a class="reference internal" href="../databases.html"><em>notas sobre backend de
+bancos de dados</em></a>.</p>
+</div>
+<div class="admonition-mysql-users admonition ">
+<p class="first admonition-title">MySQL users</p>
+<p class="last">Se você estiver usando este campo com MySQLdb 1.2.2 e a colação <tt class="docutils literal"><span class="pre">utf8_bin</span></tt>
+(que <em>não</em> é a padrão), há alguns problemas que deve ter em mente. Leia as
+<a class="reference internal" href="../databases.html#mysql-collation"><em>notas do banco de dados MySQL</em></a> para detalhes.</p>
+</div>
+</div>
+<div class="section" id="s-commaseparatedintegerfield">
+<span id="commaseparatedintegerfield"></span><h3><tt class="docutils literal"><span class="pre">CommaSeparatedIntegerField</span></tt><a class="headerlink" href="#commaseparatedintegerfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.CommaSeparatedIntegerField">
+<em class="property">class </em><tt class="descname">CommaSeparatedIntegerField</tt>(<em>max_length=None</em><span class="optional">[</span>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.CommaSeparatedIntegerField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um campo de inteiros separados por vírgulas. Como no :class`CharField`, o
+argumento <a class="reference internal" href="#django.db.models.CharField.max_length" title="django.db.models.CharField.max_length"><tt class="xref py py-attr docutils literal"><span class="pre">max_length</span></tt></a> é obrigatório e atente para as
+portabilidades mencionadas.</p>
+</div>
+<div class="section" id="s-datefield">
+<span id="datefield"></span><h3><tt class="docutils literal"><span class="pre">DateField</span></tt><a class="headerlink" href="#datefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.DateField">
+<em class="property">class </em><tt class="descname">DateField</tt>(<span class="optional">[</span><em>auto_now=False</em>, <em>auto_now_add=False</em>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.DateField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Uma data, representada por uma instância <tt class="docutils literal"><span class="pre">datetime.date</span></tt> do Python. Tem alguns
+poucos argumentos extra, opcionais:</p>
+<dl class="attribute">
+<dt id="django.db.models.DateField.auto_now">
+<tt class="descclassname">DateField.</tt><tt class="descname">auto_now</tt><a class="headerlink" href="#django.db.models.DateField.auto_now" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configura o campo automaticamente para a hora em que o objeto é salvo. Útil
+para campos de hora da &quot;última modificação&quot;. Note que <em>sempre</em> é usada a
+data atual, não é apenas um valor padrão que você pode sobrescrever.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.db.models.DateField.auto_now_add">
+<tt class="descclassname">DateField.</tt><tt class="descname">auto_now_add</tt><a class="headerlink" href="#django.db.models.DateField.auto_now_add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configura automaticamente o campo para a data em que ele foi primeiramente
+criado. Útil para a criação de carimbos de data. Note que <em>sempre</em> é usada a
+data atual, não é apenas um valir padrão que você pode sobrescrever.</p>
+</dd></dl>
+
+<p>A administração representa isso como um <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;text&quot;&gt;</span></tt> com um
+calendário JavaScript, e um atalho para &quot;Hoje.&quot;  O calendário JavaScript sempre
+irá iniciar a semana no Domingo.</p>
+</div>
+<div class="section" id="s-datetimefield">
+<span id="datetimefield"></span><h3><tt class="docutils literal"><span class="pre">DateTimeField</span></tt><a class="headerlink" href="#datetimefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.DateTimeField">
+<em class="property">class </em><tt class="descname">DateTimeField</tt>(<span class="optional">[</span><em>auto_now=False</em>, <em>auto_now_add=False</em>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.DateTimeField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>A date and time, represented in Python by a <tt class="docutils literal"><span class="pre">datetime.datetime</span></tt> instance.
+Um campo de data e hora. Tem as mesmas opções extras de <a class="reference internal" href="#django.db.models.DateField" title="django.db.models.DateField"><tt class="xref py py-class docutils literal"><span class="pre">DateField</span></tt></a>.</p>
+<p>A administração representa esse campo como dois campos <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;text&quot;&gt;</span></tt>,
+com atalhos JavaScript.</p>
+</div>
+<div class="section" id="s-decimalfield">
+<span id="decimalfield"></span><h3><tt class="docutils literal"><span class="pre">DecimalField</span></tt><a class="headerlink" href="#decimalfield" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<dl class="class">
+<dt id="django.db.models.DecimalField">
+<em class="property">class </em><tt class="descname">DecimalField</tt>(<em>max_digits=None</em>, <em>decimal_places=None</em><span class="optional">[</span>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.DecimalField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um número decimal de precisão fixa, representado no Python por uma instância de
+<tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt>. Possui dois argumentos <strong>obrigatórios</strong>:</p>
+<dl class="attribute">
+<dt id="django.db.models.DecimalField.max_digits">
+<tt class="descclassname">DecimalField.</tt><tt class="descname">max_digits</tt><a class="headerlink" href="#django.db.models.DecimalField.max_digits" title="Permalink to this definition">¶</a></dt>
+<dd><p>O número máximo de dígitos permitidos no número.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.db.models.DecimalField.decimal_places">
+<tt class="descclassname">DecimalField.</tt><tt class="descname">decimal_places</tt><a class="headerlink" href="#django.db.models.DecimalField.decimal_places" title="Permalink to this definition">¶</a></dt>
+<dd><p>O número de casas decimais para salvar com o número.</p>
+</dd></dl>
+
+<p>Por exemplo, para gravar números até 999 com uma precisão de 2 casas decimais,
+você deve usar:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">models</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">max_digits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>E para guardar números de até aproximadamente um bilhão, com uma precisão de 10
+casas decimais:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">models</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">max_digits</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A administração representa isso como um <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;text&quot;&gt;</span></tt> (um input de uma
+única linha).</p>
+</div>
+<div class="section" id="s-emailfield">
+<span id="emailfield"></span><h3><tt class="docutils literal"><span class="pre">EmailField</span></tt><a class="headerlink" href="#emailfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.EmailField">
+<em class="property">class </em><tt class="descname">EmailField</tt>(<span class="optional">[</span><em>max_length=75</em>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.EmailField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um <a class="reference internal" href="#django.db.models.CharField" title="django.db.models.CharField"><tt class="xref py py-class docutils literal"><span class="pre">CharField</span></tt></a> que verifica se o valor é um e-mail válido.</p>
+</div>
+<div class="section" id="s-filefield">
+<span id="filefield"></span><h3><tt class="docutils literal"><span class="pre">FileField</span></tt><a class="headerlink" href="#filefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.FileField">
+<em class="property">class </em><tt class="descname">FileField</tt>(<em>upload_to=None</em><span class="optional">[</span>, <em>max_length=100</em>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.FileField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um campo para upload de arquivo. Possui um argumento <strong>obrigatório</strong></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">O argumentos <tt class="docutils literal"><span class="pre">primary_key</span></tt> e <tt class="docutils literal"><span class="pre">unique</span></tt> não são suportados, e lançarão um
+<tt class="docutils literal"><span class="pre">TypeError</span></tt> se usados.</p>
+</div>
+<p>Has one <strong>required</strong> argument:</p>
+<dl class="attribute">
+<dt id="django.db.models.FileField.upload_to">
+<tt class="descclassname">FileField.</tt><tt class="descname">upload_to</tt><a class="headerlink" href="#django.db.models.FileField.upload_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um caminho no seu sistema de arquivos local que será adicionado a sua
+configuração <a class="reference internal" href="../settings.html#std:setting-MEDIA_ROOT"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_ROOT</span></tt></a> para determinar o valor do atributo
+<a class="reference internal" href="../files/file.html#django.core.files.File.url" title="django.core.files.File.url"><tt class="xref py py-attr docutils literal"><span class="pre">url</span></tt></a>.</p>
+<p>Esse caminho pode conter <a class="reference external" href="http://docs.python.org/lib/module-time.html#l2h-1941">formatação strftime</a>, que será substituído pela
+data/hora do upload do arquivo (para que os arquivos enviados não encham
+o diretório fornecido).</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Este pode também ser um chamável, como uma função, que será chamada para
+obter o caminho do upload, incluíndo o nome do arquivo. Este chamável deve
+ser preparado para receber dois argumentos, e retornar um caminho no estilo
+Unix (com barras) para serem passados ao longo do sistema de armazenamento.
+Os dois argumentos que serão passados são:</p>
+<table class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Argumento</th>
+<th class="head">Descrição</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">instance</span></tt></td>
+<td><p class="first">Uma instância do model onde o <tt class="docutils literal"><span class="pre">FileField</span></tt> é
+definido. Mais especificamente, esta é a
+instância particular onde o arquivo atual está
+atachado.</p>
+<p class="last">Na maioria dos casos, este objeto não terá sido
+salvo no banco de dados ainda, então se ele usa
+o padrão <tt class="docutils literal"><span class="pre">AutoField</span></tt>, <em>ele pode não ter ainda
+um valor para seu campo de chave primária</em>.</p>
+</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">filename</span></tt></td>
+<td>O nome que foi originalmente dado para o
+arquivo. Este pode ou não pode ser levado em
+conta durante a definição do caminho de destino
+final.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p>Também há um argumento opcional:</p>
+<dl class="attribute">
+<dt id="django.db.models.FileField.storage">
+<tt class="descclassname">FileField.</tt><tt class="descname">storage</tt><a class="headerlink" href="#django.db.models.FileField.storage" title="Permalink to this definition">¶</a></dt>
+<dd><div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Opcional. Um objeto storage, que manipula o armazenamento e recebimento de
+seus arquivos. Veja <a class="reference internal" href="../../topics/files.html"><em>Gerenciando arquivos</em></a> para mais detalhes de como prover
+este objeto.</p>
+</dd></dl>
+
+<p>A administração representa esse campo como um <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;file&quot;&gt;</span></tt> (um widget de
+upload de arquivo).</p>
+<p>O uso de um <a class="reference internal" href="#django.db.models.FileField" title="django.db.models.FileField"><tt class="xref py py-class docutils literal"><span class="pre">FileField</span></tt></a> ou um <a class="reference internal" href="#django.db.models.ImageField" title="django.db.models.ImageField"><tt class="xref py py-class docutils literal"><span class="pre">ImageField</span></tt></a> (veja abaixo) em um
+modelo requer alguns passos adicionais:</p>
+<ol class="arabic simple">
+<li>No seu arquivo de configurações, você precisa definir
+<a class="reference internal" href="../settings.html#std:setting-MEDIA_ROOT"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_ROOT</span></tt></a> como o caminho completo para o diretório onde você
+gostaria que o Django guardasse os arquivos enviados. (Por questões de
+performance, esses arquivos não são guardados no banco de dados). Defina
+o  <a class="reference internal" href="../settings.html#std:setting-MEDIA_URL"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_URL</span></tt></a> como a URL pública desse diretório. Assegure-se
+de que esse diretório tenha permissão de escrita pela conta do usuário
+que executa o servidor web.</li>
+<li>Adiciona o <a class="reference internal" href="#django.db.models.FileField" title="django.db.models.FileField"><tt class="xref py py-class docutils literal"><span class="pre">FileField</span></tt></a> ou <a class="reference internal" href="#django.db.models.ImageField" title="django.db.models.ImageField"><tt class="xref py py-class docutils literal"><span class="pre">ImageField</span></tt></a> ao seu modelo,
+definindo a opção <a class="reference internal" href="#django.db.models.FileField.upload_to" title="django.db.models.FileField.upload_to"><tt class="xref py py-attr docutils literal"><span class="pre">upload_to</span></tt></a> para dizer ao Django para
+qual subdiretório do <a class="reference internal" href="../settings.html#std:setting-MEDIA_ROOT"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_ROOT</span></tt></a> ele deve enviar os arquivos.</li>
+<li>Tudo o que será gravado no seu banco de dados é o caminho para o arquivo
+(relativo ao <a class="reference internal" href="../settings.html#std:setting-MEDIA_ROOT"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_ROOT</span></tt></a>). Você muito provavalmente usará a
+função <a class="reference internal" href="../files/file.html#django.core.files.File.url" title="django.core.files.File.url"><tt class="xref py py-attr docutils literal"><span class="pre">url</span></tt></a> fornecida pelo Django. Por
+exemplo, se seu <a class="reference internal" href="#django.db.models.ImageField" title="django.db.models.ImageField"><tt class="xref py py-class docutils literal"><span class="pre">ImageField</span></tt></a> é chamado de <tt class="docutils literal"><span class="pre">mug_shot</span></tt>, você pode
+obter a URL absoluta para sua imagem em um template com
+<tt class="docutils literal"><span class="pre">{{</span> <span class="pre">object.get_mug_shot.url</span> <span class="pre">}}</span></tt>.</li>
+</ol>
+<p>Por exemplo, digamos que o seu <a class="reference internal" href="../settings.html#std:setting-MEDIA_ROOT"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_ROOT</span></tt></a> esteja configurado para
+<tt class="docutils literal"><span class="pre">'/home/media'</span></tt>, e o <a class="reference internal" href="#django.db.models.FileField.upload_to" title="django.db.models.FileField.upload_to"><tt class="xref py py-attr docutils literal"><span class="pre">upload_to</span></tt></a> está configurado para
+<tt class="docutils literal"><span class="pre">'photos/%Y/%m/%d'</span></tt>. A parte <tt class="docutils literal"><span class="pre">'%Y/%m/%d'</span></tt> do <a class="reference internal" href="#django.db.models.FileField.upload_to" title="django.db.models.FileField.upload_to"><tt class="xref py py-attr docutils literal"><span class="pre">upload_to</span></tt></a> é
+a <a class="reference external" href="http://docs.python.org/lib/module-time.html#l2h-1941">formatação strftime</a>; <tt class="docutils literal"><span class="pre">'%Y'</span></tt> é o ano com quatro digítos,
+<tt class="docutils literal"><span class="pre">'%m'</span></tt> é o mês com dois dígitos e <tt class="docutils literal"><span class="pre">'%d'</span></tt> é o dia com dois dígitos. Se você
+enviar um arquivo em 15 de janeiro de 2007, ele será salvo no diretório
+<tt class="docutils literal"><span class="pre">/home/media/photos/2007/01/15</span></tt>.</p>
+<p>Se você quer obter o nome do arquivo no disco, ou a URL que se refere àquele
+arquivo, ou o tamanho do arquivo, você pode usar os métodos
+<a class="reference internal" href="../files/file.html#django.core.files.File.name" title="django.core.files.File.name"><tt class="xref py py-attr docutils literal"><span class="pre">name</span></tt></a>, <a class="reference internal" href="../files/file.html#django.core.files.File.url" title="django.core.files.File.url"><tt class="xref py py-attr docutils literal"><span class="pre">url</span></tt></a> e <a class="reference internal" href="../files/file.html#django.core.files.File.size" title="django.core.files.File.size"><tt class="xref py py-attr docutils literal"><span class="pre">size</span></tt></a>. Veja <a class="reference internal" href="../../topics/files.html"><em>Gerenciando arquivos</em></a>.</p>
+<p>Observe que independente da forma que você lida com arquivos enviados, você deve
+prestar muita atennção para onde você os está enviado e para quais tipos eles
+são, para evitar furos de segurança. <em>Valide todos os arquivos enviados</em> para
+assegurar-se que eles são o que você pensa que eles são. Por exemplo, se você
+permite que alguém envie arquivos sem validação, para um diretório que esteja
+dentro do document root do seu servidor web, então alguém poderia enviar um
+script CGI ou PHP e executar esse script visitando essa URL em seu site URL. Não
+permita isso.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> O argumento <tt class="docutils literal"><span class="pre">max_length</span></tt> foi adicionado nesta versão.</div>
+<p>Por padrão, instâncias de <a class="reference internal" href="#django.db.models.FileField" title="django.db.models.FileField"><tt class="xref py py-class docutils literal"><span class="pre">FileField</span></tt></a> são criadas como colunas
+<tt class="docutils literal"><span class="pre">varchar(100)</span></tt> no seu banco de dados. Assim como nos outros campos, você
+pode mudar o tamanho máximo usando o argumento <a class="reference internal" href="#django.db.models.CharField.max_length" title="django.db.models.CharField.max_length"><tt class="xref py py-attr docutils literal"><span class="pre">max_length</span></tt></a>.</p>
+</div>
+<div class="section" id="s-filepathfield">
+<span id="filepathfield"></span><h3><tt class="docutils literal"><span class="pre">FilePathField</span></tt><a class="headerlink" href="#filepathfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.FilePathField">
+<em class="property">class </em><tt class="descname">FilePathField</tt>(<em>path=None</em><span class="optional">[</span>, <em>match=None</em>, <em>recursive=False</em>, <em>max_length=100</em>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.FilePathField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um campo <a class="reference internal" href="#django.db.models.CharField" title="django.db.models.CharField"><tt class="xref py py-class docutils literal"><span class="pre">CharField</span></tt></a> cujas escolhas são limitadas a nomes de arquivos em
+um certo diretório no sistema de arquivos. Tem três argumentos especiais, sendo
+o primeiro <strong>obrigatório</strong>:</p>
+<dl class="attribute">
+<dt id="django.db.models.FilePathField.path">
+<tt class="descclassname">FilePathField.</tt><tt class="descname">path</tt><a class="headerlink" href="#django.db.models.FilePathField.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obrigatório. O caminho absoluto para um diretório no sistema de arquivos a
+partir de onde o <a class="reference internal" href="#django.db.models.FilePathField" title="django.db.models.FilePathField"><tt class="xref py py-class docutils literal"><span class="pre">FilePathField</span></tt></a> deve obter suas opções. Exemplo:
+<tt class="docutils literal"><span class="pre">&quot;/home/images&quot;</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.db.models.FilePathField.match">
+<tt class="descclassname">FilePathField.</tt><tt class="descname">match</tt><a class="headerlink" href="#django.db.models.FilePathField.match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opcional. Uma expressão regular, como uma string, que o
+<a class="reference internal" href="#django.db.models.FilePathField" title="django.db.models.FilePathField"><tt class="xref py py-class docutils literal"><span class="pre">FilePathField</span></tt></a> usará para filtrar os nomes dos arquivos. Perceba que
+a regex será aplicada apenas ao nome do aruqivo, não ao caminho completo.
+Exemplo: <tt class="docutils literal"><span class="pre">&quot;foo.*\.txt$&quot;</span></tt>, que irá casar um arquivo chamado <tt class="docutils literal"><span class="pre">foo23.txt</span></tt>
+mas não <tt class="docutils literal"><span class="pre">bar.txt</span></tt> ou <tt class="docutils literal"><span class="pre">foo23.gif</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.db.models.FilePathField.recursive">
+<tt class="descclassname">FilePathField.</tt><tt class="descname">recursive</tt><a class="headerlink" href="#django.db.models.FilePathField.recursive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opcional. <tt class="xref docutils literal"><span class="pre">True</span></tt> ou``False``. O padrão é <tt class="xref docutils literal"><span class="pre">False</span></tt>. Especifica se todos os
+subdiretórios do <a class="reference internal" href="#django.db.models.FilePathField.path" title="django.db.models.FilePathField.path"><tt class="xref py py-attr docutils literal"><span class="pre">path</span></tt></a> devem ser incluídos.</p>
+</dd></dl>
+
+<p>E é claro que todos esses argumentos podem ser usados juntos.</p>
+<p>A única pegadinha em potencial é que o <a class="reference internal" href="#django.db.models.FilePathField.match" title="django.db.models.FilePathField.match"><tt class="xref py py-attr docutils literal"><span class="pre">match</span></tt></a> aplica-se ao
+nome básico do arquivo, não ao caminho completo. Assim, esse exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">FilePathField</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s">&quot;/home/images&quot;</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s">&quot;foo.*&quot;</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>...irá casar <tt class="docutils literal"><span class="pre">/home/images/foo.gif</span></tt> mas não <tt class="docutils literal"><span class="pre">/home/images/foo/bar.gif</span></tt>
+porque o argumento <a class="reference internal" href="#django.db.models.FilePathField.match" title="django.db.models.FilePathField.match"><tt class="xref py py-attr docutils literal"><span class="pre">match</span></tt></a> aplicase aos nomes básicos dos
+arquivos (<tt class="docutils literal"><span class="pre">foo.gif</span></tt> e <tt class="docutils literal"><span class="pre">bar.gif</span></tt>).</p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> O argumento <tt class="docutils literal"><span class="pre">max_length</span></tt> foi adicionado nesta versão.</div>
+<p>Por padrão, instâncias de <a class="reference internal" href="#django.db.models.FilePathField" title="django.db.models.FilePathField"><tt class="xref py py-class docutils literal"><span class="pre">FilePathField</span></tt></a> são criadas como colunas
+<tt class="docutils literal"><span class="pre">varchar(100)</span></tt> no seu banco de dados. Assim como nos outros campos, você pode
+mudar o tamanho máximo usando o argumento <a class="reference internal" href="#django.db.models.CharField.max_length" title="django.db.models.CharField.max_length"><tt class="xref py py-attr docutils literal"><span class="pre">max_length</span></tt></a>.</p>
+</div>
+<div class="section" id="s-floatfield">
+<span id="floatfield"></span><h3><tt class="docutils literal"><span class="pre">FloatField</span></tt><a class="headerlink" href="#floatfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.FloatField">
+<em class="property">class </em><tt class="descname">FloatField</tt>(<span class="optional">[</span><em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.FloatField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionchanged">
+<span class="title">Changed in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Um número de ponto flutuante, representado no Python como uma instância de um
+<tt class="docutils literal"><span class="pre">float</span></tt>.</p>
+<p>A administração representa-o como um <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;text&quot;&gt;</span></tt> (um input de uma
+única linha).</p>
+</div>
+<div class="section" id="s-imagefield">
+<span id="imagefield"></span><h3><tt class="docutils literal"><span class="pre">ImageField</span></tt><a class="headerlink" href="#imagefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.ImageField">
+<em class="property">class </em><tt class="descname">ImageField</tt>(<em>upload_to=None</em><span class="optional">[</span>, <em>height_field=None</em>, <em>width_field=None</em>, <em>max_length=100</em>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.ImageField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Semelhante ao <a class="reference internal" href="#django.db.models.FileField" title="django.db.models.FileField"><tt class="xref py py-class docutils literal"><span class="pre">FileField</span></tt></a>, mas verifica se o objeto enviado é uma imagem
+válida. Tem dois argumentos extras opcionais:</p>
+<dl class="attribute">
+<dt id="django.db.models.ImageField.height_field">
+<tt class="descclassname">ImageField.</tt><tt class="descname">height_field</tt><a class="headerlink" href="#django.db.models.ImageField.height_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nome de um campo de model que será auto-populado com a altura da imagem toda
+vez que a instância do model for salva.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.db.models.ImageField.width_field">
+<tt class="descclassname">ImageField.</tt><tt class="descname">width_field</tt><a class="headerlink" href="#django.db.models.ImageField.width_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nome de um campo de model que será auto-populado com a largura da imagem
+toda vez que a instância do model for salva.</p>
+</dd></dl>
+
+<p>Além dos métodos especiais que estão disponíveis para <a class="reference internal" href="#django.db.models.FileField" title="django.db.models.FileField"><tt class="xref py py-class docutils literal"><span class="pre">FileField</span></tt></a>, um
+class:<cite>ImageField</cite> também tem os atributos <tt class="docutils literal"><span class="pre">File.height</span></tt> e <tt class="docutils literal"><span class="pre">File.width</span></tt>.
+Veja <a class="reference internal" href="../../topics/files.html"><em>Gerenciando arquivos</em></a>.</p>
+<p>Requer a <a class="reference external" href="http://www.pythonware.com/products/pil/">Python Imaging Library</a>.</p>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> O argumento attr:<cite>~CharField.max_length</cite> foi adicionado nesta versão.</div>
+<p>Por padrão, instâncias de <a class="reference internal" href="#django.db.models.ImageField" title="django.db.models.ImageField"><tt class="xref py py-class docutils literal"><span class="pre">ImageField</span></tt></a> são criadas como colunas
+<tt class="docutils literal"><span class="pre">varchar(100)</span></tt> no seu banco de dados. Assim como nos outros campos, você pode
+mudar o tamanho máximo usando o argumento <a class="reference internal" href="#django.db.models.CharField.max_length" title="django.db.models.CharField.max_length"><tt class="xref py py-attr docutils literal"><span class="pre">max_length</span></tt></a>.</p>
+</div>
+<div class="section" id="s-integerfield">
+<span id="integerfield"></span><h3><tt class="docutils literal"><span class="pre">IntegerField</span></tt><a class="headerlink" href="#integerfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.IntegerField">
+<em class="property">class </em><tt class="descname">IntegerField</tt>(<span class="optional">[</span><em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.IntegerField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um inteiro. A administração representa-o como um <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;text&quot;&gt;</span></tt> (um
+input de uma única linha).</p>
+</div>
+<div class="section" id="s-ipaddressfield">
+<span id="ipaddressfield"></span><h3><tt class="docutils literal"><span class="pre">IPAddressField</span></tt><a class="headerlink" href="#ipaddressfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.IPAddressField">
+<em class="property">class </em><tt class="descname">IPAddressField</tt>(<span class="optional">[</span><em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.IPAddressField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um endereço IP, em formato texto (ex: &quot;192.0.2.30&quot;). A administração
+representa-o como um <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;text&quot;&gt;</span></tt> (um input de uma única linha).</p>
+</div>
+<div class="section" id="s-nullbooleanfield">
+<span id="nullbooleanfield"></span><h3><tt class="docutils literal"><span class="pre">NullBooleanField</span></tt><a class="headerlink" href="#nullbooleanfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.NullBooleanField">
+<em class="property">class </em><tt class="descname">NullBooleanField</tt>(<span class="optional">[</span><em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.NullBooleanField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Como um <a class="reference internal" href="#django.db.models.BooleanField" title="django.db.models.BooleanField"><tt class="xref py py-class docutils literal"><span class="pre">BooleanField</span></tt></a>, mas permite <tt class="docutils literal"><span class="pre">NULL</span></tt> como uma das opções. Use-o
+no lugar de um <a class="reference internal" href="#django.db.models.BooleanField" title="django.db.models.BooleanField"><tt class="xref py py-class docutils literal"><span class="pre">BooleanField</span></tt></a> com <tt class="docutils literal"><span class="pre">null=True</span></tt>. A administração
+representa-o como uma caixa <tt class="docutils literal"><span class="pre">&lt;select&gt;</span></tt> com as escolhas &quot;Unknown&quot;, &quot;Yes&quot; e &quot;No&quot;.</p>
+</div>
+<div class="section" id="s-positiveintegerfield">
+<span id="positiveintegerfield"></span><h3><tt class="docutils literal"><span class="pre">PositiveIntegerField</span></tt><a class="headerlink" href="#positiveintegerfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.PositiveIntegerField">
+<em class="property">class </em><tt class="descname">PositiveIntegerField</tt>(<span class="optional">[</span><em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.PositiveIntegerField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Como um <a class="reference internal" href="#django.db.models.IntegerField" title="django.db.models.IntegerField"><tt class="xref py py-class docutils literal"><span class="pre">IntegerField</span></tt></a>, mas deve ser positivo.</p>
+</div>
+<div class="section" id="s-positivesmallintegerfield">
+<span id="positivesmallintegerfield"></span><h3><tt class="docutils literal"><span class="pre">PositiveSmallIntegerField</span></tt><a class="headerlink" href="#positivesmallintegerfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.PositiveSmallIntegerField">
+<em class="property">class </em><tt class="descname">PositiveSmallIntegerField</tt>(<span class="optional">[</span><em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.PositiveSmallIntegerField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Como um <a class="reference internal" href="#django.db.models.PositiveIntegerField" title="django.db.models.PositiveIntegerField"><tt class="xref py py-class docutils literal"><span class="pre">PositiveIntegerField</span></tt></a>, mas somente permite valores até um certo
+ponto (de acordo com o tipo de banco de dados utilizado).</p>
+</div>
+<div class="section" id="s-slugfield">
+<span id="slugfield"></span><h3><tt class="docutils literal"><span class="pre">SlugField</span></tt><a class="headerlink" href="#slugfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.SlugField">
+<em class="property">class </em><tt class="descname">SlugField</tt>(<span class="optional">[</span><em>max_length=50</em>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.SlugField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference internal" href="../../glossary.html#term-slug"><em class="xref std std-term">Slug</em></a> é um termo jornalístico. Um slug é um apelido curto para algo,
+contendo somente letras, números, underscores ou hífens. Eles normalmente são
+usados em URLs.</p>
+<p>Semelhantemente ao CharField, você pode especificar o
+<a class="reference internal" href="#django.db.models.CharField.max_length" title="django.db.models.CharField.max_length"><tt class="xref py py-attr docutils literal"><span class="pre">max_length</span></tt></a> (leia a nota sobre portabilidade de banco de
+dados e <a class="reference internal" href="#django.db.models.CharField.max_length" title="django.db.models.CharField.max_length"><tt class="xref py py-attr docutils literal"><span class="pre">max_length</span></tt></a> nesta seção também). Se o
+<a class="reference internal" href="#django.db.models.CharField.max_length" title="django.db.models.CharField.max_length"><tt class="xref py py-attr docutils literal"><span class="pre">max_length</span></tt></a> não for especificado, o Django irá usar um tamanho
+padrão de 50.</p>
+<p>Implica em <a class="reference internal" href="#django.db.models.Field.db_index" title="django.db.models.Field.db_index"><tt class="xref py py-attr docutils literal"><span class="pre">Field.db_index</span></tt></a>.</p>
+<p>É muitas vezes mais útil para pre-popular automaticamente um campo baseado no
+no seu valor. Você pode fazer isso automaticamente no admin usando
+<a class="reference internal" href="../contrib/admin/index.html#django.contrib.admin.ModelAdmin.prepopulated_fields" title="django.contrib.admin.ModelAdmin.prepopulated_fields"><tt class="xref py py-attr docutils literal"><span class="pre">prepopulated_fields</span></tt></a>.</p>
+</div>
+<div class="section" id="s-smallintegerfield">
+<span id="smallintegerfield"></span><h3><tt class="docutils literal"><span class="pre">SmallIntegerField</span></tt><a class="headerlink" href="#smallintegerfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.SmallIntegerField">
+<em class="property">class </em><tt class="descname">SmallIntegerField</tt>(<span class="optional">[</span><em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.SmallIntegerField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Como um <a class="reference internal" href="#django.db.models.IntegerField" title="django.db.models.IntegerField"><tt class="xref py py-class docutils literal"><span class="pre">IntegerField</span></tt></a>, mas somente permite valores até um certo
+ponto (dependendo do banco de dados).</p>
+</div>
+<div class="section" id="s-textfield">
+<span id="textfield"></span><h3><tt class="docutils literal"><span class="pre">TextField</span></tt><a class="headerlink" href="#textfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.TextField">
+<em class="property">class </em><tt class="descname">TextField</tt>(<span class="optional">[</span><em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.TextField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um campo de texto longo. A administração o representa como uma <tt class="docutils literal"><span class="pre">&lt;textarea&gt;</span></tt>
+(um input de múltiplas linhas).</p>
+<div class="admonition-mysql-users admonition ">
+<p class="first admonition-title">MySQL users</p>
+<p class="last">Se você estiver usando este campo com MySQLdb 1.2.1p2 e a colação
+<tt class="docutils literal"><span class="pre">utf8_bin</span></tt> (que <em>não</em> é a padrão), há alguns problemas que deve ter em
+mente. Leia as <a class="reference internal" href="../databases.html#mysql-collation"><em>notas do banco de dados MySQL</em></a> para
+detalhes.</p>
+</div>
+</div>
+<div class="section" id="s-timefield">
+<span id="timefield"></span><h3><tt class="docutils literal"><span class="pre">TimeField</span></tt><a class="headerlink" href="#timefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.TimeField">
+<em class="property">class </em><tt class="descname">TimeField</tt>(<span class="optional">[</span><em>auto_now=False</em>, <em>auto_now_add=False</em>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.TimeField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Uma hora. Representado em Python por uma instância <tt class="docutils literal"><span class="pre">datetime.time</span></tt>. Aceita as
+mesmas opções de auto preenchimento dos campos <a class="reference internal" href="#django.db.models.DateField" title="django.db.models.DateField"><tt class="xref py py-class docutils literal"><span class="pre">DateField</span></tt></a>.</p>
+<p>A administração o representa como uma <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;text&quot;&gt;</span></tt> com alguns
+atalhos JavaScript.</p>
+</div>
+<div class="section" id="s-urlfield">
+<span id="urlfield"></span><h3><tt class="docutils literal"><span class="pre">URLField</span></tt><a class="headerlink" href="#urlfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.URLField">
+<em class="property">class </em><tt class="descname">URLField</tt>(<span class="optional">[</span><em>verify_exists=True</em>, <em>max_length=200</em>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.URLField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um <a class="reference internal" href="#django.db.models.CharField" title="django.db.models.CharField"><tt class="xref py py-class docutils literal"><span class="pre">CharField</span></tt></a> para uma URL. Possui um argumento extra opicional:</p>
+<dl class="attribute">
+<dt id="django.db.models.URLField.verify_exists">
+<tt class="descclassname">URLField.</tt><tt class="descname">verify_exists</tt><a class="headerlink" href="#django.db.models.URLField.verify_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Se a opção for <tt class="xref docutils literal"><span class="pre">True</span></tt> (padrão), a existência da URL será verificada
+(i.e., será verificado se a URL carrega e não retorna uma reposta 404). It
+should be noted that when using the single-threaded development server,
+validating a url being serverd by the same server will hang.
+This should not be a problem for multithreaded servers.</p>
+</dd></dl>
+
+<p>A administração representa-o como um <tt class="docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;text&quot;&gt;</span></tt> (um input de uma
+única linha).</p>
+<p>Como toda subclasse de <a class="reference internal" href="#django.db.models.CharField" title="django.db.models.CharField"><tt class="xref py py-class docutils literal"><span class="pre">CharField</span></tt></a>, <a class="reference internal" href="#django.db.models.URLField" title="django.db.models.URLField"><tt class="xref py py-class docutils literal"><span class="pre">URLField</span></tt></a> recebe um argumento
+opcional, <a class="reference internal" href="#django.db.models.CharField.max_length" title="django.db.models.CharField.max_length"><tt class="xref py py-attr docutils literal"><span class="pre">max_length</span></tt></a>. Se você não especificar o
+<a class="reference internal" href="#django.db.models.CharField.max_length" title="django.db.models.CharField.max_length"><tt class="xref py py-attr docutils literal"><span class="pre">max_length</span></tt></a>, o padrão de 200 é usado.</p>
+</div>
+<div class="section" id="s-xmlfield">
+<span id="xmlfield"></span><h3><tt class="docutils literal"><span class="pre">XMLField</span></tt><a class="headerlink" href="#xmlfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.XMLField">
+<em class="property">class </em><tt class="descname">XMLField</tt>(<em>schema_path=None</em><span class="optional">[</span>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.XMLField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um <a class="reference internal" href="#django.db.models.TextField" title="django.db.models.TextField"><tt class="xref py py-class docutils literal"><span class="pre">TextField</span></tt></a> que verifica se o valor é um XML válido de acordo com um
+esquema fornecido. Possui um argumento obrigatório:</p>
+<dl class="attribute">
+<dt id="django.db.models.schema_path">
+<tt class="descname">schema_path</tt><a class="headerlink" href="#django.db.models.schema_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>O caminho no sistema de arquivos para um esquema <a class="reference external" href="http://www.relaxng.org/">RelaxNG</a> que será usado
+para a validação do campo.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="s-module-django.db.models.fields.related">
+<span id="s-campos-de-relacionamento"></span><span id="module-django.db.models.fields.related"></span><span id="campos-de-relacionamento"></span><h2>Campos de relacionamento<a class="headerlink" href="#module-django.db.models.fields.related" title="Permalink to this headline">¶</a></h2>
+<p>O Django também define um conjunto de campos que representam relacionamentos.</p>
+<div class="section" id="s-foreignkey">
+<span id="s-ref-foreignkey"></span><span id="foreignkey"></span><span id="ref-foreignkey"></span><h3><tt class="docutils literal"><span class="pre">ForeignKey</span></tt><a class="headerlink" href="#foreignkey" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.ForeignKey">
+<em class="property">class </em><tt class="descname">ForeignKey</tt>(<em>othermodel</em><span class="optional">[</span>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.ForeignKey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Uma reção muitos-para-um. Requer um argumento posicional: a classe com a qual o
+model está relacionada.</p>
+<p id="recursive-relationships">Para criar um relacionamento recursivo -- um objeto que tem um relacionamento
+muitos-para-um consigo mesmo -- use <tt class="docutils literal"><span class="pre">models.ForeignKey('self')</span></tt>.</p>
+<p id="lazy-relationships">Se você precisa criar um relacionamento em um model que não não foi definido
+ainda, você pode usar o nome do model, ao invés do objeto em si:</p>
+<div class="highlight-python"><pre>class Car(models.Model):
+    manufacturer = models.ForeignKey('Manufacturer')
+    # ...
+
+class Manufacturer(models.Model):
+    # ...</pre>
+</div>
+<div class="versionadded">
+<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<p>Para referir-se a models definidos em outra aplicação, você pode explicitamente
+especificar um model com a label completa da aplicação. Por exemplo, se o model
+<tt class="docutils literal"><span class="pre">Manufacturer</span></tt> acima é definido em outra aplicação chamada <tt class="docutils literal"><span class="pre">production</span></tt>,
+você precisará usar:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Car</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">manufacturer</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s">&#39;production.Manufacturer&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Este tipo de referência pode ser útil para resolver dependências de import
+circular entre duas aplicações.</p>
+<div class="section" id="s-representacao-no-banco-de-dados">
+<span id="representacao-no-banco-de-dados"></span><h4>Representação no banco de dados<a class="headerlink" href="#representacao-no-banco-de-dados" title="Permalink to this headline">¶</a></h4>
+<p>Por trás das cenas, o Django adiciona <tt class="docutils literal"><span class="pre">&quot;_id&quot;</span></tt> ao nome do campo para criar suas
+nomes de colunas. No exemplo acima, a tabela para o model <tt class="docutils literal"><span class="pre">Car</span></tt> terá uma
+coluna <tt class="docutils literal"><span class="pre">manufacturer_id</span></tt>. (Você pode mudar isto sendo explicito, especificando
+<a class="reference internal" href="#django.db.models.Field.db_column" title="django.db.models.Field.db_column"><tt class="xref py py-attr docutils literal"><span class="pre">db_column</span></tt></a>) No entando, seu código nunca deve lidar com o nome da
+coluna do banco de dados, a menos que você esteja escrevendo SQL customizado.
+Você sempre trabalhará com os nomes de campos de seu objeto model.</p>
+</div>
+<div class="section" id="s-argumentos">
+<span id="s-foreign-key-arguments"></span><span id="argumentos"></span><span id="foreign-key-arguments"></span><h4>Argumentos<a class="headerlink" href="#argumentos" title="Permalink to this headline">¶</a></h4>
+<p>A <a class="reference internal" href="#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><tt class="xref py py-class docutils literal"><span class="pre">ForeignKey</span></tt></a> aceita um conjunto extra de argumentos -- todos opcionais
+-- que definem detalhes de como a relação funciona.</p>
+<dl class="attribute">
+<dt id="django.db.models.ForeignKey.limit_choices_to">
+<tt class="descclassname">ForeignKey.</tt><tt class="descname">limit_choices_to</tt><a class="headerlink" href="#django.db.models.ForeignKey.limit_choices_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Um dicionário de argumentos e valores aparente (veja
+<a class="reference internal" href="../../topics/db/queries.html"><em>Fazendo consultas</em></a>) que limita as escolhas disponíveis para o admin
+sobre este objeto. Use isto com funções do módulo do Python <tt class="docutils literal"><span class="pre">datetime</span></tt>
+para limitar as escolhas dos objetos por data. Por exemplo:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">limit_choices_to</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;pub_date__lte&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>permite somente a escolha de objetos relatados com uma <tt class="docutils literal"><span class="pre">pub_date</span></tt> anterior
+a data/hora atual.</p>
+<p>Ao invés de um dicionário este pode ser também um objeto
+<tt class="xref py py-class docutils literal"><span class="pre">Q</span></tt> (um objeto com um método <tt class="xref py py-meth docutils literal"><span class="pre">get_sql()</span></tt>) para
+consultas mais complexas.</p>
+<p>O <tt class="docutils literal"><span class="pre">limit_choices_to</span></tt> não tem efeito sobre os FormSets inline que são
+criados para mostra objetos relacionados no admin.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.db.models.ForeignKey.related_name">
+<tt class="descclassname">ForeignKey.</tt><tt class="descname">related_name</tt><a class="headerlink" href="#django.db.models.ForeignKey.related_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>O nome para ser usado pelo relacionamento do objeto relacionado para este.
+Veja a <a class="reference internal" href="../../topics/db/queries.html#backwards-related-objects"><em>documentação de objetos relacionados</em></a> para uma explicação completa e exemplos. Note
+que você deve setar este valor quando estiver definindo relacionamentos em
+<a class="reference internal" href="../../topics/db/models.html#abstract-base-classes"><em>models abstratos</em></a>; e quando você utilizar
+<a class="reference internal" href="../../topics/db/models.html#abstract-related-name"><em>alguma sintaxe especial</em></a> disponível.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.db.models.ForeignKey.to_field">
+<tt class="descclassname">ForeignKey.</tt><tt class="descname">to_field</tt><a class="headerlink" href="#django.db.models.ForeignKey.to_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>O campo para qual o objeto relacionado aponta. Por padrão, o Django usa a
+chave primária dos objetos relacionados.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="s-manytomanyfield">
+<span id="s-ref-manytomany"></span><span id="manytomanyfield"></span><span id="ref-manytomany"></span><h3><tt class="docutils literal"><span class="pre">ManyToManyField</span></tt><a class="headerlink" href="#manytomanyfield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.ManyToManyField">
+<em class="property">class </em><tt class="descname">ManyToManyField</tt>(<em>othermodel</em><span class="optional">[</span>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.ManyToManyField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um relacionamento muitos-para-muitos. Requer um argumento posicional: a classe
+com a qual o model se relaciona. Isso funciona exatamente da mesma forma como um
+<a class="reference internal" href="#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><tt class="xref py py-class docutils literal"><span class="pre">ForeignKey</span></tt></a>, incluíndo todas as opções em relação a relacionamentos
+<a class="reference internal" href="#recursive-relationships"><em>recursivos</em></a> e <a class="reference internal" href="#lazy-relationships"><em>lazy</em></a>.</p>
+<div class="section" id="s-id1">
+<span id="id1"></span><h4>Representação no banco de dados.<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>Por trás das cenas, o Django cria uma tabela de ligação intermediária para
+representar o relacionamento muitos-para-muitos. Por padrão, o nome desta tabela
+é gerado usando os nomes das duas tabelas juntos. Desde que alguns bancos de
+dados não suportam nomes de tabelas acima de um certo comprimento, estes nomes
+serão automaticamente truncados para 64 caracteres e um hash de unicidade será
+utilizado. Isto significa que pode ver nomes de tabelas como
+<tt class="docutils literal"><span class="pre">author_books_9cdf4</span></tt>; isto é perfeitamente normal.
+Você pode manualmente provê o nome da tabela de ligação usando a opção
+<a class="reference internal" href="#django.db.models.ManyToManyField.db_table" title="django.db.models.ManyToManyField.db_table"><tt class="xref py py-attr docutils literal"><span class="pre">db_table</span></tt></a>.</p>
+</div>
+<div class="section" id="s-manytomany-arguments">
+<span id="s-id2"></span><span id="manytomany-arguments"></span><span id="id2"></span><h4>Argumentos<a class="headerlink" href="#manytomany-arguments" title="Permalink to this headline">¶</a></h4>
+<p>O <a class="reference internal" href="#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><tt class="xref py py-class docutils literal"><span class="pre">ManyToManyField</span></tt></a> aceita um conjunto extra de argumentos -- todos
+opicionais -- que controlam como o relacionamento funciona.</p>
+<dl class="attribute">
+<dt id="django.db.models.ManyToManyField.related_name">
+<tt class="descclassname">ManyToManyField.</tt><tt class="descname">related_name</tt><a class="headerlink" href="#django.db.models.ManyToManyField.related_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>O mesmo que <a class="reference internal" href="#django.db.models.ForeignKey.related_name" title="django.db.models.ForeignKey.related_name"><tt class="xref py py-attr docutils literal"><span class="pre">ForeignKey.related_name</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.db.models.ManyToManyField.limit_choices_to">
+<tt class="descclassname">ManyToManyField.</tt><tt class="descname">limit_choices_to</tt><a class="headerlink" href="#django.db.models.ManyToManyField.limit_choices_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>O mesmo que <a class="reference internal" href="#django.db.models.ForeignKey.limit_choices_to" title="django.db.models.ForeignKey.limit_choices_to"><tt class="xref py py-attr docutils literal"><span class="pre">ForeignKey.limit_choices_to</span></tt></a>.</p>
+<p>O <tt class="docutils literal"><span class="pre">limit_choices_to</span></tt> não surte efeito quando usado em um
+<tt class="docutils literal"><span class="pre">ManyToManyField</span></tt> com uma tabela intermediária personalizada usando o
+parâmetro <a class="reference internal" href="#django.db.models.ManyToManyField.through" title="django.db.models.ManyToManyField.through"><tt class="xref py py-attr docutils literal"><span class="pre">through</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.db.models.ManyToManyField.symmetrical">
+<tt class="descclassname">ManyToManyField.</tt><tt class="descname">symmetrical</tt><a class="headerlink" href="#django.db.models.ManyToManyField.symmetrical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Somente usado na definição de ManyToManyFields no self. Considere o seguinte
+model:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Person</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">friends</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="s">&quot;self&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Quando o Django processa este model, ele identifica que ele tem um
+<a class="reference internal" href="#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><tt class="xref py py-class docutils literal"><span class="pre">ManyToManyField</span></tt></a> para si mesmo, e como um resultado, ele não
+adiciona um atributo <tt class="docutils literal"><span class="pre">person_set</span></tt> a classe <tt class="docutils literal"><span class="pre">Person</span></tt>. Em vez disso, o
+<a class="reference internal" href="#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><tt class="xref py py-class docutils literal"><span class="pre">ManyToManyField</span></tt></a> é assumido como simétrico -- que quer dizer, se eu
+sou seu amigo, então você é meu amigo.</p>
+<p>Se você não quer simetria em relacionamentos muitos-para-muitos com
+<tt class="docutils literal"><span class="pre">self</span></tt>, mude <a class="reference internal" href="#django.db.models.ManyToManyField.symmetrical" title="django.db.models.ManyToManyField.symmetrical"><tt class="xref py py-attr docutils literal"><span class="pre">symmetrical</span></tt></a> para <tt class="xref docutils literal"><span class="pre">False</span></tt>. Isto
+forçará o Django a adicionar um descrito para o reverso do relacionamento,
+permitindo relacionamentos <a class="reference internal" href="#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><tt class="xref py py-class docutils literal"><span class="pre">ManyToManyField</span></tt></a> serem não-simétricos.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.db.models.ManyToManyField.through">
+<tt class="descclassname">ManyToManyField.</tt><tt class="descname">through</tt><a class="headerlink" href="#django.db.models.ManyToManyField.through" title="Permalink to this definition">¶</a></dt>
+<dd><p>O Django gerará automaticamente uma tabela para gerenciar o relacionamento
+muitos-para-muitos. Entretanto, se você quer especificar manualmente a
+tabela intermediária, você pode usar a opção
+<a class="reference internal" href="#django.db.models.ManyToManyField.through" title="django.db.models.ManyToManyField.through"><tt class="xref py py-attr docutils literal"><span class="pre">through</span></tt></a> para especificar o model do Django que
+representa a tabela intermediária que você deseja usar.</p>
+<p>O uso mais comum para esta opção é quando você quer associar
+<a class="reference internal" href="../../topics/db/models.html#intermediary-manytomany"><em>dados extra com um relacionamento muitos-para-muitos</em></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.db.models.ManyToManyField.db_table">
+<tt class="descclassname">ManyToManyField.</tt><tt class="descname">db_table</tt><a class="headerlink" href="#django.db.models.ManyToManyField.db_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>O nome da tabela a ser criada para o armazenamento dos dados
+muitos-para-muitos. Se este não for fornecido, o Django assumirá um nome
+padrão baseado nos nomes das duas tabelas que serão juntadas.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="s-onetoonefield">
+<span id="s-ref-onetoone"></span><span id="onetoonefield"></span><span id="ref-onetoone"></span><h3><tt class="docutils literal"><span class="pre">OneToOneField</span></tt><a class="headerlink" href="#onetoonefield" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.db.models.OneToOneField">
+<em class="property">class </em><tt class="descname">OneToOneField</tt>(<em>othermodel</em><span class="optional">[</span>, <em>parent_link=False</em>, <em>**options</em><span class="optional">]</span>)<a class="headerlink" href="#django.db.models.OneToOneField" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Um relacionamento um-para-um. Conceitualmente, este é similar a um
+<a class="reference internal" href="#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><tt class="xref py py-class docutils literal"><span class="pre">ForeignKey</span></tt></a> com <a class="reference internal" href="#django.db.models.Field.unique" title="django.db.models.Field.unique"><tt class="xref py py-attr docutils literal"><span class="pre">unique=True</span></tt></a>, mas o lado &quot;reverso&quot;
+da relação retornará diretamente um único objeto.</p>
+<p>Este é mais útil como  a chave primária de um model que &quot;extende&quot; outro model de
+alguma forma; a <a class="reference internal" href="../../topics/db/models.html#multi-table-inheritance"><em>Herança com Multi-Tabelas</em></a> é implementada adicionando uma
+relação implícita um-para-um do model filho para o model pai, por exemplo.</p>
+<p>Um argumento posicional é obrigatório: a classe para a qual o model será
+relacionado. Isso funciona exatamente da mesma forma como se fosse um
+<a class="reference internal" href="#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><tt class="xref py py-class docutils literal"><span class="pre">ForeignKey</span></tt></a>, incluíndo todas as opções em relação a relacionamentos
+<a class="reference internal" href="#recursive-relationships"><em>recursivos</em></a> e <a class="reference internal" href="#lazy-relationships"><em>lazy</em></a>.</p>
+<p id="onetoone-arguments">Adicionalmente, <tt class="docutils literal"><span class="pre">OneToOneField</span></tt> aceita todos os argumentos extra aceitos pelo
+<a class="reference internal" href="#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><tt class="xref py py-class docutils literal"><span class="pre">ForeignKey</span></tt></a>, mais um argumento extra:</p>
+<dl class="attribute">
+<dt id="django.db.models.OneToOneField.parent_link">
+<tt class="descclassname">OneToOneField.</tt><tt class="descname">parent_link</tt><a class="headerlink" href="#django.db.models.OneToOneField.parent_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quando <tt class="xref docutils literal"><span class="pre">True</span></tt> e usado em um model que herda de outro model (contreto),
+indica que este campo deve ser usado como o link para a classe pai, ao invés
+de um <tt class="docutils literal"><span class="pre">OneToOneField</span></tt> extra que normalmente seria implicitamente criado
+pela subclasse.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Referência de campos do Model</a><ul>
+<li><a class="reference internal" href="#opcoes-dos-campos">Opções dos campos</a><ul>
+<li><a class="reference internal" href="#null"><tt class="docutils literal"><span class="pre">null</span></tt></a></li>
+<li><a class="reference internal" href="#blank"><tt class="docutils literal"><span class="pre">blank</span></tt></a></li>
+<li><a class="reference internal" href="#choices"><tt class="docutils literal"><span class="pre">choices</span></tt></a></li>
+<li><a class="reference internal" href="#db-column"><tt class="docutils literal"><span class="pre">db_column</span></tt></a></li>
+<li><a class="reference internal" href="#db-index"><tt class="docutils literal"><span class="pre">db_index</span></tt></a></li>
+<li><a class="reference internal" href="#db-tablespace"><tt class="docutils literal"><span class="pre">db_tablespace</span></tt></a></li>
+<li><a class="reference internal" href="#default"><tt class="docutils literal"><span class="pre">default</span></tt></a></li>
+<li><a class="reference internal" href="#editable"><tt class="docutils literal"><span class="pre">editable</span></tt></a></li>
+<li><a class="reference internal" href="#help-text"><tt class="docutils literal"><span class="pre">help_text</span></tt></a></li>
+<li><a class="reference internal" href="#primary-key"><tt class="docutils literal"><span class="pre">primary_key</span></tt></a></li>
+<li><a class="reference internal" href="#unique"><tt class="docutils literal"><span class="pre">unique</span></tt></a></li>
+<li><a class="reference internal" href="#unique-for-date"><tt class="docutils literal"><span class="pre">unique_for_date</span></tt></a></li>
+<li><a class="reference internal" href="#unique-for-month"><tt class="docutils literal"><span class="pre">unique_for_month</span></tt></a></li>
+<li><a class="reference internal" href="#unique-for-year"><tt class="docutils literal"><span class="pre">unique_for_year</span></tt></a></li>
+<li><a class="reference internal" href="#verbose-name"><tt class="docutils literal"><span class="pre">verbose_name</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tipos-de-campos">Tipos de campos</a><ul>
+<li><a class="reference internal" href="#autofield"><tt class="docutils literal"><span class="pre">AutoField</span></tt></a></li>
+<li><a class="reference internal" href="#booleanfield"><tt class="docutils literal"><span class="pre">BooleanField</span></tt></a></li>
+<li><a class="reference internal" href="#charfield"><tt class="docutils literal"><span class="pre">CharField</span></tt></a></li>
+<li><a class="reference internal" href="#commaseparatedintegerfield"><tt class="docutils literal"><span class="pre">CommaSeparatedIntegerField</span></tt></a></li>
+<li><a class="reference internal" href="#datefield"><tt class="docutils literal"><span class="pre">DateField</span></tt></a></li>
+<li><a class="reference internal" href="#datetimefield"><tt class="docutils literal"><span class="pre">DateTimeField</span></tt></a></li>
+<li><a class="reference internal" href="#decimalfield"><tt class="docutils literal"><span class="pre">DecimalField</span></tt></a></li>
+<li><a class="reference internal" href="#emailfield"><tt class="docutils literal"><span class="pre">EmailField</span></tt></a></li>
+<li><a class="reference internal" href="#filefield"><tt class="docutils literal"><span class="pre">FileField</span></tt></a></li>
+<li><a class="reference internal" href="#filepathfield"><tt class="docutils literal"><span class="pre">FilePathField</span></tt></a></li>
+<li><a class="reference internal" href="#floatfield"><tt class="docutils literal"><span class="pre">FloatField</span></tt></a></li>
+<li><a class="reference internal" href="#imagefield"><tt class="docutils literal"><span class="pre">ImageField</span></tt></a></li>
+<li><a class="reference internal" href="#integerfield"><tt class="docutils literal"><span class="pre">IntegerField</span></tt></a></li>
+<li><a class="reference internal" href="#ipaddressfield"><tt class="docutils literal"><span class="pre">IPAddressField</span></tt></a></li>
+<li><a class="reference internal" href="#nullbooleanfield"><tt class="docutils literal"><span class="pre">NullBooleanField</span></tt></a></li>
+<li><a class="reference internal" href="#positiveintegerfield"><tt class="docutils literal"><span class="pre">PositiveIntegerField</span></tt></a></li>
+<li><a class="reference internal" href="#positivesmallintegerfield"><tt class="docutils literal"><span class="pre">PositiveSmallIntegerField</span></tt></a></li>
+<li><a class="reference internal" href="#slugfield"><tt class="docutils literal"><span class="pre">SlugField</span></tt></a></li>
+<li><a class="reference internal" href="#smallintegerfield"><tt class="docutils literal"><span class="pre">SmallIntegerField</span></tt></a></li>
+<li><a class="reference internal" href="#textfield"><tt class="docutils literal"><span class="pre">TextField</span></tt></a></li>
+<li><a class="reference internal" href="#timefield"><tt class="docutils literal"><span class="pre">TimeField</span></tt></a></li>
+<li><a class="reference internal" href="#urlfield"><tt class="docutils literal"><span class="pre">URLField</span></tt></a></li>
+<li><a class="reference internal" href="#xmlfield"><tt class="docutils literal"><span class="pre">XMLField</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-django.db.models.fields.related">Campos de relacionamento</a><ul>
+<li><a class="reference internal" href="#foreignkey"><tt class="docutils literal"><span class="pre">ForeignKey</span></tt></a><ul>
+<li><a class="reference internal" href="#representacao-no-banco-de-dados">Representação no banco de dados</a></li>
+<li><a class="reference internal" href="#argumentos">Argumentos</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#manytomanyfield"><tt class="docutils literal"><span class="pre">ManyToManyField</span></tt></a><ul>
+<li><a class="reference internal" href="#id1">Representação no banco de dados.</a></li>
+<li><a class="reference internal" href="#manytomany-arguments">Argumentos</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#onetoonefield"><tt class="docutils literal"><span class="pre">OneToOneField</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="index.html">Modelos</a></li>
+    
+    
+      <li>Next: <a href="relations.html">Referência de objetos relacionados</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Referência da API</a>
+        
+          <ul><li><a href="index.html">Modelos</a>
+        
+        <ul><li>Referência de campos do Model</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/models/fields.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="Modelos">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="relations.html" title="Referência de objetos relacionados">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

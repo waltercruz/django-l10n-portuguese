@@ -1,0 +1,101 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done $
+..   $OriginalRevision: 11298 $
+..   $TranslationAuthors: Wiliam Alves de Souza, semente $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+
+.. _glossary:
+
+=========
+Glossário
+=========
+
+.. glossary::
+
+    field
+        Um atributo em um :term:`model`; um determinado campo que usualmente é
+        mapeado diretamente para uma única coluna em uma base dados.
+
+        Veja :doc:`/topics/db/models`.
+
+    generic view
+        Uma função :term:`view` de ordem superior que fornece uma implementação
+        abstrata/genérica de um padrão comum encontrado no desenvolvimento de
+        uma view.
+
+        Veja :ref:`ref-generic-views`.
+
+    model
+        Um modelo armazena os dado de sua aplicação.
+
+        Veja :doc:`/topics/db/models`.
+
+    MTV
+        Veja :ref:`mtv`.
+
+    MVC
+        `Model-view-controller`__;  é um padrão de software. O Django
+        :ref:`segue o padrão MVC até certo ponto <mtv>`.
+
+        __ http://en.wikipedia.org/wiki/Model-view-controller
+
+    projeto
+        Um pacote Python -- ou seja, um diretório de código -- que contém todas
+        as configurações para uma instância do Django. Isto inclui a
+        configuração do banco de dados, opções específicas do Django e
+        configurações específicas das aplicações.
+
+    property
+        Também conhecida como "atributos gerenciados", e também uma
+        característica comum do Python desde a versão 2.2. Retirado da
+        `documentação da property`__:
+
+            Properties (propriedades) são o modo mais decente de implementar
+            atributos dos quais seu uso assemelha-se com o acesso a atributos,
+            mas cujo a implementação usa chamadas a métodos. [...] Você pode
+            fazer isto apenas sobrescrevendo ``__getattr__`` e ``__setattr__``;
+            mas sobrescrevendo ``__setattr__`` deixará todas as atribuições de
+            atributos consideravelmente mais lentas, e sobrescrever
+            ``__getattr__`` é sempre um pouco complicado de fazer corretamente.
+            Properties deixam você fazer isto sem complicações, sem ter que
+            sobrescrever ``__getattr__`` ou ``__setattr__``.
+
+        __ http://www.python.org/download/releases/2.2/descrintro/#property
+
+    queryset
+        Um objeto representando algum conjunto de linhas à serem obtidas do
+        banco de dados.
+
+        Veja :doc:`/topics/db/queries`.
+
+    slug
+        Uma pequena etiqueta para alguma coisa, contendo apenas letras,
+        números, underscores (sublinhados) ou hifens. São usados geralmente em
+        URLs. Por exemplo, em uma típica URL de uma página de blog:
+
+        .. parsed-literal::
+
+            http://www.djangoproject.com/weblog/2008/apr/12/**spring**/
+
+        a última parte (``spring``) é um slug.
+
+    template
+        Um fragmento de texto que se comporta como formatador para
+        representação de dados. Um template ajuda a abstrair a apresentação dos
+        dados à partir dos mesmos.
+
+        Veja :doc:`/topics/templates`.
+
+    view
+        Uma função responsável por renderizar uma página.
+

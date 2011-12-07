@@ -1,0 +1,209 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Notas de lançamento do Django 1.0.2 &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../index.html" />
+    <link rel="up" title="Notas de Lançamento" href="index.html" />
+    <link rel="next" title="Notas de lançamento do Django 1.0.1" href="1.0.1.html" />
+    <link rel="prev" title="Django 1.1 release notes" href="1.1.html" />
+ 
+<script type="text/javascript" src="../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../genindex.html">Índice</a>  |
+        <a title="Busca" href="../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="1.1.html" title="Django 1.1 release notes">previous</a> 
+     |
+    <a href="index.html" title="Notas de Lançamento" accesskey="U">up</a>
+   |
+    <a href="1.0.1.html" title="Notas de lançamento do Django 1.0.1">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="releases-1.0.2">
+            
+  <div class="section" id="s-notas-de-lancamento-do-django-1-0-2">
+<span id="s-releases-1-0-2"></span><span id="notas-de-lancamento-do-django-1-0-2"></span><span id="releases-1-0-2"></span><h1>Notas de lançamento do Django 1.0.2<a class="headerlink" href="#notas-de-lancamento-do-django-1-0-2" title="Permalink to this headline">¶</a></h1>
+<p>Bem vindo ao Django 1.0.2!</p>
+<p>Essa é a segunda versão de &#8220;bugfixes&#8221; na série 1.0 do Django,
+melhorando a estabilidade e performance da base de código do Django 1.0. Assim,
+o Django 1.0.2 não contém novas features (e, segundo a nossa
+<a class="reference internal" href="../misc/api-stability.html"><em>política de compatibilidade</em></a>, mantém retro-compatibilidade com o Django
+1.0.0), mas contém um número de correções e outras melhorias.
+O Django 1.0.2 é uma atualização recomendada para qualquer
+desenvolvimento ou deployment atualmente usando ou planejando usar o Django 1.0.</p>
+<div class="section" id="s-correcoes-e-melhorias-no-django-1-0-2">
+<span id="correcoes-e-melhorias-no-django-1-0-2"></span><h2>Correções e melhorias no Django 1.0.2<a class="headerlink" href="#correcoes-e-melhorias-no-django-1-0-2" title="Permalink to this headline">¶</a></h2>
+<p>A principal razão por trás desse release é corrigir um problema
+no recentemente lançado Django 1.0.1; os scripts de empacotamento usados para o Django
+1.0.1 omitiram alguns diretórios do pacote final, incluindo um diretório
+requerido pelo <tt class="docutils literal"><span class="pre">django.contrib.gis</span></tt> e parte da suíte de testes unitários do
+Django.</p>
+<p>O Django 1.0.2 contém scripts de empacotamento atualizados, e o pacote
+contém os diretórios omitifos no Django 1.0.1. Assim,
+esse release contém todas as correções e melhorias do Django
+1.0.1; veja <a class="reference internal" href="1.0.1.html#releases-1-0-1"><em>as notas de lançamento do Django 1.0.1</em></a> para
+detalhes.</p>
+<p>Adicionamento, desde o Django 1.0.1 foram lançados:</p>
+<ul class="simple">
+<li>Atualizadas traduções para Hebreu e Dinamarquês foram adicionadas.</li>
+<li>O método padrão <tt class="docutils literal"><span class="pre">__repr__</span></tt> dos models do Django estão mais robustos ao lidar
+com dados Unicode mal formados vindos dos métodos <tt class="docutils literal"><span class="pre">__unicode__</span></tt>; ao invés de
+lançar uma exceção em alguns casos, <tt class="docutils literal"><span class="pre">repr()</span></tt> irá conter uma string &#8220;[Bad
+Unicode data]&#8221; no lugar do Unicode inválido.</li>
+<li>Um bug envolvendo a interação da classe do Django <tt class="docutils literal"><span class="pre">SafeUnicode</span></tt> e o
+adaptador MySQL foi resolvido; Instâncias do <tt class="docutils literal"><span class="pre">SafeUnicode</span></tt> (gerados, por
+exemplo, por uma renderização de template) podem agora ser atribuidos a
+atributos de modelos e salvos no MySQL sem a necessidade de intermediação
+explicita de transformações para <tt class="docutils literal"><span class="pre">unicode</span></tt>.</li>
+<li>Um bug que afetava a filtragem de <tt class="docutils literal"><span class="pre">DateField</span></tt> anulavél no SQLite foi
+resolvido.</li>
+<li>Várias atualizações e melhorias foram feitas na documentação do Django.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Notas de lançamento do Django 1.0.2</a><ul>
+<li><a class="reference internal" href="#correcoes-e-melhorias-no-django-1-0-2">Correções e melhorias no Django 1.0.2</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="1.1.html">Django 1.1 release notes</a></li>
+    
+    
+      <li>Next: <a href="1.0.1.html">Notas de lançamento do Django 1.0.1</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="index.html">Notas de Lançamento</a>
+        
+        <ul><li>Notas de lançamento do Django 1.0.2</li></ul>
+        </li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/releases/1.0.2.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="1.1.html" title="Django 1.1 release notes">previous</a> 
+     |
+    <a href="index.html" title="Notas de Lançamento" accesskey="U">up</a>
+   |
+    <a href="1.0.1.html" title="Notas de lançamento do Django 1.0.1">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

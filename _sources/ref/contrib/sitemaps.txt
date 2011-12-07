@@ -1,0 +1,381 @@
+..
+.. META INFORMATION OF TRANSLATION
+..
+..   $TranslationStatus: Done, waiting for revision $
+..   $OriginalRevision: 11332 $
+..   $TranslationAuthors: Robson Mendonça $
+..
+.. INFO OF THIS FILE (DO NOT EDIT! UPDATED BY SUBVERSION)
+..
+..   $HeadURL$
+..   $LastChangedRevision$
+..   $LastChangedBy$
+..   $LastChangedDate$
+..
+
+===================
+O framework sitemap
+===================
+
+.. module:: django.contrib.sitemaps
+   :synopsis: Um framework para gerar sitemaps em XML para o Google.
+
+Django comes with a high-level sitemap-generating framework that makes
+creating sitemap_ XML files easy.
+
+O Django vem com um framework de alto-nível gerador de sitemaps que torna a
+criação de um sitemap_ em XML fácil.
+
+.. _sitemap: http://www.sitemaps.org/
+
+Visão geral
+===========
+
+Um sitemap é um arquivo XML sobre o seu site Web que diz aos indexadores dos
+motores de busca, frequentemente, como suas páginas mudam e quão "importante" é
+certas páginas em relação a outras. Esta informação ajuda o buscadores a indexar
+seu site.
+
+O framework sitemap do Django automatiza a criação destes arquivos XML deixando
+vocês expressar esta informação em código Python.
+
+Ele funciona parecido com o :doc:`frameworkd syndcation
+</ref/contrib/syndication>`. Para criar um sitemap, é só escrever uma classe
+:class:`~django.contrib.sitemaps.Sitemap` e criar uma URl no seu :doc:`URLconf
+</topics/http/urls>`.
+
+Instalação
+==========
+
+Para instalar a aplicação sitemap, siga estes passos:
+
+    1. Adicione ``'django.contrib.sitemaps'`` ao seu :setting:`INSTALLED_APPS`.
+
+    2. Esteja certo de que tenha o
+       ``'django.template.loaders.app_directories.load_template_source'``
+       no seu :setting:`TEMPLATE_LOADERS`. Ele é setado por padrão, assim você
+       só precisa mudar isso se você tiver alterado essa configuração.
+
+    3. Assegure-se de ter instalado o :mod:`framework sites
+       <django.contrib.sites>`.
+
+(Nota: A aplicação sitemap naõ instala qualquer tabela no banco de dados. A
+única razão dela precisar estar no :setting:`INSTALLED_APPS` é para o template
+loader :func:`~django.template.loaders.app_directories.load_template_source`
+poder encontrar os templates padrões.)
+
+Inicialização
+=============
+
+Para ativar a geração do sitemap no seu site Django, adicion esta linha ao seu
+:doc:`URLconf </topics/http/urls>`::
+
+   (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+
+Isto diz ao Django para fazer o sitemap quando um cliente acessa
+:file:`/sitemap.xml`.
+
+O nome do arquivo do sitemap não é importanto, mas a localização é. O buscadores
+somente indexam links no seu sitemap para o nível atual e inferiores. Por
+instância, se :file:`sitemap.xml` reside no seu diretório root, ele poderá
+referenciar qualquer URL no seu site. Entretanto, se seu sitemap fica em
+:file:`/content/sitemap.xml`, ele somente referencia as URLs apartir de
+:file:`/content/`.
+
+O view sitemap recebe um argumento extra, e obrigatório:
+``{'sitemaps': sitemaps}``. O ``sitemaps`` deve ser um dicionário que mapea um
+label curto da seção (e.g, ``blog`` ou ``news``) para sua classe
+:class:`~django.contrib.sitemaps.Sitemap` (e.g, ``BlogSitemap`` ou
+``NewsSitemap``). Ele pode também mapear para uma *instância* da classe
+:class:`~django.contrib.sitemaps.Sitemap` (e.g., ``BlogSitemap(some_var)``).
+
+Classes do sitemap
+==================
+
+Uma classe :class:`~django.contrib.sitemaps.Sitemap` é uma simples classe Python
+que representa uma "seção" de entradas no sitemap. Por exemplo, uma classe
+:class:`~django.contrib.sitemaps.Sitemap` representaria todoas as entradas do
+seu weblog, enquando outra representaria todos os eventos do seu calendário de
+eventos.
+
+Num caso simplista, todas essas seções seriam agrupadas num arquivo
+:file:`sitemap.xml`, mas somente é possível usar o framework para gerar um
+sitemap index que representa arquivos individuais, um por seção. (Veja,
+`Criando um sitemap index`_ abaixo.)
+
+As classes :class:`~django.contrib.sitemaps.Sitemap` devem extender
+``django.contrib.sitemaps.Sitemap``. Elas podem estar em qualquer lugar de sua
+base de código.
+
+Um exemplo simples
+==================
+
+Vamos assumir que você tem um sistema de blog, com um model ``Entry``, e você
+deseja que seu sitemap inclua todos os links de suas entradas de no blog. Aqui
+tem como sua classe sitemap pode parecer::
+
+    from django.contrib.sitemaps import Sitemap
+    from mysite.blog.models import Entry
+
+    class BlogSitemap(Sitemap):
+        changefreq = "never"
+        priority = 0.5
+
+        def items(self):
+            return Entry.objects.filter(is_draft=False)
+
+        def lastmod(self, obj):
+            return obj.pub_date
+
+Note:
+
+    * :attr:`~Sitemap.changefreq` e :attr:`~Sitemap.priority` são atributos de
+      classes correspondentes aos elementos ``<changefreq>`` e ``<priority>``,
+      respectivamente. Eles podem ser chamados como funções, como o
+      :attr:`~Sitemap.lastmod` foi no último exemplo.
+    * :attr:`~Sitemap.items()` é simplesmente um métod que retorna uma lista de
+      objetos. Os objetos retornados serão passados para qualquer método
+      chamável correspondendo a uma propriedade do sitemap
+      (:attr:`~Sitemap.location`, :attr:`~Sitemap.lastmod`,
+      :attr:`~Sitemap.changefreq`, e :attr:`~Sitemap.priority`).
+    * :attr:`~Sitemap.lastmod` deve retornar um objeto Python ``datetime``.
+    * Não há o método :attr:`~Sitemap.location` neste exemplo, mas você pode
+      fornecê-la a fim de especificar a URL para o objeto. Por padrão,
+      :attr:`~Sitemap.location()` chama o método ``get_absolute_url()`` de cada
+      objeto e retorna o resultado.
+
+Referência da classe Sitemap
+============================
+
+.. class:: Sitemap
+
+    Uma classe ``Sitemap`` pode definir os seguintes métodos/atributos:
+
+    .. attribute:: Sitemap.items
+
+        **Obrigatório.** Um método que retorna uma lista de objetos. O framework
+        não se preocupa com o *tipo* de objetos que eles são; tudo que importa é
+        que estes objetos são passados para os métodos
+        :attr:`~Sitemap.location()`, :attr:`~Sitemap.lastmod()`,
+        :attr:`~Sitemap.changefreq()` e :attr:`~Sitemap.priority()`.
+
+    .. attribute:: Sitemap.location
+
+        **Opicional.** Ambos método ou atributo.
+
+        Se ele for um método, ele deve retornar a URL absoluta para um dado
+        objeto como retornado pelo :attr:`~Sitemap.items()`.
+
+        Se ele for um atributo, seu valor deve ser uma string representando uma
+        URL absoluta para ser usada por *todos* os objetos retornados pelo
+        :attr:`~Sitemap.items()`.
+
+       Em ambos os casos, a "URL absoluta" significa uma URL que não inclui o
+        protocolo ou domínio. Exemplos:
+
+            * Bom: :file:`'/foo/bar/'`
+            * Ruim: :file:`'example.com/foo/bar/'`
+            * Ruim: :file:`'http://example.com/foo/bar/'`
+
+        Se o :attr:`~Sitemap.location` não é fornecido, o framework chamará o
+        método ``get_absolute_url()`` de cada objeto retornado pelo
+        :attr:`~Sitemap.items()`.
+
+    .. attribute:: Sitemap.lastmod
+
+        **Opcional.** Ambos, método ou atributo.
+
+        Se for um método, deve receber um argumento -- um objeto retornado pelo
+        :attr:`~Sitemap.items()` -- e retornar a data/hora da última modificação
+        deste objeto, como um objeto Python ``datetime.datetime``.
+
+        Se for um atributo, seu valor deve ser um objeto Python
+        ``datetime.datetime`` representando a data/hora da última modificação
+        para *todo* objeto retornado por :attr:`~Sitemap.items()`.
+
+    .. attribute:: Sitemap.changefreq
+
+        **Opcional.** Ambos, método ou atributo.
+
+        Se for um método, ele deve receber um argumento -- um objeto retornado
+        por :attr:`~Sitemap.items()` -- e retornar a frequencia de mudança deste
+        objeto, como uma string Python.
+
+        Se for um atributo, seu valor deve ser uma string representando a
+        frequência de mudança para *todo* objeto retornado por
+        :attr:`~Sitemap.items()`.
+
+        Os valores possíveis para :attr:`~Sitemap.changefreq`, se você você usar
+        um método ou atributo, são:
+
+            * ``'always'``
+            * ``'hourly'``
+            * ``'daily'``
+            * ``'weekly'``
+            * ``'monthly'``
+            * ``'yearly'``
+            * ``'never'``
+
+    .. method:: Sitemap.priority
+
+        **Opcional.** Ambos, método ou atributo.
+
+        Se for um método, deve ser receber um argumento -- um objeto retornado
+        por :attr:`~Sitemap.items()` -- e retorna a prioridade deste objeto,
+        como uma string ou float.
+
+        Se for um atributo, seu valor deve ser ou uma string ou uma float
+        representando a prioridade de *todo* objeto retornado por
+        :attr:`~Sitemap.items()`.
+
+        Exemplo de valores para :attr`~Sitemap.priority`: ``0.4``, ``1.0``. O
+        valor de prioridade padrão de uma página é ``0.5``. Veja a
+        `documentação do sitemaps.org`_ para saber mais.
+
+        .. _documentação do sitemaps.org: http://www.sitemaps.org/protocol.html#prioritydef
+
+Shortcuts
+=========
+
+O framework sitemap fornece algumas classes convenientes para casos comuns:
+
+.. class:: FlatPageSitemap
+
+    A classe :class:`django.contrib.sitemaps.FlatPageSitemap` se parece com a
+    :mod:`flatpages <django.contrib.flatpages>` definida para o
+    :setting:`SITE_ID` atual (Veja a :mod:`documentação do sites
+    <django.contrib.sites>`) e cria uma entrada no sitemap. Estas entradas
+    incluí somente o atributo :attr:`~Sitemap.location` -- não
+    :attr:`~Sitemap.lastmod`, :attr:`~Sitemap.changefreq` ou
+    :attr:`~Sitemap.priority`.
+
+.. class:: GenericSitemap
+
+    A classe :class:`django.contrib.sitemaps.GenericSitemap` funciona como
+    qualquer :ref:`generic views <ref-generic-views>` que você já tenha.
+    Para usá-la, cria uma instância, passando o mesmo :data:`info_dict` que você
+    passa para uma generic view. O único requesito é que o dicionário tenha uma
+    :data:`queryset` de entradas. Ele pode também ter uma entrada
+    :data:`date_field` que especifica um campo de data para objetos recebidos
+    de um :data:`queryset`. Ese será usado para o atributo
+    :attr:`~Sitemap.lastmod` no sitemap gerado. Você pode também passar os
+    argumentos nomeados :attr:`~Sitemap.priority` e :attr:`~Sitemap.changefreq`
+    para o construtor do  :class:`~django.contrib.sitemaps.GenericSitemap` para
+    especificar estes atributos para todas as URLs.
+
+Exemplo
+-------
+
+Aqui tem um exemplo de um :doc:`URLconf </topics/http/urls>` usando ambos::
+
+    from django.conf.urls.defaults import *
+    from django.contrib.sitemaps import FlatPageSitemap, GenericSitemap
+    from mysite.blog.models import Entry
+
+    info_dict = {
+        'queryset': Entry.objects.all(),
+        'date_field': 'pub_date',
+    }
+
+    sitemaps = {
+        'flatpages': FlatPageSitemap,
+        'blog': GenericSitemap(info_dict, priority=0.6),
+    }
+
+    urlpatterns = patterns('',
+        # Algum generic view usando info_dict
+        # ...
+
+        # o sitemap
+        (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+    )
+
+.. _URLconf: ../url_dispatch/
+
+Criando um sitemap index
+========================
+
+O framework sitemap também tem a abilidade de criar um sitemap index que
+referencia arquivos de sitemap individuais, um para cada seção definida no seu
+dicionário :data:`sitemaps`. As únicas diferenças no uso são:
+
+    * você usa dois views no seu URLconf:
+      :func:`django.contrib.sitemaps.views.index` e
+      :func:`django.contrib.sitemaps.views.sitemap`.
+    * O view :func:`django.contrib.sitemaps.views.sitemap` deve receber um
+      argumento nomeado :data:`section`.
+
+Aqui tem como linhas relevantes do URLconf poderiam parecer para o exemplo
+acima::
+
+   (r'^sitemap.xml$', 'django.contrib.sitemaps.views.index', {'sitemaps': sitemaps}),
+   (r'^sitemap-(?P<section>.+)\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
+
+
+Isto gerará automaticamente um arquivo :file:`sitemap.xml` que referencia ambos
+:file:`sitemap-flatpages.xml` e :file:`sitemap-blog.xml`. As classes
+:class:`~django.contrib.sitemaps.Sitemap` e o dicionário :data:`sitemaps` não
+mudam.
+
+Você deve criar um arquivo index se um de seus sitemaps tem mais de 50,000 URls.
+Neste caso, o Django automaticamente paginará o sitemap, e o index irá reletir
+isso.
+
+Pingando o Google
+=================
+
+Você deve desejar "pingar" o Google quando seu site mudar, para permitir que ele
+sáiba que tem que reindexar seu site. O framework sitemaps provê uma função só
+para fazer isso: :func:`django.contrib.sitemaps.ping_google()`.
+
+.. function:: ping_google
+
+    A função :func:`ping_google` recebe um argumento, :data:`sitemap_url`, que
+    deve ser uma URL absoluta do sitemap do seu site. (e.g.,
+    :file:`'/sitemap.xml'`). Se este argumento não for fornecido, o
+    :func:`ping_google` tentará adivinhar seu sitemap, executando uma engenharia
+    reversa sobre seu URLconf.
+
+    O :func:`ping_google` lança uma exceção
+    :exc:`django.contrib.sitemaps.SitemapNotFound` se ele não conseguir
+    determinar a URL do sitemap.
+
+.. admonition:: Register with Google first!
+
+    O comando :func:`ping_google` somente funciona se você tiver registrado
+    seu site com o `Google Webmaster Tools`_.
+
+.. _`Google Webmaster Tools`: http://www.google.com/webmasters/tools/
+
+Uma forma usual para chamar :func:`ping_google` é de um método ``save()`` de um
+model::
+
+   from django.contrib.sitemaps import ping_google
+
+    class Entry(models.Model):
+        # ...
+        def save(self, force_insert=False, force_update=False):
+            super(Entry, self).save(force_insert, force_update)
+            try:
+                ping_google()
+            except Exception:
+                # 'Exceção' vazia, pois nós podemos receber uma variedade de
+                # exceções relacionadas ao HTTP.
+                pass
+
+Uma solução mais eficiente, entretanto, seria chamar :func:`ping_google` de um
+script cron, ou alguma outra tarefa agendada. A função faz uma requisição HTTP,
+para os servidores do Google, então você precisaria introduzir uma sobrecarga de
+transferência de dados para toda chamada do ``save()``.
+
+Pingando o Google via `manage.py`
+---------------------------------
+
+.. versionadded:: 1.0
+
+Uma vez que a aplicação sitemap esteja adicionada ao seu projeto, você pode
+também pingar os servidores do Google através da interface de linha de comando
+manage.py::
+
+    python manage.py ping_google [/sitemap.xml]
+

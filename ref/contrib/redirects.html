@@ -1,0 +1,240 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>A aplicação de redirecionamento &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Os add-ons “django.contrib”" href="index.html" />
+    <link rel="next" title="O framework sitemap" href="sitemaps.html" />
+    <link rel="prev" title="The messages framework" href="messages.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="messages.html" title="The messages framework">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="sitemaps.html" title="O framework sitemap">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-redirects">
+            
+  <div class="section" id="s-module-django.contrib.redirects">
+<span id="s-a-aplicacao-de-redirecionamento"></span><span id="s-ref-contrib-redirects"></span><span id="module-django.contrib.redirects"></span><span id="a-aplicacao-de-redirecionamento"></span><span id="ref-contrib-redirects"></span><h1>A aplicação de redirecionamento<a class="headerlink" href="#module-django.contrib.redirects" title="Permalink to this headline">¶</a></h1>
+<p>O Django vem acompanhado de uma aplicação de redirecionamento opcional. Ela
+permite você armazenar redirecionadores no banco de dados e manipula o
+redirecionamento pra você.</p>
+<div class="section" id="s-instalacao">
+<span id="instalacao"></span><h2>Instalação<a class="headerlink" href="#instalacao" title="Permalink to this headline">¶</a></h2>
+<p>Para instalá-lo, siga os seguintes passos:</p>
+<ol class="arabic simple">
+<li>Adicione <tt class="docutils literal"><span class="pre">'django.contrib.redirects'</span></tt> em suas
+<a class="reference internal" href="../settings.html#std:setting-INSTALLED_APPS"><tt class="xref std std-setting docutils literal"><span class="pre">INSTALLED_APPS</span></tt></a>.</li>
+<li>Adicione
+<tt class="docutils literal"><span class="pre">'django.contrib.redirects.middleware.RedirectFallbackMiddleware'</span></tt> nas
+suas <a class="reference internal" href="../settings.html#std:setting-MIDDLEWARE_CLASSES"><tt class="xref std std-setting docutils literal"><span class="pre">MIDDLEWARE_CLASSES</span></tt></a>.</li>
+<li>Execute o commando <a class="reference internal" href="../django-admin.html#django-admin-syncdb"><tt class="xref std std-djadmin docutils literal"><span class="pre">manage.py</span> <span class="pre">syncdb</span></tt></a>.</li>
+</ol>
+</div>
+<div class="section" id="s-como-ele-funciona">
+<span id="como-ele-funciona"></span><h2>Como ele funciona<a class="headerlink" href="#como-ele-funciona" title="Permalink to this headline">¶</a></h2>
+<p>O <tt class="docutils literal"><span class="pre">manage.py</span> <span class="pre">syncdb</span></tt> cria uma tabela <tt class="docutils literal"><span class="pre">django_redirect</span></tt> no seu banco de
+dados. Essa é uma tabela de aparência simples com os campos <tt class="docutils literal"><span class="pre">site_id</span></tt>,
+<tt class="docutils literal"><span class="pre">old_path</span></tt> e <tt class="docutils literal"><span class="pre">new_path</span></tt>.</p>
+<p>O <tt class="docutils literal"><span class="pre">RedirectFallbackMiddleware</span></tt> faz todo trabalho. Toda vez que uma aplicação
+Django gera um erro 404, esse middleware checa o banco de dados do
+redirecionador para a URL acessada como um último recurso. Especialmente, ele
+procura por um redirecionador que tenha um <tt class="docutils literal"><span class="pre">old_path</span></tt> com um ID do site que
+corresponde ao <a class="reference internal" href="../settings.html#std:setting-SITE_ID"><tt class="xref std std-setting docutils literal"><span class="pre">SITE_ID</span></tt></a> no arquivo settings.py.</p>
+<ul class="simple">
+<li>Se ele encontra uma correspondência, e <tt class="docutils literal"><span class="pre">new_path</span></tt> não está vazio, ele
+redireciona para o <tt class="docutils literal"><span class="pre">new_path</span></tt>.</li>
+<li>Se ele encontra uma correspondência, e <tt class="docutils literal"><span class="pre">new_path</span></tt> está vazio, ele envia
+um cabeçalho HTTP 410 (&#8220;Gone&#8221;) e uma resposta vazia (content-less).</li>
+<li>Se ele não encontra uma correspondência, a requisição continua sendo
+processada normalmente.</li>
+</ul>
+<p>O middleware somente opera sobre 404s &#8211; não para 500s ou respostas de qualquer
+outro código de status.</p>
+<p>Note que a ordem do <tt class="docutils literal"><span class="pre">MIDDLEWARE_CLASSES</span></tt> importa. Geralmente, você pode
+colocar o <tt class="docutils literal"><span class="pre">RedirectFallbackMiddleware</span></tt> no final da lista, porque ele é um
+último recurso.</p>
+<p>Para saber mais sobre o middleware, leia a <a class="reference internal" href="../../topics/http/middleware.html"><em>documentação do middleware</em></a>.</p>
+</div>
+<div class="section" id="s-como-adicionar-mudar-e-deletar-redirecionadores">
+<span id="como-adicionar-mudar-e-deletar-redirecionadores"></span><h2>Como adicionar, mudar e deletar redirecionadores<a class="headerlink" href="#como-adicionar-mudar-e-deletar-redirecionadores" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="s-via-interface-de-administracao">
+<span id="via-interface-de-administracao"></span><h3>Via interface de administração<a class="headerlink" href="#via-interface-de-administracao" title="Permalink to this headline">¶</a></h3>
+<p>Se você tem ativada a interface de administração automática do Django, você
+pode ver uma seção &#8220;Redirects&#8221; na página principal do admin. Edite os
+redirecionadores como você edita qualquer outro objeto do sistema.</p>
+</div>
+<div class="section" id="s-via-api-do-python">
+<span id="via-api-do-python"></span><h3>Via API do Python<a class="headerlink" href="#via-api-do-python" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="django.contrib.redirects.models.Redirect">
+<em class="property">class </em><tt class="descclassname">models.</tt><tt class="descname">Redirect</tt><a class="headerlink" href="#django.contrib.redirects.models.Redirect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Os redirecionadores são representados por um <a class="reference internal" href="../../topics/db/models.html"><em>modelo Django</em></a> padrão, que se encontram em
+<a class="reference external" href="http://code.djangoproject.com/browser/django/trunk/django/contrib/redirects/models.py">django/contrib/redirects/models.py</a>. Você pode acessar os objetos de
+redirecionamento utilizando a <a class="reference internal" href="../../topics/db/queries.html"><em>API de banco de dados do Django</em></a>.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">A aplicação de redirecionamento</a><ul>
+<li><a class="reference internal" href="#instalacao">Instalação</a></li>
+<li><a class="reference internal" href="#como-ele-funciona">Como ele funciona</a></li>
+<li><a class="reference internal" href="#como-adicionar-mudar-e-deletar-redirecionadores">Como adicionar, mudar e deletar redirecionadores</a><ul>
+<li><a class="reference internal" href="#via-interface-de-administracao">Via interface de administração</a></li>
+<li><a class="reference internal" href="#via-api-do-python">Via API do Python</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="messages.html">The messages framework</a></li>
+    
+    
+      <li>Next: <a href="sitemaps.html">O framework sitemap</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Referência da API</a>
+        
+          <ul><li><a href="index.html">Os add-ons &#8220;django.contrib&#8221;</a>
+        
+        <ul><li>A aplicação de redirecionamento</li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/contrib/redirects.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="messages.html" title="The messages framework">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="sitemaps.html" title="O framework sitemap">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

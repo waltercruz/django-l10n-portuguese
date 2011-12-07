@@ -1,0 +1,317 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>O objeto File &mdash; Django v1.3.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Django v1.3.1 documentation" href="../../index.html" />
+    <link rel="up" title="Referência de manipulação de arquivos" href="index.html" />
+    <link rel="next" title="API de armazenamento de arquivos." href="storage.html" />
+    <link rel="prev" title="Referência de manipulação de arquivos" href="index.html" />
+ 
+<script type="text/javascript" src="../../templatebuiltins.js"></script>
+<script type="text/javascript">
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);
+</script>
+
+  </head>
+  <body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django v1.3.1 documentation</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Tabela de conteúdos" href="../../contents.html">Tabela de conteúdos</a>  |
+        <a title="Índice Global" href="../../genindex.html">Índice</a>  |
+        <a title="Busca" href="../../py-modindex.html">Módulos</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="Referência de manipulação de arquivos">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="storage.html" title="API de armazenamento de arquivos.">next</a> &raquo;</div>
+    </div>
+    
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-files-file">
+            
+  <div class="section" id="s-o-objeto-file">
+<span id="s-ref-files-file"></span><span id="o-objeto-file"></span><span id="ref-files-file"></span><h1>O objeto <tt class="docutils literal"><span class="pre">File</span></tt><a class="headerlink" href="#o-objeto-file" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="django.core.files.File">
+<em class="property">class </em><tt class="descname">File</tt>(<em>file_object</em>)<a class="headerlink" href="#django.core.files.File" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="section" id="s-atributos-e-metodos-de-file">
+<span id="atributos-e-metodos-de-file"></span><h2>atributos e métodos de <tt class="docutils literal"><span class="pre">File</span></tt><a class="headerlink" href="#atributos-e-metodos-de-file" title="Permalink to this headline">¶</a></h2>
+<p>O <tt class="docutils literal"><span class="pre">File</span></tt> do Django tem os seguintes atributos e métodos:</p>
+<dl class="attribute">
+<dt id="django.core.files.File.name">
+<tt class="descclassname">File.</tt><tt class="descname">name</tt><a class="headerlink" href="#django.core.files.File.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>O nome do arquivo incluindo o caminho relativo de <a class="reference internal" href="../settings.html#std:setting-MEDIA_ROOT"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_ROOT</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.core.files.File.path">
+<tt class="descclassname">File.</tt><tt class="descname">path</tt><a class="headerlink" href="#django.core.files.File.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>O caminho absoluto do arquivo no sistema de arquivos</p>
+<p><a class="reference internal" href="../../howto/custom-file-storage.html#howto-custom-file-storage"><em>Sistemas de armazenamento de arquivos personalizados</em></a> podem não gravar
+arquivos localmente; arquivos gravados nesses sistemas terão o <tt class="docutils literal"><span class="pre">path</span></tt> com valor
+<tt class="xref docutils literal"><span class="pre">None</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.core.files.File.url">
+<tt class="descclassname">File.</tt><tt class="descname">url</tt><a class="headerlink" href="#django.core.files.File.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>A URL onde o arquivo pode ser obtido. Isso é frequentemente útil em
+<a class="reference internal" href="../../topics/templates.html"><em>templates</em></a>; por exemplo, um snippet de um template
+para exibir um <tt class="docutils literal"><span class="pre">Car</span></tt> (veja abaixo) poderia ser assim:</p>
+<div class="highlight-html+django"><div class="highlight"><pre><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">car.photo.url</span> <span class="cp">}}</span><span class="s">&#39;</span> <span class="na">alt=</span><span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">car.name</span> <span class="cp">}}</span><span class="s">&#39;</span> <span class="nt">/&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.core.files.File.size">
+<tt class="descclassname">File.</tt><tt class="descname">size</tt><a class="headerlink" href="#django.core.files.File.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>O tamanho do arquivo em bytes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.core.files.File.open">
+<tt class="descclassname">File.</tt><tt class="descname">open</tt>(<em>mode=None</em>)<a class="headerlink" href="#django.core.files.File.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abre ou reabre o arquivo (que por definição também faz um <tt class="docutils literal"><span class="pre">File.seek(0)</span></tt>).
+O argumento <tt class="docutils literal"><span class="pre">mode</span></tt> segue os mesmos valores do <tt class="docutils literal"><span class="pre">open()</span></tt> padrão
+do Python.</p>
+<p>Ao reabrir um arquivo, o <tt class="docutils literal"><span class="pre">mode</span></tt> irá sobrescrever o modo com quem o
+arquivo foi originalmente aberto; <tt class="xref docutils literal"><span class="pre">None</span></tt> significa reabrir no modo original.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.core.files.File.read">
+<tt class="descclassname">File.</tt><tt class="descname">read</tt>(<em>num_bytes=None</em>)<a class="headerlink" href="#django.core.files.File.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lê o conteúdo do arquivo. O argumento opcional <tt class="docutils literal"><span class="pre">size</span></tt> é o número de bytes a
+serem lidos; se não for especificado, o arquivo será lido por completo.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.core.files.File.__iter__">
+<tt class="descclassname">File.</tt><tt class="descname">__iter__</tt>()<a class="headerlink" href="#django.core.files.File.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Itera sobre o arquivo retornando uma linha por vez.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.core.files.File.chunks">
+<tt class="descclassname">File.</tt><tt class="descname">chunks</tt>(<em>chunk_size=None</em>)<a class="headerlink" href="#django.core.files.File.chunks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Itera sobre o arquivo retornando &quot;pedaços&quot; de um dado tamanho. O padrão para
+<tt class="docutils literal"><span class="pre">chunk_size</span></tt> é 64 KB.</p>
+<p>Isto é especialmente útil com arquivos muito grandes, desde que os permitem
+serem enviados por stream para o disco, evitando o armazenamento de todo o
+arquivo na memória.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.core.files.File.multiple_chunks">
+<tt class="descclassname">File.</tt><tt class="descname">multiple_chunks</tt>(<em>chunk_size=None</em>)<a class="headerlink" href="#django.core.files.File.multiple_chunks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna <tt class="xref docutils literal"><span class="pre">True</span></tt> se o arquivo é grande o suficiente para exigir múltiplos pedaços
+ou se todo o seu conteúdo pode ser acessado no <tt class="docutils literal"><span class="pre">chunk_size</span></tt> fornecido.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.core.files.File.write">
+<tt class="descclassname">File.</tt><tt class="descname">write</tt>(<em>content</em>)<a class="headerlink" href="#django.core.files.File.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Escreve a string especificada no conteúdo do arquivo. Dependendo do sistema de
+armazenamento nos bastidores, esse conteúdo pode não estar completamente escrito até
+<tt class="docutils literal"><span class="pre">close()</span></tt> ser chamado no arquivo.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.core.files.File.close">
+<tt class="descclassname">File.</tt><tt class="descname">close</tt>()<a class="headerlink" href="#django.core.files.File.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fecha o arquivo.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-atributos-adicionais-de-imagefield">
+<span id="atributos-adicionais-de-imagefield"></span><h2>Atributos adicionais de <tt class="docutils literal"><span class="pre">ImageField</span></tt><a class="headerlink" href="#atributos-adicionais-de-imagefield" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="django.core.files.File.width">
+<tt class="descclassname">File.</tt><tt class="descname">width</tt><a class="headerlink" href="#django.core.files.File.width" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tamanho da imagem.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.core.files.File.height">
+<tt class="descclassname">File.</tt><tt class="descname">height</tt><a class="headerlink" href="#django.core.files.File.height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Altura da image.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-metodos-adicionais-de-arquivos-anexados-a-objetos">
+<span id="metodos-adicionais-de-arquivos-anexados-a-objetos"></span><h2>Métodos adicionais de arquivos anexados a objetos<a class="headerlink" href="#metodos-adicionais-de-arquivos-anexados-a-objetos" title="Permalink to this headline">¶</a></h2>
+<p>Qualquer <a class="reference internal" href="#django.core.files.File" title="django.core.files.File"><tt class="xref py py-class docutils literal"><span class="pre">File</span></tt></a> que esteja associado com um objeto (como o <tt class="docutils literal"><span class="pre">Car.photo</span></tt>,
+no exemplo acima) irá ter algums métodos extras:</p>
+<dl class="method">
+<dt id="django.core.files.File.save">
+<tt class="descclassname">File.</tt><tt class="descname">save</tt>(<em>name</em>, <em>content</em>, <em>save=True</em>)<a class="headerlink" href="#django.core.files.File.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Salva um novo arquivo com o nome de arquivo e conteúdo fornecidos. Não irá
+substituir o arquivo original, mas criar um novo arquivo e atualizar o objeto
+para apontar pra ele. Se <tt class="docutils literal"><span class="pre">save</span></tt> é <tt class="xref docutils literal"><span class="pre">True</span></tt>, o método <tt class="docutils literal"><span class="pre">save()</span></tt> do modelo irá
+ser chamado assim que o arquivo é salvo. Assim, essas duas linhas:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">car</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">&#39;myphoto.jpg&#39;</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">car</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>são o mesmo que essa única linha:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">car</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">&#39;myphoto.jpg&#39;</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note que o argumento <tt class="docutils literal"><span class="pre">content</span></tt> deve ser uma instância da classe
+<a class="reference internal" href="#django.core.files.File" title="django.core.files.File"><tt class="xref py py-class docutils literal"><span class="pre">File</span></tt></a> ou uma subclasse de <a class="reference internal" href="#django.core.files.File" title="django.core.files.File"><tt class="xref py py-class docutils literal"><span class="pre">File</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.core.files.File.delete">
+<tt class="descclassname">File.</tt><tt class="descname">delete</tt>(<em>save=True</em>)<a class="headerlink" href="#django.core.files.File.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove o arquivo da instância do modelo e deleta o arquivo em si. O argumento
+<tt class="docutils literal"><span class="pre">save</span></tt> funciona como acima.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>         
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">O objeto <tt class="docutils literal"><span class="pre">File</span></tt></a><ul>
+<li><a class="reference internal" href="#atributos-e-metodos-de-file">atributos e métodos de <tt class="docutils literal"><span class="pre">File</span></tt></a></li>
+<li><a class="reference internal" href="#atributos-adicionais-de-imagefield">Atributos adicionais de <tt class="docutils literal"><span class="pre">ImageField</span></tt></a></li>
+<li><a class="reference internal" href="#metodos-adicionais-de-arquivos-anexados-a-objetos">Métodos adicionais de arquivos anexados a objetos</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>Browse</h3>
+  <ul>
+    
+      <li>Prev: <a href="index.html">Referência de manipulação de arquivos</a></li>
+    
+    
+      <li>Next: <a href="storage.html">API de armazenamento de arquivos.</a></li>
+    
+  </ul>
+  <h3>Você está aqui:</h3>
+  <ul>
+      <li>
+        <a href="../../index.html">Django v1.3.1 documentation</a>
+        
+          <ul><li><a href="../index.html">Referência da API</a>
+        
+          <ul><li><a href="index.html">Referência de manipulação de arquivos</a>
+        
+        <ul><li>O objeto <tt class="docutils literal"><span class="pre">File</span></tt></li></ul>
+        </li></ul></li></ul>
+      </li>
+  </ul>  
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/ref/files/file.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Última atualização:</h3>
+              <p class="topless">Dec 06, 2011</p>
+          </div> 
+        
+      
+    </div>
+    
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="Referência de manipulação de arquivos">previous</a> 
+     |
+    <a href="../index.html" title="Referência da API" accesskey="U">up</a>
+   |
+    <a href="storage.html" title="API de armazenamento de arquivos.">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

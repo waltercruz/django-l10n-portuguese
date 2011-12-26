@@ -290,7 +290,7 @@ espera.</p>
 exemplo, um campo <tt class="docutils literal"><span class="pre">ManyToMany</span></tt>). Normalmente isso não será uma coisa sensível
 a se fazer e ele realmente é uma funcionalidade avançada de uso.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Se você não quer que qualquer ordenamento seja aplicado a consulta, nem mesmo o
 ordenamento padrão, chame <tt class="docutils literal"><span class="pre">order_by()</span></tt> sem parametros.
 .. versionadded:: 1.0</p>
@@ -303,7 +303,7 @@ mais que seu backend de banco de dados normalmente o faça.</p>
 <div class="section" id="s-reverse">
 <span id="reverse"></span><h4><tt class="docutils literal"><span class="pre">reverse()</span></tt><a class="headerlink" href="#reverse" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Use o método <tt class="docutils literal"><span class="pre">reverse()</span></tt> para reverter a ordem em que os elementos de uma
 queryset são retornados. Chamando <tt class="docutils literal"><span class="pre">reverse()</span></tt> uma segunda vez restaura a
 ordem de volta a direção normal.</p>
@@ -416,7 +416,7 @@ pois o ordenamento pode afetar os resultados. Veja a nota na seção
 </li>
 </ul>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Anteriormente, não seria possível passar <tt class="docutils literal"><span class="pre">blog_id</span></tt> ao <tt class="docutils literal"><span class="pre">values()</span></tt> no exemplo
 acima, somente <tt class="docutils literal"><span class="pre">blog</span></tt>.</p>
 <p>Um <tt class="docutils literal"><span class="pre">ValuesQuerySet</span></tt> é útil quando você sabe que vai precisar de valores de um
@@ -439,7 +439,7 @@ ostentar seu individualismo.</p>
 <div class="section" id="s-values-list-fields">
 <span id="values-list-fields"></span><h4><tt class="docutils literal"><span class="pre">values_list(*fields)</span></tt><a class="headerlink" href="#values-list-fields" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Este é similar ao <tt class="docutils literal"><span class="pre">values()</span></tt> exceto que ao invés de retornar uma lista de
 dicionários, ele retorna uma lista de tuplas. Cada tupla contém o valor do
 respectivo campo passado dentro da chamada <tt class="docutils literal"><span class="pre">values_list()</span></tt> -- então o primeiro
@@ -496,7 +496,7 @@ especifica como ordenar os resultados.</p>
 <div class="section" id="s-none">
 <span id="none"></span><h4><tt class="docutils literal"><span class="pre">none()</span></tt><a class="headerlink" href="#none" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Retorna um <tt class="docutils literal"><span class="pre">EmptyQuerySet</span></tt> -- um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que sempre avalia para uma lista
 vazia. Este pode ser usado nos casos onde você sabe que você deve retornar uma
 lista de resultados vazia e sua chamada está esperando um objeto <tt class="docutils literal"><span class="pre">QuerySet</span></tt>
@@ -510,7 +510,7 @@ lista de resultados vazia e sua chamada está esperando um objeto <tt class="doc
 <div class="section" id="s-all">
 <span id="all"></span><h4><tt class="docutils literal"><span class="pre">all()</span></tt><a class="headerlink" href="#all" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Retorna uma ''cópia'' do <tt class="docutils literal"><span class="pre">QuerySet</span></tt> atual (ou extende o <tt class="docutils literal"><span class="pre">QuerySet</span></tt> que você
 passou). Isso pode ser útil em algumas situações onde você pode querer passar
 em cada model manager ou um <tt class="docutils literal"><span class="pre">QuerySet</span></tt> e fazer uma filtragem maior do
@@ -615,7 +615,7 @@ tenham <tt class="docutils literal"><span class="pre">null=True</span></tt> (ind
 um erro usar ambos, uma lista de campos e o paramêtro <tt class="docutils literal"><span class="pre">depth</span></tt>, na mesma
 chamada do <tt class="docutils literal"><span class="pre">select_related()</span></tt>, já que eles são opções conflitantes.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Ambos, o argumento <tt class="docutils literal"><span class="pre">depth</span></tt> e a abilidade de especificar nomes de campos em
 chamadas do <tt class="docutils literal"><span class="pre">select_related()</span></tt>, são novidades do Django 1.0.</p>
 </div>
@@ -668,7 +668,7 @@ da sub-consulta não são obrigatório na cláusula <tt class="docutils literal"
 note que alguns backends de banco de dados, como algumas versões do MySQL,
 não suportam sub-consultas.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Em alguns casos raros, você pode querer passar paramêtros para os fragmentos
 SQL no <tt class="docutils literal"><span class="pre">extra(select=...)</span></tt>. Para este proposito, use o paramêtro
 <tt class="docutils literal"><span class="pre">select_params</span></tt>. Já que  <tt class="docutils literal"><span class="pre">select_params</span></tt> é uma sequência de atributos
@@ -974,7 +974,7 @@ interpretado como um SQL <tt class="docutils literal"><span class="pre">NULL</sp
 SELECT ... WHERE id IS NULL;</pre>
 </div>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.0:</span> A semântica de <tt class="docutils literal"><span class="pre">id__exact=None</span></tt> mudou no Django 1.0. Anteriormente, ela era
+<span class="title">Alterado no Django 1.0:</span> A semântica de <tt class="docutils literal"><span class="pre">id__exact=None</span></tt> mudou no Django 1.0. Anteriormente, ela era
 (intencionalmente) convetido para <tt class="docutils literal"><span class="pre">WHERE</span> <span class="pre">id</span> <span class="pre">=</span> <span class="pre">NULL</span></tt> a nível de SQL, o que
 nunca combinaria com nada. Agora ela foi mudada para fazer o mesmo utilizando
 <tt class="docutils literal"><span class="pre">id__isnull=True</span></tt>.</div>

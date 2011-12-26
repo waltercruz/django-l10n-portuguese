@@ -217,7 +217,7 @@ a forma antiga de se usar:</p>
 especificar valores de variáveis. Ou vígulas de fato. Ou espaços. Nós
 mencionamos que você não deve usar esta sintaxe em nenhum novo projeto?</p>
 <div class="versionadded">
-<span class="title">New in Django 1.3:</span> <a class="reference internal" href="../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.3:</span> <a class="reference internal" href="../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
 <p>By default, when you use the <tt class="docutils literal"><span class="pre">as</span></tt> keyword with the cycle tag, the
 usage of <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">cycle</span> <span class="pre">%}</span></tt> that declares the cycle will itself output
 the first value in the cycle. This could be a problem if you want to
@@ -446,7 +446,7 @@ variáveis ou para negá-las:</p>
 </pre></div>
 </div>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.2:</span> <a class="reference internal" href="../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Alterado no Django 1.2:</span> <a class="reference internal" href="../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>Use of both <tt class="docutils literal"><span class="pre">and</span></tt> and <tt class="docutils literal"><span class="pre">or</span></tt> clauses within the same tag is allowed, with
 <tt class="docutils literal"><span class="pre">and</span></tt> having higher precedence than <tt class="docutils literal"><span class="pre">or</span></tt> e.g.:</p>
 <div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">if</span> <span class="nv">athlete_list</span> <span class="k">and</span> <span class="nv">coach_list</span> <span class="k">or</span> <span class="nv">cheerleader_list</span> <span class="cp">%}</span>
@@ -458,7 +458,7 @@ variáveis ou para negá-las:</p>
 <p>Use of actual brackets in the <tt class="docutils literal"><span class="pre">if</span></tt> tag is invalid syntax.  If you need them to
 indicate precedence, you should use nested <tt class="docutils literal"><span class="pre">if</span></tt> tags.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p><tt class="docutils literal"><span class="pre">if</span></tt> tags may also use the operators <tt class="docutils literal"><span class="pre">==</span></tt>, <tt class="docutils literal"><span class="pre">!=</span></tt>, <tt class="docutils literal"><span class="pre">&lt;</span></tt>, <tt class="docutils literal"><span class="pre">&gt;</span></tt>,
 <tt class="docutils literal"><span class="pre">&lt;=</span></tt>, <tt class="docutils literal"><span class="pre">&gt;=</span></tt> and <tt class="docutils literal"><span class="pre">in</span></tt> which work as follows:</p>
 </div>
@@ -651,14 +651,14 @@ strings. Você não pode checar a igualdade entre objetos Python com <tt class="
 <tt class="xref docutils literal"><span class="pre">False</span></tt>. Se você precisa testar se algo é verdadeiro ou falso, use a tag
 <tt class="docutils literal"><span class="pre">if</span></tt>.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> An alternative to the <tt class="docutils literal"><span class="pre">ifequal</span></tt> tag is to use the <a class="reference internal" href="#std:templatetag-if"><tt class="xref std std-ttag docutils literal"><span class="pre">if</span></tt></a> tag and the <tt class="docutils literal"><span class="pre">==</span></tt> operator.</div>
+<span class="title">Novo no Django 1.2:</span> An alternative to the <tt class="docutils literal"><span class="pre">ifequal</span></tt> tag is to use the <a class="reference internal" href="#std:templatetag-if"><tt class="xref std std-ttag docutils literal"><span class="pre">if</span></tt></a> tag and the <tt class="docutils literal"><span class="pre">==</span></tt> operator.</div>
 </div>
 <div class="section" id="s-ifnotequal">
 <span id="s-std:templatetag-ifnotequal"></span><span id="ifnotequal"></span><span id="std:templatetag-ifnotequal"></span><h3>ifnotequal<a class="headerlink" href="#ifnotequal" title="Permalink to this headline">¶</a></h3>
 <p>Exatamente como <tt class="docutils literal"><span class="pre">ifequal</span></tt>, exceto que testa se os dois argumentos não são
 iguais.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> An alternative to the <tt class="docutils literal"><span class="pre">ifnotequal</span></tt> tag is to use the <a class="reference internal" href="#std:templatetag-if"><tt class="xref std std-ttag docutils literal"><span class="pre">if</span></tt></a> tag and the <tt class="docutils literal"><span class="pre">!=</span></tt> operator.</div>
+<span class="title">Novo no Django 1.2:</span> An alternative to the <tt class="docutils literal"><span class="pre">ifnotequal</span></tt> tag is to use the <a class="reference internal" href="#std:templatetag-if"><tt class="xref std std-ttag docutils literal"><span class="pre">if</span></tt></a> tag and the <tt class="docutils literal"><span class="pre">!=</span></tt> operator.</div>
 </div>
 <div class="section" id="s-include">
 <span id="s-std:templatetag-include"></span><span id="include"></span><span id="std:templatetag-include"></span><h3>include<a class="headerlink" href="#include" title="Permalink to this headline">¶</a></h3>
@@ -692,7 +692,7 @@ exemplo produz uma saída <tt class="docutils literal"><span class="pre">&quot;H
 </li>
 </ul>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.3:</span> Additional context and exclusive context.</div>
+<span class="title">Alterado no Django 1.3:</span> Additional context and exclusive context.</div>
 <p>You can pass additional context to the template using keyword arguments:</p>
 <div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">include</span> <span class="s2">&quot;name_snippet.html&quot;</span> <span class="k">with</span> <span class="nv">person</span><span class="o">=</span><span class="s2">&quot;Jane&quot;</span> <span class="nv">greeting</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span> <span class="cp">%}</span>
 </pre></div>
@@ -721,7 +721,7 @@ registered in <tt class="docutils literal"><span class="pre">somelibrary</span><
 </pre></div>
 </div>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.3:</span> <a class="reference internal" href="../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Alterado no Django 1.3:</span> <a class="reference internal" href="../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
 <p>You can also selectively load individual filters or tags from a library, using
 the <tt class="docutils literal"><span class="pre">from</span></tt> argument. In this example, the template tags/filters named <tt class="docutils literal"><span class="pre">foo</span></tt>
 and <tt class="docutils literal"><span class="pre">bar</span></tt> will be loaded from <tt class="docutils literal"><span class="pre">somelibrary</span></tt>:</p>
@@ -1180,14 +1180,14 @@ como este:</p>
 </div>
 <p>A tag do template gerará uma string <tt class="docutils literal"><span class="pre">/clients/client/123/</span></tt>.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Se você está usando <a class="reference internal" href="../../topics/http/urls.html#naming-url-patterns"><em>padrões de URL nomeados</em></a>, você
 pode referenciar o nome do padrão na tag <tt class="docutils literal"><span class="pre">url</span></tt> ao invés de usar o caminho do
 view.</p>
 <p>Note que se a URL que você está revertendo não existe, você irá receber uma
 exceção <tt class="xref py py-exc docutils literal"><span class="pre">NoReverseMatch</span></tt>, que fará seu site mostrar uma página de erro.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Se você gostaria de receber uma URL sem mostrá-la, você pode usar uma chamada
 ligeiramente diferente:</p>
 <div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">url</span> <span class="nv">path.to.view</span> <span class="nv">arg</span><span class="o">,</span> <span class="nv">arg2</span> <span class="k">as</span> <span class="nv">the_url</span> <span class="cp">%}</span>
@@ -1219,7 +1219,7 @@ arredondado para cima, 88).</p>
 <div class="section" id="s-with">
 <span id="s-std:templatetag-with"></span><span id="with"></span><span id="std:templatetag-with"></span><h3>with<a class="headerlink" href="#with" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Cacheia uma variável complexa sob um simples nome. Isto é usual quando se acessa
 um método muito &quot;custoso&quot; (e.g, um que consulta o banco de dados) múltiplas
 vezes.</p>
@@ -1362,14 +1362,14 @@ feita. Então é seguro usar esta função mesmo em ambientes que possuem escape
 automático. Se você deseja multiplicar os passes do <tt class="docutils literal"><span class="pre">escape</span></tt> a serem
 aplicados, use o filtro <tt class="docutils literal"><span class="pre">force_escape</span></tt>.</p>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.0:</span> Devido ao auto-escape, o comportamento deste filtro foi ligeiramente mudado.
+<span class="title">Alterado no Django 1.0:</span> Devido ao auto-escape, o comportamento deste filtro foi ligeiramente mudado.
 As substituições são feitas somente uma vez, depois de todos os outros
 filtros -- incluíndo os filtros antes e depois dele.</div>
 </div>
 <div class="section" id="s-escapejs">
 <span id="s-std:templatefilter-escapejs"></span><span id="escapejs"></span><span id="std:templatefilter-escapejs"></span><h3>escapejs<a class="headerlink" href="#escapejs" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Escapa caracteres para uso em strings de JavaScript. Ele <em>não</em> cria a string
 pronta para usar em HTML, mas proteje você de erros de sintaxe quando são usados
 templates para gerar JavaScript/JSON.</p>
@@ -1396,7 +1396,7 @@ templates para gerar JavaScript/JSON.</p>
 <div class="section" id="s-fix-ampersands">
 <span id="s-std:templatefilter-fix_ampersands"></span><span id="fix-ampersands"></span><span id="std:templatefilter-fix_ampersands"></span><h3>fix_ampersands<a class="headerlink" href="#fix-ampersands" title="Permalink to this headline">¶</a></h3>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.0:</span> Este raramente é útil pois comerciais (<em>&amp;</em>) são automaticamente escapados agora. Veja <a class="reference internal" href="#escape">escape</a> para mais informações.</div>
+<span class="title">Alterado no Django 1.0:</span> Este raramente é útil pois comerciais (<em>&amp;</em>) são automaticamente escapados agora. Veja <a class="reference internal" href="#escape">escape</a> para mais informações.</div>
 <p>Substitui comecial (<em>&amp;</em>) pela entidade <tt class="docutils literal"><span class="pre">&amp;amp;</span></tt>.</p>
 <p>Por exemplo:</p>
 <div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{{</span> <span class="nv">value</span><span class="o">|</span><span class="nf">fix_ampersands</span> <span class="cp">}}</span>
@@ -1501,7 +1501,7 @@ argumento <tt class="docutils literal"><span class="pre">-1</span></tt>.</p>
 <div class="section" id="s-force-escape">
 <span id="s-std:templatefilter-force_escape"></span><span id="force-escape"></span><span id="std:templatefilter-force_escape"></span><h3>force_escape<a class="headerlink" href="#force-escape" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Escapa o HTML para uma string (veja o filtro <tt class="docutils literal"><span class="pre">escape</span></tt> para detalhes).
 Este filtro é aplicado <em>imediatamente</em> e retorna uma nova, string escapada. Ele
 é usual em raros casos onde você precisa dar múltiplos escapes ou quer aplicar
@@ -1541,7 +1541,7 @@ possuem caracteres não ASCII na URL.</p>
 <div class="section" id="s-last">
 <span id="s-std:templatefilter-last"></span><span id="last"></span><span id="std:templatefilter-last"></span><h3>last<a class="headerlink" href="#last" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Retorna o último item de uma lista.</p>
 <p>Por exemplo:</p>
 <div class="highlight-html+django"><div class="highlight"><pre><span class="cp">{{</span> <span class="nv">value</span><span class="o">|</span><span class="nf">last</span> <span class="cp">}}</span>
@@ -1792,7 +1792,7 @@ quando estiver sendo passado textos HTML.</p>
 <p>Recursivamente recebe uma lista auto-aninhada e retorna uma lista HTML
 não-ordenada -- SEM abrir e fechar tags &lt;ul&gt;.</p>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.0:</span> O formato aceito por  <tt class="docutils literal"><span class="pre">unordered_list</span></tt> mudou para facilitar o entendimento.</div>
+<span class="title">Alterado no Django 1.0:</span> O formato aceito por  <tt class="docutils literal"><span class="pre">unordered_list</span></tt> mudou para facilitar o entendimento.</div>
 <p>A lista é para ser assumida no formato correto. Por exemplo, se <tt class="docutils literal"><span class="pre">var</span></tt> contém
 <tt class="docutils literal"><span class="pre">['States',</span> <span class="pre">['Kansas',</span> <span class="pre">['Lawrence',</span> <span class="pre">'Topeka'],</span> <span class="pre">'Illinois']]</span></tt>, então
 <tt class="docutils literal"><span class="pre">{{</span> <span class="pre">var|unordered_list</span> <span class="pre">}}</span></tt> retornaria:</p>

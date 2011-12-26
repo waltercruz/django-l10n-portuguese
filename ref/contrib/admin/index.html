@@ -193,7 +193,7 @@ changelist displays actions at the top of the page (<tt class="docutils literal"
 <dt id="django.contrib.admin.ModelAdmin.actions_selection_counter">
 <tt class="descclassname">ModelAdmin.</tt><tt class="descname">actions_selection_counter</tt><a class="headerlink" href="#django.contrib.admin.ModelAdmin.actions_selection_counter" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>Controls whether a selection counter is display next to the action dropdown.
 By default, the admin changelist will display it
 (<tt class="docutils literal"><span class="pre">actions_selection_counter</span> <span class="pre">=</span> <span class="pre">True</span></tt>).</p>
@@ -210,7 +210,7 @@ navigation by that field.</p>
 </pre></div>
 </div>
 <div class="versionadded">
-<span class="title">New in Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
 <p>This will intelligently populate itself based on available data,
 e.g. if all the dates are in one month, it'll show the day-level
 drill-down only.</p>
@@ -257,7 +257,7 @@ the <tt class="docutils literal"><span class="pre">django.contrib.flatpages.Flat
 <p>In the above example, only the fields 'url', 'title' and 'content' will be
 displayed, sequentially, in the form.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p><tt class="docutils literal"><span class="pre">fields</span></tt> can contain values defined in <a class="reference internal" href="#django.contrib.admin.ModelAdmin.readonly_fields" title="django.contrib.admin.ModelAdmin.readonly_fields"><tt class="xref py py-attr docutils literal"><span class="pre">ModelAdmin.readonly_fields</span></tt></a>
 to be displayed as read-only.</p>
 <div class="admonition-note admonition ">
@@ -321,7 +321,7 @@ their own tuple. In this example, the <tt class="docutils literal"><span class="
 </pre></div>
 </div>
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p class="last"><tt class="docutils literal"><span class="pre">fields</span></tt> can contain values defined in
 <a class="reference internal" href="#django.contrib.admin.ModelAdmin.readonly_fields" title="django.contrib.admin.ModelAdmin.readonly_fields"><tt class="xref py py-attr docutils literal"><span class="pre">readonly_fields</span></tt></a> to be displayed as read-only.</p>
 </dd>
@@ -646,7 +646,7 @@ shows how both <tt class="docutils literal"><span class="pre">list_display</span
 </div></blockquote>
 <p>(This example also has <tt class="docutils literal"><span class="pre">search_fields</span></tt> defined. See below.)</p>
 <div class="versionadded">
-<span class="title">New in Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
 <p>Fields in <tt class="docutils literal"><span class="pre">list_filter</span></tt> can also span relations using the <tt class="docutils literal"><span class="pre">__</span></tt> lookup:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">UserAdminWithLookup</span><span class="p">(</span><span class="n">UserAdmin</span><span class="p">):</span>
     <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;groups__name&#39;</span><span class="p">)</span>
@@ -693,7 +693,7 @@ will be ignored.</p>
 <dt id="django.contrib.admin.ModelAdmin.paginator">
 <tt class="descclassname">ModelAdmin.</tt><tt class="descname">paginator</tt><a class="headerlink" href="#django.contrib.admin.ModelAdmin.paginator" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
 <p>The paginator class to be used for pagination. By default,
 <a class="reference internal" href="../../../topics/pagination.html#django.core.paginator.Paginator" title="django.core.paginator.Paginator"><tt class="xref py py-class docutils literal"><span class="pre">django.core.paginator.Paginator</span></tt></a> is used. If the custom paginator
 class doesn't have the same constructor interface as
@@ -757,7 +757,7 @@ into an <tt class="docutils literal"><span class="pre">Input</span></tt> widget 
 <dt id="django.contrib.admin.ModelAdmin.readonly_fields">
 <tt class="descclassname">ModelAdmin.</tt><tt class="descname">readonly_fields</tt><a class="headerlink" href="#django.contrib.admin.ModelAdmin.readonly_fields" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>By default the admin shows all fields as editable. Any fields in this
 option (which should be a <tt class="docutils literal"><span class="pre">list</span></tt> or <tt class="docutils literal"><span class="pre">tuple</span></tt>) will display its data
 as-is and non-editable. This option behaves nearly identical to
@@ -863,7 +863,7 @@ templates used by the <a class="reference internal" href="#django.contrib.admin.
 <dt id="django.contrib.admin.ModelAdmin.add_form_template">
 <tt class="descclassname">ModelAdmin.</tt><tt class="descname">add_form_template</tt><a class="headerlink" href="#django.contrib.admin.ModelAdmin.add_form_template" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>Path to a custom template, used by <a class="reference internal" href="#django.contrib.admin.ModelAdmin.add_view" title="django.contrib.admin.ModelAdmin.add_view"><tt class="xref py py-meth docutils literal"><span class="pre">add_view()</span></tt></a>.</p>
 </dd></dl>
 
@@ -890,7 +890,7 @@ confirmation page when deleting one or more objects.</p>
 <dt id="django.contrib.admin.ModelAdmin.delete_selected_confirmation_template">
 <tt class="descclassname">ModelAdmin.</tt><tt class="descname">delete_selected_confirmation_template</tt><a class="headerlink" href="#django.contrib.admin.ModelAdmin.delete_selected_confirmation_template" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>Path to a custom template, used by the <tt class="xref py py-meth docutils literal"><span class="pre">delete_selected()</span></tt>
 action method for displaying a confirmation page when deleting one
 or more objects. See the <a class="reference internal" href="actions.html"><em>actions
@@ -932,7 +932,7 @@ or changing the object. Here you can do any pre- or post-save operations.</p>
 <dt id="django.contrib.admin.ModelAdmin.delete_model">
 <tt class="descclassname">ModelAdmin.</tt><tt class="descname">delete_model</tt>(<em>self</em>, <em>request</em>, <em>obj</em>)<a class="headerlink" href="#django.contrib.admin.ModelAdmin.delete_model" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
 <p>The <tt class="docutils literal"><span class="pre">delete_model</span></tt> method is given the <tt class="docutils literal"><span class="pre">HttpRequest</span></tt> and a model
 instance. Use this method to do pre- or post-delete operations.</p>
 </dd></dl>
@@ -960,7 +960,7 @@ model instance:</p>
 <dt id="django.contrib.admin.ModelAdmin.get_readonly_fields">
 <tt class="descclassname">ModelAdmin.</tt><tt class="descname">get_readonly_fields</tt>(<em>self</em>, <em>request</em>, <em>obj=None</em>)<a class="headerlink" href="#django.contrib.admin.ModelAdmin.get_readonly_fields" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>The <tt class="docutils literal"><span class="pre">get_readonly_fields</span></tt> method is given the <tt class="docutils literal"><span class="pre">HttpRequest</span></tt> and the
 <tt class="docutils literal"><span class="pre">obj</span></tt> being edited (or <tt class="xref docutils literal"><span class="pre">None</span></tt> on an add form) and is expected to return
 a <tt class="docutils literal"><span class="pre">list</span></tt> or <tt class="docutils literal"><span class="pre">tuple</span></tt> of field names that will be displayed as read-only,
@@ -1147,7 +1147,7 @@ using the <a class="reference internal" href="../messages.html#module-django.con
 <dt id="django.contrib.admin.ModelAdmin.get_paginator">
 <tt class="descclassname">ModelAdmin.</tt><tt class="descname">get_paginator</tt>(<em>queryset</em>, <em>per_page</em>, <em>orphans=0</em>, <em>allow_empty_first_page=True</em>)<a class="headerlink" href="#django.contrib.admin.ModelAdmin.get_paginator" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
 <p>Returns an instance of the paginator to use for this view. By default,
 instantiates an instance of <a class="reference internal" href="#django.contrib.admin.ModelAdmin.paginator" title="django.contrib.admin.ModelAdmin.paginator"><tt class="xref py py-attr docutils literal"><span class="pre">paginator</span></tt></a>.</p>
 </dd></dl>
@@ -1229,7 +1229,7 @@ on your <tt class="docutils literal"><span class="pre">ModelAdmin</span></tt>:</
 </pre></div>
 </div>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Alterado no Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
 <p>The <a class="reference internal" href="../staticfiles.html"><em>staticfiles app</em></a> prepends
 <tt class="xref std std-setting docutils literal"><span class="pre">STATIC_URL</span></tt> (or <a class="reference internal" href="../../settings.html#std:setting-MEDIA_URL"><tt class="xref std std-setting docutils literal"><span class="pre">MEDIA_URL</span></tt></a> if <tt class="xref std std-setting docutils literal"><span class="pre">STATIC_URL</span></tt> is
 <tt class="xref docutils literal"><span class="pre">None</span></tt>) to any media paths. The same rules apply as <a class="reference internal" href="../../../topics/forms/media.html#form-media-paths"><em>regular media
@@ -1331,13 +1331,13 @@ adds some of its own (the shared features are actually defined in the
 <li><a class="reference internal" href="#django.contrib.admin.ModelAdmin.formfield_for_manytomany" title="django.contrib.admin.ModelAdmin.formfield_for_manytomany"><tt class="xref py py-meth docutils literal"><span class="pre">formfield_for_manytomany()</span></tt></a></li>
 </ul>
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <ul class="simple">
 <li><a class="reference internal" href="#django.contrib.admin.ModelAdmin.readonly_fields" title="django.contrib.admin.ModelAdmin.readonly_fields"><tt class="xref py py-attr docutils literal"><span class="pre">readonly_fields</span></tt></a></li>
 <li><a class="reference internal" href="#django.contrib.admin.ModelAdmin.formfield_overrides" title="django.contrib.admin.ModelAdmin.formfield_overrides"><tt class="xref py py-attr docutils literal"><span class="pre">formfield_overrides</span></tt></a></li>
 </ul>
 <div class="versionadded">
-<span class="title">New in Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
 <ul class="simple">
 <li><a class="reference internal" href="#django.contrib.admin.ModelAdmin.ordering" title="django.contrib.admin.ModelAdmin.ordering"><tt class="xref py py-attr docutils literal"><span class="pre">ordering</span></tt></a></li>
 <li><a class="reference internal" href="#django.contrib.admin.ModelAdmin.queryset" title="django.contrib.admin.ModelAdmin.queryset"><tt class="xref py py-meth docutils literal"><span class="pre">queryset()</span></tt></a></li>
@@ -1381,7 +1381,7 @@ addition to the initial forms. See the
 <a class="reference internal" href="../../../topics/forms/formsets.html"><em>formsets documentation</em></a> for more
 information.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>For users with JavaScript-enabled browsers, an &quot;Add another&quot; link is
 provided to enable any number of additional inlines to be added in addition
 to those provided as a result of the <tt class="docutils literal"><span class="pre">extra</span></tt> argument.</p>
@@ -1467,7 +1467,7 @@ automatically:</p>
 <div class="section" id="s-working-with-many-to-many-models">
 <span id="working-with-many-to-many-models"></span><h3>Working with many-to-many models<a class="headerlink" href="#working-with-many-to-many-models" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>By default, admin widgets for many-to-many relations will be displayed
 on whichever model contains the actual reference to the
 <a class="reference internal" href="../../models/fields.html#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><tt class="xref py py-class docutils literal"><span class="pre">ManyToManyField</span></tt></a>. Depending on your <tt class="docutils literal"><span class="pre">ModelAdmin</span></tt>
@@ -1741,7 +1741,7 @@ view.</p>
 <dt id="django.contrib.admin.AdminSite.login_form">
 <tt class="descclassname">AdminSite.</tt><tt class="descname">login_form</tt><a class="headerlink" href="#django.contrib.admin.AdminSite.login_form" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.3:</span> <a class="reference internal" href="../../../releases/1.3.html"><em>Please, see the release notes</em></a></div>
 <p>Subclass of <a class="reference internal" href="../../../topics/auth.html#django.contrib.auth.forms.AuthenticationForm" title="django.contrib.auth.forms.AuthenticationForm"><tt class="xref py py-class docutils literal"><span class="pre">AuthenticationForm</span></tt></a> that
 will be used by the admin site login view.</p>
 </dd></dl>
@@ -1750,7 +1750,7 @@ will be used by the admin site login view.</p>
 <dt id="django.contrib.admin.AdminSite.logout_template">
 <tt class="descclassname">AdminSite.</tt><tt class="descname">logout_template</tt><a class="headerlink" href="#django.contrib.admin.AdminSite.logout_template" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>Path to a custom template that will be used by the admin site logout view.</p>
 </dd></dl>
 
@@ -1758,7 +1758,7 @@ will be used by the admin site login view.</p>
 <dt id="django.contrib.admin.AdminSite.password_change_template">
 <tt class="descclassname">AdminSite.</tt><tt class="descname">password_change_template</tt><a class="headerlink" href="#django.contrib.admin.AdminSite.password_change_template" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>Path to a custom template that will be used by the admin site password
 change view.</p>
 </dd></dl>
@@ -1767,7 +1767,7 @@ change view.</p>
 <dt id="django.contrib.admin.AdminSite.password_change_done_template">
 <tt class="descclassname">AdminSite.</tt><tt class="descname">password_change_done_template</tt><a class="headerlink" href="#django.contrib.admin.AdminSite.password_change_done_template" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>Path to a custom template that will be used by the admin site password
 change done view.</p>
 </dd></dl>

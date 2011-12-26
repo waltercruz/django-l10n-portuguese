@@ -136,7 +136,7 @@ está sempre em maiúsculo. Exemplo:</p>
 <dt id="django.http.HttpRequest.encoding">
 <tt class="descclassname">HttpRequest.</tt><tt class="descname">encoding</tt><a class="headerlink" href="#django.http.HttpRequest.encoding" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Uma string representando o valor atual de codificação utilizado para
 decodificar o envio de dados de formulário (ou <tt class="xref docutils literal"><span class="pre">None</span></tt>, que quer dizer
 que o parâmetro de configuração <tt class="docutils literal"><span class="pre">DEFAULT_CHARSET</span></tt> é utilizado). Você
@@ -210,7 +210,7 @@ e o <tt class="docutils literal"><span class="pre">&lt;form&gt;</span></tt> que 
 <tt class="docutils literal"><span class="pre">enctype=&quot;multipart/form-data&quot;</span></tt>. De outra forma, <tt class="docutils literal"><span class="pre">FILES</span></tt> será um
 dicionário em branco.</p>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Alterado no Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Nas versões anteriores do Django, <tt class="docutils literal"><span class="pre">request.FILES</span></tt> contendo um simples
 <tt class="docutils literal"><span class="pre">dict</span></tt> representando os arquivos enviados. Isto já não é verdade -- os
 arquivos são representados por objetos <tt class="docutils literal"><span class="pre">UploadedFile</span></tt> como decrito abaixo.</p>
@@ -298,7 +298,7 @@ Veja <a class="reference internal" href="../topics/http/urls.html#how-django-pro
 <dt id="django.http.HttpRequest.get_host">
 <tt class="descclassname">HttpRequest.</tt><tt class="descname">get_host</tt>()<a class="headerlink" href="#django.http.HttpRequest.get_host" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Retorna o servidor originador da requisição usando informações dos cabeçalhos
 <tt class="docutils literal"><span class="pre">HTTP_X_FORWARDED_HOST</span></tt> e <tt class="docutils literal"><span class="pre">HTTP_HOST</span></tt> (nesta ordem). Se eles não fornecem
 um valor, o método usa uma combinação de <tt class="docutils literal"><span class="pre">SERVER_NAME</span></tt> e <tt class="docutils literal"><span class="pre">SERVER_PORT</span></tt>
@@ -317,7 +317,7 @@ como detalhado em <a class="reference external" href="http://www.python.org/dev/
 <dt id="django.http.HttpRequest.build_absolute_uri">
 <tt class="descclassname">HttpRequest.</tt><tt class="descname">build_absolute_uri</tt>(<em>location</em>)<a class="headerlink" href="#django.http.HttpRequest.build_absolute_uri" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Retorna a URI absoluta de <tt class="docutils literal"><span class="pre">location</span></tt>. Se nenhum location é fornecido, o
 location será setado para <cite>request.get_full_path()`</cite>.</p>
 <p>Se o location já é uma URI absoluta, ele não será alterado. De outra forma a
@@ -337,7 +337,7 @@ HTTPS.</p>
 <dt id="django.http.HttpRequest.is_ajax">
 <tt class="descclassname">HttpRequest.</tt><tt class="descname">is_ajax</tt>()<a class="headerlink" href="#django.http.HttpRequest.is_ajax" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Retorna <tt class="xref docutils literal"><span class="pre">True</span></tt> se a requisição foi feita via um <tt class="docutils literal"><span class="pre">XMLHttpRequest</span></tt>,
 checando o cabeçalho <tt class="docutils literal"><span class="pre">HTTP_X_REQUESTED_WITH</span></tt> por um string
 <tt class="docutils literal"><span class="pre">'XMLHttpRequest'</span></tt>. As seguintes bibliotecas JavaScript enviam seus
@@ -631,7 +631,7 @@ retornar strings, e suas strings serão unidas para formar o conteúdo da
 resposta.</p>
 <p>O <tt class="docutils literal"><span class="pre">status</span></tt> é o <a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10">Status code HTTP</a> para a resposta.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>O <tt class="docutils literal"><span class="pre">content_type</span></tt> é um alias para <tt class="docutils literal"><span class="pre">mimetype</span></tt>. Historicamente, este
 parâmetro foi chamado somente <tt class="docutils literal"><span class="pre">mimetype</span></tt>, mas como na verdade ele é o
 valor incluso no cabeçalho HTTP <tt class="docutils literal"><span class="pre">Content-Type</span></tt>, também pode incluir o
@@ -750,7 +750,7 @@ página não foi modificada desde a última requisição do usuário (status cod
 <dt id="django.http.HttpResponseBadRequest">
 <em class="property">class </em><tt class="descname">HttpResponseBadRequest</tt><a class="headerlink" href="#django.http.HttpResponseBadRequest" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Age como um <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><tt class="xref py py-class docutils literal"><span class="pre">HttpResponse</span></tt></a> mas usa um &quot;status code&quot; 400.</p>
 </dd></dl>
 

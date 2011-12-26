@@ -88,8 +88,6 @@
             
   <div class="section" id="s-module-django.contrib.formtools.wizard">
 <span id="s-form-wizard"></span><span id="s-ref-contrib-formtools-form-wizard"></span><span id="module-django.contrib.formtools.wizard"></span><span id="form-wizard"></span><span id="ref-contrib-formtools-form-wizard"></span><h1>Form wizard<a class="headerlink" href="#module-django.contrib.formtools.wizard" title="Permalink to this headline">¶</a></h1>
-<div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>O Django vem acompanhado uma aplicação opicional &#8220;form wizard&#8221; que divide
 <a class="reference internal" href="../../../topics/forms/index.html"><em>formulários</em></a> em várias páginas Web. Ele mantém o
 estado num hash HTML de campos <tt class="samp docutils literal"><span class="pre">&lt;input</span> <span class="pre">type=&quot;hidden&quot;&gt;</span></tt>, e os dados não são
@@ -125,8 +123,8 @@ precise fazer.</li>
 <p>Esta aplicação manipula tantos mecanismos para você quanto possível.
 Geralmente, você só tem que fazer estas coisas:</p>
 <ol class="arabic simple">
-<li>Definir um número de classes <tt class="xref py py-mod docutils literal"><span class="pre">django.forms</span></tt> e
-<tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt> &#8211; uma por página do wizard.</li>
+<li>Definir um número de classes <tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt> &#8211;
+uma por página do wizard.</li>
 <li>Criar uma classe <a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard" title="django.contrib.formtools.wizard.FormWizard"><tt class="xref py py-class docutils literal"><span class="pre">FormWizard</span></tt></a> que
 especifica o que fazer uma vez que todos os seus formulários foram
 submetidos e validados. Isso também permite você sobrescrever alguns
@@ -134,17 +132,16 @@ comportamentos do wizard.</li>
 <li>Criar alguns templates que renderizam formulários. Você pode definir um
 único template genérico para manipular todos os formulários, ou definir
 um template específico para cada formulário.</li>
-<li>Apontar seu URLconf para sua classe
-<a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard" title="django.contrib.formtools.wizard.FormWizard"><tt class="xref py py-class docutils literal"><span class="pre">FormWizard</span></tt></a>.</li>
+<li>Apontar seu URLconf para sua classe <a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard" title="django.contrib.formtools.wizard.FormWizard"><tt class="xref py py-class docutils literal"><span class="pre">FormWizard</span></tt></a>.</li>
 </ol>
 </div>
 <div class="section" id="s-definindo-classes-form">
 <span id="definindo-classes-form"></span><h2>Definindo classes <tt class="docutils literal"><span class="pre">Form</span></tt><a class="headerlink" href="#definindo-classes-form" title="Permalink to this headline">¶</a></h2>
 <p>o primeiro passo para criar um &#8220;form wizard&#8221; é criar as classes
-<tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt>. Estes deveriam ser padronizados com as
-classes <tt class="xref py py-mod docutils literal"><span class="pre">django.forms</span></tt> e <tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt>, explanados na
-<a class="reference internal" href="../../../topics/forms/index.html"><em>documentação do forms</em></a>.</p>
-<p>Estas classes podem estar em qualquer lugar de sua base de código, mas por
+<tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt>. Estes devel ser classses
+<tt class="xref py py-class docutils literal"><span class="pre">django.forms.Form</span></tt> padrão conforme explicado na
+<a class="reference internal" href="../../../topics/forms/index.html"><em>documentação do forms</em></a>. Estas classes podem estar
+em qualquer lugar de sua base de código, mas por
 convenção são postas num arquivo chamado <tt class="file docutils literal"><span class="pre">forms.py</span></tt> dentro da sua
 aplicação.</p>
 <p>Por exemplo, vamos escrever um wizard &#8220;contact form&#8221;, onde a primeira página
@@ -394,6 +391,34 @@ querer setar um <tt class="docutils literal"><span class="pre">self.extra_contex
 </dd></dl>
 
 </div>
+<div class="section" id="s-providing-initial-data-for-the-forms">
+<span id="providing-initial-data-for-the-forms"></span><h2>Providing initial data for the forms<a class="headerlink" href="#providing-initial-data-for-the-forms" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="django.contrib.formtools.wizard.FormWizard.initial">
+<tt class="descclassname">FormWizard.</tt><tt class="descname">initial</tt><a class="headerlink" href="#django.contrib.formtools.wizard.FormWizard.initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initial data for a wizard's <tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt> objects can be
+provided using the optional <a class="reference internal" href="#django.contrib.formtools.wizard.FormWizard.initial" title="django.contrib.formtools.wizard.FormWizard.initial"><tt class="xref py py-attr docutils literal"><span class="pre">initial</span></tt></a> keyword argument.
+This argument should be a dictionary mapping a step to a dictionary
+containing the initial data for that step. The dictionary of initial data
+will be passed along to the constructor of the step's
+<tt class="xref py py-class docutils literal"><span class="pre">Form</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">testapp.forms</span> <span class="kn">import</span> <span class="n">ContactForm1</span><span class="p">,</span> <span class="n">ContactForm2</span><span class="p">,</span> <span class="n">ContactWizard</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">initial</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;subject&#39;</span><span class="p">:</span> <span class="s">&#39;Hello&#39;</span><span class="p">,</span> <span class="s">&#39;sender&#39;</span><span class="p">:</span> <span class="s">&#39;user@example.com&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="s">&#39;Hi there!&#39;</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wiz</span> <span class="o">=</span> <span class="n">ContactWizard</span><span class="p">([</span><span class="n">ContactForm1</span><span class="p">,</span> <span class="n">ContactForm2</span><span class="p">],</span> <span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form1</span> <span class="o">=</span> <span class="n">wiz</span><span class="o">.</span><span class="n">get_form</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form2</span> <span class="o">=</span> <span class="n">wiz</span><span class="o">.</span><span class="n">get_form</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form1</span><span class="o">.</span><span class="n">initial</span>
+<span class="go">{&#39;sender&#39;: &#39;user@example.com&#39;, &#39;subject&#39;: &#39;Hello&#39;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form2</span><span class="o">.</span><span class="n">initial</span>
+<span class="go">{&#39;message&#39;: &#39;Hi there!&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -416,6 +441,7 @@ querer setar um <tt class="docutils literal"><span class="pre">self.extra_contex
 <li><a class="reference internal" href="#criando-templates-para-formularios">Criando templates para formulários</a></li>
 <li><a class="reference internal" href="#ligando-o-wizard-num-urlconf">Ligando o wizard num URLconf</a></li>
 <li><a class="reference internal" href="#metodos-avancados-do-formwizard">Métodos avançados do FormWizard</a></li>
+<li><a class="reference internal" href="#providing-initial-data-for-the-forms">Providing initial data for the forms</a></li>
 </ul>
 </li>
 </ul>

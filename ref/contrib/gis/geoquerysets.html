@@ -235,7 +235,7 @@ lookup geometry's bounding box.</p>
 <div class="section" id="s-contains-properly">
 <span id="s-std:fieldlookup-contains_properly"></span><span id="contains-properly"></span><span id="std:fieldlookup-contains_properly"></span><h3>contains_properly<a class="headerlink" href="#contains-properly" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p><em>Availability</em>: PostGIS</p>
 <p>Returns true if the lookup geometry intersects the interior of the
 geometry field, but not the boundary (or exterior). <a class="footnote-reference" href="#fncontainsproperly" id="id2">[4]</a></p>
@@ -1004,7 +1004,7 @@ of the queryset; otherwise sets with None.</p>
 <dd></dd></dl>
 
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p><em>Availability</em>: PostGIS</p>
 <p>Returns a modified version of the polygon/multipolygon in which all
 of the vertices follow the Right-Hand-Rule, and attaches as a
@@ -1018,7 +1018,7 @@ of the vertices follow the Right-Hand-Rule, and attaches as a
 <dd></dd></dl>
 
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p><em>Availability</em>: PostGIS, Oracle</p>
 <p>Reverse the coordinate order of the geometry field, and attaches as a
 <tt class="docutils literal"><span class="pre">reverse</span></tt> attribute on each element of the queryset.</p>
@@ -1040,7 +1040,7 @@ of the vertices follow the Right-Hand-Rule, and attaches as a
 <dd></dd></dl>
 
 <div class="versionadded">
-<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.1:</span> <a class="reference internal" href="../../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
 <p>Snap all points of the input geometry to the grid.  How the
 geometry is snapped to the grid depends on how many numeric
 (either float, integer, or long) arguments are given.</p>
@@ -1174,7 +1174,7 @@ of the geometry field in each model converted to the requested output format.</p
 <dd></dd></dl>
 
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>Attaches a <tt class="docutils literal"><span class="pre">geohash</span></tt> attribute to every model the the queryset
 containing the <a class="reference external" href="http://geohash.org/">GeoHash</a> representation of the geometry.</p>
 </div>
@@ -1186,7 +1186,7 @@ containing the <a class="reference external" href="http://geohash.org/">GeoHash<
 <dd></dd></dl>
 
 <div class="versionadded">
-<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.1:</span> <a class="reference internal" href="../../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
 <p><em>Availability</em>: PostGIS</p>
 <p>Attaches a <tt class="docutils literal"><span class="pre">geojson</span></tt> attribute to every model in the queryset that contains the
 <a class="reference external" href="http://geojson.org/">GeoJSON</a> representation of the geometry.</p>
@@ -1374,7 +1374,7 @@ the <tt class="docutils literal"><span class="pre">GeoQuerySet</span></tt>; othe
 <div class="section" id="s-spatial-aggregates">
 <span id="spatial-aggregates"></span><h2>Spatial Aggregates<a class="headerlink" href="#spatial-aggregates" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
-<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.1:</span> <a class="reference internal" href="../../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
 <div class="section" id="s-aggregate-methods">
 <span id="aggregate-methods"></span><h3>Aggregate Methods<a class="headerlink" href="#aggregate-methods" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="s-collect">
@@ -1385,7 +1385,7 @@ the <tt class="docutils literal"><span class="pre">GeoQuerySet</span></tt>; othe
 <dd></dd></dl>
 
 <div class="versionadded">
-<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.1:</span> <a class="reference internal" href="../../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
 <p><em>Availability</em>: PostGIS</p>
 <p>Returns a <tt class="docutils literal"><span class="pre">GEOMETRYCOLLECTION</span></tt> or a <tt class="docutils literal"><span class="pre">MULTI</span></tt> geometry object from the geometry
 column.  This is analagous to a simplified version of the <a class="reference internal" href="#django.contrib.gis.db.models.GeoQuerySet.unionagg" title="django.contrib.gis.db.models.GeoQuerySet.unionagg"><tt class="xref py py-meth docutils literal"><span class="pre">GeoQuerySet.unionagg()</span></tt></a> method,
@@ -1418,7 +1418,7 @@ lower left coordinate and the upper right coordinate.</p>
 <dd></dd></dl>
 
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p><em>Availability</em>: PostGIS</p>
 <p>Returns the 3D extent of the <tt class="docutils literal"><span class="pre">GeoQuerySet</span></tt> as a six-tuple, comprising
 the lower left coordinate and upper right coordinate.</p>
@@ -1521,7 +1521,7 @@ details.</td>
 <dd></dd></dl>
 
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>Returns the same as the <a class="reference internal" href="#django.contrib.gis.db.models.GeoQuerySet.extent3d" title="django.contrib.gis.db.models.GeoQuerySet.extent3d"><tt class="xref py py-meth docutils literal"><span class="pre">GeoQuerySet.extent3d()</span></tt></a> aggregate method.</p>
 </div>
 <div class="section" id="s-makeline">

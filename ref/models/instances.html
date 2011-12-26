@@ -110,7 +110,7 @@ para isso, você precisa do <tt class="docutils literal"><span class="pre">save(
 <div class="section" id="s-validating-objects">
 <span id="s-id1"></span><span id="validating-objects"></span><span id="id1"></span><h2>Validating objects<a class="headerlink" href="#validating-objects" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> <a class="reference internal" href="../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.2:</span> <a class="reference internal" href="../../releases/1.2.html"><em>Please, see the release notes</em></a></div>
 <p>There are three steps involved in validating a model:</p>
 <ol class="arabic simple">
 <li>Validate the model fields</li>
@@ -212,9 +212,9 @@ will not be checked.</p>
 <dd></dd></dl>
 
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> The <tt class="docutils literal"><span class="pre">force_insert</span></tt> and <tt class="docutils literal"><span class="pre">force_update</span></tt> arguments were added.</div>
+<span class="title">Novo no Django 1.0:</span> The <tt class="docutils literal"><span class="pre">force_insert</span></tt> and <tt class="docutils literal"><span class="pre">force_update</span></tt> arguments were added.</div>
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> The <tt class="docutils literal"><span class="pre">using</span></tt> argument was added.</div>
+<span class="title">Novo no Django 1.2:</span> The <tt class="docutils literal"><span class="pre">using</span></tt> argument was added.</div>
 <p>If you want customized saving behavior, you can override this
 <tt class="docutils literal"><span class="pre">save()</span></tt> method. See <a class="reference internal" href="../../topics/db/models.html#overriding-model-methods"><em>Sobrescrevendo métodos de model predefinidos</em></a> for more
 details.</p>
@@ -239,7 +239,7 @@ campo. Veja a documentação para <tt class="docutils literal"><span class="pre"
 <div class="section" id="s-a-propriedade-pk">
 <span id="a-propriedade-pk"></span><h4>A propriedade <tt class="docutils literal"><span class="pre">pk</span></tt><a class="headerlink" href="#a-propriedade-pk" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <dl class="attribute">
 <dt id="django.db.models.Model.pk">
 <tt class="descclassname">Model.</tt><tt class="descname">pk</tt><a class="headerlink" href="#django.db.models.Model.pk" title="Permalink to this definition">¶</a></dt>
@@ -273,7 +273,7 @@ será atualizado no banco de dados:</p>
 <span class="n">b4</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>  <span class="c"># Sobrescreve o blog já existente com ID=3!</span>
 </pre></div>
 </div>
-<p>Veja <a href="#id2"><span class="problematic" id="id3">`Como o Django sabe quando fazer UPDATE vs. INSERT`_</span></a>, abaixo, para entender
+<p>Veja <a class="reference internal" href="#como-o-django-sabe-quando-fazer-update-ou-insert">Como o Django sabe quando fazer UPDATE ou INSERT</a>, abaixo, para entender
 por que isso acontece.</p>
 <p>Especificar explicitamente os valores de auto-primary-key é mais usual para
 salvar objetos em massa, quando você está certo de que não há colisões de chaves
@@ -318,8 +318,8 @@ ação personalizada.</p>
 </li>
 </ol>
 </div>
-<div class="section" id="s-como-o-django-sabe-quando-fazer-update-ou-um-insert">
-<span id="como-o-django-sabe-quando-fazer-update-ou-um-insert"></span><h3>Como o Django sabe quando fazer UPDATE ou um INSERT<a class="headerlink" href="#como-o-django-sabe-quando-fazer-update-ou-um-insert" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="s-como-o-django-sabe-quando-fazer-update-ou-insert">
+<span id="como-o-django-sabe-quando-fazer-update-ou-insert"></span><h3>Como o Django sabe quando fazer UPDATE ou INSERT<a class="headerlink" href="#como-o-django-sabe-quando-fazer-update-ou-insert" title="Permalink to this headline">¶</a></h3>
 <p>Você pode ter notado que os objetos de banco de dados do Django, utilizam o
 mesmo método <tt class="docutils literal"><span class="pre">save()</span></tt> para criar e atualizar objetos. O Django abstrai a
 necessidade de uso do <tt class="docutils literal"><span class="pre">INSERT</span></tt> ou <tt class="docutils literal"><span class="pre">UPDATE</span></tt>. Especificamente, quando você
@@ -343,7 +343,7 @@ UPDATE</a> abaixo.</p>
 <div class="section" id="s-forcando-um-insert-ou-update">
 <span id="s-ref-models-force-insert"></span><span id="forcando-um-insert-ou-update"></span><span id="ref-models-force-insert"></span><h4>Forçando um INSERT ou UPDATE<a class="headerlink" href="#forcando-um-insert-ou-update" title="Permalink to this headline">¶</a></h4>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Em algumas raras circunstâncias, é necessário forçar o método <tt class="docutils literal"><span class="pre">save()</span></tt> a
 executar um SQL <tt class="docutils literal"><span class="pre">INSERT</span></tt> e não retroceder para fazer um <tt class="docutils literal"><span class="pre">UPDATE</span></tt>. Ou
 vice-versa: atualizar, se possível, mas não inserir uma nova linha. Nestes casos
@@ -399,7 +399,7 @@ the actual value that was applied to the updated field:</p>
 <dd></dd></dl>
 
 <div class="versionadded">
-<span class="title">New in Django 1.2:</span> The <tt class="docutils literal"><span class="pre">using</span></tt> argument was added.<p>Emite um SQL <tt class="docutils literal"><span class="pre">DELETE</span></tt> para um objeto. Este somente deleta o objeto no banco
+<span class="title">Novo no Django 1.2:</span> The <tt class="docutils literal"><span class="pre">using</span></tt> argument was added.<p>Emite um SQL <tt class="docutils literal"><span class="pre">DELETE</span></tt> para um objeto. Este somente deleta o objeto no banco
 de dados; a instância do Python persistirá, e conterá dados em seus campos.</p>
 </div>
 <p>For more details, including how to delete objects in bulk, see
@@ -650,7 +650,7 @@ como solução de checagem. Isto garante que nenhum dado será pulado ou duplica
 </ul>
 </li>
 <li><a class="reference internal" href="#o-que-acontece-quando-voce-salva">O que acontece quando você salva?</a></li>
-<li><a class="reference internal" href="#como-o-django-sabe-quando-fazer-update-ou-um-insert">Como o Django sabe quando fazer UPDATE ou um INSERT</a><ul>
+<li><a class="reference internal" href="#como-o-django-sabe-quando-fazer-update-ou-insert">Como o Django sabe quando fazer UPDATE ou INSERT</a><ul>
 <li><a class="reference internal" href="#forcando-um-insert-ou-update">Forçando um INSERT ou UPDATE</a></li>
 </ul>
 </li>

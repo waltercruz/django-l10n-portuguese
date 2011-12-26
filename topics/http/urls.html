@@ -278,7 +278,7 @@ inicial).</p>
 <div class="section" id="s-url">
 <span id="url"></span><h3>url<a class="headerlink" href="#url" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <dl class="function">
 <dt id="django.core.urlresolvers.url">
 <tt class="descname">url</tt>(<em>regex</em>, <em>view</em>, <em>kwargs=None</em>, <em>name=None</em>, <em>prefix=''</em>)<a class="headerlink" href="#django.core.urlresolvers.url" title="Permalink to this definition">¶</a></dt>
@@ -314,7 +314,7 @@ que deve ser chamada se nenhum dos padrões de URL corresponder.</p>
 <p>Por padrão, este valor é <tt class="docutils literal"><span class="pre">'django.views.defaults.page_not_found'</span></tt>, que na
 maioria das vezes deve ser suficiente.</p>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.2:</span> Previous versions of Django only accepted strings representing import paths.</div>
+<span class="title">Alterado no Django 1.2:</span> Previous versions of Django only accepted strings representing import paths.</div>
 </div>
 <div class="section" id="s-handler500">
 <span id="handler500"></span><h3>handler500<a class="headerlink" href="#handler500" title="Permalink to this headline">¶</a></h3>
@@ -329,7 +329,7 @@ quando você tem erros em tempo de execução no código da sua view.</p>
 <p>Por padrão, este valor é <tt class="docutils literal"><span class="pre">'django.views.defaults.server_error'</span></tt>, que na
 maioria das vezes deve ser suficiente.</p>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.2:</span> Previous versions of Django only accepted strings representing import paths.</div>
+<span class="title">Alterado no Django 1.2:</span> Previous versions of Django only accepted strings representing import paths.</div>
 </div>
 <div class="section" id="s-include">
 <span id="include"></span><h3>include<a class="headerlink" href="#include" title="Permalink to this headline">¶</a></h3>
@@ -342,7 +342,7 @@ maioria das vezes deve ser suficiente.</p>
 URLconf que deve ser &quot;incluído&quot; neste local. Veja <a class="reference internal" href="#incluindo-outros-urlconfs">Incluindo outros URLconfs</a>
 abaixo.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
 <p><a class="reference internal" href="#django.core.urlresolvers.include" title="django.core.urlresolvers.include"><tt class="xref py py-func docutils literal"><span class="pre">include()</span></tt></a> also accepts as an argument an iterable that returns URL
 patterns.</p>
 <p>Veja <a class="reference internal" href="#incluindo-outros-urlconfs">Incluindo outros URLconfs</a> abaixo.</p>
@@ -465,7 +465,7 @@ Django encontra <tt class="docutils literal"><span class="pre">include()</span><
 até aquele ponto e envia a string restante ao URLconf incluído para
 processamento adicional.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
 <p>Another possibility is to include additional URL patterns not by specifying the
 URLconf Python module defining them as the <a class="reference internal" href="#include">include</a> argument but by using
 directly the pattern list as returned by <a class="reference internal" href="#patterns">patterns</a> instead. For example:</p>
@@ -663,7 +663,7 @@ o prefixo da view (como explicado em &quot;O prefixo da view&quot; acima) não t
 <div class="section" id="s-nomeando-padroes-de-url">
 <span id="s-naming-url-patterns"></span><span id="nomeando-padroes-de-url"></span><span id="naming-url-patterns"></span><h2>Nomeando padrões de URL<a class="headerlink" href="#nomeando-padroes-de-url" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>É bastante comum usar a mesma função de view em múltiplos padrões de URL em seu
 URLconf. Por exemplo, estes dois padrões de URL apontam para a view
 <tt class="docutils literal"><span class="pre">archive</span></tt>:</p>
@@ -714,7 +714,7 @@ aplicação, diminuirá as chances de colisão. Recomendamos algo como
 <div class="section" id="s-url-namespaces">
 <span id="s-topics-http-reversing-url-namespaces"></span><span id="url-namespaces"></span><span id="topics-http-reversing-url-namespaces"></span><h3>URL namespaces<a class="headerlink" href="#url-namespaces" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
-<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
 <p>Namespaced URLs are specified using the <tt class="docutils literal"><span class="pre">:</span></tt> operator. For example, the main
 index page of the admin application is referenced using <tt class="docutils literal"><span class="pre">admin:index</span></tt>. This
 indicates a namespace of <tt class="docutils literal"><span class="pre">admin</span></tt>, and a named URL of <tt class="docutils literal"><span class="pre">index</span></tt>.</p>
@@ -811,7 +811,7 @@ vertical (<tt class="docutils literal"><span class="pre">&quot;|&quot;</span></t
 corresponderem às requisições recebidas e envia-las para os views, mas você não
 pode reverter tais padrões.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.1:</span> <a class="reference internal" href="../../releases/1.1.html"><em>Please, see the release notes</em></a></div>
 <p>The <tt class="docutils literal"><span class="pre">current_app</span></tt> argument allows you to provide a hint to the resolver
 indicating the application to which the currently executing view belongs.
 This <tt class="docutils literal"><span class="pre">current_app</span></tt> argument is used as a hint to resolve application
@@ -884,7 +884,7 @@ para mais informações.</p>
 <dd></dd></dl>
 
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Normally, you should always use <a class="reference internal" href="#django.core.urlresolvers.reverse" title="django.core.urlresolvers.reverse"><tt class="xref py py-func docutils literal"><span class="pre">reverse()</span></tt></a> or
 <a class="reference internal" href="../../ref/models/instances.html#django.db.models.permalink" title="django.db.models.permalink"><tt class="xref py py-func docutils literal"><span class="pre">permalink()</span></tt></a> to define URLs within your application.
 However, if your application constructs part of the URL hierarchy itself, you

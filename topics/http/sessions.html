@@ -112,7 +112,7 @@ se você não estiver usando um backend de sessão de banco de dados; veja
 </li>
 </ul>
 <div class="versionchanged">
-<span class="title">Changed in Django 1.0:</span> Este passo é opcional se você não está usando o banco de dados sessão
+<span class="title">Alterado no Django 1.0:</span> Este passo é opcional se você não está usando o banco de dados sessão
 backend; veja <a class="reference internal" href="#configurando-o-mecanismo-de-sessao">configurando o mecanismo de sessão</a>.</div>
 <p>Se você não deseja utilizar sessões, você pode remover a linha
 <tt class="docutils literal"><span class="pre">SessionMiddleware</span></tt> do <tt class="docutils literal"><span class="pre">MIDDLEWARE_CLASSES</span></tt> e <tt class="docutils literal"><span class="pre">'django.contrib.sessions'</span></tt>
@@ -121,7 +121,7 @@ de seu <tt class="docutils literal"><span class="pre">INSTALLED_APPS</span></tt>
 <div class="section" id="s-configurando-o-mecanismo-de-sessao">
 <span id="configurando-o-mecanismo-de-sessao"></span><h2>Configurando o mecanismo de sessão<a class="headerlink" href="#configurando-o-mecanismo-de-sessao" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Por padrão, o Django armazena as sessões no seu banco de dados (usando o modelo
 <tt class="docutils literal"><span class="pre">django.contrib.sessions.models.Session</span></tt>). Apesar de ser conveniente, em
 algumas configurações é mais rápido armazenar esses dados em algum outro lugar,
@@ -187,12 +187,12 @@ não está na sessão, uma exceção <tt class="docutils literal"><span class="p
 </li>
 </ul>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <tt class="docutils literal"><span class="pre">setdefault()</span></tt> and <tt class="docutils literal"><span class="pre">clear()</span></tt> são novos nesta versão.</div>
+<span class="title">Novo no Django 1.0:</span> <tt class="docutils literal"><span class="pre">setdefault()</span></tt> and <tt class="docutils literal"><span class="pre">clear()</span></tt> são novos nesta versão.</div>
 <p>Existem também estes métodos:</p>
 <ul>
 <li><p class="first"><tt class="docutils literal"><span class="pre">flush()</span></tt></p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Deleta os dados da sessão corrente da sessão, e re-gera a chave o
 valor da chave da sessão que é enviado de volta para o cookie do usuário.
 Isto é usado se você quer assegurar que os dados de uma sessão prévia não
@@ -217,7 +217,7 @@ abaixo para mais informações.</p>
 </li>
 <li><p class="first"><tt class="docutils literal"><span class="pre">set_expiry(value)</span></tt></p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Configura o tempo de expiração para a sessão. Você pode passar vários
 valores diferentes:</p>
 <ul class="simple">
@@ -235,7 +235,7 @@ global de expiração.</li>
 </li>
 <li><p class="first"><tt class="docutils literal"><span class="pre">get_expiry_age()</span></tt></p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Devolve o número de segundos até que a sessão expire. Para sessões sem
 uma expiração customizada (ou aquelas que são configuradas para expirar
 quando o navegador fecha), esse valor será igual a
@@ -243,7 +243,7 @@ quando o navegador fecha), esse valor será igual a
 </li>
 <li><p class="first"><tt class="docutils literal"><span class="pre">get_expiry_date()</span></tt></p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Devolve a data em que a sessão expirará. Para sessões sem expiração
 customizada (ou aquelas que são configuradas para expirar quando o
 navegador fechar), esse valor é igual à data
@@ -251,7 +251,7 @@ navegador fechar), esse valor é igual à data
 </li>
 <li><p class="first"><tt class="docutils literal"><span class="pre">get_expire_at_browser_close()</span></tt></p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Devolve <tt class="xref docutils literal"><span class="pre">True</span></tt> ou <tt class="xref docutils literal"><span class="pre">False</span></tt>, dependendo se o cookie de sessão do
 usuário expirar quando o navegador Web do usuário for fechado.</p>
 </li>
@@ -338,7 +338,7 @@ Faça isso depois que você verificou que o cookie funcionou.</p>
 <div class="section" id="s-usando-sessoes-fora-das-views">
 <span id="usando-sessoes-fora-das-views"></span><h2>Usando sessões fora das views<a class="headerlink" href="#usando-sessoes-fora-das-views" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Uma API está disponível para manipular os dados da sessão fora de uma view:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.contrib.sessions.backends.db</span> <span class="kn">import</span> <span class="n">SessionStore</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">SessionStore</span><span class="p">(</span><span class="n">session_key</span><span class="o">=</span><span class="s">&#39;2b1189a188b44ad18c35e113ac6ceead&#39;</span><span class="p">)</span>
@@ -416,7 +416,7 @@ duram enquanto o navegador estiver aberto -- ou seja, eles expirarão assim
 que o usuário fechar o seu navegador. Use isso se você deseja que as pessoas
 tenham de se autenticar toda vez que abrem o seu navegador.</p>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Esse parâmetro é um padrão global que pode ser redefinido para cada sessão
 chamando explicitamente <tt class="docutils literal"><span class="pre">request.session.set_expiry()</span></tt> como descrito acima,
 em <a class="reference internal" href="#utilizando-sessoes-nas-views">utilizando sessões nas views</a>.</p>
@@ -443,7 +443,7 @@ comportamento de sessões:</p>
 <div class="section" id="s-session-engine">
 <span id="session-engine"></span><h3>SESSION_ENGINE<a class="headerlink" href="#session-engine" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Padrão: <tt class="docutils literal"><span class="pre">django.contrib.sessions.backends.db</span></tt></p>
 <p>Controla onde o Django armazena os dados de sessão. Os valores válidos são:</p>
 <ul class="simple">
@@ -456,7 +456,7 @@ comportamento de sessões:</p>
 <div class="section" id="s-session-file-path">
 <span id="session-file-path"></span><h3>SESSION_FILE_PATH<a class="headerlink" href="#session-file-path" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
-<span class="title">New in Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
+<span class="title">Novo no Django 1.0:</span> <a class="reference internal" href="../../releases/1.0.html"><em>Please, see the release notes</em></a></div>
 <p>Padrão: <tt class="docutils literal"><span class="pre">/tmp/</span></tt></p>
 <p>Se você está usando um armazenamento baseado em arquivos, esse parâmetro
 configura o diretório no qual o Django irá armazenar os dados de sessão.</p>

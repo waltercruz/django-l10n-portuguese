@@ -105,6 +105,13 @@ to HTML.</p>
 <tt class="docutils literal"><span class="pre">{%</span> <span class="pre">load</span> <span class="pre">markup</span> <span class="pre">%}</span></tt> in a template, and you&#8217;ll have access to these filters.
 For more documentation, read the source code in
 <tt class="file docutils literal"><span class="pre">django/contrib/markup/templatetags/markup.py</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The output of markup filters is marked &#8220;safe&#8221; and will not be escaped when
+rendered in a template. Always be careful to sanitize your inputs and make
+sure you are not leaving yourself vulnerable to cross-site scripting or
+other types of attacks.</p>
+</div>
 <div class="section" id="s-restructured-text">
 <span id="restructured-text"></span><h2>reStructured Text<a class="headerlink" href="#restructured-text" title="Permalink to this headline">¶</a></h2>
 <p>When using the <tt class="docutils literal"><span class="pre">restructuredtext</span></tt> markup filter you can define a
